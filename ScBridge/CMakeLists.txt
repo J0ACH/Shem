@@ -1,0 +1,19 @@
+MESSAGE(STATUS "\nScBridge init...")
+MESSAGE(STATUS "SC_SCR_DIR : " ${SC_SRC_DIR})
+
+SET (CMAKE_PREFIX_PATH ${SC_SRC_DIR})
+MESSAGE(STATUS "CMAKE_PREFIX_PATH : " ${CMAKE_PREFIX_PATH})
+
+FIND_PACKAGE(SC)
+
+IF(SC_FOUND)
+	MESSAGE(STATUS "SCmodule : " ${SC_FOUND})
+ELSE()
+	MESSAGE(STATUS "SCmodule - nenalezen")
+ENDIF()
+
+SET(ScBridge_src ScBridge.cpp)
+
+ADD_LIBRARY(ScBridge STATIC ${ScBridge_src})
+
+MESSAGE(STATUS "\nScBridge done...")
