@@ -12,6 +12,8 @@ SET(CMAKE_MODULE_PATH
 	${SC_SRC_DIR}/cmake_modules/
 )
 
+include_directories(SC_INCLUDE_DIR)
+
 ### Compiler setup ########################
 
 IF(CMAKE_GENERATOR MATCHES "Visual Studio 12 2013")

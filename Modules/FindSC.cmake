@@ -2,19 +2,28 @@ MESSAGE(STATUS "\nFindSC init...")
 MESSAGE(STATUS "SC_SRC_DIR : " ${SC_SRC_DIR})
 
 FIND_PATH(
-    LANG_INCLUDE_DIR
+    SC_INCLUDE_DIR
     NAMES SC_LanguageClient.h
-    PATHS ${SC_SRC_DIR}/include/lang
+    PATHS "${SC_SRC_DIR}/include/lang"
 )
 MESSAGE(STATUS "LANG_INCLUDE_DIR : " ${LANG_INCLUDE_DIR})
 
+
+
 FIND_LIBRARY(
-    LANG_LINK_DIR
-    NAMES sclang libsclang.a libsclang.dll libsclang.dynlib
+  SC_LIBRARY
+    NAMES sclang libsclang
     HINTS ${SC_BUILD_DIR}/lang
     PATHS ${SC_BUILD_DIR}/lang
     PATH_SUFFIXES Release
 )
+
+set(SC_FOUND "NO")
+
+if( SC_INCLUDE_DIR AND SC_LIBRARY)
+  SET(SC_FOUND "YES")
+endif()
+
 
 MESSAGE(STATUS "LANG_LINK_DIR : " ${LANG_LINK_DIR})
 
