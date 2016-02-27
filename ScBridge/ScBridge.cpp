@@ -25,7 +25,7 @@
 #include <QDebug>
 */
 
-#include "SC_LanguageClient.h"
+#include <SC_LanguageClient.h>
 
 /*
 int main(int argc, char** argv){

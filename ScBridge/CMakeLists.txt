@@ -12,6 +12,8 @@ ELSE()
 	MESSAGE(STATUS "SCmodule - nenalezen")
 ENDIF()
 
+include_directories(SC_INCLUDE_DIR)
+
 SET(ScBridge_src ScBridge.cpp)
 
 ADD_LIBRARY(ScBridge STATIC ${ScBridge_src})
