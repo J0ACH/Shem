@@ -7,8 +7,10 @@ MESSAGE(STATUS "\nShem init...")
 SET(SC_SRC_DIR "D:/Supercollider/supercollider" CACHE PATH "Supercollider source path")
 SET(SC_BUILD_DIR "D:/Supercollider/Supercollider_findModules" CACHE PATH "Supercollider build path")
 
-SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules )
-LIST(APPEND CMAKE_MODULE_PATH "${SC_SRC_DIR}/cmake_modules/")
+SET(CMAKE_MODULE_PATH 
+	${CMAKE_CURRENT_SOURCE_DIR}/Modules 
+	${SC_SRC_DIR}/cmake_modules/
+)
 
 ### Compiler setup ########################
 
