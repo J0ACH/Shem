@@ -2,26 +2,41 @@ MESSAGE(STATUS "\nFindSC init...")
 MESSAGE(STATUS "SC_SRC_DIR : " ${SC_SRC_DIR})
 
 FIND_PATH(
-    SC_INCLUDE_DIR
-    NAMES SC_LanguageClient.h
-    PATHS "${SC_SRC_DIR}/include/lang"
-)
-MESSAGE(STATUS "LANG_INCLUDE_DIR : " ${LANG_INCLUDE_DIR})
+  SC_INCLUDE_DIR
+  NAMES SC_LanguageClient.h
+  PATHS "${SC_SRC_DIR}/include/lang"
+  )
+
+FIND_PATH(
+  SC_INCLUDE_DIRS
+  NAMES SC_Export.h
+  PATHS "${SC_SRC_DIR}/include/common"
+  )
+
+MESSAGE(STATUS "SC_INCLUDE_DIR : " ${SC_INCLUDE_DIR})
+MESSAGE(STATUS "SC_INCLUDE_DIRS : " ${SC_INCLUDE_DIRS})
+
 
 
 
 FIND_LIBRARY(
   SC_LIBRARY
-    NAMES sclang libsclang
-    HINTS ${SC_BUILD_DIR}/lang
-    PATHS ${SC_BUILD_DIR}/lang
-    PATH_SUFFIXES Release
-)
+  NAMES sclang libsclang
+  HINTS ${SC_BUILD_DIR}/lang
+  PATHS ${SC_BUILD_DIR}/lang
+  PATH_SUFFIXES Release
+  )
 
-set(SC_FOUND "NO")
+
+#find_package_handle_standard_args(SC FOUND_VAR SC_FOUND
+#  REQUIRED_VARS SC_LIBRARY SC_INCLUDE_DIR SC_INCLUDE_DIRS
+#  VERSION_VAR SC_VERSION_STRING)
+
+
+set(SC_FOUND FALSE)
 
 if( SC_INCLUDE_DIR AND SC_LIBRARY)
-  SET(SC_FOUND "YES")
+  SET(SC_FOUND TRUE)
 endif()
 
 

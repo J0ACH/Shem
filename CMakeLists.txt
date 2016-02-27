@@ -12,7 +12,6 @@ SET(CMAKE_MODULE_PATH
 	${SC_SRC_DIR}/cmake_modules/
 )
 
-include_directories(SC_INCLUDE_DIR)
 
 ### Compiler setup ########################
 

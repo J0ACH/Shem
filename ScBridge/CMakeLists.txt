@@ -8,6 +8,8 @@ FIND_PACKAGE(SC)
 
 IF(SC_FOUND)
 	MESSAGE(STATUS "SCmodule : " ${SC_FOUND})
+        include_directories(${SC_INCLUDE_DIR})
+        include_directories(${SC_INCLUDE_DIRS})
 ELSE()
 	MESSAGE(STATUS "SCmodule - nenalezen")
 ENDIF()
@@ -16,5 +18,6 @@ ENDIF()
 SET(ScBridge_src ScBridge.cpp)
 
 ADD_LIBRARY(ScBridge STATIC ${ScBridge_src})
+
 
 MESSAGE(STATUS "\nScBridge done...")
