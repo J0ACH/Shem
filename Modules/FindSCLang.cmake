@@ -16,7 +16,7 @@ FIND_PATH(
 
 FIND_PATH(
   SC_LANG_LIBRARY_DIR
-  NAMES libsclang.lib
+  NAMES libsclang.lib libsclang.a
   PATHS "${SC_BUILD_DIR}/lang"
   PATH_SUFFIXES Release
 )
