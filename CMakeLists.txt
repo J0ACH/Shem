@@ -1,17 +1,17 @@
 PROJECT (Shem)
 
+### Project setup ########################
+
 CMAKE_MINIMUM_REQUIRED ( VERSION 3.4 )
+
+SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+
+### Path setup ########################
 
 MESSAGE(STATUS "\nShem init...")
 
-SET(SC_SRC_DIR "D:/Supercollider/supercollider" CACHE PATH "Supercollider source path")
-SET(SC_BUILD_DIR "D:/Supercollider/Supercollider_findModules" CACHE PATH "Supercollider build path")
-
-SET(CMAKE_MODULE_PATH 
-	${CMAKE_CURRENT_SOURCE_DIR}/Modules 
-	${SC_SRC_DIR}/cmake_modules/
-)
-
+SET(SC_SRC_DIR "C:/Supercollider/supercollider" CACHE PATH "Supercollider source path")
+SET(SC_BUILD_DIR "C:/Supercollider/Supercollider_findModules" CACHE PATH "Supercollider build path")
 
 ### Compiler setup ########################
 
@@ -27,11 +27,30 @@ IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	SET(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/Install" CACHE STRING "Cmake install path" FORCE)
 ENDIF()
 
-### Subdirectories ########################
+### Modules setup ########################
 
+SET(CMAKE_MODULE_PATH 
+	${CMAKE_CURRENT_SOURCE_DIR}/Modules 
+	${SC_SRC_DIR}/cmake_modules/
+)
+
+FILE(GLOB_RECURSE SHEM_MODULES ${CMAKE_SOURCE_DIR}/Modules/*.cmake )
+
+MESSAGE(STATUS "Modules found:")
+FOREACH(ONEMODULE ${SHEM_MODULES})
+	MESSAGE(STATUS "\t - " ${ONEMODULE})
+    #add_test(NAME ${TEST}  COMMAND $<TARGET_FILE:${TEST}>)
+    #set_tests_properties( ${TEST} PROPERTIES TIMEOUT 1) 
+    #set_property(TARGET ${TEST} PROPERTY FOLDER "Modules")
+	#source_group("Modules" FILES ${TEST})
+ENDFOREACH(ONEMODULE)
+
+### Subdirectories ########################
 
 #ADD_SUBDIRECTORY(Modules)
 ADD_SUBDIRECTORY(ScBridge)
+
+
 
 
 MESSAGE(STATUS "\nShem done...")

@@ -46,6 +46,9 @@ ScBridge::ScBridge()
 {
 	SC_LanguageClient * client = createLanguageClient("sclang");
 
+	//client->runMain();
+	//client->setCmdLine("s.boot;");
+
 	/*
 	QStringList arguments(QApplication::arguments());
 	arguments.pop_front(); // application path
