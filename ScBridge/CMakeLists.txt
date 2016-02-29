@@ -7,10 +7,8 @@ MESSAGE(STATUS "SC_SRC_DIR : " ${SC_SRC_DIR})
 #LINK_DIRECTORIES()
 
 SET(ScBridge_hdr ScBridge.h)
-
 SET(ScBridge_src ScBridge.cpp)
 
- 
 ADD_LIBRARY(ScBridge ${ScBridge_src} ${ScBridge_hdr})
 
 #TARGET_LINK_LIBRARIES(ScBridge libsclang)
