@@ -13,6 +13,7 @@ MESSAGE(STATUS "\nShem init...")
 SET(SC_SRC_DIR "/home/kof/src/supercollider" CACHE PATH "Supercollider source path")
 SET(SC_BUILD_DIR "/home/kof/src/supercollider/build" CACHE PATH "Supercollider build path")
 
+
 ### Compiler setup ########################
 
 IF(CMAKE_GENERATOR MATCHES "Visual Studio 12 2013")
@@ -30,11 +31,14 @@ ENDIF()
 ### Modules setup ########################
 
 SET(CMAKE_MODULE_PATH 
-	${CMAKE_CURRENT_SOURCE_DIR}/Modules 
+	${CMAKE_SOURCE_DIR}/Modules 
 	${SC_SRC_DIR}/cmake_modules/
 )
 
+
 FILE(GLOB_RECURSE SHEM_MODULES ${CMAKE_SOURCE_DIR}/Modules/*.cmake )
+
+find_package(Sc)
 
 MESSAGE(STATUS "Modules found:")
 FOREACH(ONEMODULE ${SHEM_MODULES})
