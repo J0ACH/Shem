@@ -1,15 +1,12 @@
 MESSAGE(STATUS "\nQuant init...")
 MESSAGE(STATUS "SC_SRC_DIR : " ${SC_SRC_DIR})
 
+# FIND QT #############################################
 
 FIND_PACKAGE(Qt5Core)
 FIND_PACKAGE(Qt5Widgets)
 FIND_PACKAGE(Qt5Gui)
-FIND_PACKAGE(ScBridge)
 
-if(SCBRIDGE_FOUND)
-  MESSAGE(STATUS "OK got SCBRIDGE!")
-endif()
 
 SET(QT_LIBRARIES 
   Qt5::Core
@@ -17,20 +14,41 @@ SET(QT_LIBRARIES
   Qt5::Widgets
   )
 
+
+# PATHS  ############################################
+
 INCLUDE_DIRECTORIES(
-  ${SCBRIDGE_INCLUDE_DIR}
+  "${CMAKE_SOURCE_DIR}/ScBridge"
   )
 
-SET(Quant_hdr Quant.h)
+link_directories(
+  ${CMAKE_BINARY_DIR}/ScBridge
+  )
 
+
+# SOURCES ##################################################
+
+SET(Quant_hdr Quant.h)
 SET(Quant_src Quant.cpp)
 
-ADD_EXECUTABLE(Quant WIN32 ${Quant_hdr} ${Quant_src})
+
+
+if(UNIX)
+  ADD_EXECUTABLE(Quant ${Quant_hdr} ${Quant_src})
+else()
+  ADD_EXECUTABLE(Quant WIN32 ${Quant_hdr} ${Quant_src})
+endif()
+
+
+# LINKER #######################################################
 
 TARGET_LINK_LIBRARIES(Quant
   ${QT_LIBRARIES}
-    ${SCBRIDGE_LIBRARY}
+  ScBridge
   )
+
+
+# INSTALL ########################################################
 
 INSTALL(TARGETS Quant DESTINATION ${CMAKE_BINARY_DIR}/Install)
 
