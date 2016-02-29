@@ -4,8 +4,8 @@ MESSAGE(STATUS "SC_SRC_DIR : " ${SC_SRC_DIR})
 #FIND_PACKAGE(SC)
 
 INCLUDE_DIRECTORIES(
-    ${SC_SRC_DIR}/include/lang
-    ${SC_SRC_DIR}/include/common
+    ${SC_SOURCE_DIR}/include/lang
+    ${SC_SOURCE_DIR}/include/common
   )
 #LINK_DIRECTORIES()
 

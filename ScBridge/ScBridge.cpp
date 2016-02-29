@@ -3,9 +3,10 @@
 
 
 
+
 ScBridge::ScBridge()
 {
-    SC_LanguageClient * client = createLanguageClient("sclang");
+    SC_LanguageClient *client = createLanguageClient("sclang");
 
 	client->runMain();
 	client->setCmdLine("s.boot;");
