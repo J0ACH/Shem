@@ -18,12 +18,14 @@ ENDIF()
 #INCLUDE_DIRECTORIES()
 #LINK_DIRECTORIES()
 
+SET(ScBridge_hdr ScBridge.h)
+
 SET(ScBridge_src ScBridge.cpp)
 
  
-ADD_LIBRARY(ScBridge ${ScBridge_src})
+ADD_LIBRARY(ScBridge ${ScBridge_src} ${ScBridge_hdr})
 
-TARGET_LINK_LIBRARIES(ScBridge libsclang)
+#TARGET_LINK_LIBRARIES(ScBridge libsclang)
 
 IF(SC_LANG_FOUND)
     MESSAGE(STATUS "Linking Scalng..")
@@ -31,7 +33,7 @@ IF(SC_LANG_FOUND)
   # TARGET_LINK_LIBRARIES(ScBridgeApp ${SC_LANG_LIBRARY})
 ENDIF()
 
-#INSTALL(TARGETS ScBridge DESTINATION  ${CMAKE_BINARY_DIR}/Install)
+INSTALL(TARGETS ScBridge DESTINATION  ${CMAKE_CURRENT_BINARY_DIR})
 
 
 MESSAGE(STATUS "\nScBridge done...")

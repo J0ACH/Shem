@@ -17,7 +17,7 @@ INCLUDE_DIRECTORIES(
 )
 
 LINK_DIRECTORIES(
-	${CMAKE_BINARY_DIR}/ScBridge/Release
+	${CMAKE_BINARY_DIR}/ScBridge
 )
 
 SET(Quant_hdr Quant.h)
@@ -28,6 +28,8 @@ ADD_EXECUTABLE(Quant WIN32 ${Quant_hdr} ${Quant_src})
 
 TARGET_LINK_LIBRARIES(Quant
 	${QT_LIBRARIES}
+	${CMAKE_BINARY_DIR}/ScBridge/Release/ScBridge.lib
+	${CMAKE_BINARY_DIR}/ScBridge/libScBridge.a
 	)
 
 INSTALL(TARGETS Quant DESTINATION ${CMAKE_BINARY_DIR}/Install)
