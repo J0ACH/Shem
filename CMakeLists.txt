@@ -47,9 +47,9 @@ ENDFOREACH(ONEMODULE)
 
 ### Subdirectories ########################
 
-#ADD_SUBDIRECTORY(Modules)
-ADD_SUBDIRECTORY(ScBridge)
 
+ADD_SUBDIRECTORY(ScBridge)
+ADD_SUBDIRECTORY(Quant)
 
 
 
