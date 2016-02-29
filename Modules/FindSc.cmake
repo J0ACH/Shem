@@ -17,9 +17,9 @@ IF(SC_SOURCE_DIR)
   message(status "Ok got supercollider source dir, and it is FOUND! : " + ${SC_SOURCE_DIR})
 
 else()
-  message(status "Oh no, I coundn't find SUpercollider juicy path!")
-  mark_as_advanced(CLEAR SC_SRC_DIR)
-  mark_as_advanced(CLEAR SC_BUILD_DIR)
+  message(status "Oh no, I coundn't find SuperCollider source path!")
+  mark_as_advanced(CLEAR ${SC_SRC_DIR})
+  mark_as_advanced(CLEAR ${SC_BUILD_DIR})
 ENDIF()
 
 
