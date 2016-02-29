@@ -18,8 +18,8 @@ IF(SC_SOURCE_DIR)
 
 else()
   message(status "Oh no, I coundn't find SUpercollider juicy path!")
-  mark_as_advanced(SC_SRC_DIR)
-  mark_as_advanced(SC_BUILD_DIR)
+  mark_as_advanced(CLEAR SC_SRC_DIR)
+  mark_as_advanced(CLEAR SC_BUILD_DIR)
 ENDIF()
 
 
