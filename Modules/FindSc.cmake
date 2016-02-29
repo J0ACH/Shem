@@ -1,5 +1,7 @@
 MESSAGE(STATUS "\nFIND SC init...")
 
+SET(SC_FOUND FALSE)
+
 FIND_PATH(
   SC_SOURCE_DIR
   NAMES SCVersion.txt
@@ -10,16 +12,14 @@ FIND_PATH(
   NO_DEFAULT_PATH
   )
 
-SET(SC_FOUND FALSE)
-
 IF(SC_SOURCE_DIR)
-  SET(SCBRIDGE_FOUND TRUE)
+  SET(SC_FOUND TRUE)
   message(status "Ok got supercollider source dir, and it is FOUND! : " + ${SC_SOURCE_DIR})
 
 else()
   message(status "Oh no, I coundn't find SuperCollider source path!")
-  mark_as_advanced(CLEAR ${SC_SRC_DIR})
-  mark_as_advanced(CLEAR ${SC_BUILD_DIR})
+  mark_as_advanced(CLEAR SC_SRC_DIR)
+  mark_as_advanced(CLEAR SC_BUILD_DIR)
 ENDIF()
 
 
