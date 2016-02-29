@@ -10,8 +10,8 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 MESSAGE(STATUS "\nShem init...")
 
-SET(SC_SRC_DIR "C:/Supercollider/supercollider" CACHE PATH "Supercollider source path")
-SET(SC_BUILD_DIR "C:/Supercollider/Supercollider_findModules" CACHE PATH "Supercollider build path")
+SET(SC_SRC_DIR "/home/kof/src/supercollider" CACHE PATH "Supercollider source path")
+SET(SC_BUILD_DIR "/home/kof/src/supercollider/build" CACHE PATH "Supercollider build path")
 
 ### Compiler setup ########################
 

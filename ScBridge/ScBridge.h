@@ -1,6 +1,7 @@
 #ifndef SCBRIDGE_H
 #define SCBRIDGE_H
 
+
 /*
 #include <QAbstractNativeEventFilter>
 #include <QAction>

@@ -1,4 +1,5 @@
 #include "ScBridge.h"
+#include <SC_LanguageClient.h>
 /*
 #include "main.hpp"
 #include "settings/manager.hpp"
@@ -32,10 +33,10 @@
 
 ScBridge::ScBridge()
 {
-//SC_LanguageClient * client = createLanguageClient("sclang");
+    SC_LanguageClient * client = createLanguageClient("sclang");
 
-	//client->runMain();
-	//client->setCmdLine("s.boot;");
+	client->runMain();
+	client->setCmdLine("s.boot;");
 
 	/*
 	QStringList arguments(QApplication::arguments());
