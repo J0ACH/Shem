@@ -30,7 +30,7 @@ ENDIF()
 
 ### Modules setup ########################
 
-LIST(APPEND CMAKE_MODULE_PATH 
+SET(CMAKE_MODULE_PATH 
 	${CMAKE_SOURCE_DIR}/Modules 
 	${SC_SRC_DIR}/cmake_modules/
 )
