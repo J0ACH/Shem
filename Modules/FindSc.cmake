@@ -12,13 +12,14 @@ FIND_PATH(
 
 SET(SC_FOUND FALSE)
 
-IF(SC_FOUND)
+IF(SC_SOURCE_DIR)
   SET(SCBRIDGE_FOUND TRUE)
   message(status "Ok got supercollider source dir, and it is FOUND! : " + ${SC_SOURCE_DIR})
 
 else()
   message(status "Oh no, I coundn't find SUpercollider juicy path!")
-
+  mark_as_advanced(SC_SRC_DIR)
+  mark_as_advanced(SC_BUILD_DIR)
 ENDIF()
 
 
