@@ -1,8 +1,5 @@
 #include "ScBridge.h"
-#include <SC_LanguageClient.h>
-
-
-
+#include "SC_LanguageClient.h"
 
 ScBridge::ScBridge()
 {
