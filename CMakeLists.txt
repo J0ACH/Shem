@@ -10,10 +10,6 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 MESSAGE(STATUS "\nShem init...")
 
-#SET(SC_SRC_DIR "/home/kof/src/supercollider" CACHE PATH "Supercollider source path")
-#SET(SC_BUILD_DIR "/home/kof/src/supercollider/build" CACHE PATH "Supercollider build path")
-
-
 ### Compiler setup ########################
 
 IF(CMAKE_GENERATOR MATCHES "Visual Studio 12 2013")
@@ -32,7 +28,7 @@ ENDIF()
 
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Modules)
 
-FIND_PACKAGE(Sc)
+FIND_PACKAGE(Sc) # looking for SC
 
 LIST(APPEND CMAKE_MODULE_PATH 
         #${CMAKE_MODULE_PATH}	
@@ -49,10 +45,7 @@ ENDFOREACH(ONE_CMAKE_MODULEPATH)
 
 ### Subdirectories ########################
 
-
 ADD_SUBDIRECTORY(ScBridge)
 ADD_SUBDIRECTORY(Quant)
-
-
 
 MESSAGE(STATUS "\nShem done...")
