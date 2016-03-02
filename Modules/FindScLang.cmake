@@ -26,7 +26,7 @@ FIND_PATH(
 
 FIND_LIBRARY(
   SCLANG_LIBRARY
-  NAMES libsclang
+  NAMES libsclang sclang
   PATHS ${SC_BUILD_DIR}/lang
   PATH_SUFFIXES "Release"
 )

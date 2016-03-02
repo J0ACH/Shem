@@ -41,10 +41,11 @@ SET(SC_BUILD_FOUND FALSE)
 
 FIND_PATH(
   SC_BUILD_DIR
-  NAMES SuperCollider.sln
+  NAMES SuperCollider.sln build_sclang.cfg
   PATHS 
-  #"/home/kof/src/supercollider/build"
+  "C:/Supercollider/Supercollider_findModules"
   "D:/Supercollider/Supercollider_3.7"
+  "/home/kof/src/supercollider/build"
   ONLY_CMAKE_FIND_ROOT_PATH
 )
 
