@@ -1,3 +1,5 @@
+PROJECT (Quant)
+
 MESSAGE(STATUS "\nQuant init...")
 MESSAGE(STATUS "SC_SRC_DIR : " ${SC_SRC_DIR})
 

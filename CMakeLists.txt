@@ -10,8 +10,8 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 MESSAGE(STATUS "\nShem init...")
 
-SET(SC_SRC_DIR "/home/kof/src/supercollider" CACHE PATH "Supercollider source path")
-SET(SC_BUILD_DIR "/home/kof/src/supercollider/build" CACHE PATH "Supercollider build path")
+#SET(SC_SRC_DIR "/home/kof/src/supercollider" CACHE PATH "Supercollider source path")
+#SET(SC_BUILD_DIR "/home/kof/src/supercollider/build" CACHE PATH "Supercollider build path")
 
 
 ### Compiler setup ########################
@@ -30,25 +30,22 @@ ENDIF()
 
 ### Modules setup ########################
 
-SET(CMAKE_MODULE_PATH 
-        ${CMAKE_MODULE_PATH}	
-        ${CMAKE_SOURCE_DIR}/Modules 
-	${SC_SRC_DIR}/cmake_modules/
+SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Modules)
+
+FIND_PACKAGE(Sc)
+
+LIST(APPEND CMAKE_MODULE_PATH 
+        #${CMAKE_MODULE_PATH}	
+        ${SC_SOURCE_DIR}/cmake_modules
 )
 
-
-FILE(GLOB_RECURSE SHEM_MODULES ${CMAKE_SOURCE_DIR}/Modules/*.cmake )
-
-find_package(Sc)
-
-MESSAGE(STATUS "Modules found:")
-FOREACH(ONEMODULE ${SHEM_MODULES})
-	MESSAGE(STATUS "\t - " ${ONEMODULE})
-    #add_test(NAME ${TEST}  COMMAND $<TARGET_FILE:${TEST}>)
-    #set_tests_properties( ${TEST} PROPERTIES TIMEOUT 1) 
-    #set_property(TARGET ${TEST} PROPERTY FOLDER "Modules")
-	#source_group("Modules" FILES ${TEST})
-ENDFOREACH(ONEMODULE)
+MESSAGE(STATUS "Shem can use this modules:")
+FOREACH(ONE_CMAKE_MODULEPATH ${CMAKE_MODULE_PATH})	
+	FILE(GLOB_RECURSE ONE_PATH_MODULES ${ONE_CMAKE_MODULEPATH}/*.cmake )
+	FOREACH(SHEM_MODULES ${ONE_PATH_MODULES})
+		MESSAGE(STATUS "\t - " ${SHEM_MODULES})
+	ENDFOREACH(SHEM_MODULES)
+ENDFOREACH(ONE_CMAKE_MODULEPATH)
 
 ### Subdirectories ########################
 
