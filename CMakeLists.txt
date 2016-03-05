@@ -47,6 +47,10 @@ ENDFOREACH(ONE_CMAKE_MODULEPATH)
 
 ### Subdirectories ########################
 
+#INCLUDE(${SC_SOURCE_DIR})
+#INCLUDE(${SC_SOURCE_DIR}/CMakeLists.txt)
+#ADD_SUBDIRECTORY(SuperCollider)
+
 ADD_SUBDIRECTORY(ScBridge)
 ADD_SUBDIRECTORY(Quant)
 

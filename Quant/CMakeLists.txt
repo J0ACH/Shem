@@ -31,10 +31,12 @@ SET(QT_LIBRARIES
 
 INCLUDE_DIRECTORIES(
   "${CMAKE_SOURCE_DIR}/ScBridge"
+#${BRIDGE_INCLUDE_DIRS}
   )
 
 link_directories(
   ${CMAKE_BINARY_DIR}/ScBridge
+
   )
 
 
@@ -57,6 +59,7 @@ endif()
 TARGET_LINK_LIBRARIES(Quant
   ${QT_LIBRARIES}
   ScBridge
+#${BRIDGE_LINK_LIBRARIES}
   )
 
 

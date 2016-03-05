@@ -6,18 +6,46 @@ MESSAGE(STATUS "\nScBridge init...")
 MESSAGE(STATUS "SC_SOURCE_DIR : " ${SC_SOURCE_DIR})
 MESSAGE(STATUS "SC_BUILD_DIR : " ${SC_BUILD_DIR})
 
-FIND_PACKAGE(ScLang)
+#FIND_PACKAGE(ScLang)
+
+#MESSAGE(STATUS "ScLang_EXE FOUND : " ${SCLANG_EXE})
+
+SET(ScBridge_hdr ScBridge.h)
+SET(ScBridge_src ScBridge.cpp)
+
+ADD_LIBRARY(ScBridge ${ScBridge_src} ${ScBridge_hdr})
+
+INCLUDE(ExternalProject)
+ExternalProject_Add(mySC
+	PREFIX ${CMAKE_BINARY_DIR}/installSC
+	SOURCE_DIR ${SC_SOURCE_DIR}
+)
+
+#add_library(myLang UNKNOWN IMPORTED)
+#set_property(TARGET myLang PROPERTY IMPORTED_LOCATION ${SC_BUILD_DIR}/lang/lib/libfoobar.a )
+#add_dependencies(ScBridge myLang)
+#SET(Foobar_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/foobar)
+#SET(myLang_LIBRARIES myLang) 
 
 
+#ExternalProject_Get_Property(mySC LINK_LIBRARIES)
+#ADD_LIBRARY(myexe STATIC IMPORTED)
+#SET_PROPERTY(TARGET myexe PROPERTY IMPORTED_LOCATION "${SCLANG_EXE}")
 
-MESSAGE(STATUS "ScLang_FOUND ${SCLANG_LIBRARY}: " ${SCLANG_FOUND})
+#GET_PROPERTY(msg TARGET sclang PROPERTY LINK_LIBRARIES)
+MESSAGE(STATUS "msg : " ${msg})
 
-ADD_LIBRARY(mylang STATIC IMPORTED)
-SET_TARGET_PROPERTIES(mylang PROPERTIES IMPORTED_LOCATION "${SCLANG_LIBRARY}")
+
+#ADD_LIBRARY(mylang STATIC IMPORTED)
+#SET_PROPERTY(TARGET mylang PROPERTY IMPORTED_LOCATION ${SCLANG_LIBRARY})
+
+#GET_TARGET_PROPERTY(msg2 mySC )
+#GET_PROPERTY(msg2 TARGET mylang PROPERTY IMPORTED_LOCATION )
+#MESSAGE(STATUS "msg : " ${msg2})
+
 #SET_TARGET_PROPERTIES(mylang PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${SCLANG_INCLUDE_DIR}")
 
-GET_TARGET_PROPERTY(msg mylang LINK_DEPENDS)
-MESSAGE(STATUS "msg : " ${msg})
+
 
 #GET_TARGET_PROPERTY(Lang_INCLUDE_DIRS ScLang INCLUDE_DIRECTORIES)
 #MESSAGE(STATUS "ScLang_INCLUDE_DIRS : " ${Lang_INCLUDE_DIRS})
@@ -28,47 +56,45 @@ MESSAGE(STATUS "msg : " ${msg})
 #GET_TARGET_PROPERTY(ScLang_SOURCES sclang INTERFACE_SOURCES)
 #MESSAGE(STATUS "ScLang_SOURCES : " ${ScLang_SOURCES})
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES LINK_DIRECTORIES ${SCLANG_LIBRARY_DIR})
+#SET_DIRECTORY_PROPERTIES(PROPERTIES LINK_DIRECTORIES ${SCLANG_LIBRARY_DIR})
 
-INCLUDE_DIRECTORIES(
-	${CMAKE_CURRENT_SOURCE_DIR}
+#INCLUDE_DIRECTORIES(
+#	${CMAKE_CURRENT_SOURCE_DIR}
 	
-    ${SC_BUILD_DIR}/common
-	${SC_SOURCE_DIR}/include/common
-	${SC_SOURCE_DIR}/include/lang
-	${SC_SOURCE_DIR}/include/plugin_interface
-	${SC_SOURCE_DIR}/include/server
-	${SC_SOURCE_DIR}/common
-	${SC_SOURCE_DIR}/external_libraries/yaml-cpp-0.3.0/include
-	${SC_SOURCE_DIR}/external_libraries/threadpool
-	${SC_SOURCE_DIR}/external_libraries/boost_sync/include
-	${SC_SOURCE_DIR}/lang/LangSource
-	${SC_SOURCE_DIR}/lang/LangPrimSource
-	${SC_SOURCE_DIR}/external_libraries/hidapi/hidapi
-	${SC_SOURCE_DIR}/external_libraries/hidapi/hidapi_parser
-	${SC_SOURCE_DIR}/external_libraries/nova-tt
-	${SC_SOURCE_DIR}/lang/LangSource/Bison
-	${SC_SOURCE_DIR}/lang/../platform/windows/compat_stuff
-	${SC_SOURCE_DIR}/lang/../platform/windows/compat_stuff/getopt
-	${SC_SOURCE_DIR}/QtCollider
-	${SC_SOURCE_DIR}/SCDoc
-	${SC_SOURCE_DIR}/external_libraries/boost
+ #   ${SC_BUILD_DIR}/common
+	#${SC_SOURCE_DIR}/include/common
+	#${SC_SOURCE_DIR}/include/lang
+	#${SC_SOURCE_DIR}/include/plugin_interface
+	#${SC_SOURCE_DIR}/include/server
+	#${SC_SOURCE_DIR}/common
+	#${SC_SOURCE_DIR}/external_libraries/yaml-cpp-0.3.0/include
+	#${SC_SOURCE_DIR}/external_libraries/threadpool
+	#${SC_SOURCE_DIR}/external_libraries/boost_sync/include
+	#${SC_SOURCE_DIR}/lang/LangSource
+	#${SC_SOURCE_DIR}/lang/LangPrimSource
+	#${SC_SOURCE_DIR}/external_libraries/hidapi/hidapi
+	#${SC_SOURCE_DIR}/external_libraries/hidapi/hidapi_parser
+	#${SC_SOURCE_DIR}/external_libraries/nova-tt
+	#${SC_SOURCE_DIR}/lang/LangSource/Bison
+	#${SC_SOURCE_DIR}/lang/../platform/windows/compat_stuff
+	#${SC_SOURCE_DIR}/lang/../platform/windows/compat_stuff/getopt
+	#${SC_SOURCE_DIR}/QtCollider
+	#${SC_SOURCE_DIR}/SCDoc
+	#${SC_SOURCE_DIR}/external_libraries/boost
 ####D:\Supercollider\x64\libsndfile\include
-	${SC_SOURCE_DIR}/external_libraries/TLSF-2.4.6/src
+	#${SC_SOURCE_DIR}/external_libraries/TLSF-2.4.6/src
 
 ####" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtCore" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\.\mkspecs\win32-msvc2013" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtGui" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtWidgets" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtNetwork" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtWebKit" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtWebKitWidgets" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtPrintSupport" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtOpenGL" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtSensors" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtQuick" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtQml" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtSql" /I"C:\Qt\Qt5.5\5.5\msvc2013_64\include\QtPositioning" 
 	
-	${SC_SOURCE_DIR}/external_libraries/portmidi/pm_common
-	${SC_SOURCE_DIR}/external_libraries/portmidi/porttime
-)
+	#${SC_SOURCE_DIR}/external_libraries/portmidi/pm_common
+	#${SC_SOURCE_DIR}/external_libraries/portmidi/porttime
+#)
 
-SET(ScBridge_hdr ScBridge.h)
-SET(ScBridge_src ScBridge.cpp)
 
-ADD_LIBRARY(ScBridge ${ScBridge_src} ${ScBridge_hdr})
 
 TARGET_LINK_LIBRARIES(ScBridge 
-	${SCLANG_LIBRARY}
+	#${SCLANG_LIBRARY}
+	
 )
 
 MESSAGE(STATUS "ScBridge include folders:")
