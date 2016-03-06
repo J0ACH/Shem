@@ -32,10 +32,10 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Modules)
 
 FIND_PACKAGE(Sc) # looking for SC
 
-LIST(APPEND CMAKE_MODULE_PATH 
+#LIST(APPEND CMAKE_MODULE_PATH 
         #${CMAKE_MODULE_PATH}	
-        ${SC_SOURCE_DIR}/cmake_modules
-)
+        #${SC_SOURCE_DIR}/cmake_modules
+#)
 
 MESSAGE(STATUS "Shem can use this modules:")
 FOREACH(ONE_CMAKE_MODULEPATH ${CMAKE_MODULE_PATH})	
@@ -47,10 +47,7 @@ ENDFOREACH(ONE_CMAKE_MODULEPATH)
 
 ### Subdirectories ########################
 
-#INCLUDE(${SC_SOURCE_DIR})
-#INCLUDE(${SC_SOURCE_DIR}/CMakeLists.txt)
-#ADD_SUBDIRECTORY(SuperCollider)
-
+#ADD_SUBDIRECTORY(sc-ide)
 ADD_SUBDIRECTORY(ScBridge)
 ADD_SUBDIRECTORY(Quant)
 

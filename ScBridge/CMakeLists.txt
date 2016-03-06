@@ -6,20 +6,69 @@ MESSAGE(STATUS "\nScBridge init...")
 MESSAGE(STATUS "SC_SOURCE_DIR : " ${SC_SOURCE_DIR})
 MESSAGE(STATUS "SC_BUILD_DIR : " ${SC_BUILD_DIR})
 
-#FIND_PACKAGE(ScLang)
+INCLUDE(${SC_SOURCE_DIR}/external_libraries/CMakeLists.txt)
 
-#MESSAGE(STATUS "ScLang_EXE FOUND : " ${SCLANG_EXE})
+FIND_PACKAGE(Boost)
+INCLUDE_DIRECTORIES(${SC_SOURCE_DIR}/external_libraries/boost)
+INCLUDE_DIRECTORIES(${SC_SOURCE_DIR}/external_libraries/oscpack_1_1_0)
+
+FIND_PACKAGE(OscPack)
+
+ADD_LIBRARY(oscpack_target STATIC IMPORTED)
+SET_PROPERTY(TARGET oscpack_target PROPERTY IMPORTED_LOCATION ${OSCPACK_LIBRARY})
+#add_library(oscpack STATIC EXCLUDE_FROM_ALL "${SC_SOURCE_DIR}/external_libraries/oscpack_build.cpp")
+#target_include_directories(oscpack PRIVATE boost)
+#target_include_directories(oscpack INTERFACE oscpack_1_1_0 )
+#SET_TARGET_PROPERTIES(oscpack PROPERTIES INCLUDE_DIRECTORIES boost) 
+
+
+#target_include_directories(oscpack PRIVATE boost)
+#target_include_directories(oscpack INTERFACE oscpack_1_1_0 )
+
+#if(NOT YAMLCPP_FOUND)
+#  message(STATUS "using bundled libyaml-cpp")
+
+  # yaml-cpp
+#  aux_source_directory(${SC_SOURCE_DIR}/external_libraries/yaml-cpp-0.3.0/src yaml_src)
+  
+#  add_library(yaml STATIC ${yaml_src})
+#  target_include_directories(yaml PUBLIC ${SC_SOURCE_DIR}/external_libraries/yaml-cpp-0.3.0/include)
+#  set_property( TARGET yaml PROPERTY FOLDER 3rdparty )
+
+#  if(CMAKE_COMPILER_IS_GNUCXX)
+#    target_compile_options(yaml PRIVATE -Wno-deprecated-declarations)
+#  endif()
+
+#endif()
+
+LINK_DIRECTORIES(${SC_BUILD_DIR}/external_libraries/Release)
+
+
 
 SET(ScBridge_hdr ScBridge.h)
 SET(ScBridge_src ScBridge.cpp)
 
-ADD_LIBRARY(ScBridge ${ScBridge_src} ${ScBridge_hdr})
+#ADD_LIBRARY(ScBridge STATIC ${ScBridge_src} ${ScBridge_hdr})
+ADD_EXECUTABLE(ScBridge ${ScBridge_src} ${ScBridge_hdr})
 
-INCLUDE(ExternalProject)
-ExternalProject_Add(mySC
-	PREFIX ${CMAKE_BINARY_DIR}/installSC
-	SOURCE_DIR ${SC_SOURCE_DIR}
+TARGET_INCLUDE_DIRECTORIES(ScBridge PUBLIC ${OSCPACK_INCLUDE_DIR}/osc)
+
+TARGET_LINK_LIBRARIES(ScBridge 
+	#${OSCPACK_LIBRARY}
+	oscpack_target
 )
+
+ADD_DEPENDENCIES(ScBridge oscpack_target)
+
+#target_include_directories(ScBridge PRIVATE boost)
+#target_include_directories(ScBridge INTERFACE oscpack_1_1_0 )
+
+
+#INCLUDE(ExternalProject)
+#ExternalProject_Add(mySC
+	#PREFIX ${CMAKE_BINARY_DIR}/installSC
+	#SOURCE_DIR ${SC_SOURCE_DIR}
+#)
 
 #add_library(myLang UNKNOWN IMPORTED)
 #set_property(TARGET myLang PROPERTY IMPORTED_LOCATION ${SC_BUILD_DIR}/lang/lib/libfoobar.a )

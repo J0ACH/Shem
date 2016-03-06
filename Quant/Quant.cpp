@@ -8,7 +8,7 @@ int main(int argc, char** argv){
 	win->setGeometry(100, 100, 300, 200);
 	win->show();
 
-	ScBridge * bridge = new ScBridge();
+	//ScBridge * bridge = new ScBridge();
 
 
 	return app.exec();
