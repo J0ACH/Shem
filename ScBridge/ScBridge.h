@@ -1,62 +1,55 @@
 #ifndef SCBRIDGE_H
 #define SCBRIDGE_H
 
-
-/*
-#include <QAbstractNativeEventFilter>
 #include <QAction>
-#include <QObject>
-*/
+#include <QByteArray>
+#include <QDateTime>
+#include <QDebug>
+#include <QProcess>
+#include <QThread>
+#include <QUuid>
+#include <QtNetwork/QLocalSocket>
+#include <QtNetwork/QLocalServer>
+#include <QBuffer>
 
-//#include "C:/Supercollider/Supercollider_src/editors/sc-ide/core/sc_process.hpp"
-/*
-#include "sc_process.hpp"
-#include "sc_server.hpp"
-#include "doc_manager.hpp"
-#include "settings/manager.hpp"
-*/
-
-
-//using namespace ScIDE
-
-//class SessionManager;
-
-class ScBridge
+class ScBridge : public QProcess
 {
-
+	Q_OBJECT
 
 public:
-	ScBridge();
+	ScBridge(QObject *parent);
 	~ScBridge();
-private:
 
+	void startLang();
+	void stopLang();
+	
+public slots:
+	void evaluateCode(QString const & commandString, bool silent = false);
+
+signals:
+	void scPost(QString const &);
+	void statusMessage(QString const &);
+	//void response(const QString & selector, const QString & data);
+	
+
+private slots:
+	void onReadyRead(void);
+	
+private:
+	QLocalServer *mIpcServer;
+	QLocalSocket *mIpcSocket;
+	QString mIpcServerName;
+	QByteArray mIpcData;
+
+	bool mTerminationRequested;
+	QDateTime mTerminationRequestTime;
+	bool mCompiled;
 };
 
-/*
-class QntInstanceGuard :
-public QObject, public IIpcHandler
-{
-Q_OBJECT
 
-public:
-static const int Port = 6770;
-
-bool tryConnect(QStringList const & arguments);
-void onIpcLog(const QString & message) override;
-void onIpcMessage(const QString &selector, const QVariantList &data) override;
-
-public Q_SLOTS:
-void onNewIpcConnection();
-void onIpcData();
-
-
-private:
-IIpcHandler * mHandler;
-ScIpcChannel * mIpcChannel;
-QTcpServer * mIpcServer;
-QTcpSocket * mIpcSocket;
-};
-*/
 
 
 #endif // SCBRIDGE
+
+
+	
