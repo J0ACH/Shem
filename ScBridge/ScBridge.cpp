@@ -56,7 +56,7 @@ void ScBridge::startLang()
 	else
 	{
 		char *txt = "Start interpreter done!";
-		printf("OUTPUT: %s", txt);
+		printf("OUTPUT: %s\n", txt);
 	}
 
 }
@@ -77,6 +77,10 @@ void ScBridge::evaluateCode(QString const & commandString, bool silent)
 
 	char commandChar = silent ? '\x1b' : '\x0c';
 
+	QByteArray ba = commandString.toLatin1();
+	const char *c_str2 = ba.data();
+	printf("command: %s\n", c_str2);
+	
 	write(&commandChar, 1);
 }
 
@@ -93,56 +97,11 @@ void ScBridge::onReadyRead()
 	
 	QByteArray ba = postString.toLatin1();
 	const char *c_str2 = ba.data();
-	printf("lang: %s", c_str2);
+	printf("msg: %s", c_str2);
 	
 	//emit scPost(postString);
 }
 
-/*
-void ScBridge::onNewIpcConnection()
-{
-
-	char *txt = "--onNewIpcConnection!";
-	printf("OUTPUT: %s", txt);
-
-	if (mIpcSocket)
-		// we can handle only one ipc connection at a time
-		mIpcSocket->disconnect();
-
-	mIpcSocket = mIpcServer->nextPendingConnection();
-	//connect(mIpcSocket, SIGNAL(disconnected()), this, SLOT(finalizeConnection()));
-	connect(mIpcSocket, SIGNAL(readyRead()), this, SLOT(onIpcData()));
-}
-
-void ScBridge::onIpcData()
-{
-	mIpcData.append(mIpcSocket->readAll());
-
-	while (mIpcData.size()) {
-		QBuffer receivedData(&mIpcData);
-		receivedData.open(QIODevice::ReadOnly);
-
-		QDataStream in(&receivedData);
-		in.setVersion(QDataStream::Qt_4_6);
-		QString selector, message;
-		in >> selector;
-		if (in.status() != QDataStream::Ok)
-			return;
-
-		in >> message;
-		if (in.status() != QDataStream::Ok)
-			return;
-
-		mIpcData.remove(0, receivedData.pos());
-
-		printf("OUTPUT: %s", receivedData);
-
-		//onResponse(selector, message);
-
-		//emit response(selector, message);
-	}
-}
-*/
 
 ScBridge::~ScBridge()
 {

@@ -30,17 +30,11 @@ signals:
 	void scPost(QString const &);
 	void statusMessage(const QString &);
 	void response(const QString & selector, const QString & data);
-	//void classLibraryRecompiled();
-	//void introspectionAboutToSwap();
+	
 
 private slots:
-	//void onNewIpcConnection();
-	//void onIpcData();
-	//void finalizeConnection();
-	//void onProcessStateChanged(QProcess::ProcessState state);
 	void onReadyRead(void);
-	//void updateToggleRunningAction();
-
+	
 private:
 	QLocalServer *mIpcServer;
 	QLocalSocket *mIpcSocket;
