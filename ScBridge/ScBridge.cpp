@@ -5,7 +5,7 @@ ScBridge::ScBridge(QObject * parent) :
 QProcess(parent),
 mIpcServer(new QLocalServer(this)),
 mIpcSocket(NULL),
-mIpcServerName("SCIde_" + QString::number(QCoreApplication::applicationPid())),
+mIpcServerName("SCBridge_" + QString::number(QCoreApplication::applicationPid())),
 mTerminationRequested(false),
 mCompiled(false)
 {
@@ -45,6 +45,8 @@ void ScBridge::stopLang()
 {
 	char *txt = "Stop interpreter!";
 	printf("OUTPUT: %s\n", txt);
+
+	evaluateCode("Server.local.quit;");
 
 	if (state() != QProcess::Running) {
 		emit statusMessage(tr("Interpreter is not running!"));

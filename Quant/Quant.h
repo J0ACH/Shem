@@ -19,6 +19,9 @@ public slots:
 	void beep();
 	void pdefPlay();
 
+protected:
+	void closeEvent(QCloseEvent *event);
+
 private:
 	QPushButton *butt1;
 	QPushButton *butt2;

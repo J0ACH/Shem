@@ -19,7 +19,7 @@ Quant::Quant()
 
 	bridge->evaluateCode("Server.local = Server.default = s;");
 	bridge->evaluateCode("s.boot;");
-	bridge->evaluateCode("s.waitForBoot({().play});");
+	bridge->evaluateCode("s.waitForBoot(s.scope;{().play});");
 
 	butt1 = new QPushButton(this);
 	butt1->setGeometry(10, 10, 50, 50);
@@ -44,5 +44,12 @@ void Quant::pdefPlay()
 
 Quant::~Quant()
 {
+	
+}
+
+void Quant::closeEvent(QCloseEvent *event)
+{
+	bridge->evaluateCode("Server.local.quit;"); // not working?
 	bridge->stopLang();
+	close();
 }
