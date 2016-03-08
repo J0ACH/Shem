@@ -7,7 +7,7 @@ int main(int argc, char** argv){
 	QApplication app(argc, argv);
 
 	Quant *win = new Quant();
-	win->setGeometry(100, 100, 300, 200);
+	win->setGeometry(100, 100, 700, 500);
 	win->show();
 
 	return app.exec();
@@ -16,10 +16,6 @@ int main(int argc, char** argv){
 Quant::Quant()
 {
 	bridge = new ScBridge(this);
-
-	bridge->evaluateCode("Server.local = Server.default = s;");
-	bridge->evaluateCode("s.boot;");
-	bridge->evaluateCode("s.waitForBoot(s.scope;{().play});");
 
 	butt1 = new QPushButton(this);
 	butt1->setGeometry(10, 10, 50, 50);
@@ -30,8 +26,26 @@ Quant::Quant()
 	butt2->setGeometry(60, 10, 50, 50);
 	butt2->setText("Pdef!");
 	connect(butt2, SIGNAL(pressed()), this, SLOT(pdefPlay()));
+
+	console = new QTextEdit(this);
+	console->setGeometry(10, 70, 680, 420);
+	console->setReadOnly(true);
+	console->setOverwriteMode(false);
+	console->setFont(QFont("Consolas", 8));
+	console->append(tr("Console init test..."));
+	connect(bridge, SIGNAL(scPost(QString)), this, SLOT(consoleAddMsg(QString)));
+	connect(bridge, SIGNAL(statusMessage(QString)), this, SLOT(consoleAddMsg(QString)));
+			
+	bridge->evaluateCode("Server.local = Server.default = s;");
+	bridge->evaluateCode("s.boot;");
+	bridge->evaluateCode("s.waitForBoot(s.scope;{().play});");
+
 }
 
+void Quant::consoleAddMsg(QString msg)
+{
+	console->append(msg);
+}
 void Quant::beep()
 {
 	bridge->evaluateCode("().play");

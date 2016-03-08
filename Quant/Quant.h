@@ -4,6 +4,7 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QTextEdit>
 #include "ScBridge.h"
 
 
@@ -18,6 +19,7 @@ public:
 public slots:
 	void beep();
 	void pdefPlay();
+	void consoleAddMsg(QString);
 
 protected:
 	void closeEvent(QCloseEvent *event);
@@ -25,6 +27,8 @@ protected:
 private:
 	QPushButton *butt1;
 	QPushButton *butt2;
+
+	QTextEdit *console;
 
 	ScBridge *bridge;
 };

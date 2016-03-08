@@ -29,17 +29,13 @@ void ScBridge::startLang()
 	bool processStarted = QProcess::waitForStarted();
 	if (!processStarted)
 	{
-		char *txt = "Failed to start interpreter!";
-		printf("OUTPUT: %s", txt);
 		emit statusMessage(tr("Failed to start interpreter!"));
 	}
 	else
 	{
-		char *txt = "Start interpreter done!";
-		printf("OUTPUT: %s\n", txt);
+		emit statusMessage(tr("Start interpreter done!"));
+		}
 	}
-
-}
 
 void ScBridge::stopLang()
 {
@@ -90,10 +86,8 @@ void ScBridge::evaluateCode(QString const & commandString, bool silent)
 
 	char commandChar = silent ? '\x1b' : '\x0c';
 
-	QByteArray ba = commandString.toLatin1();
-	const char *c_str2 = ba.data();
-	printf("command: %s\n", c_str2);
-
+	emit scPost(tr("userCmd: %1").arg(commandString));
+	
 	write(&commandChar, 1);
 }
 
@@ -107,12 +101,8 @@ void ScBridge::onReadyRead()
 
 	QByteArray out = QProcess::readAll();
 	QString postString = QString::fromUtf8(out);
-
-	QByteArray ba = postString.toLatin1();
-	const char *c_str2 = ba.data();
-	printf("msg: %s", c_str2);
-
-	//emit scPost(postString);
+	
+	emit scPost(postString);
 }
 
 

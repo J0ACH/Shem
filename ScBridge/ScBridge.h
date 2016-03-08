@@ -28,8 +28,8 @@ public slots:
 
 signals:
 	void scPost(QString const &);
-	void statusMessage(const QString &);
-	void response(const QString & selector, const QString & data);
+	void statusMessage(QString const &);
+	//void response(const QString & selector, const QString & data);
 	
 
 private slots:
