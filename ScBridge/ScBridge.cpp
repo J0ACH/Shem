@@ -1,27 +1,7 @@
 #include "ScBridge.h"
-
 #include <QtWidgets/QApplication>
-#include <QWidget>
 
-int main(int argc, char** argv){
-
-	QApplication app(argc, argv);
-
-	QWidget *win = new QWidget();
-	win->setGeometry(100, 100, 300, 200);
-	win->show();
-
-	ScBridge *bridge = new ScBridge(win);	
-
-	bridge->evaluateCode("Server.local = Server.default = s;");
-	bridge->evaluateCode("s.boot;");
-	bridge->evaluateCode("s.waitForBoot({().play});");
-
-	return app.exec();
-}
-
-
-ScBridge::ScBridge(QObject * parent):
+ScBridge::ScBridge(QObject * parent) :
 QProcess(parent),
 mIpcServer(new QLocalServer(this)),
 mIpcSocket(NULL),
@@ -39,7 +19,7 @@ void ScBridge::startLang()
 {
 	QString sclangCommand = "sclang";
 	QString configFile;
-	
+
 	QStringList sclangArguments;
 	if (!configFile.isEmpty())
 		sclangArguments << "-l" << configFile;
@@ -61,6 +41,37 @@ void ScBridge::startLang()
 
 }
 
+void ScBridge::stopLang()
+{
+	char *txt = "Stop interpreter!";
+	printf("OUTPUT: %s\n", txt);
+
+	if (state() != QProcess::Running) {
+		emit statusMessage(tr("Interpreter is not running!"));
+		return;
+	}
+
+	evaluateCode("0.exit", true);
+	closeWriteChannel();
+
+	mCompiled = false;
+	mTerminationRequested = true;
+	mTerminationRequestTime = QDateTime::currentDateTimeUtc();
+
+	bool finished = waitForFinished(200);
+	if (!finished && (state() != QProcess::NotRunning)) {
+#ifdef Q_OS_WIN32
+		kill();
+#else
+		terminate();
+#endif
+		bool reallyFinished = waitForFinished(200);
+		if (!reallyFinished)
+			emit statusMessage(tr("Failed to stop interpreter!"));
+	}
+	mTerminationRequested = false;
+}
+
 void ScBridge::evaluateCode(QString const & commandString, bool silent)
 {
 	if (state() != QProcess::Running) {
@@ -80,7 +91,7 @@ void ScBridge::evaluateCode(QString const & commandString, bool silent)
 	QByteArray ba = commandString.toLatin1();
 	const char *c_str2 = ba.data();
 	printf("command: %s\n", c_str2);
-	
+
 	write(&commandChar, 1);
 }
 
@@ -94,11 +105,11 @@ void ScBridge::onReadyRead()
 
 	QByteArray out = QProcess::readAll();
 	QString postString = QString::fromUtf8(out);
-	
+
 	QByteArray ba = postString.toLatin1();
 	const char *c_str2 = ba.data();
 	printf("msg: %s", c_str2);
-	
+
 	//emit scPost(postString);
 }
 

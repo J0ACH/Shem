@@ -20,10 +20,14 @@ SET(QT_LIBRARIES
 SET(ScBridge_hdr ScBridge.h)
 SET(ScBridge_src ScBridge.cpp)
 
-ADD_EXECUTABLE(ScBridge ${ScBridge_src} ${ScBridge_hdr})
+#ADD_EXECUTABLE(ScBridge ${ScBridge_src} ${ScBridge_hdr})
+
+ADD_LIBRARY(ScBridge STATIC ${ScBridge_src} ${ScBridge_hdr})
 
 TARGET_LINK_LIBRARIES(ScBridge ${QT_LIBRARIES})
 
-INSTALL(TARGETS ScBridge DESTINATION  ${SC_BUILD_DIR}/Install/Supercollider)
+#SET_DIRECTORY_PROPERTIES(ScBridge PROPERTIES INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
+
+#INSTALL(TARGETS ScBridge DESTINATION  ${SC_BUILD_DIR}/Install/Supercollider)
 
 MESSAGE(STATUS "\nScBridge done...")

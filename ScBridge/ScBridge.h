@@ -21,8 +21,8 @@ public:
 	~ScBridge();
 
 	void startLang();
-	void read();
-
+	void stopLang();
+	
 public slots:
 	void evaluateCode(QString const & commandString, bool silent = false);
 
