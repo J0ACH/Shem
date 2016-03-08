@@ -23,6 +23,9 @@ public:
 	void startLang();
 	void read();
 
+public slots:
+	void evaluateCode(QString const & commandString, bool silent = false);
+
 signals:
 	void scPost(QString const &);
 	void statusMessage(const QString &);
@@ -31,8 +34,8 @@ signals:
 	//void introspectionAboutToSwap();
 
 private slots:
-	void onNewIpcConnection();
-	void onIpcData();
+	//void onNewIpcConnection();
+	//void onIpcData();
 	//void finalizeConnection();
 	//void onProcessStateChanged(QProcess::ProcessState state);
 	void onReadyRead(void);

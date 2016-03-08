@@ -13,6 +13,10 @@ int main(int argc, char** argv){
 
 	ScBridge *bridge = new ScBridge(win);	
 
+	bridge->evaluateCode("Server.local = Server.default = s;");
+	bridge->evaluateCode("s.boot;");
+	bridge->evaluateCode("s.waitForBoot({().play});");
+
 	return app.exec();
 }
 
@@ -28,7 +32,7 @@ mCompiled(false)
 	this->startLang();
 
 	connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-	connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
+	//connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
 }
 
 void ScBridge::startLang()
@@ -57,6 +61,25 @@ void ScBridge::startLang()
 
 }
 
+void ScBridge::evaluateCode(QString const & commandString, bool silent)
+{
+	if (state() != QProcess::Running) {
+		emit statusMessage(tr("Interpreter is not running!"));
+		return;
+	}
+
+	QByteArray bytesToWrite = commandString.toUtf8();
+	size_t writtenBytes = write(bytesToWrite);
+	if (writtenBytes != bytesToWrite.size()) {
+		emit statusMessage(tr("Error when passing data to interpreter!"));
+		return;
+	}
+
+	char commandChar = silent ? '\x1b' : '\x0c';
+
+	write(&commandChar, 1);
+}
+
 void ScBridge::onReadyRead()
 {
 	if (mTerminationRequested) {
@@ -75,8 +98,13 @@ void ScBridge::onReadyRead()
 	//emit scPost(postString);
 }
 
+/*
 void ScBridge::onNewIpcConnection()
 {
+
+	char *txt = "--onNewIpcConnection!";
+	printf("OUTPUT: %s", txt);
+
 	if (mIpcSocket)
 		// we can handle only one ipc connection at a time
 		mIpcSocket->disconnect();
@@ -114,6 +142,7 @@ void ScBridge::onIpcData()
 		//emit response(selector, message);
 	}
 }
+*/
 
 ScBridge::~ScBridge()
 {
