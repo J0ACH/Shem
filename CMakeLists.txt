@@ -57,7 +57,7 @@ IF(Build_Demo)
 	ADD_SUBDIRECTORY(Demo)
 ENDIF()
 
-OPTION(Build_Quant "Build project Quant" ON)
+OPTION(Build_Quant "Build project Quant" OFF)
 IF(Build_Quant)
 	MESSAGE(STATUS "Building the Quant IDE")
 	ADD_SUBDIRECTORY(Quant)
