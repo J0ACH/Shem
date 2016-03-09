@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QTextEdit>
-#include <QCheckBox>
+#include <QLabel>
 
 #include "ScBridge.h"
 
@@ -22,11 +22,15 @@ namespace DemoIDE {
 		Demo();
 		~Demo();
 
-		public slots:
+	public slots:
 		void beep();
+		void sendCode();
 		void pdefPlay();
 		void consoleAddMsg(QString);
 
+	signals:
+		void sendCode(QString);
+		
 	protected:
 		void closeEvent(QCloseEvent *event);
 
@@ -39,15 +43,14 @@ namespace DemoIDE {
 		QPushButton *buttStartServer;
 		QPushButton *buttKillLang;
 		QPushButton *buttKillServer;
-
-		
-		QCheckBox *runningLang;
-		QCheckBox *runningServer;
-		
-
 		QPushButton *buttBeep;
+		QPushButton *buttCode;
+		
+		QLabel *runningLang;
+		QLabel *runningServer;
 		
 		QTextEdit *console;
+		QTextEdit *editor;
 
 		
 	};

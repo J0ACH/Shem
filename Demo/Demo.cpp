@@ -27,15 +27,14 @@ Demo::Demo()
 	connect(buttStartServer, SIGNAL(pressed()), bridge, SLOT(startServer()));
 	connect(buttKillServer, SIGNAL(pressed()), bridge, SLOT(killServer()));
 
-	connect(bridge, SIGNAL(bootedLang(bool)), runningLang, SLOT(setChecked(bool)));
-	connect(bridge, SIGNAL(bootedServer(bool)), runningServer, SLOT(setChecked(bool)));
+	connect(bridge, SIGNAL(bootedLang(bool)), runningLang, SLOT(setVisible(bool)));
+	connect(bridge, SIGNAL(bootedServer(bool)), runningServer, SLOT(setVisible(bool)));
 
 	connect(bridge, SIGNAL(scPost(QString)), this, SLOT(consoleAddMsg(QString)));
 	connect(bridge, SIGNAL(statusMessage(QString)), this, SLOT(consoleAddMsg(QString)));
 
 	connect(buttBeep, SIGNAL(pressed()), this, SLOT(beep()));
-
-	
+	connect(buttCode, SIGNAL(pressed()), this, SLOT(sendCode()));
 	
 			
 	
@@ -46,39 +45,50 @@ Demo::Demo()
 void Demo::initControlers()
 {
 	buttStartLang = new QPushButton(this);
-	buttStartLang->setGeometry(10, 10, 150, 30);
+	buttStartLang->setGeometry(10, 10, 190, 30);
 	buttStartLang->setText("ScBridge.startLang()");
 
 	buttKillLang = new QPushButton(this);
-	buttKillLang->setGeometry(10, 45, 150, 30);
+	buttKillLang->setGeometry(10, 45, 190, 30);
 	buttKillLang->setText("ScBridge.killLang()");
 
 	buttStartServer = new QPushButton(this);
-	buttStartServer->setGeometry(10, 85, 150, 30);
+	buttStartServer->setGeometry(10, 85, 190, 30);
 	buttStartServer->setText("ScBridge.startServer()");
 
 	buttKillServer = new QPushButton(this);
-	buttKillServer->setGeometry(10, 120, 150, 30);
+	buttKillServer->setGeometry(10, 120, 190, 30);
 	buttKillServer->setText("ScBridge.killServer()");
 
 	console = new QTextEdit(this);
-	console->setGeometry(180, 10, 700, 480);
+	console->setGeometry(210, 10, 680, 320);
 	console->setReadOnly(true);
 	console->setOverwriteMode(false);
 	console->setFont(QFont("Consolas", 8));
 	console->append(tr("Console init test..."));
 
-	runningLang = new QCheckBox(this);
-	runningLang->setGeometry(10, 400, 150, 30);
-	runningLang->setText("running Lang");
-	
-	runningServer = new QCheckBox(this);
-	runningServer->setGeometry(10, 430, 150, 30);
-	runningServer->setText("running Server");
+	runningLang = new QLabel(this);
+	runningLang->setGeometry(10, 160, 190, 20);
+	runningLang->setText("Lang is running...");
+	runningLang->setVisible(false);
+
+	runningServer = new QLabel(this);
+	runningServer->setGeometry(10, 180, 190, 20);
+	runningServer->setText("Server is running...");
+	runningServer->setVisible(false);
 
 	buttBeep = new QPushButton(this);
-	buttBeep->setGeometry(10, 190, 150, 50);
+	buttBeep->setGeometry(10, 210, 190, 50);
 	buttBeep->setText("BEEP!");
+
+	editor = new QTextEdit(this);
+	editor->setGeometry(210, 350, 680, 50);
+	editor->setFont(QFont("Consolas", 8));
+	editor->append(tr("Ndef('test', {SinOsc.ar(150!2, 0, Saw.kr(1))}).play;"));
+
+	buttCode = new QPushButton(this);
+	buttCode->setGeometry(10, 350, 190, 50);
+	buttCode->setText("ScBridge.evaluateCode(String)");
 
 }
 
@@ -89,6 +99,11 @@ void Demo::consoleAddMsg(QString msg)
 void Demo::beep()
 {
 	bridge->evaluateCode("().play");
+}
+
+void Demo::sendCode()
+{
+	bridge->evaluateCode(editor->toPlainText());
 }
 
 void Demo::pdefPlay()
