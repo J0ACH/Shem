@@ -31,13 +31,17 @@ namespace SupercolliderBridge
 		void evaluateCode(QString const & commandString, bool silent = false);
 
 	signals:
+		void bootedLang(bool);
+		void bootedServer(bool);
+
 		void scPost(QString const &);
 		void statusMessage(QString const &);
 		//void response(const QString & selector, const QString & data);
 
 
-		private slots:
+	private slots:
 		void onReadyRead(void);
+		//void testStart();
 
 	private:
 		QLocalServer *mIpcServer;
@@ -48,6 +52,8 @@ namespace SupercolliderBridge
 		bool mTerminationRequested;
 		QDateTime mTerminationRequestTime;
 		bool mCompiled;
+
+		
 	};
 
 }

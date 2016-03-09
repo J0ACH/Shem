@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QCheckBox>
+
 #include "ScBridge.h"
 
 using namespace SupercolliderBridge;
@@ -38,9 +40,13 @@ namespace DemoIDE {
 		QPushButton *buttKillLang;
 		QPushButton *buttKillServer;
 
-		QPushButton *buttBeep;
-		QPushButton *butt2;
+		
+		QCheckBox *runningLang;
+		QCheckBox *runningServer;
+		
 
+		QPushButton *buttBeep;
+		
 		QTextEdit *console;
 
 		

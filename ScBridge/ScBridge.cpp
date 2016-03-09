@@ -17,7 +17,11 @@ namespace SupercolliderBridge
 
 		connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 		//connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
+
+		//connect(this, SIGNAL(started()), this, SLOT(testStart()));
 	}
+
+
 
 	void ScBridge::startLang()
 	{
@@ -37,14 +41,14 @@ namespace SupercolliderBridge
 		}
 		else
 		{
-			emit statusMessage(tr("Start interpreter done!"));
+			emit statusMessage(tr("Starting ScLang ..."));
+			emit bootedLang(true);
 		}
 	}
 
 	void ScBridge::killLang()
 	{
-		char *txt = "Stop interpreter!";
-		printf("OUTPUT: %s\n", txt);
+		this->killServer();
 
 		//evaluateCode("Server.local.quit;");
 
@@ -70,20 +74,29 @@ namespace SupercolliderBridge
 			bool reallyFinished = waitForFinished(200);
 			if (!reallyFinished)
 				emit statusMessage(tr("Failed to stop interpreter!"));
+			else
+			{
+				emit statusMessage(tr("MOMENT kdy LANG umrel...."));
+				emit bootedLang(false);
+			}
 		}
 		mTerminationRequested = false;
 	}
 
 	void ScBridge::startServer()
 	{
+		
 		evaluateCode("Server.local = Server.default = s;");
 		evaluateCode("s.boot;");
+		evaluateCode("s.waitForBoot({ 'MOMENT kdy Server nastartoval....'.postln; })");
+		emit bootedServer(true);
 	}
 
 	void ScBridge::killServer()
 	{
 		//evaluateCode("Server.killAll;"); // not working?
-		evaluateCode("s.quit;"); // not working?
+		evaluateCode("s.quit;");
+		emit bootedServer(false);
 	}
 
 	void ScBridge::evaluateCode(QString const & commandString, bool silent)
