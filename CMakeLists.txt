@@ -36,7 +36,7 @@ IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	SET(CMAKE_INSTALL_PREFIX ${SC_INSTALL_DIR} CACHE PATH "Cmake install path" FORCE)
 ENDIF()
 
-### Project semaphore ########################
+### ScBridge ########################
 
 ADD_SUBDIRECTORY(ScBridge)
 SET(SCBRIDGE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/ScBridge)
@@ -48,6 +48,14 @@ GET_TARGET_PROPERTY(SCBRIDGE_LINK_LIBRARIES ScBridge LINK_LIBRARIES)
 FOREACH(ONE_BRGLINK ${SCBRIDGE_LINK_LIBRARIES})	
 		MESSAGE(STATUS "\t - " ${ONE_BRGLINK})
 ENDFOREACH(ONE_BRGLINK)
+
+### Project semaphore ########################
+
+OPTION(Build_Demo "Build basic example of using ScBridge" ON)
+IF(Build_Demo)
+	MESSAGE(STATUS "Building the Demo")
+	ADD_SUBDIRECTORY(Demo)
+ENDIF()
 
 OPTION(Build_Quant "Build project Quant" ON)
 IF(Build_Quant)
