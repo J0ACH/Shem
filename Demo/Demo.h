@@ -7,6 +7,8 @@
 #include <QTextEdit>
 #include "ScBridge.h"
 
+using namespace SupercolliderBridge;
+
 namespace DemoIDE {
 
 
@@ -27,6 +29,8 @@ namespace DemoIDE {
 		void closeEvent(QCloseEvent *event);
 
 	private:
+		ScBridge *bridge;
+
 		void initControlers();
 
 		QPushButton *buttStartLang;
@@ -39,7 +43,7 @@ namespace DemoIDE {
 
 		QTextEdit *console;
 
-		ScBridge *bridge;
+		
 	};
 
 }

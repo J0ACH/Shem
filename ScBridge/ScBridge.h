@@ -12,42 +12,45 @@
 #include <QtNetwork/QLocalServer>
 #include <QBuffer>
 
-class ScBridge : public QProcess
+namespace SupercolliderBridge
 {
-	Q_OBJECT
 
-public:
-	ScBridge(QObject *parent);
-	~ScBridge();
+	class ScBridge : public QProcess
+	{
+		Q_OBJECT
 
-	void startLang();
-	void stopLang();
-	
-public slots:
-	void evaluateCode(QString const & commandString, bool silent = false);
+	public:
+		ScBridge(QObject *parent);
+		~ScBridge();
+		
+	public slots:
+		void startLang();
+		void killLang();
+		void startServer();
+		void killServer();
+		void evaluateCode(QString const & commandString, bool silent = false);
 
-signals:
-	void scPost(QString const &);
-	void statusMessage(QString const &);
-	//void response(const QString & selector, const QString & data);
-	
-
-private slots:
-	void onReadyRead(void);
-	
-private:
-	QLocalServer *mIpcServer;
-	QLocalSocket *mIpcSocket;
-	QString mIpcServerName;
-	QByteArray mIpcData;
-
-	bool mTerminationRequested;
-	QDateTime mTerminationRequestTime;
-	bool mCompiled;
-};
+	signals:
+		void scPost(QString const &);
+		void statusMessage(QString const &);
+		//void response(const QString & selector, const QString & data);
 
 
+		private slots:
+		void onReadyRead(void);
 
+	private:
+		QLocalServer *mIpcServer;
+		QLocalSocket *mIpcSocket;
+		QString mIpcServerName;
+		QByteArray mIpcData;
+
+		bool mTerminationRequested;
+		QDateTime mTerminationRequestTime;
+		bool mCompiled;
+	};
+
+}
 
 #endif // SCBRIDGE
 
