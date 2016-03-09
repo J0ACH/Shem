@@ -92,10 +92,6 @@ void Demo::initControlers()
 
 }
 
-void Demo::consoleAddMsg(QString msg)
-{
-	console->append(msg);
-}
 void Demo::beep()
 {
 	bridge->evaluateCode("().play");
@@ -104,11 +100,6 @@ void Demo::beep()
 void Demo::sendCode()
 {
 	bridge->evaluateCode(editor->toPlainText());
-}
-
-void Demo::pdefPlay()
-{
-	bridge->evaluateCode("Pdef('test', Pbind('instrument', 'default', 'dur', Pseq([1,1,0.5,0.5], 2), 'freq', 90)).play;");
 }
 
 Demo::~Demo()

@@ -25,9 +25,7 @@ namespace DemoIDE {
 	public slots:
 		void beep();
 		void sendCode();
-		void pdefPlay();
-		void consoleAddMsg(QString);
-
+		
 	signals:
 		void sendCode(QString);
 		
