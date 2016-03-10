@@ -102,6 +102,12 @@ void Demo::sendCode()
 	bridge->evaluateCode(editor->toPlainText());
 }
 
+void Demo::consoleAddMsg(QString msg)
+{
+	console->append(msg);
+}
+
+
 Demo::~Demo()
 {
 	
