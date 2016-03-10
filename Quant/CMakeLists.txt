@@ -2,7 +2,13 @@ PROJECT (Quant)
 
 CMAKE_MINIMUM_REQUIRED ( VERSION 3.4 )
 
-MESSAGE(STATUS "\nQuant init...")
+# INCLUDE #######################################################
+INCLUDE("QuantVersion.txt" ${QT_USE_FILE})
+SET(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH}")
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/Jui)
+
+MESSAGE(STATUS "\nQuant [${PROJECT_VERSION}] init...")
 
 # FIND QT #############################################
 
@@ -15,6 +21,8 @@ SET(QT_LIBRARIES
   Qt5::Gui 
   Qt5::Widgets
   )
+  
+ADD_SUBDIRECTORY(Jui)  
 
 # SOURCES ##################################################
 
@@ -23,7 +31,7 @@ SET(Quant_src Quant.cpp)
 
 ADD_EXECUTABLE(Quant ${Quant_hdr} ${Quant_src})
 IF(WIN32) 
-	set_target_properties( Quant PROPERTIES WIN32_EXECUTABLE TRUE )
+	SET_TARGET_PROPERTIES( Quant PROPERTIES WIN32_EXECUTABLE TRUE )
 ENDIF()
 
 # LINKER #######################################################
@@ -31,6 +39,7 @@ ENDIF()
 TARGET_LINK_LIBRARIES(Quant
 	${QT_LIBRARIES}
 	ScBridge
+	Jui
 )
 
 # INSTALL ########################################################

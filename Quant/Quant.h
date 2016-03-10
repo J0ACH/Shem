@@ -5,33 +5,41 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QTextEdit>
+
 #include "ScBridge.h"
+#include "Canvan.h"
 
+using namespace SupercolliderBridge;
+using namespace Jui;
 
-class Quant : public QWidget
+namespace QuantIDE
 {
-	Q_OBJECT
 
-public:
-	Quant();
-	~Quant();
+	class Quant : public Canvan
+	{
+		Q_OBJECT
 
-public slots:
-	void beep();
-	void pdefPlay();
-	void consoleAddMsg(QString);
+	public:
+		explicit Quant(QWidget *parent = 0);
+		~Quant();
 
-protected:
-	void closeEvent(QCloseEvent *event);
+	public slots:
+		void beep();
+		void pdefPlay();
+		void consoleAddMsg(QString);
 
-private:
-	QPushButton *butt1;
-	QPushButton *butt2;
+	protected:
+		void closeEvent(QCloseEvent *event);
 
-	QTextEdit *console;
+	private:
+		//QPushButton *butt1;
+		//QPushButton *butt2;
 
-	ScBridge *bridge;
-};
+		QTextEdit *console;
 
+		ScBridge *bridge;
+		//Canvan *canvan;
+	};
+}
 #endif // QUANT
 
