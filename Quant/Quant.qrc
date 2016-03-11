@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="logo128.png">Resources/QntLogo128pxBlack.png</file>
+</qresource>
+</RCC>

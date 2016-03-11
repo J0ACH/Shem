@@ -1,5 +1,6 @@
 #include "Canvan.h"
-//#include "JuiConfig.h"
+#include "JuiConfig.h"
+
 namespace Jui
 {
 	/*
@@ -24,8 +25,9 @@ namespace Jui
 		//mySetPalette();
 
 #ifdef JUI_CANVAN_SYSTEMFRAME
-		setWindowFlags(Qt::CustomizeWindowHint);
+		//setWindowFlags(Qt::cu CustomizeWindowHint);
 #else
+		setWindowFlags(Qt::CustomizeWindowHint);
 		setWindowFlags(Qt::FramelessWindowHint);
 #endif
 

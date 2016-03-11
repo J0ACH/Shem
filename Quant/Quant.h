@@ -18,7 +18,7 @@ namespace QuantIDE
 	class Quant : public Canvan
 	{
 		Q_OBJECT
-
+		
 	public:
 		explicit Quant(QWidget *parent = 0);
 		~Quant();
@@ -29,16 +29,17 @@ namespace QuantIDE
 		void consoleAddMsg(QString);
 
 	protected:
+		void paintEvent(QPaintEvent *event);
 		void closeEvent(QCloseEvent *event);
 
 	private:
-		//QPushButton *butt1;
-		//QPushButton *butt2;
-
-		QTextEdit *console;
+		void initControl();
 
 		ScBridge *bridge;
-		//Canvan *canvan;
+
+		Button *buttAddNode;
+
+		
 	};
 }
 #endif // QUANT

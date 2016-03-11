@@ -36,7 +36,7 @@ namespace Jui
 	signals:
 		void sendToConsole(QString);
 
-		public slots:
+	public slots:
 		void msgConsole(QString);
 		void closeCanvan();
 		void minimizeCanvan();

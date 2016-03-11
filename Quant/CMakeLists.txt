@@ -28,8 +28,20 @@ ADD_SUBDIRECTORY(Jui)
 
 SET(Quant_hdr Quant.h)
 SET(Quant_src Quant.cpp)
+SET(Quant_res Quant.qrc)
 
-ADD_EXECUTABLE(Quant ${Quant_hdr} ${Quant_src})
+# APPLICATION ICON ##################################################
+
+if(WIN32)
+	SET(Quant_ico ${CMAKE_CURRENT_SOURCE_DIR}/Icon/QuantIcon.rc)
+	SET(CMAKE_RC_COMPILER_INIT windres)
+	ENABLE_LANGUAGE(RC)
+	SET(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> -O coff <DEFINES> -i <SOURCE> -o <OBJECT>")
+endif(WIN32)
+
+# EXE ##################################################
+
+ADD_EXECUTABLE(Quant ${Quant_hdr} ${Quant_src} ${Quant_res} ${Quant_ico})
 IF(WIN32) 
 	SET_TARGET_PROPERTIES( Quant PROPERTIES WIN32_EXECUTABLE TRUE )
 ENDIF()
@@ -45,5 +57,7 @@ TARGET_LINK_LIBRARIES(Quant
 # INSTALL ########################################################
 
 INSTALL(TARGETS Quant DESTINATION ${SC_INSTALL_DIR})
+
+
 
 
