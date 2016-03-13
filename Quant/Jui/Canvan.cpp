@@ -9,24 +9,22 @@ namespace Jui
 	{
 	*/
 
-	Canvan::Canvan(QWidget *parent)
-		: QMainWindow()
+	Canvan::Canvan(QWidget *parent) : QWidget()
 	{
 
+		this->setWindowTitle("New Title");
+		this->window()->setWindowOpacity(0.95);
 
 		//ui.setupUi(this);
-		this->setWindowTitle("New Title");
 		//this->setIconSize(QSize(100, 100));
 		//this->window()->setWindowIcon(QIcon("Qnt_Logo_128px.png"));
-		this->window()->setWindowOpacity(0.95);
 
 
 		//setGeometry(QRect(originX, originY, sizeX, sizeY));
-		setGeometry(QRect(100, 100, 600, 400));
-		
+
 
 #ifdef JUI_CANVAN_SYSTEMFRAME
-		//setWindowFlags(Qt::cu CustomizeWindowHint);
+		setWindowFlags(Qt::CustomizeWindowHint);
 #else
 		setWindowFlags(Qt::CustomizeWindowHint);
 		setWindowFlags(Qt::FramelessWindowHint);
@@ -36,26 +34,34 @@ namespace Jui
 
 		mCursor = new QPoint(0, 0);
 
+		this->setGeometry(QRect(100, 100, 600, 400));
 		//this->setMouseTracking(true);
 
-		menu = new QMenuBar(this);
+		//menu = new QMenuBar(this);
 		header = new QWidget(this);
 		screen = new QWidget(this);
-		tail = new QStatusBar(this);
+		tail = new QWidget(this);
 
-		setMenuBar(menu);
-		setCentralWidget(screen);
-		setStatusBar(tail);
+		headerSize = 100;
+		tailSize = 50;
+
+		//header->setGeometry(0, 0, this->width(), 100);
+		//screen->setGeometry(0, 100, this->width(), 250);
+		//tail->setGeometry(0, this->height()-50, this->width(), 50);
+
+		//setMenuBar(menu);
+		//setCentralWidget(screen);
+		//setStatusBar(tail);
 
 		//menu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		//tail->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		//header->setGeometry(0, 0, width()/2, 150);
 		//menu->setCornerWidget(header);
-		
 
-		menu->setFixedHeight(70);
-		menu->addMenu(tr("&File"));
-		menu->addMenu(tr("&Edit"));
+
+		//menu->setFixedHeight(70);
+		//menu->addMenu(tr("&File"));
+		//menu->addMenu(tr("&Edit"));
 
 		//infoLabel->setText(tr("Invoked <b>File|New</b>"));
 
@@ -63,29 +69,31 @@ namespace Jui
 		buttTest->setGeometry(350, 150, 100, 50);
 		buttTest->setText("TEST");
 
+		/*
 		buttTest2 = new QPushButton(menu);
 		buttTest2->setGeometry(350, 10, 100, 30);
 		buttTest2->setText("CLOSE");
+		*/
 
 		testButton = new Button(screen);
 		testButton->setGeometry(50, 50, 100, 30);
 		testButton->setName(tr("testButton"));
 
-		closeButton = new Button(menu);
-		minimizeButton = new Button(menu);
-		maximizeButton = new Button(menu);
+		closeButton = new Button(header);
+		minimizeButton = new Button(header);
+		maximizeButton = new Button(header);
 
 		closeButton->show();
 
 
 		//console = new QDockWidget(QString("Console"), this);
 
-		dock = new QDockWidget(tr("Console"), this);
+		dock = new QDockWidget(tr("Console"), screen);
 		dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
 		console = new Console(dock);
 		dock->setWidget(console);
-		addDockWidget(Qt::RightDockWidgetArea, dock);
+		//addDockWidget(Qt::RightDockWidgetArea, dock);
 
 
 
@@ -122,9 +130,9 @@ namespace Jui
 
 		screen->setStyleSheet(
 			tr("background-color: QColor(%1,%2,%3); color: white;").arg(strR, strG, strB)
-		);
+			);
 		console->setStyleSheet(strBackColor);
-		menu->setStyleSheet(strBackColor2);
+		//menu->setStyleSheet(strBackColor2);
 		tail->setStyleSheet(strBackColor2);
 
 	}
@@ -138,9 +146,9 @@ namespace Jui
 		QString strR = QString::number(color.red());
 		QString strG = QString::number(color.green());
 		QString strB = QString::number(color.blue());
-		
+
 		QString strFrontColor = tr("color: QColor(%1,%2,%3);").arg(strR, strG, strB);
-		
+
 		screen->setStyleSheet(strFrontColor);
 		console->setStyleSheet(strFrontColor);
 		//menu->setStyleSheet(strFrontColor);
@@ -155,14 +163,9 @@ namespace Jui
 
 	void Canvan::setTitle(QString name)
 	{
-#ifdef JUI_CANVAN_SYSTEMFRAME
-		this->setWindowTitle(name);
-#else
-		title = new QLabel(screen);
+		title = new QLabel(header);
 		title->setGeometry(10, 10, 100, 50);
 		title->setText(name);
-#endif
-
 	}
 	void Canvan::setVersion(int major = 0, int minor = 0, int patch = 0)
 	{
@@ -171,12 +174,15 @@ namespace Jui
 		version = new QLabel(this);
 		version->setGeometry(300, 300, 100, 50);
 		version->setText(text);
-		tail->showMessage(text);
+		//tail->showMessage(text);
 	}
 
-	void Canvan::paintEvent(QPaintEvent *)
+
+	void Canvan::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
+		QWidget::paintEvent(event);
+
 		QRectF rect = screen->geometry();
 
 		QPen *pen;
@@ -185,14 +191,25 @@ namespace Jui
 
 
 		painter.setPen(Qt::NoPen);
-		painter.setBrush(QBrush(QColor(30, 30, 30), Qt::SolidPattern));
+		painter.setBrush(QBrush(QColor(20, 20, 20), Qt::SolidPattern));
 		painter.drawRect(screen->geometry());
+
+		painter.setPen(Qt::NoPen);
+		painter.setBrush(QBrush(QColor(30, 30, 30), Qt::SolidPattern));
+		painter.drawRect(header->geometry());
+		painter.drawRect(tail->geometry());
 
 		painter.setPen(QPen(Qt::red, 1));
 		painter.setBrush(Qt::NoBrush);
 		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 
+		painter.setPen(QPen(Qt::red, 1));
+		painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
+		painter.drawText(100, 15, title->text());
+		//QPainter headerPaiter(this);
 
+
+		//header->update();
 		/*
 		QRect imgRect(200, 100, 168, 128);
 
@@ -212,8 +229,19 @@ namespace Jui
 		//QRectF rect = dock->geometry();
 		//painter.drawRect(rect);
 		//painter.drawText(10, 15, QString::number(backgroundAlpha));
+		//msgConsole(tr("draw"));
+	}
+	void Canvan::setHeaderHeight(int height)
+	{
+		headerSize = height;
+		refresh();
 	}
 
+	void Canvan::setTailHeight(int height)
+	{
+		tailSize = height;
+		refresh();
+	}
 
 	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
 	{
@@ -221,9 +249,17 @@ namespace Jui
 		maximizeButton->setGeometry(width() - 70, 10, 30, 30);
 		minimizeButton->setGeometry(width() - 100, 10, 30, 30);
 
-		header->setGeometry(0, 0, width(), 150);
+		refresh();
+
 
 		msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
+	}
+
+	void Canvan::refresh()
+	{
+		header->setGeometry(0, 0, this->width(), headerSize);
+		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize);
+		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
 	}
 
 	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)

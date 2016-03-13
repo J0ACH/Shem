@@ -18,7 +18,7 @@
 namespace Jui
 {
 
-	class Canvan : public QMainWindow
+	class Canvan : public QWidget
 	{
 		Q_OBJECT
 
@@ -34,7 +34,13 @@ namespace Jui
 		void setColor_foreground(QColor);
 
 		Console *console;
+
+		QWidget *header;
 		QWidget *screen;
+		QWidget *tail;
+		
+		void setHeaderHeight(int);
+		void setTailHeight(int);
 
 	signals:
 		void sendToConsole(QString);
@@ -49,15 +55,16 @@ namespace Jui
 		void mousePressEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
 		void resizeEvent(QResizeEvent *event);
-		void paintEvent(QPaintEvent *event);
+		virtual	void paintEvent(QPaintEvent *event);
 
 	private:
 		//Ui::CanvanClass ui;
 
-		QMenuBar *menu;
-		QWidget *header;
+		//QMenuBar *menu;
+		int headerSize;
+		int tailSize;
 
-		QStatusBar *tail;
+		void refresh();
 
 		Button *testButton;
 		Button *closeButton;

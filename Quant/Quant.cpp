@@ -37,7 +37,9 @@ namespace QuantIDE
 
 		this->initControl();
 		
-		this->setColor_background(QColor(30, 30, 30));
+		this->setHeaderHeight(50);
+		this->setTailHeight(30);
+		//this->setColor_background(QColor(30, 30, 30));
 		//this->setColor_foreground(QColor(230, 230, 230));
 		
 		
@@ -77,11 +79,11 @@ namespace QuantIDE
 		bridge->evaluateCode("Pdef('test', Pbind('instrument', 'default', 'dur', Pseq([1,1,0.5,0.5], 2), 'freq', 90)).play;");
 	}
 
+	/*
 	void Quant::paintEvent(QPaintEvent *event)
 	{
-		
-
 		QPainter painter(this);
+		QWidget::paintEvent(event);
 		
 		painter.setPen(QPen(Qt::red, 3));
 		painter.setBrush(QBrush(QColor(120, 20, 20), Qt::SolidPattern));
@@ -98,7 +100,12 @@ namespace QuantIDE
 		painter.drawImage(target, image, source);
 
 		//painter.drawText(10, 15, QString::number(backgroundAlpha));
+
+
+		this->msgConsole(QString("Quant draw..."));
 	}
+	*/
+	
 
 	Quant::~Quant()
 	{

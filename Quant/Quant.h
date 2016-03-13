@@ -29,7 +29,7 @@ namespace QuantIDE
 		void consoleAddMsg(QString);
 
 	protected:
-		void paintEvent(QPaintEvent *event);
+	//	void paintEvent(QPaintEvent *event);
 		void closeEvent(QCloseEvent *event);
 
 	private:
@@ -38,6 +38,8 @@ namespace QuantIDE
 		ScBridge *bridge;
 
 		Button *buttAddNode;
+
+
 
 		
 	};
