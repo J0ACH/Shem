@@ -5,24 +5,25 @@ namespace Jui
 {
 	/*
 	Canvan::Canvan(int originX, int originY, int sizeX, int sizeY)
-		: QMainWindow()
+	: QMainWindow()
 	{
 	*/
 
-		Canvan::Canvan(QWidget *parent)
-			: QMainWindow()
-		{
+	Canvan::Canvan(QWidget *parent)
+		: QMainWindow()
+	{
 
 
 		//ui.setupUi(this);
 		this->setWindowTitle("New Title");
-		this->setIconSize(QSize(100, 100));
+		//this->setIconSize(QSize(100, 100));
 		//this->window()->setWindowIcon(QIcon("Qnt_Logo_128px.png"));
 		this->window()->setWindowOpacity(0.95);
 
+
 		//setGeometry(QRect(originX, originY, sizeX, sizeY));
 		setGeometry(QRect(100, 100, 600, 400));
-		//mySetPalette();
+		
 
 #ifdef JUI_CANVAN_SYSTEMFRAME
 		//setWindowFlags(Qt::cu CustomizeWindowHint);
@@ -35,7 +36,7 @@ namespace Jui
 
 		mCursor = new QPoint(0, 0);
 
-		this->setMouseTracking(true);
+		//this->setMouseTracking(true);
 
 		menu = new QMenuBar(this);
 		header = new QWidget(this);
@@ -50,20 +51,21 @@ namespace Jui
 		//tail->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		//header->setGeometry(0, 0, width()/2, 150);
 		//menu->setCornerWidget(header);
-		//menu->setForegroundRole(QPalette::Background);
-		//menu->setBackgroundRole(QPalette::Background);
-		//menu->setPalette(*palette);
+		
 
 		menu->setFixedHeight(70);
 		menu->addMenu(tr("&File"));
 		menu->addMenu(tr("&Edit"));
 
-		//	menu->setStyleSheet("QMenuBar{ background - color: qlineargradient(x1 : 0, y1 : 0, x2 : 0, y2 : 1, stop : 0 lightgray, stop : 1 darkgray); }");
-
-		menu->setStyleSheet("QMenuBar{ background - color: yellow; }");
-
 		//infoLabel->setText(tr("Invoked <b>File|New</b>"));
 
+		buttTest = new QPushButton(screen);
+		buttTest->setGeometry(350, 150, 100, 50);
+		buttTest->setText("TEST");
+
+		buttTest2 = new QPushButton(menu);
+		buttTest2->setGeometry(350, 10, 100, 30);
+		buttTest2->setText("CLOSE");
 
 		testButton = new Button(screen);
 		testButton->setGeometry(50, 50, 100, 30);
@@ -99,7 +101,52 @@ namespace Jui
 
 		msgConsole(tr("start"));
 	}
+	void Canvan::setColor_background(QColor color)
+	{
+		msgConsole(QString::number(color.red()));
+		msgConsole(QString::number(color.green()));
+		msgConsole(QString::number(color.blue()));
 
+		QString strR = QString::number(color.red());
+		QString strG = QString::number(color.green());
+		QString strB = QString::number(color.blue());
+		QString strR2 = QString::number(color.red() + 10);
+		QString strG2 = QString::number(color.green() + 10);
+		QString strB2 = QString::number(color.blue() + 10);
+
+
+		QString strBackColor = tr("background-color: QColor(%1,%2,%3);").arg(strR, strG, strB);
+		QString strBackColor2 = tr("background-color: QColor(%1,%2,%3);").arg(strR2, strG2, strB2);
+
+		QString strFrontColor = tr("color: QColor(%1,%2,%3);").arg(strR, strG, strB);
+
+		screen->setStyleSheet(
+			tr("background-color: QColor(%1,%2,%3); color: white;").arg(strR, strG, strB)
+		);
+		console->setStyleSheet(strBackColor);
+		menu->setStyleSheet(strBackColor2);
+		tail->setStyleSheet(strBackColor2);
+
+	}
+
+	void Canvan::setColor_foreground(QColor color)
+	{
+		msgConsole(QString::number(color.red()));
+		msgConsole(QString::number(color.green()));
+		msgConsole(QString::number(color.blue()));
+
+		QString strR = QString::number(color.red());
+		QString strG = QString::number(color.green());
+		QString strB = QString::number(color.blue());
+		
+		QString strFrontColor = tr("color: QColor(%1,%2,%3);").arg(strR, strG, strB);
+		
+		screen->setStyleSheet(strFrontColor);
+		console->setStyleSheet(strFrontColor);
+		//menu->setStyleSheet(strFrontColor);
+		//tail->setStyleSheet(strFrontColor);
+
+	}
 
 	void Canvan::msgConsole(QString text)
 	{
@@ -108,9 +155,14 @@ namespace Jui
 
 	void Canvan::setTitle(QString name)
 	{
+#ifdef JUI_CANVAN_SYSTEMFRAME
+		this->setWindowTitle(name);
+#else
 		title = new QLabel(screen);
 		title->setGeometry(10, 10, 100, 50);
 		title->setText(name);
+#endif
+
 	}
 	void Canvan::setVersion(int major = 0, int minor = 0, int patch = 0)
 	{

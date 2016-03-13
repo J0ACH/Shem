@@ -30,6 +30,9 @@ namespace Jui
 		void setTitle(QString titleName);
 		void setVersion(int major, int minor, int patch);
 
+		void setColor_background(QColor);
+		void setColor_foreground(QColor);
+
 		Console *console;
 		QWidget *screen;
 
@@ -60,6 +63,9 @@ namespace Jui
 		Button *closeButton;
 		Button *maximizeButton;
 		Button *minimizeButton;
+
+		QPushButton *buttTest;
+		QPushButton *buttTest2;
 
 
 		QDockWidget *dock;

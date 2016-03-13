@@ -1,7 +1,7 @@
 #include "Quant.h"
 #include <QApplication>
 
-using namespace Jui;
+//using namespace Jui;
 using namespace SupercolliderBridge;
 
 
@@ -10,7 +10,10 @@ int main(int argc, char** argv){
 
 	QApplication app(argc, argv);
 	
+
 	QuantIDE::Quant *win = new QuantIDE::Quant();
+	win->setStyleSheet("QMenuBar {	background - color: black;	}");
+
 	//QMainWindow *win = new QMainWindow();
 	//win->setWindowIcon(QIcon(":/Resources/Qnt_AppIcon_16px.ico"));
 	win->setGeometry(100, 100, 1100, 400);
@@ -29,13 +32,17 @@ namespace QuantIDE
 
 		bridge = new ScBridge(this);
 		this->msgConsole(QString("ScBridge init..."));
+		
+		this->setTitle("Quant");
 
 		this->initControl();
 		
-
+		this->setColor_background(QColor(30, 30, 30));
+		//this->setColor_foreground(QColor(230, 230, 230));
 		
 		
-		this->setTitle("Quant2");
+		
+		
 		//win.setVersion(Qnt_VERSION_MAJOR, Qnt_VERSION_MINOR, Qnt_VERSION_PATCH);
 		
 		//app.setPalette(darkPalette);
@@ -44,6 +51,7 @@ namespace QuantIDE
 
 		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(msgConsole(QString("AddNode"))));
 			
+		
 	}
 	
 	void Quant::initControl()
@@ -71,6 +79,8 @@ namespace QuantIDE
 
 	void Quant::paintEvent(QPaintEvent *event)
 	{
+		
+
 		QPainter painter(this);
 		
 		painter.setPen(QPen(Qt::red, 3));
