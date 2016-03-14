@@ -12,6 +12,13 @@ namespace Jui
 	Canvan::Canvan(QWidget *parent) : QWidget(parent)
 	{
 
+#ifdef JUI_CANVAN_SYSTEMFRAME
+		setWindowFlags(Qt::CustomizeWindowHint);
+#else
+		setWindowFlags(Qt::CustomizeWindowHint);
+		setWindowFlags(Qt::FramelessWindowHint);
+#endif
+
 		this->setWindowTitle("New Title");
 		this->window()->setWindowOpacity(0.95);
 
@@ -23,12 +30,7 @@ namespace Jui
 		//setGeometry(QRect(originX, originY, sizeX, sizeY));
 
 
-#ifdef JUI_CANVAN_SYSTEMFRAME
-		setWindowFlags(Qt::CustomizeWindowHint);
-#else
-		setWindowFlags(Qt::CustomizeWindowHint);
-		setWindowFlags(Qt::FramelessWindowHint);
-#endif
+
 
 		//setIconSize(QSize(100, 100));
 
@@ -45,7 +47,9 @@ namespace Jui
 		headerSize = 100;
 		tailSize = 50;
 
-		panelConsole = new Panel(screen);
+		panelConsole = new Panel(this);
+		panelConsole->setGeometry(QRect(300, 200, 200, 400));
+		panelConsole->show();
 
 		//header->setGeometry(0, 0, this->width(), 100);
 		//screen->setGeometry(0, 100, this->width(), 250);
@@ -85,7 +89,7 @@ namespace Jui
 		minimizeButton = new Button(header);
 		maximizeButton = new Button(header);
 
-		closeButton->show();
+		//closeButton->show();
 
 
 		//console = new QDockWidget(QString("Console"), this);
@@ -111,6 +115,7 @@ namespace Jui
 
 		msgConsole(tr("start"));
 	}
+
 	void Canvan::addScreen(QWidget *inScreen)
 	{
 		inScreen->setGeometry(100,100,300,300);
@@ -189,12 +194,24 @@ namespace Jui
 	void Canvan::paintEvent(QPaintEvent *event)
 	{
 		drawCanvan();
+		//emit actDraw();
+		
+		//this->children
+		
+		
 	}
 
 	void Canvan::drawCanvan()
 	{
+
+		
+
 		QPainter painter(this);
 		//QWidget::paintEvent(event);
+
+
+
+		//panelConsole->paintEvent(event);
 
 		QRectF rect = screen->geometry();
 
@@ -211,14 +228,19 @@ namespace Jui
 		painter.setBrush(QBrush(QColor(30, 30, 30), Qt::SolidPattern));
 		painter.drawRect(header->geometry());
 		painter.drawRect(tail->geometry());
+		//painter.drawRect(panelConsole->geometry());
 
 		painter.setPen(QPen(Qt::red, 1));
 		painter.setBrush(Qt::NoBrush);
 		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 
+		
+
 		painter.setPen(QPen(Qt::red, 1));
 		painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
 		painter.drawText(100, 15, title->text());
+
+		
 		//QPainter headerPaiter(this);
 
 
@@ -244,7 +266,10 @@ namespace Jui
 		//painter.drawText(10, 15, QString::number(backgroundAlpha));
 		//msgConsole(tr("draw"));
 		this->msgConsole(QString("Canvan draw..."));
+
+		panelConsole->draw();
 	}
+
 	void Canvan::setHeaderHeight(int height)
 	{
 		headerSize = height;
@@ -274,6 +299,8 @@ namespace Jui
 		header->setGeometry(0, 0, this->width(), headerSize);
 		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize);
 		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
+
+		panelConsole->setGeometry(this->width() - 300, headerSize, 300, this->height() - tailSize);
 	}
 
 	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)

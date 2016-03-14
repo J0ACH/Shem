@@ -27,6 +27,7 @@ namespace QuantIDE
 		void beep();
 		void pdefPlay();
 		void consoleAddMsg(QString);
+		void addNode();
 
 	protected:
 		void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
@@ -34,6 +35,7 @@ namespace QuantIDE
 
 	private:
 		void initControl();
+		
 
 		ScBridge *bridge;
 		//Canvan *canvan;

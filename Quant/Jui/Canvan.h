@@ -46,6 +46,7 @@ namespace Jui
 		void setTailHeight(int);
 
 	signals:
+		void actDraw();
 		void sendToConsole(QString);
 
 	public slots:
@@ -58,7 +59,7 @@ namespace Jui
 		void mousePressEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
 		void resizeEvent(QResizeEvent *event);
-		void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+		virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 	private:
 		//Ui::CanvanClass ui;

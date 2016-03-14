@@ -38,33 +38,31 @@ namespace QuantIDE
 		
 		this->setTitle("Quant");
 
+		this->setGeometry(100, 100, 1100, 600);
+
 		this->initControl();
 		
 		this->setHeaderHeight(50);
 		this->setTailHeight(30);
-		//this->setColor_background(QColor(30, 30, 30));
-		//this->setColor_foreground(QColor(230, 230, 230));
-		
-		
-		
 		
 		//win.setVersion(Qnt_VERSION_MAJOR, Qnt_VERSION_MINOR, Qnt_VERSION_PATCH);
 		
-		//app.setPalette(darkPalette);
-
-		
-
-		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(msgConsole(QString("AddNode"))));
-			
-		//canvan->addScreen(this);
-	}
+		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
+	
+		}
 	
 	void Quant::initControl()
 	{
 		this->msgConsole(QString("Control init..."));
 
 		buttAddNode = new Button(this);
-		buttAddNode->setGeometry(200, 100, 80, 30);
+		buttAddNode->setGeometry(500, 400, 80, 30);
+		buttAddNode->setName("AddNode");
+	}
+
+	void Quant::addNode()
+	{
+		this->msgConsole(QString("Node add..."));
 	}
 	
 
@@ -88,6 +86,7 @@ namespace QuantIDE
 		drawCanvan();
 		draw();
 	}
+	
 	
 	void Quant::draw()
 	{

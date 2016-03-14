@@ -13,8 +13,12 @@ namespace Jui
 	public:
 		Panel(QWidget *parent = 0);
 
+
+	public slots:
+		void draw();
+
 	protected:
-		void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+		//void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 	private:
 
