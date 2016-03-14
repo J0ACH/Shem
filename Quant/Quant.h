@@ -29,17 +29,17 @@ namespace QuantIDE
 		void consoleAddMsg(QString);
 
 	protected:
-	//	void paintEvent(QPaintEvent *event);
+		void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 		void closeEvent(QCloseEvent *event);
 
 	private:
 		void initControl();
 
 		ScBridge *bridge;
-
+		//Canvan *canvan;
 		Button *buttAddNode;
 
-
+		void draw();
 
 		
 	};

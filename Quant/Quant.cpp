@@ -10,13 +10,15 @@ int main(int argc, char** argv){
 
 	QApplication app(argc, argv);
 	
-
+	//Canvan *canvan = new Canvan(0);
+	//canvan->setGeometry(100, 100, 1100, 400);
+	
 	QuantIDE::Quant *win = new QuantIDE::Quant();
-	win->setStyleSheet("QMenuBar {	background - color: black;	}");
+	//win->setStyleSheet("QMenuBar {	background - color: black;	}");
+	//canvan->show();
 
 	//QMainWindow *win = new QMainWindow();
 	//win->setWindowIcon(QIcon(":/Resources/Qnt_AppIcon_16px.ico"));
-	win->setGeometry(100, 100, 1100, 400);
 	win->show();
 
 	return app.exec();
@@ -27,10 +29,11 @@ int main(int argc, char** argv){
 namespace QuantIDE
 {
 	
-	Quant::Quant(QWidget *parent)
+	Quant::Quant(QWidget *parent) 
 	{
-
+		//this = new Canvan();
 		bridge = new ScBridge(this);
+
 		this->msgConsole(QString("ScBridge init..."));
 		
 		this->setTitle("Quant");
@@ -53,7 +56,7 @@ namespace QuantIDE
 
 		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(msgConsole(QString("AddNode"))));
 			
-		
+		//canvan->addScreen(this);
 	}
 	
 	void Quant::initControl()
@@ -67,7 +70,7 @@ namespace QuantIDE
 
 	void Quant::consoleAddMsg(QString msg)
 	{
-		console->append(msg);
+		this->console->append(msg);
 	}
 	void Quant::beep()
 	{
@@ -79,22 +82,28 @@ namespace QuantIDE
 		bridge->evaluateCode("Pdef('test', Pbind('instrument', 'default', 'dur', Pseq([1,1,0.5,0.5], 2), 'freq', 90)).play;");
 	}
 
-	/*
+	
 	void Quant::paintEvent(QPaintEvent *event)
 	{
+		drawCanvan();
+		draw();
+	}
+	
+	void Quant::draw()
+	{
 		QPainter painter(this);
-		QWidget::paintEvent(event);
-		
+		//canvan->paintEvent(event);
+
 		painter.setPen(QPen(Qt::red, 3));
 		painter.setBrush(QBrush(QColor(120, 20, 20), Qt::SolidPattern));
-		painter.drawRect(QRect(500,200,50,50));
+		painter.drawRect(QRect(500, 200, 50, 50));
 
 		painter.drawLine(150, 250, 300, 250);
 
 		//QRectF target(0, 0, width(), height());
-		QRectF target(150, 250, 168/2, 128/2);
+		QRectF target(150, 250, 168 / 2, 128 / 2);
 		QRectF source(0, 0, 168, 128);
-		
+
 		QImage image(":/logo128.png");
 
 		painter.drawImage(target, image, source);
@@ -104,8 +113,6 @@ namespace QuantIDE
 
 		this->msgConsole(QString("Quant draw..."));
 	}
-	*/
-	
 
 	Quant::~Quant()
 	{

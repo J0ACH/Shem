@@ -14,6 +14,7 @@
 
 #include "Console.h"
 #include "Button.h"
+#include "Panel.h"
 
 namespace Jui
 {
@@ -24,7 +25,7 @@ namespace Jui
 
 	public:
 
-		explicit Canvan(QWidget *parent = 0);
+		Canvan(QWidget *parent = 0);
 		~Canvan();
 
 		void setTitle(QString titleName);
@@ -32,13 +33,15 @@ namespace Jui
 
 		void setColor_background(QColor);
 		void setColor_foreground(QColor);
+		void drawCanvan();
+		void addScreen(QWidget *inScreen);
 
 		Console *console;
 
 		QWidget *header;
 		QWidget *screen;
 		QWidget *tail;
-		
+
 		void setHeaderHeight(int);
 		void setTailHeight(int);
 
@@ -55,7 +58,7 @@ namespace Jui
 		void mousePressEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
 		void resizeEvent(QResizeEvent *event);
-		virtual	void paintEvent(QPaintEvent *event);
+		void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 	private:
 		//Ui::CanvanClass ui;
@@ -64,6 +67,7 @@ namespace Jui
 		int headerSize;
 		int tailSize;
 
+		
 		void refresh();
 
 		Button *testButton;
@@ -74,6 +78,7 @@ namespace Jui
 		QPushButton *buttTest;
 		QPushButton *buttTest2;
 
+		Panel *panelConsole;
 
 		QDockWidget *dock;
 

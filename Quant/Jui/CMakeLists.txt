@@ -20,12 +20,14 @@ SET(Jui_src
 	Canvan.cpp
 	Button.cpp
 	Console.cpp
+	Panel.cpp
 )
 
 SET(Jui_hdr
 	Canvan.h
 	Button.h
 	Console.h
+	Panel.h
 )
 
 SET(Jui_res

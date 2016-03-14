@@ -9,7 +9,7 @@ namespace Jui
 	{
 	*/
 
-	Canvan::Canvan(QWidget *parent) : QWidget()
+	Canvan::Canvan(QWidget *parent) : QWidget(parent)
 	{
 
 		this->setWindowTitle("New Title");
@@ -44,6 +44,8 @@ namespace Jui
 
 		headerSize = 100;
 		tailSize = 50;
+
+		panelConsole = new Panel(screen);
 
 		//header->setGeometry(0, 0, this->width(), 100);
 		//screen->setGeometry(0, 100, this->width(), 250);
@@ -109,6 +111,12 @@ namespace Jui
 
 		msgConsole(tr("start"));
 	}
+	void Canvan::addScreen(QWidget *inScreen)
+	{
+		inScreen->setGeometry(100,100,300,300);
+		screen = inScreen;
+	}
+
 	void Canvan::setColor_background(QColor color)
 	{
 		msgConsole(QString::number(color.red()));
@@ -180,8 +188,13 @@ namespace Jui
 
 	void Canvan::paintEvent(QPaintEvent *event)
 	{
+		drawCanvan();
+	}
+
+	void Canvan::drawCanvan()
+	{
 		QPainter painter(this);
-		QWidget::paintEvent(event);
+		//QWidget::paintEvent(event);
 
 		QRectF rect = screen->geometry();
 
@@ -230,6 +243,7 @@ namespace Jui
 		//painter.drawRect(rect);
 		//painter.drawText(10, 15, QString::number(backgroundAlpha));
 		//msgConsole(tr("draw"));
+		this->msgConsole(QString("Canvan draw..."));
 	}
 	void Canvan::setHeaderHeight(int height)
 	{
