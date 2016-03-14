@@ -12,12 +12,12 @@ int main(int argc, char** argv){
 	
 	/*
 	QWidget *win2 = new QWidget();
-	win2->setGeometry(50, 100, 1100, 400);
 	Canvan *canvan = new Canvan(win2);
 	canvan->show();
 	*/
 	
 	QuantIDE::Quant *win = new QuantIDE::Quant();
+	win->setGeometry(50, 100, 1100, 700);
 	win->show();
 	//win->setStyleSheet("QMenuBar {	background - color: black;	}");
 	//canvan->show();
@@ -119,7 +119,7 @@ namespace QuantIDE
 		//painter.drawText(10, 15, QString::number(backgroundAlpha));
 
 
-		canvan->msgConsole(QString("TOPView draw..."));
+		//canvan->msgConsole(QString("TOPView draw..."));
 	}
 	
 	

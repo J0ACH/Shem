@@ -35,7 +35,9 @@ namespace Jui
 
 		//setIconSize(QSize(100, 100));
 
-		mCursor = new QPoint(0, 0);
+		mCursorGlobal = new QPoint(0, 0);
+		mCursorLocal = new QPoint(0, 0);
+		mFrameOriginGlobal = new QPoint(0, 0);
 
 		//this->setGeometry(parent->geometry());
 		//this->setMouseTracking(true);
@@ -153,7 +155,7 @@ namespace Jui
 
 
 
-		msgConsole("Canvan draw...");
+		//msgConsole("Canvan draw...");
 
 		//Quant::draw(event);
 	}
@@ -189,17 +191,43 @@ namespace Jui
 
 	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		*mCursor = mouseEvent->globalPos();
+		*mCursorGlobal = mouseEvent->globalPos();
+		*mCursorLocal = mouseEvent->pos();
+		*mFrameOriginGlobal = QPoint(
+			mCursorGlobal->x() - mCursorLocal->x(),
+			mCursorGlobal->y() - mCursorLocal->y()
+			);
+
 		//*mCursor = mouseEvent->pos();
-		msgConsole(tr("pressed [%1,%2]").arg(QString::number(mCursor->x()), QString::number(mCursor->y())));
+		msgConsole(tr("pressedGlobal [%1,%2]").arg(QString::number(mCursorGlobal->x()), QString::number(mCursorGlobal->y())));
+		msgConsole(tr("pressedLocal [%1,%2]").arg(QString::number(mCursorLocal->x()), QString::number(mCursorLocal->y())));
+		msgConsole(tr("frameOriginGlobal [%1,%2]").arg(QString::number(mFrameOriginGlobal->x()), QString::number(mFrameOriginGlobal->y())));
 	}
 
 	void Canvan::mouseMoveEvent(QMouseEvent *mouseEvent)
 	{
-		QPoint mouseCoor = mouseEvent->globalPos();
-		//QPoint mouseCoor = mouseEvent->pos();
-		setGeometry(QRect(mouseCoor.x() - mCursor->x(), mouseCoor.y() - mCursor->y(), width(), height()));
-		msgConsole(tr("move [%1,%2]").arg(QString::number(mCursor->x()), QString::number(mCursor->y())));
+		QPoint mouseCurrentGlobal = mouseEvent->globalPos();
+		int posX = mFrameOriginGlobal->x() - mCursorGlobal->x() + mouseCurrentGlobal.x();
+		int posY = mFrameOriginGlobal->y() - mCursorGlobal->y() + mouseCurrentGlobal.y();
+
+		/*
+		setGeometry(QRect(
+			posX,
+			posY,
+			width(),
+			height()
+			));
+		*/
+		msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
+		/*
+		msgConsole(tr("move [%1,%2]").arg(QString::number(mouseCoor.x()), QString::number(mouseCoor.y())));
+		msgConsole(tr("moveLocal [%1,%2]").arg(
+			QString::number(mouseLocalCoor->x()),
+			QString::number(mouseLocalCoor->y())
+			));
+		*/
+		//parent->setGeometry(posX, posY, parent->width(), parent->height());
+		parent->move(posX, posY);
 	}
 
 

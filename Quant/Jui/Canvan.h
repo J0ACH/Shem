@@ -99,7 +99,9 @@ namespace Jui
 		QColor *backColor;
 		QColor *panelColor;
 
-		QPoint *mCursor;
+		QPoint *mCursorGlobal;
+		QPoint *mCursorLocal;
+		QPoint *mFrameOriginGlobal;
 	};
 
 }
