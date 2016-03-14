@@ -44,6 +44,9 @@
 
 #include <QPlainTextEdit>
 #include <QObject>
+#include "ScBridge.h"
+
+
 
 class QPaintEvent;
 class QResizeEvent;
@@ -52,6 +55,7 @@ class QWidget;
 
 class LineNumberArea;
 
+using namespace SupercolliderBridge;
 
 class CodeEditor : public QPlainTextEdit
 {

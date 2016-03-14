@@ -47,7 +47,7 @@ int main(int argv, char **args)
     QApplication app(argv, args);
 
     CodeEditor editor;
-    editor.setWindowTitle(QObject::tr("Code Editor Example"));
+    editor.setWindowTitle(QObject::tr("Shem Editor"));
     editor.show();
 
     return app.exec();
