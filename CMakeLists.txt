@@ -58,6 +58,13 @@ IF(Build_Demo)
 	ADD_SUBDIRECTORY(Demo)
 ENDIF()
 
+OPTION(Build_Editor "Build code editor test" ON)
+IF(Build_Editor)
+	MESSAGE(STATUS "Building the Editor")
+	ADD_SUBDIRECTORY(Editor)
+ENDIF()
+
+
 OPTION(Build_Quant "Build project Quant" OFF)
 IF(Build_Quant)
 	MESSAGE(STATUS "Building the Quant IDE")
