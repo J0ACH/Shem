@@ -9,26 +9,27 @@ namespace Jui
 	{
 	*/
 
-	Canvan::Canvan(QWidget *parent) : QWidget(parent)
+	Canvan::Canvan(QWidget *window) : QWidget(window)
 	{
+		parent = window;
+
+		//parent->resizeEvent(QResizeEvent *event);
 
 #ifdef JUI_CANVAN_SYSTEMFRAME
-		setWindowFlags(Qt::CustomizeWindowHint);
+		parent->setWindowFlags(Qt::CustomizeWindowHint);
 #else
-		setWindowFlags(Qt::CustomizeWindowHint);
-		setWindowFlags(Qt::FramelessWindowHint);
+		parent->setWindowFlags(Qt::CustomizeWindowHint);
+		parent->setWindowFlags(Qt::FramelessWindowHint);
 #endif
-
-		this->setWindowTitle("New Title");
-		this->window()->setWindowOpacity(0.95);
+		parent->setWindowTitle("New Title");
+		parent->window()->setWindowOpacity(0.95);
 
 		//ui.setupUi(this);
 		//this->setIconSize(QSize(100, 100));
 		//this->window()->setWindowIcon(QIcon("Qnt_Logo_128px.png"));
 
 
-		//setGeometry(QRect(originX, originY, sizeX, sizeY));
-
+		setGeometry(0, 0, parent->width(), parent->height());
 
 
 
@@ -36,7 +37,7 @@ namespace Jui
 
 		mCursor = new QPoint(0, 0);
 
-		this->setGeometry(QRect(100, 100, 600, 400));
+		//this->setGeometry(parent->geometry());
 		//this->setMouseTracking(true);
 
 		//menu = new QMenuBar(this);
@@ -116,9 +117,96 @@ namespace Jui
 		msgConsole(tr("start"));
 	}
 
+
+	void Canvan::paintEvent(QPaintEvent *event)
+	{
+		QPainter painter(this);
+
+		QRectF rect = screen->geometry();
+
+		QPen *pen;
+		pen = new QPen(Qt::red, 1);
+
+		/*
+		painter.setPen(Qt::NoPen);
+		painter.setBrush(QBrush(QColor(20, 20, 20), Qt::SolidPattern));
+		painter.drawRect(screen->geometry());
+
+		*/
+
+
+		painter.setPen(Qt::NoPen);
+		painter.setBrush(QBrush(QColor(30, 30, 30), Qt::SolidPattern));
+		painter.drawRect(header->geometry());
+		painter.drawRect(tail->geometry());
+		//painter.drawRect(panelConsole->geometry());
+
+		painter.setPen(QPen(Qt::red, 1));
+		painter.setBrush(Qt::NoBrush);
+		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+
+
+
+		painter.setPen(QPen(Qt::red, 1));
+		painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
+		painter.drawText(100, 15, title->text());
+
+
+
+		msgConsole("Canvan draw...");
+
+		//Quant::draw(event);
+	}
+
+	void Canvan::setHeaderHeight(int height)
+	{
+		headerSize = height;
+	}
+
+	void Canvan::setTailHeight(int height)
+	{
+		tailSize = height;
+	}
+
+
+
+	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
+	{
+		this->setGeometry(0, 0, parent->width(), parent->height());
+
+		closeButton->setGeometry(width() - 40, 10, 30, 30);
+		maximizeButton->setGeometry(width() - 70, 10, 30, 30);
+		minimizeButton->setGeometry(width() - 100, 10, 30, 30);
+
+		header->setGeometry(0, 0, this->width(), headerSize);
+		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize - headerSize);
+		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
+
+		panelConsole->setGeometry(this->width() - 300, headerSize, 300, this->height() - tailSize);
+
+		msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
+	}
+
+	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)
+	{
+		*mCursor = mouseEvent->globalPos();
+		//*mCursor = mouseEvent->pos();
+		msgConsole(tr("pressed [%1,%2]").arg(QString::number(mCursor->x()), QString::number(mCursor->y())));
+	}
+
+	void Canvan::mouseMoveEvent(QMouseEvent *mouseEvent)
+	{
+		QPoint mouseCoor = mouseEvent->globalPos();
+		//QPoint mouseCoor = mouseEvent->pos();
+		setGeometry(QRect(mouseCoor.x() - mCursor->x(), mouseCoor.y() - mCursor->y(), width(), height()));
+		msgConsole(tr("move [%1,%2]").arg(QString::number(mCursor->x()), QString::number(mCursor->y())));
+	}
+
+
+
 	void Canvan::addScreen(QWidget *inScreen)
 	{
-		inScreen->setGeometry(100,100,300,300);
+		inScreen->setGeometry(100, 100, 300, 300);
 		screen = inScreen;
 	}
 
@@ -191,131 +279,6 @@ namespace Jui
 	}
 
 
-	void Canvan::paintEvent(QPaintEvent *event)
-	{
-		drawCanvan();
-		//emit actDraw();
-		
-		//this->children
-		
-		
-	}
-
-	void Canvan::drawCanvan()
-	{
-
-		
-
-		QPainter painter(this);
-		//QWidget::paintEvent(event);
-
-
-
-		//panelConsole->paintEvent(event);
-
-		QRectF rect = screen->geometry();
-
-		QPen *pen;
-		pen = new QPen(Qt::red, 1);
-
-
-
-		painter.setPen(Qt::NoPen);
-		painter.setBrush(QBrush(QColor(20, 20, 20), Qt::SolidPattern));
-		painter.drawRect(screen->geometry());
-
-		painter.setPen(Qt::NoPen);
-		painter.setBrush(QBrush(QColor(30, 30, 30), Qt::SolidPattern));
-		painter.drawRect(header->geometry());
-		painter.drawRect(tail->geometry());
-		//painter.drawRect(panelConsole->geometry());
-
-		painter.setPen(QPen(Qt::red, 1));
-		painter.setBrush(Qt::NoBrush);
-		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
-
-		
-
-		painter.setPen(QPen(Qt::red, 1));
-		painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
-		painter.drawText(100, 15, title->text());
-
-		
-		//QPainter headerPaiter(this);
-
-
-		//header->update();
-		/*
-		QRect imgRect(200, 100, 168, 128);
-
-		QRectF target(0, 0, width(), height());
-		QRectF source(0, 0, 168, 128);
-		QImage image("C:/GitHub/QntGui/Resources/Qnt_Logo_128px.png");
-
-		painter.setPen(*pen);
-		//painter.drawRect(imgRect);
-		painter.drawImage(imgRect, image, source);
-		*/
-
-
-
-
-
-		//QRectF rect = dock->geometry();
-		//painter.drawRect(rect);
-		//painter.drawText(10, 15, QString::number(backgroundAlpha));
-		//msgConsole(tr("draw"));
-		this->msgConsole(QString("Canvan draw..."));
-
-		panelConsole->draw();
-	}
-
-	void Canvan::setHeaderHeight(int height)
-	{
-		headerSize = height;
-		refresh();
-	}
-
-	void Canvan::setTailHeight(int height)
-	{
-		tailSize = height;
-		refresh();
-	}
-
-	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
-	{
-		closeButton->setGeometry(width() - 40, 10, 30, 30);
-		maximizeButton->setGeometry(width() - 70, 10, 30, 30);
-		minimizeButton->setGeometry(width() - 100, 10, 30, 30);
-
-		refresh();
-
-
-		msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
-	}
-
-	void Canvan::refresh()
-	{
-		header->setGeometry(0, 0, this->width(), headerSize);
-		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize);
-		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
-
-		panelConsole->setGeometry(this->width() - 300, headerSize, 300, this->height() - tailSize);
-	}
-
-	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)
-	{
-		*mCursor = mouseEvent->pos();
-		msgConsole(tr("pressed [%1,%2]").arg(QString::number(mCursor->x()), QString::number(mCursor->y())));
-	}
-
-	void Canvan::mouseMoveEvent(QMouseEvent *mouseEvent)
-	{
-		QPoint mouseCoor = mouseEvent->globalPos();
-		setGeometry(QRect(mouseCoor.x() - mCursor->x(), mouseCoor.y() - mCursor->y(), width(), height()));
-		msgConsole(tr("move [%1,%2]").arg(QString::number(mCursor->x()), QString::number(mCursor->y())));
-	}
-
 	void Canvan::mySetPalette()
 	{
 		//	menu->setStyle(QStyleFactory::create("Fusion"));
@@ -368,7 +331,7 @@ namespace Jui
 		*/
 	}
 
-	void Canvan::closeCanvan() { close(); }
+	void Canvan::closeCanvan() { /*close();*/ parent->close(); }
 	void Canvan::minimizeCanvan()
 	{
 		//emit minimizeAct();

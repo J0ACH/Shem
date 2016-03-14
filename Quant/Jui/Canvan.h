@@ -33,7 +33,7 @@ namespace Jui
 
 		void setColor_background(QColor);
 		void setColor_foreground(QColor);
-		void drawCanvan();
+		void drawCanvan(QPaintEvent *event);
 		void addScreen(QWidget *inScreen);
 
 		Console *console;
@@ -44,6 +44,7 @@ namespace Jui
 
 		void setHeaderHeight(int);
 		void setTailHeight(int);
+		
 
 	signals:
 		void actDraw();
@@ -55,22 +56,23 @@ namespace Jui
 		void minimizeCanvan();
 		void maximizeCanvan();
 
+		void resizeEvent(QResizeEvent *event);
+
 	protected:
 		void mousePressEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
-		void resizeEvent(QResizeEvent *event);
-		virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+		void paintEvent(QPaintEvent *event);
 
 	private:
 		//Ui::CanvanClass ui;
 
 		//QMenuBar *menu;
+		QWidget *parent;
+		
 		int headerSize;
 		int tailSize;
 
 		
-		void refresh();
-
 		Button *testButton;
 		Button *closeButton;
 		Button *maximizeButton;

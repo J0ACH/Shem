@@ -10,16 +10,20 @@ int main(int argc, char** argv){
 
 	QApplication app(argc, argv);
 	
-	//Canvan *canvan = new Canvan(0);
-	//canvan->setGeometry(100, 100, 1100, 400);
+	/*
+	QWidget *win2 = new QWidget();
+	win2->setGeometry(50, 100, 1100, 400);
+	Canvan *canvan = new Canvan(win2);
+	canvan->show();
+	*/
 	
 	QuantIDE::Quant *win = new QuantIDE::Quant();
+	win->show();
 	//win->setStyleSheet("QMenuBar {	background - color: black;	}");
 	//canvan->show();
 
 	//QMainWindow *win = new QMainWindow();
 	//win->setWindowIcon(QIcon(":/Resources/Qnt_AppIcon_16px.ico"));
-	win->show();
 
 	return app.exec();
 }
@@ -31,19 +35,19 @@ namespace QuantIDE
 	
 	Quant::Quant(QWidget *parent) 
 	{
-		//this = new Canvan();
+		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
 
-		this->msgConsole(QString("ScBridge init..."));
+		canvan->msgConsole(QString("ScBridge init..."));
 		
-		this->setTitle("Quant");
+		canvan->setTitle("Quant");
 
-		this->setGeometry(100, 100, 1100, 600);
+		//this->setGeometry(100, 100, 1100, 600);
 
 		this->initControl();
 		
-		this->setHeaderHeight(50);
-		this->setTailHeight(30);
+		canvan->setHeaderHeight(50);
+		canvan->setTailHeight(30);
 		
 		//win.setVersion(Qnt_VERSION_MAJOR, Qnt_VERSION_MINOR, Qnt_VERSION_PATCH);
 		
@@ -53,22 +57,22 @@ namespace QuantIDE
 	
 	void Quant::initControl()
 	{
-		this->msgConsole(QString("Control init..."));
+		canvan->msgConsole(QString("Control init..."));
 
-		buttAddNode = new Button(this);
-		buttAddNode->setGeometry(500, 400, 80, 30);
+		buttAddNode = new Button(canvan->screen);
+		buttAddNode->setGeometry(500, 200, 80, 30);
 		buttAddNode->setName("AddNode");
 	}
 
 	void Quant::addNode()
 	{
-		this->msgConsole(QString("Node add..."));
+		canvan->msgConsole(QString("Node add..."));
 	}
 	
 
 	void Quant::consoleAddMsg(QString msg)
 	{
-		this->console->append(msg);
+		canvan->console->append(msg);
 	}
 	void Quant::beep()
 	{
@@ -80,22 +84,27 @@ namespace QuantIDE
 		bridge->evaluateCode("Pdef('test', Pbind('instrument', 'default', 'dur', Pseq([1,1,0.5,0.5], 2), 'freq', 90)).play;");
 	}
 
-	
+
+	void Quant::resizeEvent(QResizeEvent *resizeEvent)
+	{
+		canvan->resizeEvent(resizeEvent);
+
+
+		canvan->msgConsole(tr("TOPView resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
+	}
+
+
+
 	void Quant::paintEvent(QPaintEvent *event)
 	{
-		drawCanvan();
-		draw();
-	}
-	
-	
-	void Quant::draw()
-	{
+		
 		QPainter painter(this);
 		//canvan->paintEvent(event);
 
 		painter.setPen(QPen(Qt::red, 3));
 		painter.setBrush(QBrush(QColor(120, 20, 20), Qt::SolidPattern));
-		painter.drawRect(QRect(500, 200, 50, 50));
+		//painter.drawRect(QRect(0, 0, canvan->screen->width(), canvan->screen->height()));
+		painter.drawRect(canvan->screen->geometry());
 
 		painter.drawLine(150, 250, 300, 250);
 
@@ -110,8 +119,11 @@ namespace QuantIDE
 		//painter.drawText(10, 15, QString::number(backgroundAlpha));
 
 
-		this->msgConsole(QString("Quant draw..."));
+		canvan->msgConsole(QString("TOPView draw..."));
 	}
+	
+	
+	
 
 	Quant::~Quant()
 	{

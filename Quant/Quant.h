@@ -15,10 +15,10 @@ using namespace Jui;
 namespace QuantIDE
 {
 
-	class Quant : public Canvan
+	class Quant : public QWidget
 	{
 		Q_OBJECT
-		
+
 	public:
 		explicit Quant(QWidget *parent = 0);
 		~Quant();
@@ -29,21 +29,22 @@ namespace QuantIDE
 		void consoleAddMsg(QString);
 		void addNode();
 
+
 	protected:
-		void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+		void resizeEvent(QResizeEvent *event);
 		void closeEvent(QCloseEvent *event);
+		void paintEvent(QPaintEvent *event);
 
 	private:
 		void initControl();
-		
+
 
 		ScBridge *bridge;
-		//Canvan *canvan;
+		Canvan *canvan;
 		Button *buttAddNode;
 
-		void draw();
 
-		
+
 	};
 }
 #endif // QUANT
