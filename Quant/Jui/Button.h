@@ -20,7 +20,7 @@ namespace Jui
 
 		QRectF boundingRect() const;
 
-		void setIconPath(QString path);
+		void setIcon(QString imgPath);
 		void setName(QString name);
 
 	protected:
@@ -30,8 +30,7 @@ namespace Jui
 		bool isPressed, isOver;
 
 		QString *name;
-
-		QString iconPath;
+		QString *icon;
 
 		void prepisePopisek();
 

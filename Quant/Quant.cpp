@@ -42,14 +42,17 @@ namespace QuantIDE
 		
 		canvan->setTitle("Quant");
 
-		//this->setGeometry(100, 100, 1100, 600);
+		
 
 		this->initControl();
 		
 		canvan->setHeaderHeight(50);
 		canvan->setTailHeight(30);
+
+		resizeTest = new QWidget(canvan->screen);
+		resizeTest->setGeometry(500, 100, 100, 100);
 		
-		//win.setVersion(Qnt_VERSION_MAJOR, Qnt_VERSION_MINOR, Qnt_VERSION_PATCH);
+		//canvan.setVersion(Qnt_VERSION_MAJOR, Qnt_VERSION_MINOR, Qnt_VERSION_PATCH);
 		
 		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
 	
@@ -101,8 +104,9 @@ namespace QuantIDE
 		QPainter painter(this);
 		//canvan->paintEvent(event);
 
-		painter.setPen(QPen(Qt::red, 3));
-		painter.setBrush(QBrush(QColor(120, 20, 20), Qt::SolidPattern));
+		
+		painter.setPen(Qt::NoPen);
+		painter.setBrush(QBrush(QColor(20, 20, 20), Qt::SolidPattern));
 		//painter.drawRect(QRect(0, 0, canvan->screen->width(), canvan->screen->height()));
 		painter.drawRect(canvan->screen->geometry());
 
@@ -118,6 +122,10 @@ namespace QuantIDE
 
 		//painter.drawText(10, 15, QString::number(backgroundAlpha));
 
+
+		painter.setPen(QPen(Qt::red, 3));
+		painter.setBrush(QBrush(QColor(120, 120, 20), Qt::SolidPattern));
+		painter.drawRect(resizeTest->geometry());
 
 		//canvan->msgConsole(QString("TOPView draw..."));
 	}

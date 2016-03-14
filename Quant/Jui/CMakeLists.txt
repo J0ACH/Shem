@@ -16,22 +16,24 @@ SET(QT_JUI_LIBRARIES
 	Qt5::Widgets
 )
 
-SET(Jui_src
-	Canvan.cpp
-	Button.cpp
-	Console.cpp
-	Panel.cpp
-)
-
 SET(Jui_hdr
 	Canvan.h
 	Button.h
 	Console.h
 	Panel.h
+	EdgeControler.h
+)
+
+SET(Jui_src
+	Canvan.cpp
+	Button.cpp
+	Console.cpp
+	Panel.cpp
+	EdgeControler.cpp
 )
 
 SET(Jui_res
-	
+	Jui.qrc
 )
 
 ADD_LIBRARY(Jui STATIC

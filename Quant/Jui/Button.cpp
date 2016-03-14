@@ -9,7 +9,7 @@ namespace Jui
 		isOver = false;
 
 		name = new QString();
-		iconPath = QString();
+		icon = new QString();
 
 		backgroundAlpha = 0;
 		fadeTimeIn = 1000;
@@ -20,10 +20,9 @@ namespace Jui
 		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
 	}
 
-	void Button::setName(QString buttonName)
-	{
-		*name = buttonName;
-	}
+	void Button::setName(QString buttonName) { *name = buttonName; }
+
+	void Button::setIcon(QString path) { *icon = path; }
 
 	QRectF Button::boundingRect() const
 	{
@@ -80,13 +79,13 @@ namespace Jui
 				pen = new QPen(Qt::white, 1);
 			}
 		}
-		if (!iconPath.isNull()){
+		if (!icon->isNull()){
 			pen = new QPen(Qt::NoPen);
 
-			QRectF target(0, 0, width(), height());
-			QRectF source(0, 0, 128, 128);
-			QImage image(iconPath);
-			painter.drawImage(target, image, source);
+			QRectF target(5, 5, 20, 20);
+			QRectF source(0, 0, 25, 25);
+			QImage img(*icon);
+			painter.drawImage(target, img, source);
 		}
 
 

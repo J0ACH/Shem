@@ -16,9 +16,9 @@ namespace Jui
 		//parent->resizeEvent(QResizeEvent *event);
 
 #ifdef JUI_CANVAN_SYSTEMFRAME
-		parent->setWindowFlags(Qt::CustomizeWindowHint);
+		//parent->setWindowFlags(Qt::CustomizeWindowHint);
+		parent->setWindowFlags(Qt::FramelessWindowHint);
 #else
-		parent->setWindowFlags(Qt::CustomizeWindowHint);
 		parent->setWindowFlags(Qt::FramelessWindowHint);
 #endif
 		parent->setWindowTitle("New Title");
@@ -92,6 +92,9 @@ namespace Jui
 		minimizeButton = new Button(header);
 		maximizeButton = new Button(header);
 
+		//closeButton->setIcon(QString(":/close.png"));
+
+
 		//closeButton->show();
 
 
@@ -138,26 +141,22 @@ namespace Jui
 
 
 		painter.setPen(Qt::NoPen);
-		painter.setBrush(QBrush(QColor(30, 30, 30), Qt::SolidPattern));
+		painter.setBrush(QBrush(QColor(40, 40, 40), Qt::SolidPattern));
 		painter.drawRect(header->geometry());
 		painter.drawRect(tail->geometry());
 		//painter.drawRect(panelConsole->geometry());
 
-		painter.setPen(QPen(Qt::red, 1));
+		painter.setPen(QPen(QColor(200, 200, 200), 1));
 		painter.setBrush(Qt::NoBrush);
 		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 
 
-
-		painter.setPen(QPen(Qt::red, 1));
 		painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
 		painter.drawText(100, 15, title->text());
 
 
 
 		//msgConsole("Canvan draw...");
-
-		//Quant::draw(event);
 	}
 
 	void Canvan::setHeaderHeight(int height)
@@ -198,7 +197,6 @@ namespace Jui
 			mCursorGlobal->y() - mCursorLocal->y()
 			);
 
-		//*mCursor = mouseEvent->pos();
 		msgConsole(tr("pressedGlobal [%1,%2]").arg(QString::number(mCursorGlobal->x()), QString::number(mCursorGlobal->y())));
 		msgConsole(tr("pressedLocal [%1,%2]").arg(QString::number(mCursorLocal->x()), QString::number(mCursorLocal->y())));
 		msgConsole(tr("frameOriginGlobal [%1,%2]").arg(QString::number(mFrameOriginGlobal->x()), QString::number(mFrameOriginGlobal->y())));
@@ -210,23 +208,8 @@ namespace Jui
 		int posX = mFrameOriginGlobal->x() - mCursorGlobal->x() + mouseCurrentGlobal.x();
 		int posY = mFrameOriginGlobal->y() - mCursorGlobal->y() + mouseCurrentGlobal.y();
 
-		/*
-		setGeometry(QRect(
-			posX,
-			posY,
-			width(),
-			height()
-			));
-		*/
 		msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
-		/*
-		msgConsole(tr("move [%1,%2]").arg(QString::number(mouseCoor.x()), QString::number(mouseCoor.y())));
-		msgConsole(tr("moveLocal [%1,%2]").arg(
-			QString::number(mouseLocalCoor->x()),
-			QString::number(mouseLocalCoor->y())
-			));
-		*/
-		//parent->setGeometry(posX, posY, parent->width(), parent->height());
+
 		parent->move(posX, posY);
 	}
 

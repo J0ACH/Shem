@@ -43,7 +43,7 @@ namespace QuantIDE
 		Canvan *canvan;
 		Button *buttAddNode;
 
-
+		QWidget *resizeTest;
 
 	};
 }
