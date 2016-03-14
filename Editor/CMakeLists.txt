@@ -23,8 +23,9 @@ SET(Editor_src
   main.cpp
   Editor.cpp
 )
+QT5_WRAP_CPP( Editor_moc ${Editor_hdr} )
 
-ADD_EXECUTABLE(Editor ${Editor_hdr} ${Editor_src})
+ADD_EXECUTABLE(Editor ${Editor_hdr} ${Editor_src} ${Editor_moc})
 IF(WIN32) 
 	set_target_properties( Editor PROPERTIES WIN32_EXECUTABLE TRUE )
 ENDIF()

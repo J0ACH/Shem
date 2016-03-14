@@ -30,6 +30,10 @@ SET(Quant_hdr Quant.h)
 SET(Quant_src Quant.cpp)
 SET(Quant_res Quant.qrc)
 
+QT5_WRAP_CPP( Quant_moc ${Quant_hdr} )
+QT5_ADd_RESOURCES( Quant_rcc ${Quant_res} )
+SET(Quant_QT_Sources ${Quant_moc} ${Quant_rcc})
+
 # APPLICATION ICON ##################################################
 
 if(WIN32)
@@ -41,7 +45,7 @@ endif(WIN32)
 
 # EXE ##################################################
 
-ADD_EXECUTABLE(Quant ${Quant_hdr} ${Quant_src} ${Quant_res} ${Quant_ico})
+ADD_EXECUTABLE(Quant ${Quant_src} ${Quant_hdr} ${Quant_QT_Sources} ${Quant_ico})
 IF(WIN32) 
 	SET_TARGET_PROPERTIES( Quant PROPERTIES WIN32_EXECUTABLE TRUE )
 ENDIF()

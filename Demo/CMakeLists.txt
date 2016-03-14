@@ -21,7 +21,9 @@ SET(QT_LIBRARIES
 SET(Demo_hdr Demo.h)
 SET(Demo_src Demo.cpp)
 
-ADD_EXECUTABLE(Demo ${Demo_hdr} ${Demo_src})
+QT5_WRAP_CPP( Demo_moc ${Demo_hdr} )
+
+ADD_EXECUTABLE(Demo ${Demo_hdr} ${Demo_src} ${Demo_moc})
 IF(WIN32) 
 	set_target_properties( Demo PROPERTIES WIN32_EXECUTABLE TRUE )
 ENDIF()
