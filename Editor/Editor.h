@@ -52,16 +52,17 @@ class QPaintEvent;
 class QResizeEvent;
 class QSize;
 class QWidget;
+ScBridge bridge;
 
 class LineNumberArea;
 
-using namespace SupercolliderBridge;
 
 class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
 
 public:
+
     CodeEditor(QWidget *parent = 0);
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
@@ -133,10 +134,10 @@ namespace DemoIDE {
 		void beep();
 		void sendCode();
 		void consoleAddMsg(QString);
-		
+
 	signals:
 		void sendCode(QString);
-		
+
 	protected:
 		void closeEvent(QCloseEvent *event);
 
@@ -151,14 +152,14 @@ namespace DemoIDE {
 		QPushButton *buttKillServer;
 		QPushButton *buttBeep;
 		QPushButton *buttCode;
-		
+
 		QLabel *runningLang;
 		QLabel *runningServer;
-		
+
 		QTextEdit *console;
 		QTextEdit *editor;
 
-		
+
 	};
 
 }

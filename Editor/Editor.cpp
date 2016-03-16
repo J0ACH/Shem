@@ -43,6 +43,7 @@
 #include "Editor.h"
 
 
+
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     lineNumberArea = new LineNumberArea(this);
@@ -188,9 +189,9 @@ Editor::Editor()
 
 	connect(buttBeep, SIGNAL(pressed()), this, SLOT(beep()));
 	connect(buttCode, SIGNAL(pressed()), this, SLOT(sendCode()));
-	
-			
-	
+
+
+
 	//bridge->startLang();
 	//bridge->startServer();
 }
@@ -263,7 +264,7 @@ void Editor::consoleAddMsg(QString msg)
 
 Editor::~Editor()
 {
-	
+
 }
 
 void Editor::closeEvent(QCloseEvent *event)

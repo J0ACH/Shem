@@ -42,11 +42,20 @@
 
 #include "Editor.h"
 
+using namespace SupercolliderBridge;
+
+ScBridge bridge;
+
 int main(int argv, char **args)
 {
     QApplication app(argv, args);
 
+
+
+
     CodeEditor editor;
+
+            bridge = new ScBridge(editor);
     editor.setWindowTitle(QObject::tr("Shem Editor"));
     editor.show();
 
