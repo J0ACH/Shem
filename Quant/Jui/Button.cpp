@@ -20,13 +20,13 @@ namespace Jui
 		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
 	}
 
-	void Button::setName(QString buttonName) { *name = buttonName; }
+	void Button::setText(QString buttonName) { *name = buttonName; }
 
 	void Button::setIcon(QString path) { *icon = path; }
 
-	QRectF Button::boundingRect() const
+	QRect Button::bounds() 
 	{
-		return QRectF(1.5, 1.5, width() - 3, height() - 3);
+		return QRect(0, 0, width() - 1, height() - 1);
 	}
 
 	void Button::alphaUpdate()
@@ -62,7 +62,7 @@ namespace Jui
 	void Button::paintEvent(QPaintEvent *)
 	{
 		QPainter painter(this);
-		QRectF rect = boundingRect();
+		//QRectF rect = boundingRect();
 
 		QPen *pen;
 		if (isPressed){
@@ -87,11 +87,13 @@ namespace Jui
 			QImage img(*icon);
 			painter.drawImage(target, img, source);
 		}
+		
 
+		painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
 
 		painter.setPen(*pen);
 		painter.setBrush(QBrush(QColor(120, 20, 20, backgroundAlpha), Qt::SolidPattern));
-		painter.drawRect(boundingRect());
+		painter.drawRect(bounds());
 
 		painter.drawText(10, 15, QString::number(backgroundAlpha));
 	}

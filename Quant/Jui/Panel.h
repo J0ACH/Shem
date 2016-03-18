@@ -2,7 +2,13 @@
 #define PANEL_H
 
 #include <QWidget>
+#include <QLabel>
 #include <QPainter>
+#include <QEvent>
+
+#include "Button.h"
+#include "Edges.h"
+
 
 namespace Jui
 {
@@ -12,16 +18,26 @@ namespace Jui
 
 	public:
 		Panel(QWidget *parent = 0);
+		~Panel();
 
+		QRect bounds();
 
-	public slots:
-		void draw();
+		void setTitle(QString);
+		void setBackground(QColor);
+
+		bool eventFilter(QObject *target, QEvent *event);
 
 	protected:
-		//void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent *event);
 
 	private:
+		QString title;
+		QColor backColor;
 
+		Button *closeButton;
+
+		Edges *edges;
 	};
 
 

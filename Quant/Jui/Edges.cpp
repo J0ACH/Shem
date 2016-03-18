@@ -4,25 +4,25 @@ namespace Jui
 {
 	Edges::Edges(QWidget *parent)
 	{
-		this->setParent(parent);
+		//this->setParent(parent);
 		this->setGeometry(QRect(0, 0, parent->width(), parent->height()));
 		//parent = widget;
 		//std::list<EdgeControler> controlers;
 		//std::list<QWidget> controlers;
 
-		QList<EdgeControler*> test;
+		//QList<EdgeControler*> test;
 		//QList<EdgeControler> test;
 
 		//this->setGeometry(parent->geometry());
-		EdgePosition position(EdgePosition::RIGHT);
+		//EdgePosition position(EdgePosition::RIGHT);
 
-		QRect frame = parent->geometry();
-		EdgeControler *edge = new EdgeControler(this);
+		//QRect frame = parent->geometry();
+		//EdgeControler *edge = new EdgeControler(this);
 		//ahoj = new EdgeControler(this);
 
 
 
-		switch (position)
+		switch (EdgePosition::RIGHT)
 		{
 		case Jui::LEFT:
 			break;
@@ -45,22 +45,38 @@ namespace Jui
 
 		//controlers.emplace_back(edge);
 		//controlers.push_back(edge);
-		test.append(edge);
+		//test.append(edge);
+	}
+
+	QRect Edges::bounds()
+	{
+		return QRect(0, 0, width() - 1, height() - 1);
 	}
 
 	//EdgeControler Edges::getAhoj(void) { return ahoj;  }
-	
+	/*
 	void Edges::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter;
 
-		painter.setPen(QPen(Qt::white, 3));
-		//painter.setBrush(QBrush(QColor(20, 20, 20), Qt::SolidPattern));
-		//painter.drawRect(QRect(0, 0, canvan->screen->width(), canvan->screen->height()));
-		painter.drawRect(QRect(0, 0, 20, 20));
-		painter.drawRect(this->geometry());
+		painter.setPen(QPen(Qt::red, 1));
+		painter.drawRect(bounds());
 	}
-	
+	*/
+	bool Edges::eventFilter(QObject* target, QEvent* event)
+	{
+		if (target == this && event->type() == QEvent::Paint) {
+			QPainter painter;
+			painter.begin(this);
+			painter.setRenderHint(QPainter::Antialiasing, true);
+			painter.setPen(QPen(Qt::black, 12, Qt::DashDotLine, Qt::RoundCap));
+			painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
+			painter.drawEllipse(50, 50, 100, 100);
+			painter.end();
+			return true; // return true if you do not want to have the child widget paint on its own afterwards, otherwise, return false.
+		}
+		return false;
+	}
 
 	Edges::~Edges()
 	{

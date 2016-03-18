@@ -18,10 +18,10 @@ namespace Jui
 		Button(QWidget *parent);
 		~Button();
 
-		QRectF boundingRect() const;
+		QRect bounds();
 
 		void setIcon(QString imgPath);
-		void setName(QString name);
+		void setText(QString name);
 
 	protected:
 		void paintEvent(QPaintEvent *);

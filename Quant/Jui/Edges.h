@@ -1,14 +1,16 @@
-
+#ifndef EDGES_H
+#define EDGES_H
 
 
 #include <QWidget>
 #include <QPainter>
 #include <QList>
+#include <QEvent>
 //#include <list>
 
 namespace Jui
 {
-	
+
 	enum EdgePosition
 	{
 		LEFT,
@@ -17,19 +19,22 @@ namespace Jui
 		BOTTOM,
 		ALL
 	};
-	
+
 	class Edges : public QWidget
 	{
 		Q_OBJECT
 
 	public:
+		Edges(){};
 		Edges(QWidget *parent);
 		~Edges();
 
-		//EdgeControler getAhoj(void);
+		QRect bounds();
+
+		bool eventFilter(QObject *target, QEvent *event);
 
 	protected:
-		void paintEvent(QPaintEvent *event);
+		//void paintEvent(QPaintEvent *event);
 
 	private:
 		//EdgeControler *ahoj;
@@ -47,12 +52,13 @@ namespace Jui
 	protected:
 		void paintEvent(QPaintEvent *event);
 
-	//private:
+		//private:
 		//QWidget *parent;
 
 	};
 
 }
+#endif // EDGES_H
 
 
 

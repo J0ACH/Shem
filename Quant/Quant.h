@@ -49,7 +49,7 @@ namespace QuantIDE
 		QWidget *resizeTest2;
 		Button *testButton;
 
-		Edges *resizeManipulator;
+		Jui::Edges *resizeManipulator;
 
 		QRect rectTest;
 		

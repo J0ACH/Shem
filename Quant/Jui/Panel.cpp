@@ -6,29 +6,77 @@ namespace Jui
 	Panel::Panel(QWidget *parent) : QWidget(parent)
 	{
 		this->setParent(parent);
-		//this->setGeometry(600, 100, 200, 200);
-		//this->setProperty()
-		connect(this->parent(), SIGNAL(actDraw()), this, SLOT(draw()));
-	}
-	/*
-	void Panel::paintEvent(QPaintEvent *)
-	{
+
+		title = "panel";
+		backColor = QColor(120, 120, 120);
+
+		edges = new Edges(this);
+		edges->installEventFilter(this);
+
+		closeButton = new Button(this);
+		closeButton->installEventFilter(this);
 		
-		//draw();
+			
+		//connect(this->parent(), SIGNAL(actDraw()), this, SLOT(draw()));
 	}
-	*/
-
-	
-	void Panel::draw()
+		
+	QRect Panel::bounds()
 	{
-		//this->parent->msgConsole(QString("Panel draw..."));
-
-		QPainter painter(this);
-
-		painter.setPen(QPen(Qt::red, 5));
-		painter.setBrush(QBrush(QColor(120, 120, 120), Qt::SolidPattern));
-		painter.drawRect(this->geometry());
+		return QRect(0, 0, width() - 1, height() - 1);
 	}
-	
 
+	void Panel::setTitle(QString name)
+	{
+		title = name;
+	}
+
+	void Panel::setBackground(QColor backgroundColor)
+	{
+		backColor = backgroundColor;
+	}
+
+	void Panel::paintEvent(QPaintEvent *event)
+	{
+		QPainter painter(this);
+		painter.fillRect(bounds(), backColor);
+
+		painter.setPen(QPen(QColor(200, 200, 200), 1));
+		painter.drawRect(bounds().adjusted(5, 5, -5, -5));
+		painter.drawText(15, 25, title);
+
+		
+	}
+
+	void Panel::resizeEvent(QResizeEvent *resizeEvent)
+	{
+		closeButton->setGeometry(width() - 30, 10, 20, 20);
+	}
+		
+	bool Panel::eventFilter(QObject* target, QEvent* event)
+	{
+		if (target == this) {
+			if (event->type() == QEvent::Resize) {
+				closeButton->setGeometry(width() - 30, 10, 20, 20);
+				//QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+				//QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
+				qDebug() << "Panel: closeButton resized";//<< resizeEvent ->key();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			// pass the event on to the parent class
+			return QWidget::eventFilter(target, event);
+		}
+
+		
+	}
+		
+	
+	Panel::~Panel()
+	{
+
+	}
 }

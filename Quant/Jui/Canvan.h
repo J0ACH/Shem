@@ -45,6 +45,7 @@ namespace Jui
 		void setHeaderHeight(int);
 		void setTailHeight(int);
 		
+		bool eventFilter(QObject *target, QEvent *event);
 
 	signals:
 		void actDraw();
@@ -73,14 +74,13 @@ namespace Jui
 		int tailSize;
 
 		
-		Button *testButton;
+		//Button *testButton;
 		Button *closeButton;
 		Button *maximizeButton;
 		Button *minimizeButton;
 
-		QPushButton *buttTest;
-		QPushButton *buttTest2;
-
+		//Button *buttTest;
+		
 		Panel *panelConsole;
 
 		QDockWidget *dock;
