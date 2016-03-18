@@ -12,7 +12,7 @@ MESSAGE(STATUS "\nShem init...")
 ### Compiler setup ########################
 
 IF(CMAKE_GENERATOR MATCHES "Visual Studio 12 2013")
-    SET(CMAKE_CONFIGURATION_TYPES Release)
+    SET(CMAKE_CONFIGURATION_TYPES Debug Release)
     SET(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
         "Reset the configurations to what we need/support"
         FORCE

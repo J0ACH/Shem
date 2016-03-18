@@ -13,7 +13,6 @@ namespace Jui
 	{
 		parent = window;
 
-		//parent->resizeEvent(QResizeEvent *event);
 
 #ifdef JUI_CANVAN_SYSTEMFRAME
 		//parent->setWindowFlags(Qt::CustomizeWindowHint);

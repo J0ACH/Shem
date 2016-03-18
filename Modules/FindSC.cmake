@@ -9,8 +9,8 @@ FIND_PATH(
   SC_INSTALL_DIR
   NAMES "sclang.exe" "sclang"
   PATHS 
-  "C:/Supercollider/Supercollider_findModules"
-  "D:/Supercollider/Supercollider_3.7"
+  "C:/Supercollider/supercollider/build"
+  "D:/Supercollider/supercollider/build"
   "/home/kof/src/supercollider/build"
   PATH_SUFFIXES "Install/Supercollider"
 )

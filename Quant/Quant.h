@@ -8,6 +8,8 @@
 
 #include "ScBridge.h"
 #include "Canvan.h"
+#include "Edges.h"
+#include "Rect.h"
 
 using namespace SupercolliderBridge;
 using namespace Jui;
@@ -20,7 +22,7 @@ namespace QuantIDE
 		Q_OBJECT
 
 	public:
-		explicit Quant(QWidget *parent = 0);
+		 Quant(QWidget *parent = 0);
 		~Quant();
 
 	public slots:
@@ -44,6 +46,13 @@ namespace QuantIDE
 		Button *buttAddNode;
 
 		QWidget *resizeTest;
+		QWidget *resizeTest2;
+		Button *testButton;
+
+		Edges *resizeManipulator;
+
+		QRect rectTest;
+		
 
 	};
 }

@@ -21,7 +21,8 @@ SET(Jui_hdr
 	Button.h
 	Console.h
 	Panel.h
-	EdgeControler.h
+	Edges.h
+	Rect.h
 )
 
 SET(Jui_src
@@ -29,7 +30,8 @@ SET(Jui_src
 	Button.cpp
 	Console.cpp
 	Panel.cpp
-	EdgeControler.cpp
+	Edges.cpp
+	Rect.cpp
 )
 
 SET(Jui_res
