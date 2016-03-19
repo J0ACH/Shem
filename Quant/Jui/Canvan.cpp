@@ -121,12 +121,12 @@ namespace Jui
 		QPen *pen;
 		pen = new QPen(Qt::red, 1);
 
-		/*
+		
 		painter.setPen(Qt::NoPen);
 		painter.setBrush(QBrush(QColor(20, 20, 20), Qt::SolidPattern));
 		painter.drawRect(screen->geometry());
 
-		*/
+		
 
 
 		painter.setPen(Qt::NoPen);
