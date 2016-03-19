@@ -22,7 +22,6 @@ SET(Jui_hdr
 	Console.h
 	Panel.h
 	Edges.h
-	Rect.h
 )
 
 SET(Jui_src
@@ -31,7 +30,6 @@ SET(Jui_src
 	Console.cpp
 	Panel.cpp
 	Edges.cpp
-	Rect.cpp
 )
 
 SET(Jui_res

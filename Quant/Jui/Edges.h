@@ -38,6 +38,7 @@ namespace Jui
 	//	QWidget *parent;		
 		//EdgeControler *ahoj;
 	};
+
 	/*
 	class EdgeControler : public QWidget
 	{

@@ -4,7 +4,6 @@ namespace Jui
 {
 	Edges::Edges(QWidget *parent) : QWidget(parent)
 	{
-		//parent = window;
 		setGeometry(0, 0, parent->width(), parent->height());
 
 		setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -70,23 +69,7 @@ namespace Jui
 		//this->setGeometry(0, 0, parent->width(), parent->height());
 		qDebug("Edges::resizeEvent");
 	}
-	/*
-	bool Edges::eventFilter(QObject* target, QEvent* event)
-	{
-		if (target == this && event->type() == QEvent::Paint) {
-			QPainter painter;
-			painter.begin(this);
-			painter.setRenderHint(QPainter::Antialiasing, true);
-			painter.setPen(QPen(Qt::black, 12, Qt::DashDotLine, Qt::RoundCap));
-			painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
-			painter.drawEllipse(50, 50, 100, 100);
-			painter.end();
-			return true; // return true if you do not want to have the child widget paint on its own afterwards, otherwise, return false.
-		}
-		return false;
-	}
-	*/
-
+	
 	Edges::~Edges()
 	{
 

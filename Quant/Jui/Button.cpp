@@ -58,8 +58,7 @@ namespace Jui
 	void Button::paintEvent(QPaintEvent *)
 	{
 		QPainter painter(this);
-		//QRectF rect = boundingRect();
-
+		
 		QPen *pen;
 		if (isPressed){
 
@@ -83,8 +82,7 @@ namespace Jui
 			QImage img(icon);
 			painter.drawImage(target, img, source);
 		}
-
-
+		
 		painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
 
 		painter.setPen(*pen);

@@ -3,8 +3,7 @@
 namespace Jui
 {
 
-	Console::Console(QWidget *parent)
-		:QTextEdit(parent)
+	Console::Console(QWidget *parent):QTextEdit(parent)
 	{
 		//text = new QTextEdit(this);
 		setReadOnly(true);

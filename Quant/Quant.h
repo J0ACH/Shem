@@ -8,8 +8,8 @@
 
 #include "ScBridge.h"
 #include "Canvan.h"
+#include "Panel.h"
 #include "Edges.h"
-#include "Rect.h"
 
 using namespace SupercolliderBridge;
 using namespace Jui;
@@ -39,6 +39,8 @@ namespace QuantIDE
 		ScBridge *bridge;
 		Canvan *canvan;
 		Button *buttAddNode;
+
+		Panel *testPanel;
 
 	};
 }

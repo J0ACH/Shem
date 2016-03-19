@@ -12,13 +12,7 @@ int main(int argc, char** argv){
 	QuantIDE::Quant *win = new QuantIDE::Quant();
 	win->setGeometry(50, 50, 1100, 700);
 	win->show();
-
-	//QWidget win;
-	//Canvan *win = new Canvan();
-
-	//win.setGeometry(100, 100, 800, 600);
-	//win.show();
-
+	
 	return app.exec();
 }
 
@@ -50,12 +44,15 @@ namespace QuantIDE
 
 	void Quant::initControl()
 	{
-	//	canvan->installEventFilter(this);
-		
 		buttAddNode = new Button(canvan->screen);
 		buttAddNode->setGeometry(400, 5, 80, 30);
 		buttAddNode->setText("AddNode");
-	//	buttAddNode->installEventFilter(this);
+	
+		testPanel = new Panel(this);
+		testPanel->setGeometry(100, 100, 300, 300);
+		testPanel->setTitle("Test");
+		testPanel->setBackground(Qt::black);
+
 	}
 	
 	void Quant::resizeEvent(QResizeEvent *resizeEvent)
