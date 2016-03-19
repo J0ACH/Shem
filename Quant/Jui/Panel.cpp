@@ -12,7 +12,7 @@ namespace Jui
 
 		this->initControl();
 
-		//connect(this->parent(), SIGNAL(actDraw()), this, SLOT(draw()));
+		connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
 	}
 
 	QRect Panel::bounds()
@@ -23,12 +23,13 @@ namespace Jui
 	void Panel::initControl()
 	{
 		closeButton = new Button(this);
-		closeButton->installEventFilter(this);
+		//closeButton->installEventFilter(this);
 		closeButton->setGeometry(this->width() - 30, 10, 20, 20);
 		closeButton->setText("X");
 
 		edges = new Edges(this);
-		edges->installEventFilter(this);
+		//edges->installEventFilter(this);
+		//closeButton->installEventFilter(this);
 	}
 
 	void Panel::setTitle(QString name)
@@ -50,7 +51,7 @@ namespace Jui
 		painter.drawRect(bounds().adjusted(5, 5, -5, -5));
 		painter.drawText(15, 25, title);
 
-		qDebug("Panel::paintEvent");
+		//qDebug("Panel::paintEvent");
 	}
 
 	void Panel::resizeEvent(QResizeEvent *resizeEvent)

@@ -7,6 +7,8 @@ namespace Jui
 		//parent = window;
 		setGeometry(0, 0, parent->width(), parent->height());
 
+		setAttribute(Qt::WA_TransparentForMouseEvents);
+
 		//std::list<EdgeControler> controlers;
 		//std::list<QWidget> controlers;
 
@@ -60,7 +62,7 @@ namespace Jui
 		//painter.drawRect(bounds().adjusted(2, 2, -2, -2));
 		painter.drawRect(bounds());
 
-		qDebug("Edges::paintEvent");
+	//	qDebug("Edges::paintEvent");
 	}
 
 	void Edges::resizeEvent(QResizeEvent *resizeEvent)

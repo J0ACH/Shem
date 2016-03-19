@@ -50,45 +50,18 @@ namespace QuantIDE
 
 	void Quant::initControl()
 	{
-		canvan->installEventFilter(this);
+	//	canvan->installEventFilter(this);
 		
 		buttAddNode = new Button(canvan->screen);
 		buttAddNode->setGeometry(400, 5, 80, 30);
 		buttAddNode->setText("AddNode");
-		buttAddNode->installEventFilter(this);
+	//	buttAddNode->installEventFilter(this);
 	}
 	
 	void Quant::resizeEvent(QResizeEvent *resizeEvent)
 	{
-		//canvan->resizeEvent(resizeEvent);
-
-
 		canvan->msgConsole(tr("TOPView resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
 	}
-	/*
-	void Quant::paintEvent(QPaintEvent *event)
-	{
-
-		QPainter painter(this);
-		
-		painter.setPen(QPen(Qt::yellow, 3));
-		painter.drawRect(QRect(0, 0, 500, 500));
-
-		painter.setPen(QPen(Qt::red, 1));
-		painter.drawLine(canvan->screen->geometry().bottomLeft(), canvan->screen->geometry().topRight());
-		painter.drawLine(canvan->screen->geometry().bottomRight(), canvan->screen->geometry().topLeft());
-
-		painter.setPen(QPen(Qt::red, 3));
-		painter.drawRect(canvan->screen->geometry().adjusted(5, 5, -5, -5));
-
-		painter.setPen(Qt::NoPen);
-		//painter.setBrush(QBrush(QColor(120, 20, 20, 150), Qt::SolidPattern));
-		//painter.drawRect(resizeTest->geometry());
-		painter.fillRect(resizeTest->geometry(), QColor(120, 20, 20, 150));
-
-		qDebug("Quant::paintEvent");
-	}
-	*/
 
 	void Quant::addNode()
 	{

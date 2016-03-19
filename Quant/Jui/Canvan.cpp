@@ -58,7 +58,7 @@ namespace Jui
 		maximizeButton = new Button(header);
 
 		panelConsole = new Panel(this);
-		panelConsole->installEventFilter(this);
+		//panelConsole->installEventFilter(this);
 		panelConsole->setTitle("Console");
 		panelConsole->setBackground(QColor(30, 30, 30));
 		panelConsole->setGeometry(0, 0, 150, 150);
@@ -132,7 +132,7 @@ namespace Jui
 		painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
 		painter.drawText(100, 15, title->text());
 		
-		qDebug("Canvan::paintEvent");
+		//qDebug("Canvan::paintEvent");
 		//msgConsole("Canvan draw...");
 	}
 

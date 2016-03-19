@@ -29,17 +29,17 @@ namespace Jui
 	private:
 		bool isPressed, isOver;
 
-		QString *name;
-		QString *icon;
+		QString name;
+		QString icon;
 
-		void prepisePopisek();
+		//void prepisePopisek();
 
 		void mousePressEvent(QMouseEvent *event);
 		void mouseReleaseEvent(QMouseEvent *event);
 		void enterEvent(QEvent *event);
 		void leaveEvent(QEvent *event);
 
-		void addAction();
+		//void addAction();
 		int fadeTimeIn;
 		int fadeTimeOut;
 		int fps;
