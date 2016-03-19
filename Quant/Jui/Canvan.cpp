@@ -16,7 +16,7 @@ namespace Jui
 #endif
 		parent->setWindowTitle("New Title");
 		parent->window()->setWindowOpacity(0.95);
-		
+
 		setGeometry(0, 0, parent->width(), parent->height());
 
 		mCursorGlobal = new QPoint(0, 0);
@@ -31,23 +31,10 @@ namespace Jui
 		headerSize = 100;
 		tailSize = 50;
 
-
-		closeButton = new Button(header);
-		minimizeButton = new Button(header);
-		maximizeButton = new Button(header);
-
-		panelConsole = new Panel(this);
-		panelConsole->installEventFilter(this);
-		panelConsole->setTitle("Console");
-		panelConsole->setBackground(QColor(30, 30, 30));
-
-
+		this->initControl();
+		
 		//closeButton->setIcon(QString(":/close.png"));
-
-
 		//closeButton->show();
-
-
 		//console = new QDockWidget(QString("Console"), this);
 
 		dock = new QDockWidget(tr("Console"), screen);
@@ -56,25 +43,53 @@ namespace Jui
 		console = new Console(dock);
 		dock->setWidget(console);
 		//addDockWidget(Qt::RightDockWidgetArea, dock);
-
-
-
+		
 
 		connect(this, SIGNAL(sendToConsole(QString)), console, SLOT(addLine(QString)));
-
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(closeCanvan()));
 
 		msgConsole(tr("start"));
 	}
 
+	void Canvan::initControl()
+	{
+		closeButton = new Button(header);
+		minimizeButton = new Button(header);
+		maximizeButton = new Button(header);
+
+		panelConsole = new Panel(this);
+		panelConsole->installEventFilter(this);
+		panelConsole->setTitle("Console");
+		panelConsole->setBackground(QColor(30, 30, 30));
+		panelConsole->setGeometry(0, 0, 150, 150);
+	}
+
+	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
+	{
+		this->setGeometry(0, 0, parent->width(), parent->height());
+
+		closeButton->setGeometry(width() - 40, 10, 30, 30);
+		maximizeButton->setGeometry(width() - 75, 10, 30, 30);
+		minimizeButton->setGeometry(width() - 110, 10, 30, 30);
+
+		header->setGeometry(0, 0, this->width(), headerSize);
+		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize - headerSize);
+		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
+
+		panelConsole->setGeometry(this->width() - 300, headerSize + 5, 300, this->height() - headerSize - tailSize - 10);
+
+		msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
+	}
+
+	/*
 	bool Canvan::eventFilter(QObject* target, QEvent* event)
 	{
 		if (target == panelConsole) {
 			if (event->type() == QEvent::Resize) {
-				
+
 				//QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 				QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
-				qDebug() << "Canvan: ConsolePanel resized"<< resizeEvent->size();
+				qDebug() << "Canvan: ConsolePanel resized" << resizeEvent->size();
 				return true;
 			}
 			else {
@@ -97,54 +112,27 @@ namespace Jui
 			return QWidget::eventFilter(target, event);
 		}
 
-		/*
-		if (target == edges && event->type() == QEvent::Paint) {
-		QPainter painter;
-		painter.begin(edges);
-		painter.setRenderHint(QPainter::Antialiasing, true);
-		painter.setPen(QPen(Qt::black, 12, Qt::DashDotLine, Qt::RoundCap));
-		painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
-		painter.drawEllipse(50, 50, 100, 100);
-		painter.end();
-		return true; // return true if you do not want to have the child widget paint on its own afterwards, otherwise, return false.
-		}
-		return false;
-		*/
+		
 	}
+	*/
 
 	void Canvan::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
 
-		QRectF rect = screen->geometry();
-
-		QPen *pen;
-		pen = new QPen(Qt::red, 1);
-
-		
 		painter.setPen(Qt::NoPen);
-		painter.setBrush(QBrush(QColor(20, 20, 20), Qt::SolidPattern));
-		painter.drawRect(screen->geometry());
-
+		painter.fillRect(screen->geometry(), QColor(20, 20, 20));
+		painter.fillRect(header->geometry(), QColor(40, 40, 40));
+		painter.fillRect(tail->geometry(), QColor(40, 40, 40));
 		
-
-
-		painter.setPen(Qt::NoPen);
-		painter.setBrush(QBrush(QColor(40, 40, 40), Qt::SolidPattern));
-		painter.drawRect(header->geometry());
-		painter.drawRect(tail->geometry());
-		//painter.drawRect(panelConsole->geometry());
-
 		painter.setPen(QPen(QColor(200, 200, 200), 1));
 		painter.setBrush(Qt::NoBrush);
 		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
-
-
+		
 		painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
 		painter.drawText(100, 15, title->text());
-
-
-
+		
+		qDebug("Canvan::paintEvent");
 		//msgConsole("Canvan draw...");
 	}
 
@@ -160,22 +148,7 @@ namespace Jui
 
 
 
-	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
-	{
-		this->setGeometry(0, 0, parent->width(), parent->height());
 
-		closeButton->setGeometry(width() - 40, 10, 30, 30);
-		maximizeButton->setGeometry(width() - 75, 10, 30, 30);
-		minimizeButton->setGeometry(width() - 110, 10, 30, 30);
-
-		header->setGeometry(0, 0, this->width(), headerSize);
-		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize - headerSize);
-		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
-
-		panelConsole->setGeometry(this->width() - 300, headerSize, 300, this->height() - headerSize - tailSize);
-
-		msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
-	}
 
 	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)
 	{

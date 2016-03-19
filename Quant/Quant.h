@@ -26,16 +26,13 @@ namespace QuantIDE
 		~Quant();
 
 	public slots:
-		void beep();
-		void pdefPlay();
 		void consoleAddMsg(QString);
 		void addNode();
-
 
 	protected:
 		void resizeEvent(QResizeEvent *event);
 		void closeEvent(QCloseEvent *event);
-		void paintEvent(QPaintEvent *event);
+	//	void paintEvent(QPaintEvent *event);
 
 	private:
 		void initControl();

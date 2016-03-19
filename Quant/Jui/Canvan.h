@@ -28,6 +28,8 @@ namespace Jui
 		Canvan(QWidget *parent = 0);
 		~Canvan();
 
+		void initControl();
+
 		void setTitle(QString titleName);
 		void setVersion(int major, int minor, int patch);
 
@@ -45,7 +47,7 @@ namespace Jui
 		void setHeaderHeight(int);
 		void setTailHeight(int);
 		
-		bool eventFilter(QObject *target, QEvent *event);
+		//bool eventFilter(QObject *target, QEvent *event);
 
 	signals:
 		void actDraw();

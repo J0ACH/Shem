@@ -10,7 +10,7 @@ int main(int argc, char** argv){
 
 	
 	QuantIDE::Quant *win = new QuantIDE::Quant();
-	win->setGeometry(50, 100, 1100, 700);
+	win->setGeometry(50, 50, 1100, 700);
 	win->show();
 
 	//QWidget win;
@@ -49,8 +49,6 @@ namespace QuantIDE
 			QString::number(rectTest.bottom())
 			));
 
-		
-		
 		//rectTest = Rect.offset(canvan->screen, 0, 0, 0, 0);
 
 		resizeTest = new QWidget(canvan->screen);
@@ -78,8 +76,11 @@ namespace QuantIDE
 		canvan->msgConsole(QString("Control init..."));
 
 		buttAddNode = new Button(canvan->screen);
-		buttAddNode->setGeometry(500, 200, 80, 30);
+		buttAddNode->setGeometry(400, 5, 80, 30);
 		buttAddNode->setText("AddNode");
+		buttAddNode->installEventFilter(this);
+
+
 	}
 	
 	void Quant::resizeEvent(QResizeEvent *resizeEvent)
@@ -89,14 +90,12 @@ namespace QuantIDE
 
 		canvan->msgConsole(tr("TOPView resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
 	}
-
+	/*
 	void Quant::paintEvent(QPaintEvent *event)
 	{
 
-		QPainter painter;
-		painter.begin(this);
-
-
+		QPainter painter(this);
+		
 		painter.setPen(QPen(Qt::yellow, 3));
 		painter.drawRect(QRect(0, 0, 500, 500));
 
@@ -112,8 +111,9 @@ namespace QuantIDE
 		//painter.drawRect(resizeTest->geometry());
 		painter.fillRect(resizeTest->geometry(), QColor(120, 20, 20, 150));
 
-		painter.end();
+		qDebug("Quant::paintEvent");
 	}
+	*/
 
 	void Quant::addNode()
 	{
@@ -124,16 +124,7 @@ namespace QuantIDE
 	{
 		canvan->console->append(msg);
 	}
-	void Quant::beep()
-	{
-		bridge->evaluateCode("().play");
-	}
-
-	void Quant::pdefPlay()
-	{
-		bridge->evaluateCode("Pdef('test', Pbind('instrument', 'default', 'dur', Pseq([1,1,0.5,0.5], 2), 'freq', 90)).play;");
-	}
-
+	
 	Quant::~Quant()
 	{
 

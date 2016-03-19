@@ -24,7 +24,7 @@ namespace Jui
 
 	void Button::setIcon(QString path) { *icon = path; }
 
-	QRect Button::bounds() 
+	QRect Button::bounds()
 	{
 		return QRect(0, 0, width() - 1, height() - 1);
 	}
@@ -87,7 +87,7 @@ namespace Jui
 			QImage img(*icon);
 			painter.drawImage(target, img, source);
 		}
-		
+
 
 		painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
 
@@ -95,7 +95,16 @@ namespace Jui
 		painter.setBrush(QBrush(QColor(120, 20, 20, backgroundAlpha), Qt::SolidPattern));
 		painter.drawRect(bounds());
 
-		painter.drawText(10, 15, QString::number(backgroundAlpha));
+		if (!name->isNull())
+		{
+			painter.drawText(10, 15, *name);
+		}
+		else
+		{
+			painter.drawText(10, 15, QString::number(backgroundAlpha));
+		}
+
+
 	}
 
 	void Button::mousePressEvent(QMouseEvent *event)

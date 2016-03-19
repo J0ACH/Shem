@@ -22,10 +22,12 @@ namespace Jui
 
 		QRect bounds();
 
+		void initControl();
+
 		void setTitle(QString);
 		void setBackground(QColor);
 
-		bool eventFilter(QObject *target, QEvent *event);
+		//bool eventFilter(QObject *target, QEvent *event);
 
 	protected:
 		void paintEvent(QPaintEvent *event);
