@@ -25,7 +25,7 @@ int main(int argc, char** argv){
 namespace QuantIDE
 {
 
-	Quant::Quant(QWidget *parent)
+	Quant::Quant(QWidget *parent) : QWidget(parent)
 	{
 		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
@@ -38,32 +38,9 @@ namespace QuantIDE
 		canvan->setHeaderHeight(50);
 		canvan->setTailHeight(30);
 
-		rectTest = Rect(this).offset(100,100,0,0);
+		canvan->msgConsole(QString("Control init..."));
 
 		//this->setMouseTracking(true);
-
-		canvan->msgConsole(tr("rectTest left:%1, top:%2, right:%3, bottom:%4").arg(
-			QString::number(rectTest.left()),
-			QString::number(rectTest.top()),
-			QString::number(rectTest.right()),
-			QString::number(rectTest.bottom())
-			));
-
-		//rectTest = Rect.offset(canvan->screen, 0, 0, 0, 0);
-
-		resizeTest = new QWidget(canvan->screen);
-		resizeTest->setGeometry(500, 50, 300, 300);
-
-		resizeTest2 = new QWidget(resizeTest);
-		resizeTest2->setGeometry(20, 20, 260, 260);
-		
-		testButton = new Button(resizeTest);
-		testButton->setGeometry(20, 20, 260, 260);
-		
-		resizeManipulator = new Jui::Edges(resizeTest);
-		resizeManipulator->installEventFilter(this);
-		//resizeManipulator->setGeometry(0, 0, 20, 100);
-		//, EdgePosition::RIGHT
 
 		//canvan.setVersion(Qnt_VERSION_MAJOR, Qnt_VERSION_MINOR, Qnt_VERSION_PATCH);
 
@@ -73,19 +50,17 @@ namespace QuantIDE
 
 	void Quant::initControl()
 	{
-		canvan->msgConsole(QString("Control init..."));
-
+		canvan->installEventFilter(this);
+		
 		buttAddNode = new Button(canvan->screen);
 		buttAddNode->setGeometry(400, 5, 80, 30);
 		buttAddNode->setText("AddNode");
 		buttAddNode->installEventFilter(this);
-
-
 	}
 	
 	void Quant::resizeEvent(QResizeEvent *resizeEvent)
 	{
-		canvan->resizeEvent(resizeEvent);
+		//canvan->resizeEvent(resizeEvent);
 
 
 		canvan->msgConsole(tr("TOPView resize [%1, %2]").arg(QString::number(width()), QString::number(height())));

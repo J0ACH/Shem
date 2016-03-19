@@ -37,19 +37,9 @@ namespace QuantIDE
 	private:
 		void initControl();
 
-
 		ScBridge *bridge;
 		Canvan *canvan;
 		Button *buttAddNode;
-
-		QWidget *resizeTest;
-		QWidget *resizeTest2;
-		Button *testButton;
-
-		Jui::Edges *resizeManipulator;
-
-		QRect rectTest;
-		
 
 	};
 }

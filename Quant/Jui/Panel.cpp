@@ -56,6 +56,7 @@ namespace Jui
 	void Panel::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		closeButton->setGeometry(this->width() - 30, 10, 20, 20);
+
 		edges->setGeometry(0, 0, width(), height());
 
 		qDebug("Panel::resizeEvent");

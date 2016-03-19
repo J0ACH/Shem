@@ -2,14 +2,11 @@
 
 namespace Jui
 {
-	Edges::Edges(QWidget *window) : QWidget(window)
+	Edges::Edges(QWidget *parent) : QWidget(parent)
 	{
-		//this->setParent(parent);
-		//this->setGeometry(QRect(0, 0, parent->width(), parent->height()));
-		parent = window;
+		//parent = window;
 		setGeometry(0, 0, parent->width(), parent->height());
 
-		//parent = widget;
 		//std::list<EdgeControler> controlers;
 		//std::list<QWidget> controlers;
 
@@ -22,9 +19,7 @@ namespace Jui
 		//QRect frame = parent->geometry();
 		//EdgeControler *edge = new EdgeControler(this);
 		//ahoj = new EdgeControler(this);
-
-
-
+		/*
 		switch (EdgePosition::RIGHT)
 		{
 		case Jui::LEFT:
@@ -44,6 +39,7 @@ namespace Jui
 		default:
 			break;
 		}
+		*/
 
 
 		//controlers.emplace_back(edge);
@@ -58,17 +54,18 @@ namespace Jui
 	
 	void Edges::paintEvent(QPaintEvent *event)
 	{
-		QPainter painter;
+		QPainter painter(this);
 
-		painter.setPen(QPen(Qt::red, 1));
-		painter.drawRect(bounds().adjusted(2, 2, -2, -2));
+		painter.setPen(QPen(Qt::red, 1 ));
+		//painter.drawRect(bounds().adjusted(2, 2, -2, -2));
+		painter.drawRect(bounds());
 
 		qDebug("Edges::paintEvent");
 	}
 
 	void Edges::resizeEvent(QResizeEvent *resizeEvent)
 	{		
-		this->setGeometry(0, 0, parent->width(), parent->height());
+		//this->setGeometry(0, 0, parent->width(), parent->height());
 		qDebug("Edges::resizeEvent");
 	}
 	/*
