@@ -12,6 +12,7 @@ namespace Jui
 
 		//name = "";
 		//icon = new QString();
+		iconOffset = 0;
 
 		backgroundAlpha = 0;
 		fadeTimeIn = 1000;
@@ -19,12 +20,13 @@ namespace Jui
 		fps = 25;
 
 		timer = new QTimer(this);
+
 		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
 	}
 
 	void Button::setText(QString buttonName) { name = buttonName; }
 
-	void Button::setIcon(QString path) { icon = path; }
+	void Button::setIcon(QImage img, int offset = 0) { icon = img; iconOffset = offset; }
 
 	QRect Button::bounds()
 	{
@@ -58,7 +60,7 @@ namespace Jui
 	void Button::paintEvent(QPaintEvent *)
 	{
 		QPainter painter(this);
-		
+
 		QPen *pen;
 		if (isPressed){
 			pen = new QPen(Qt::red, 3);
@@ -73,32 +75,20 @@ namespace Jui
 				pen = new QPen(Qt::white, 1);
 			}
 		}
-		
+
 		if (!icon.isNull()){
-			//pen = new QPen(Qt::NoPen);
+
 			painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
 
-			pen = new QPen(Qt::red, 1);
-
-			QRectF target(7, 7, 16, 16);
-			QRectF source(0, 0, 128, 128);
-			//QImage img("C:/GitHub/Shem/Quant/Jui/Images/IconClose.png");
-			QImage img(":/close128.png");
-			if (img.isNull())
-			{
-				qDebug() << tr("ButtonImg nenalezen");
-			};
-			painter.drawImage(target, img, source);
-			
-			painter.setPen(*pen);
-		//	painter.drawRect(bounds());
-
-			qDebug() << tr("ButtonImg [%1, %2, %3, %4]").arg(
-				QString::number(img.rect().left()),
-				QString::number(img.rect().top()),
-				QString::number(img.size().width()),
-				QString::number(img.size().height())
+			QRectF target(
+				iconOffset,
+				iconOffset,
+				this->width() - 2 * iconOffset - 1,
+				this->height() - 2 * iconOffset - 1
 				);
+			QRectF source(0, 0, icon.width(), icon.height());
+
+			painter.drawImage(target, icon, source);
 		}
 		else
 		{
@@ -116,11 +106,6 @@ namespace Jui
 				painter.drawText(10, 15, QString::number(backgroundAlpha));
 			}
 		}
-		
-		
-
-
-
 	}
 
 	void Button::mousePressEvent(QMouseEvent *event)
@@ -141,7 +126,7 @@ namespace Jui
 	{
 		isPressed = false;
 		update();
-		QWidget::mouseReleaseEvent(event);
+		//QWidget::mouseReleaseEvent(event);
 	}
 
 	void Button::enterEvent(QEvent *event)
@@ -153,19 +138,7 @@ namespace Jui
 		isOver = true;
 		emit enterAct(tr("Button_EnterAct [%1]").arg(name));
 
-		QVariant posX(bounds().left());
-		QVariant posY(bounds().top());
-		QVariant sizeX(bounds().width());
-		QVariant sizeY(bounds().height());
-
-		qDebug() << tr("Button (%1, icon: %2)::enterEvent [%3, %4, %5, %6]").arg(
-			name, 
-			icon,
-			posX.toString(),
-			posY.toString(),
-			sizeX.toString(),
-			sizeY.toString()
-			);
+		qDebug() << tr("Button::enterEvent");
 	}
 
 	void Button::leaveEvent(QEvent *event)
@@ -176,7 +149,7 @@ namespace Jui
 
 		isOver = false;
 		emit leaveAct(tr("Button_LeaveAct [%1]").arg(name));
-		qDebug("Button::leaveEvent");
+		qDebug() << tr("Button (%1, icon: %2)::leaveEvent");
 	}
 
 	Button::~Button()

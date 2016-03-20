@@ -81,6 +81,8 @@ namespace Jui
 
 		Panel *panelConsole;
 
+		Edges *edges;
+
 		QDockWidget *dock;
 
 		QImage logo;

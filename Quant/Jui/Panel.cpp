@@ -23,8 +23,8 @@ namespace Jui
 	void Panel::initControl()
 	{
 		closeButton = new Button(this);
-		//closeButton->installEventFilter(this);
 		closeButton->setGeometry(this->width() - 30, 10, 20, 20);
+		closeButton->setIcon(QImage(":/close128.png"), 5);
 		closeButton->setText("X");
 
 		edges = new Edges(this);

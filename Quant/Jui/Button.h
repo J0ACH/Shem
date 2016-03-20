@@ -20,8 +20,16 @@ namespace Jui
 
 		QRect bounds();
 
-		void setIcon(QString imgPath);
+		void setIcon(QImage, int);
 		void setText(QString name);
+
+	signals:
+		void pressAct();
+		void enterAct(QString name);
+		void leaveAct(QString name);
+
+	public slots:
+		void alphaUpdate();
 
 	protected:
 		void paintEvent(QPaintEvent *);
@@ -30,8 +38,8 @@ namespace Jui
 		bool isPressed, isOver;
 
 		QString name;
-		QString icon;
-
+		QImage icon;
+		int iconOffset;
 		//void prepisePopisek();
 
 		void mousePressEvent(QMouseEvent *event);
@@ -47,13 +55,7 @@ namespace Jui
 
 		QTimer *timer;
 
-	signals:
-		void pressAct();
-		void enterAct(QString name);
-		void leaveAct(QString name);
-
-		public slots:
-		void alphaUpdate();
+	
 
 
 	};

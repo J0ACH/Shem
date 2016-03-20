@@ -53,7 +53,8 @@ namespace Jui
 	{
 		closeButton = new Button(header);
 		closeButton->setText("Canvan_close");
-		closeButton->setIcon(":/close.png");
+		closeButton->setIcon(QImage(":/close128.png"), 6);
+
 		minimizeButton = new Button(header);
 		maximizeButton = new Button(header);
 
@@ -62,6 +63,8 @@ namespace Jui
 		panelConsole->setTitle("Console");
 		panelConsole->setBackground(QColor(30, 30, 30));
 		panelConsole->setGeometry(0, 0, 150, 150);
+
+		edges = new Edges(this);
 	}
 
 	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
@@ -77,6 +80,8 @@ namespace Jui
 		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
 
 		panelConsole->setGeometry(this->width() - 300, headerSize + 5, 300, this->height() - headerSize - tailSize - 10);
+
+		edges->setGeometry(0, 0, width(), height());
 
 		msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
 	}
@@ -119,6 +124,7 @@ namespace Jui
 	void Canvan::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
+		painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
 		painter.setPen(Qt::NoPen);
 		//painter.fillRect(screen->geometry(), QColor(20, 20, 20));

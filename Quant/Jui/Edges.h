@@ -20,6 +20,30 @@ namespace Jui
 		ALL
 	};
 
+
+	// EdgeControler musi byt nacten pred Edge
+	class EdgeControler : public QWidget
+	{
+		Q_OBJECT
+
+	public:
+		EdgeControler(QWidget *parent = 0);
+		~EdgeControler();
+
+		QRect bounds();
+
+		void setDirection(EdgePosition);
+
+	protected:
+		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent *event);
+		
+	private:
+		EdgePosition side;
+	};
+
+
+
 	class Edges : public QWidget
 	{
 		Q_OBJECT
@@ -29,34 +53,17 @@ namespace Jui
 		~Edges();
 
 		QRect bounds();
-		
+
+	private:
+		EdgeControler *testEdge;
+
 	protected:
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
 
-	private:
-	//	QWidget *parent;		
-		//EdgeControler *ahoj;
 	};
 
-	/*
-	class EdgeControler : public QWidget
-	{
-		Q_OBJECT
-
-	public:
-		EdgeControler(QWidget *parent);
-		~EdgeControler();
-
-	protected:
-		void paintEvent(QPaintEvent *event);
-
-		//private:
-		//QWidget *parent;
-
-	};
-	*/
-
+	
 }
 #endif // EDGES_H
 
