@@ -32,6 +32,7 @@ namespace QuantIDE
 	protected:
 		void resizeEvent(QResizeEvent *event);
 		void closeEvent(QCloseEvent *event);
+		void paintEvent(QPaintEvent *event);
 
 	private:
 		void initControl();

@@ -1,7 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file alias="close.png">Images/IconClose.png</file>
-    <file alias="maximize.png">Images/IconMaximize.png</file>
-    <file alias="minimize.png">Images/IconMinimize.png</file>
+    <file alias="close128.png">Resources/IconClose.png</file>
 </qresource>
 </RCC>

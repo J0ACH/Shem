@@ -7,7 +7,6 @@ using namespace SupercolliderBridge;
 int main(int argc, char** argv){
 
 	QApplication app(argc, argv);
-
 	
 	QuantIDE::Quant *win = new QuantIDE::Quant();
 	win->setGeometry(50, 50, 1100, 700);
@@ -25,17 +24,18 @@ namespace QuantIDE
 		bridge = new ScBridge(this);
 
 		canvan->msgConsole(QString("ScBridge init..."));
-		canvan->setTitle("Quant");
 
 		this->initControl();
 
 		canvan->setHeaderHeight(50);
 		canvan->setTailHeight(30);
+		canvan->setLogo(QImage(":/logo128.png"));
 
 		canvan->msgConsole(QString("Control init..."));
 
 		//this->setMouseTracking(true);
 
+		//canvan->setTitle("Quant");
 		//canvan.setVersion(Qnt_VERSION_MAJOR, Qnt_VERSION_MINOR, Qnt_VERSION_PATCH);
 
 		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
@@ -55,6 +55,12 @@ namespace QuantIDE
 
 	}
 	
+	void Quant::paintEvent(QPaintEvent *paintEvent)
+	{
+		QPainter painter(this);
+		painter.fillRect(QRect(0,0,width()-1, height()-1), QColor(20, 20, 20));
+	}
+
 	void Quant::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		canvan->msgConsole(tr("TOPView resize [%1, %2]").arg(QString::number(width()), QString::number(height())));

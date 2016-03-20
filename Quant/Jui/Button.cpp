@@ -61,7 +61,6 @@ namespace Jui
 		
 		QPen *pen;
 		if (isPressed){
-
 			pen = new QPen(Qt::red, 3);
 		}
 		else
@@ -74,29 +73,52 @@ namespace Jui
 				pen = new QPen(Qt::white, 1);
 			}
 		}
-		if (!icon.isNull()){
-			pen = new QPen(Qt::NoPen);
-
-			QRectF target(5, 5, 20, 20);
-			QRectF source(0, 0, 25, 25);
-			QImage img(icon);
-			painter.drawImage(target, img, source);
-		}
 		
-		painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
+		if (!icon.isNull()){
+			//pen = new QPen(Qt::NoPen);
+			painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
 
-		painter.setPen(*pen);
-		painter.setBrush(QBrush(QColor(120, 20, 20, backgroundAlpha), Qt::SolidPattern));
-		painter.drawRect(bounds());
+			pen = new QPen(Qt::red, 1);
 
-		if (!name.isNull())
-		{
-			painter.drawText(10, 15, name);
+			QRectF target(7, 7, 16, 16);
+			QRectF source(0, 0, 128, 128);
+			//QImage img("C:/GitHub/Shem/Quant/Jui/Images/IconClose.png");
+			QImage img(":/close128.png");
+			if (img.isNull())
+			{
+				qDebug() << tr("ButtonImg nenalezen");
+			};
+			painter.drawImage(target, img, source);
+			
+			painter.setPen(*pen);
+		//	painter.drawRect(bounds());
+
+			qDebug() << tr("ButtonImg [%1, %2, %3, %4]").arg(
+				QString::number(img.rect().left()),
+				QString::number(img.rect().top()),
+				QString::number(img.size().width()),
+				QString::number(img.size().height())
+				);
 		}
 		else
 		{
-			painter.drawText(10, 15, QString::number(backgroundAlpha));
+			painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
+			painter.setPen(*pen);
+			painter.setBrush(QBrush(QColor(120, 20, 20, backgroundAlpha), Qt::SolidPattern));
+			painter.drawRect(bounds());
+
+			if (!name.isNull())
+			{
+				painter.drawText(10, 15, name);
+			}
+			else
+			{
+				painter.drawText(10, 15, QString::number(backgroundAlpha));
+			}
 		}
+		
+		
+
 
 
 	}
@@ -136,8 +158,9 @@ namespace Jui
 		QVariant sizeX(bounds().width());
 		QVariant sizeY(bounds().height());
 
-		qDebug() << tr("Button (%1)::enterEvent [%2, %3, %4, %5]").arg(
+		qDebug() << tr("Button (%1, icon: %2)::enterEvent [%3, %4, %5, %6]").arg(
 			name, 
+			icon,
 			posX.toString(),
 			posY.toString(),
 			sizeX.toString(),

@@ -29,9 +29,10 @@ namespace Jui
 		~Canvan();
 
 		void initControl();
-
+		/*
 		void setTitle(QString titleName);
 		void setVersion(int major, int minor, int patch);
+		*/
 
 		void setColor_background(QColor);
 		void setColor_foreground(QColor);
@@ -46,9 +47,8 @@ namespace Jui
 
 		void setHeaderHeight(int);
 		void setTailHeight(int);
+		void setLogo(QImage);
 		
-		//bool eventFilter(QObject *target, QEvent *event);
-
 	signals:
 		void actDraw();
 		void sendToConsole(QString);
@@ -74,27 +74,21 @@ namespace Jui
 		
 		int headerSize;
 		int tailSize;
-
 		
-		//Button *testButton;
 		Button *closeButton;
 		Button *maximizeButton;
 		Button *minimizeButton;
 
-		//Button *buttTest;
-		
 		Panel *panelConsole;
 
 		QDockWidget *dock;
 
-
-		QLabel *title;
-		QLabel *version;
-
+		QImage logo;
+		//QLabel *title;
+		//QLabel *version;
 
 		void mySetPalette();
-
-
+		
 		QPalette *palette;
 		QColor *textColor;
 		QColor *activeColor;

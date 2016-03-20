@@ -32,17 +32,14 @@ SET(Jui_src
 	Edges.cpp
 )
 
-SET(Jui_res
-	Jui.qrc
-)
+#SET(Jui_res Jui.qrc)
 
 
 QT5_WRAP_CPP( Jui_moc ${Jui_hdr} )
-QT5_ADd_RESOURCES( Jui_rcc ${Jui_res} )
-SET(Jui_QT_Sources ${Jui_moc} ${Jui_rcc})
+#QT5_ADD_RESOURCES( Jui_rcc ${Jui_res} )
+#SET(Jui_QT_Sources ${Jui_moc} ${Jui_rcc})
 
-ADD_LIBRARY(Jui STATIC	${Jui_src} ${Jui_hdr} ${Jui_QT_Sources} )
-
+ADD_LIBRARY(Jui STATIC ${Jui_src} ${Jui_hdr} ${Jui_moc} )
 
 TARGET_INCLUDE_DIRECTORIES(Jui PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 TARGET_LINK_LIBRARIES(Jui ${QT_JUI_LIBRARIES})

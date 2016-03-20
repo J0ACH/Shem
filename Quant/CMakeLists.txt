@@ -28,10 +28,13 @@ ADD_SUBDIRECTORY(Jui)
 
 SET(Quant_hdr Quant.h)
 SET(Quant_src Quant.cpp)
-SET(Quant_res Quant.qrc)
+SET(Quant_res 
+	Quant.qrc
+	Jui/Jui.qrc
+	)
 
 QT5_WRAP_CPP( Quant_moc ${Quant_hdr} )
-QT5_ADd_RESOURCES( Quant_rcc ${Quant_res} )
+QT5_ADD_RESOURCES( Quant_rcc ${Quant_res} )
 SET(Quant_QT_Sources ${Quant_moc} ${Quant_rcc})
 
 # APPLICATION ICON ##################################################

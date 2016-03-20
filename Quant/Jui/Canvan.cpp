@@ -32,9 +32,7 @@ namespace Jui
 		tailSize = 50;
 
 		this->initControl();
-		
-		//closeButton->setIcon(QString(":/close.png"));
-		//closeButton->show();
+
 		//console = new QDockWidget(QString("Console"), this);
 
 		dock = new QDockWidget(tr("Console"), screen);
@@ -43,7 +41,7 @@ namespace Jui
 		console = new Console(dock);
 		dock->setWidget(console);
 		//addDockWidget(Qt::RightDockWidgetArea, dock);
-		
+
 
 		connect(this, SIGNAL(sendToConsole(QString)), console, SLOT(addLine(QString)));
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(closeCanvan()));
@@ -54,6 +52,8 @@ namespace Jui
 	void Canvan::initControl()
 	{
 		closeButton = new Button(header);
+		closeButton->setText("Canvan_close");
+		closeButton->setIcon(":/close.png");
 		minimizeButton = new Button(header);
 		maximizeButton = new Button(header);
 
@@ -84,35 +84,35 @@ namespace Jui
 	/*
 	bool Canvan::eventFilter(QObject* target, QEvent* event)
 	{
-		if (target == panelConsole) {
-			if (event->type() == QEvent::Resize) {
+	if (target == panelConsole) {
+	if (event->type() == QEvent::Resize) {
 
-				//QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-				QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
-				qDebug() << "Canvan: ConsolePanel resized" << resizeEvent->size();
-				return true;
-			}
-			else {
-				return false;
-			}
+	//QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+	QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
+	qDebug() << "Canvan: ConsolePanel resized" << resizeEvent->size();
+	return true;
+	}
+	else {
+	return false;
+	}
 
-			if (event->type() == QEvent::Paint) {
+	if (event->type() == QEvent::Paint) {
 
-				QPaintEvent *paintEvent = static_cast<QPaintEvent*>(event);
-				qDebug() << "Canvan: ConsolePanel paint";// << paintEvent->rect();
-			}
-			else
-			{
+	QPaintEvent *paintEvent = static_cast<QPaintEvent*>(event);
+	qDebug() << "Canvan: ConsolePanel paint";// << paintEvent->rect();
+	}
+	else
+	{
 
-				return false;
-			}
-		}
-		else {
-			// pass the event on to the parent class
-			return QWidget::eventFilter(target, event);
-		}
+	return false;
+	}
+	}
+	else {
+	// pass the event on to the parent class
+	return QWidget::eventFilter(target, event);
+	}
 
-		
+
 	}
 	*/
 
@@ -121,34 +121,30 @@ namespace Jui
 		QPainter painter(this);
 
 		painter.setPen(Qt::NoPen);
-		painter.fillRect(screen->geometry(), QColor(20, 20, 20));
+		//painter.fillRect(screen->geometry(), QColor(20, 20, 20));
 		painter.fillRect(header->geometry(), QColor(40, 40, 40));
 		painter.fillRect(tail->geometry(), QColor(40, 40, 40));
-		
+
 		painter.setPen(QPen(QColor(200, 200, 200), 1));
 		painter.setBrush(Qt::NoBrush);
 		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
-		
-		painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
-		painter.drawText(100, 15, title->text());
-		
+
+		//painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
+		//painter.drawText(100, 15, title->text());
+
+		QRectF target(5, 5, 56, 43);
+		QRectF source(0, 0, 168, 128);
+		painter.drawImage(target, logo, source);
+
 		//qDebug("Canvan::paintEvent");
 		//msgConsole("Canvan draw...");
 	}
 
-	void Canvan::setHeaderHeight(int height)
-	{
-		headerSize = height;
-	}
+	void Canvan::setHeaderHeight(int height) { headerSize = height; }
 
-	void Canvan::setTailHeight(int height)
-	{
-		tailSize = height;
-	}
+	void Canvan::setTailHeight(int height) { tailSize = height; }
 
-
-
-
+	void Canvan::setLogo(QImage img) { logo = img; }
 
 	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)
 	{
@@ -234,22 +230,24 @@ namespace Jui
 	{
 		emit sendToConsole(text);
 	}
-
+	/*
 	void Canvan::setTitle(QString name)
 	{
-		title = new QLabel(header);
-		title->setGeometry(10, 10, 100, 50);
-		title->setText(name);
+	title = new QLabel(header);
+	title->setGeometry(10, 10, 100, 50);
+	title->setText(name);
 	}
+
 	void Canvan::setVersion(int major = 0, int minor = 0, int patch = 0)
 	{
-		QString text = tr("version %1.%2%3").arg(QString::number(major), QString::number(minor), QString::number(patch));
+	QString text = tr("version %1.%2%3").arg(QString::number(major), QString::number(minor), QString::number(patch));
 
-		version = new QLabel(this);
-		version->setGeometry(300, 300, 100, 50);
-		version->setText(text);
-		//tail->showMessage(text);
+	version = new QLabel(this);
+	version->setGeometry(300, 300, 100, 50);
+	version->setText(text);
+	//tail->showMessage(text);
 	}
+	*/
 
 
 	void Canvan::mySetPalette()
