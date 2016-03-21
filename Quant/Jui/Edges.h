@@ -4,9 +4,12 @@
 
 #include <QWidget>
 #include <QPainter>
+#include <QTimer>
 #include <QList>
 #include <QEvent>
 //#include <list>
+
+#include "Button.h"
 
 namespace Jui
 {
@@ -33,13 +36,31 @@ namespace Jui
 		QRect bounds();
 
 		void setDirection(EdgePosition);
+		void setEdgeOffset(int);
+
+	public slots:
+		void alphaUpdate();
 
 	protected:
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
-		
+
 	private:
+		bool isOver;
 		EdgePosition side;
+
+		int fadeTimeIn;
+		int fadeTimeOut;
+		int fps;
+		int backgroundAlpha;
+
+		QTimer *timer;
+
+		void enterEvent(QEvent *event);
+		void leaveEvent(QEvent *event);
+
+		int edgeOffset;
+
 	};
 
 
@@ -53,17 +74,20 @@ namespace Jui
 		~Edges();
 
 		QRect bounds();
+		void setEdgeOffset(int);
 
 	private:
 		EdgeControler *testEdge;
-
+		Button *testButton;
+		int edgeOffset;
+		
 	protected:
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
 
 	};
 
-	
+
 }
 #endif // EDGES_H
 

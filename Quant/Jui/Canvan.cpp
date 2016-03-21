@@ -19,6 +19,8 @@ namespace Jui
 
 		setGeometry(0, 0, parent->width(), parent->height());
 
+		//this->setMouseTracking(true);
+
 		mCursorGlobal = new QPoint(0, 0);
 		mCursorLocal = new QPoint(0, 0);
 		mFrameOriginGlobal = new QPoint(0, 0);
@@ -51,6 +53,8 @@ namespace Jui
 
 	void Canvan::initControl()
 	{
+		edges = new Edges(this);
+
 		closeButton = new Button(header);
 		closeButton->setText("Canvan_close");
 		closeButton->setIcon(QImage(":/close128.png"), 6);
@@ -64,12 +68,15 @@ namespace Jui
 		panelConsole->setBackground(QColor(30, 30, 30));
 		panelConsole->setGeometry(0, 0, 150, 150);
 
-		edges = new Edges(this);
+		
 	}
 
 	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		this->setGeometry(0, 0, parent->width(), parent->height());
+		
+		edges->setGeometry(0, 0, width(), height());
+
 
 		closeButton->setGeometry(width() - 40, 10, 30, 30);
 		maximizeButton->setGeometry(width() - 75, 10, 30, 30);
@@ -81,7 +88,6 @@ namespace Jui
 
 		panelConsole->setGeometry(this->width() - 300, headerSize + 5, 300, this->height() - headerSize - tailSize - 10);
 
-		edges->setGeometry(0, 0, width(), height());
 
 		msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
 	}

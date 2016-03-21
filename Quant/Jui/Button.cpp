@@ -126,7 +126,8 @@ namespace Jui
 	{
 		isPressed = false;
 		update();
-		//QWidget::mouseReleaseEvent(event);
+
+		QWidget::mouseReleaseEvent(event);
 	}
 
 	void Button::enterEvent(QEvent *event)
@@ -136,9 +137,11 @@ namespace Jui
 		timer->start();
 
 		isOver = true;
-		emit enterAct(tr("Button_EnterAct [%1]").arg(name));
+		//emit enterAct(tr("Button_EnterAct [%1]").arg(name));
 
 		qDebug() << tr("Button::enterEvent");
+
+		QWidget::enterEvent(event);
 	}
 
 	void Button::leaveEvent(QEvent *event)
@@ -148,8 +151,10 @@ namespace Jui
 		timer->start();
 
 		isOver = false;
-		emit leaveAct(tr("Button_LeaveAct [%1]").arg(name));
+		//emit leaveAct(tr("Button_LeaveAct [%1]").arg(name));
 		qDebug() << tr("Button (%1, icon: %2)::leaveEvent");
+
+		QWidget::leaveEvent(event);
 	}
 
 	Button::~Button()

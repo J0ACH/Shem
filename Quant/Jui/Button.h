@@ -25,8 +25,8 @@ namespace Jui
 
 	signals:
 		void pressAct();
-		void enterAct(QString name);
-		void leaveAct(QString name);
+		//void enterAct(QString name);
+		//void leaveAct(QString name);
 
 	public slots:
 		void alphaUpdate();
@@ -40,8 +40,7 @@ namespace Jui
 		QString name;
 		QImage icon;
 		int iconOffset;
-		//void prepisePopisek();
-
+		
 		void mousePressEvent(QMouseEvent *event);
 		void mouseReleaseEvent(QMouseEvent *event);
 		void enterEvent(QEvent *event);
