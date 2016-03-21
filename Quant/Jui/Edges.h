@@ -27,7 +27,7 @@ namespace Jui
 		void setEdgeOffset(int);
 
 	private:
-		QList<EdgeControler*> collEdges;
+		QVector<EdgeControler*> *collEdges;
 		QVector<QRect> *collRect;
 		EdgeControler *testEdge;
 		Button *testButton;

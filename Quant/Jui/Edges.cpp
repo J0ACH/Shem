@@ -11,15 +11,16 @@ namespace Jui
 		//QRegion maskRegion(bounds());
 		//maskRegion.operator+(bounds());
 
+		collEdges = new QVector<EdgeControler*>();
 		collRect = new QVector<QRect>();
 
-		collRect->append(QRect(0, 0, 30, 30));
-		collRect->append(QRect(100, 0, 30, 30));
-		collRect->append(QRect(0, 100, 30, 30));
+		//collRect->append(QRect(0, 0, 30, 30));
+		//collRect->append(QRect(200, 0, 30, 30));
+		//collRect->append(QRect(0, 200, 30, 30));
 
 
 		this->addManipulator(EdgePosition::LEFT);
-		this->addManipulator(EdgePosition::RIGHT);
+		//this->addManipulator(EdgePosition::RIGHT);
 
 		//setAttribute(Qt::WA_TransparentForMouseEvents, true);
 		//setAttribute(Qt::WA_NoMousePropagation);
@@ -48,11 +49,14 @@ namespace Jui
 
 	void Edges::addManipulator(EdgePosition direction)
 	{
-		EdgeControler manipulator(this);
-		manipulator.setGeometry(0, 0, 150, 150);
-		manipulator.setDirection(direction);
+		EdgeControler *manipulator = new EdgeControler(this);
+		manipulator->setGeometry(0, 0, 150, 150);
+		manipulator->setDirection(direction);
+		collEdges->append(manipulator);
 
-		QRect manipulatorRect = manipulator.bounds();
+		QRect manipulatorRect = manipulator->bounds();
+		collRect->append(manipulatorRect);
+
 		qDebug() << tr("manipulatorRect : %1, %2, %3, %4").arg(
 			QString::number(manipulatorRect.left()),
 			QString::number(manipulatorRect.top()),
@@ -84,7 +88,7 @@ namespace Jui
 
 		if (drawRegion)
 		{
-			//painter.fillRect(bounds(), QColor(255, 30, 30, 100));
+			painter.fillRect(bounds(), QColor(255, 30, 30, 100));
 			/*
 			for (int i = 0; i < collRect->size(); ++i) {
 				painter.fillRect(collRect->at(i), QColor(255, 30, 30, 100));
@@ -94,7 +98,12 @@ namespace Jui
 
 			foreach(QRect oneRect, *collRect)
 			{
-				painter.fillRect(oneRect, QColor(255, 30, 30, 100));
+				maskRegion = maskRegion.operator+=(oneRect);
+			}
+
+			foreach(QRect oneRect, *collRect)
+			{
+			//	painter.fillRect(oneRect, QColor(255, 30, 30, 100));
 			}
 		}
 
@@ -119,10 +128,11 @@ namespace Jui
 		//maskRegion = r1.subtracted(r2);
 		
 
-		foreach(QRect oneRect, *collRect)
+		foreach(EdgeControler *oneCtrl, *collEdges)
 		{
-			maskRegion = maskRegion.operator+=(oneRect);
+			oneCtrl->fitGeometry();
 		}
+
 
 		this->setMask(maskRegion);
 
