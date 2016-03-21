@@ -22,6 +22,7 @@ SET(Jui_hdr
 	Console.h
 	Panel.h
 	Edges.h
+	EdgeControler.h
 )
 
 SET(Jui_src
@@ -30,6 +31,7 @@ SET(Jui_src
 	Console.cpp
 	Panel.cpp
 	Edges.cpp
+	EdgeControler.cpp
 )
 
 QT5_WRAP_CPP( Jui_moc ${Jui_hdr} )
