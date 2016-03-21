@@ -118,7 +118,13 @@ namespace Jui
 		//QRegion r2(bounds().adjusted(edgeOffset, edgeOffset, -edgeOffset, -edgeOffset));
 		//maskRegion = r1.subtracted(r2);
 		
-		//this->setMask(maskRegion);
+
+		foreach(QRect oneRect, *collRect)
+		{
+			maskRegion = maskRegion.operator+=(oneRect);
+		}
+
+		this->setMask(maskRegion);
 
 		//		this->parentWidget()->resize(this->size());
 
