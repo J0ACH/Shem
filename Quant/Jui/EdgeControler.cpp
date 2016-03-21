@@ -31,7 +31,35 @@ namespace Jui
 	void EdgeControler::setDirection(EdgePosition direction)
 	{
 		side = direction;
-		update();
+		this->fitGeometry();
+		//		update();
+
+	}
+
+	void EdgeControler::fitGeometry()
+	{
+		switch (side)
+		{
+		case Jui::LEFT:
+			this->setGeometry(0, 0, edgeOffset, this->parentWidget()->height());
+			break;
+		case Jui::TOP:
+			break;
+		case Jui::RIGHT:
+			this->setGeometry(
+				this->parentWidget()->width() - edgeOffset,
+				0,
+				edgeOffset,
+				this->parentWidget()->height()
+				);
+			break;
+		case Jui::BOTTOM:
+			break;
+		case Jui::ALL:
+			break;
+		default:
+			break;
+		}
 	}
 
 	void EdgeControler::setEdgeOffset(int offset) { edgeOffset = offset; }
@@ -75,6 +103,8 @@ namespace Jui
 
 	void EdgeControler::resizeEvent(QResizeEvent *resizeEvent)
 	{
+		this->fitGeometry();
+		/*
 		switch (side)
 		{
 		case Jui::LEFT:
@@ -97,6 +127,7 @@ namespace Jui
 		default:
 			break;
 		}
+		*/
 
 		qDebug("EdgeControler::resizeEvent");
 	}

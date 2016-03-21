@@ -36,6 +36,7 @@ namespace Jui
 		void setDirection(EdgePosition);
 		void setEdgeOffset(int);
 
+
 	public slots:
 		void alphaUpdate();
 
@@ -48,6 +49,8 @@ namespace Jui
 	private:
 		bool isOver;
 		EdgePosition side;
+		
+		void fitGeometry();
 
 		int fadeTimeIn;
 		int fadeTimeOut;

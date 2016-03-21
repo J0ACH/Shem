@@ -27,14 +27,20 @@ namespace Jui
 		void setEdgeOffset(int);
 
 	private:
+		QList<EdgeControler*> collEdges;
+		QVector<QRect> *collRect;
 		EdgeControler *testEdge;
 		Button *testButton;
 		int edgeOffset;
+		bool drawRegion;
+		QRegion maskRegion;
+
+		void addManipulator(EdgePosition);
 		
 	protected:
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
-
+		void moveEvent(QMoveEvent * event);
 	};
 
 

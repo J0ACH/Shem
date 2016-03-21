@@ -53,7 +53,7 @@ namespace Jui
 
 	void Canvan::initControl()
 	{
-		edges = new Edges(this);
+		//edges = new Edges(this);
 
 		closeButton = new Button(header);
 		closeButton->setText("Canvan_close");
@@ -75,7 +75,7 @@ namespace Jui
 	{
 		this->setGeometry(0, 0, parent->width(), parent->height());
 		
-		edges->setGeometry(0, 0, width(), height());
+		//edges->setGeometry(0, 0, width(), height());
 
 		closeButton->setGeometry(width() - 40, 10, 30, 30);
 		maximizeButton->setGeometry(width() - 75, 10, 30, 30);

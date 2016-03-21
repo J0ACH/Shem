@@ -2,48 +2,78 @@
 
 namespace Jui
 {
-	
+
 	Edges::Edges(QWidget *parent) : QWidget(parent)
 	{
 		setGeometry(0, 0, parent->width(), parent->height());
 		setEdgeOffset(10);
+		drawRegion = true;
+		//QRegion maskRegion(bounds());
+		//maskRegion.operator+(bounds());
+
+		collRect = new QVector<QRect>();
+
+		collRect->append(QRect(0, 0, 30, 30));
+		collRect->append(QRect(100, 0, 30, 30));
+		collRect->append(QRect(0, 100, 30, 30));
+
+
+		this->addManipulator(EdgePosition::LEFT);
+		this->addManipulator(EdgePosition::RIGHT);
 
 		//setAttribute(Qt::WA_TransparentForMouseEvents, true);
 		//setAttribute(Qt::WA_NoMousePropagation);
 
-		//testEdge = new EdgeControler(this);
+		/*
 		testEdge = new EdgeControler(this);
 		testEdge->setGeometry(0, 0, 150, 150);
 		testEdge->setDirection(EdgePosition::LEFT);
-		//	testEdge->setDirection(EdgePosition::RIGHT);
 		testEdge->setEdgeOffset(edgeOffset);
 
+		collEdges.append(testEdge);
 
+		testEdge = new EdgeControler(this);
+		testEdge->setGeometry(0, 0, 150, 150);
+		testEdge->setDirection(EdgePosition::RIGHT);
+		testEdge->setEdgeOffset(edgeOffset);
 
-		//std::list<EdgeControler> controlers;
-		//std::list<QWidget> controlers;
-
-		//QList<EdgeControler*> test;
-		//QList<EdgeControler> test;
-
-		//this->setGeometry(parent->geometry());
-		//EdgePosition position(EdgePosition::RIGHT);
-
-		//QRect frame = parent->geometry();
-		//EdgeControler *edge = new EdgeControler(this);
-		//ahoj = new EdgeControler(this);
-
-
-		//controlers.emplace_back(edge);
-		//controlers.push_back(edge);
-		//test.append(edge);
-
-
+		collEdges.append(testEdge);
+		*/
 	}
 
 	QRect Edges::bounds()
 	{
 		return QRect(0, 0, width() - 1, height() - 1);
+	}
+
+	void Edges::addManipulator(EdgePosition direction)
+	{
+		EdgeControler manipulator(this);
+		manipulator.setGeometry(0, 0, 150, 150);
+		manipulator.setDirection(direction);
+
+		QRect manipulatorRect = manipulator.bounds();
+		qDebug() << tr("manipulatorRect : %1, %2, %3, %4").arg(
+			QString::number(manipulatorRect.left()),
+			QString::number(manipulatorRect.top()),
+			QString::number(manipulatorRect.right()),
+			QString::number(manipulatorRect.bottom())
+			);
+
+		qDebug() << tr("rectCount : %1").arg(QString::number(maskRegion.rectCount()));
+
+		if (maskRegion.rectCount() == 0){
+			QRegion maskRegion(manipulatorRect);
+			qDebug() << tr("NewMask : %1").arg(QString::number(maskRegion.rectCount()));
+		}
+		else
+		{
+			maskRegion = maskRegion.operator+=(manipulatorRect);
+			qDebug() << tr("AddMask : %1").arg(QString::number(maskRegion.rectCount()));
+		};
+		qDebug() << tr("rectCount2 : %1").arg(QString::number(maskRegion.rectCount()));
+		//this->setMask(maskRegion);
+
 	}
 
 	void Edges::setEdgeOffset(int offset) { edgeOffset = offset; }
@@ -52,25 +82,47 @@ namespace Jui
 	{
 		QPainter painter(this);
 
-		//painter.setClipRegion(r3);
+		if (drawRegion)
+		{
+			//painter.fillRect(bounds(), QColor(255, 30, 30, 100));
+			/*
+			for (int i = 0; i < collRect->size(); ++i) {
+				painter.fillRect(collRect->at(i), QColor(255, 30, 30, 100));
+				//	cout << "Found Alfonso at position " << i << endl;
+			}
+			*/
 
-		painter.fillRect(bounds(), QColor(255, 30, 30, 100));
+			foreach(QRect oneRect, *collRect)
+			{
+				painter.fillRect(oneRect, QColor(255, 30, 30, 100));
+			}
+		}
 
 		painter.setPen(QPen(Qt::red, 1));
-		//painter.drawRect(bounds().adjusted(2, 2, -2, -2));
 		painter.drawRect(bounds());
+			qDebug("Edges::paintEvent");
+	}
 
-		//	qDebug("Edges::paintEvent");
+	void Edges::moveEvent(QMoveEvent * moveEvent)
+	{
+
 	}
 
 	void Edges::resizeEvent(QResizeEvent *resizeEvent)
 	{
-		QRegion r1(bounds());
-		QRegion r2(bounds().adjusted(edgeOffset, edgeOffset, -edgeOffset, -edgeOffset));
-		QRegion r3 = r1.subtracted(r2);
-		this->setMask(r3);
+		setGeometry(0, 0, this->parentWidget()->width(), this->parentWidget()->height());
 
-//		this->parentWidget()->resize(this->size());
+		qDebug() << tr("rectCountResize : %1").arg(QString::number(maskRegion.rectCount()));
+		//this->addManipulator(EdgePosition::LEFT);
+		//QRegion r1(bounds());
+		//QRegion r2(bounds().adjusted(edgeOffset, edgeOffset, -edgeOffset, -edgeOffset));
+		//maskRegion = r1.subtracted(r2);
+		
+		//this->setMask(maskRegion);
+
+		//		this->parentWidget()->resize(this->size());
+
+
 
 		qDebug("Edges::resizeEvent");
 	}
@@ -79,5 +131,4 @@ namespace Jui
 	{
 
 	}
-
 }
