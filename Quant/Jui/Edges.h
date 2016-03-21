@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QList>
 #include <QEvent>
+#include <QMouseEvent>
 //#include <list>
 
 #include "Button.h"
@@ -44,6 +45,8 @@ namespace Jui
 	protected:
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
+		void mousePressEvent(QMouseEvent *event);
+		void mouseMoveEvent(QMouseEvent *event);
 
 	private:
 		bool isOver;
@@ -60,6 +63,10 @@ namespace Jui
 		void leaveEvent(QEvent *event);
 
 		int edgeOffset;
+
+		QPoint *mCursorGlobal;
+		QPoint *mCursorLocal;
+		QPoint *mFrameOriginGlobal;
 
 	};
 

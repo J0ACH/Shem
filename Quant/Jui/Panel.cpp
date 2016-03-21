@@ -28,8 +28,6 @@ namespace Jui
 		closeButton->setText("X");
 
 		edges = new Edges(this);
-		//edges->installEventFilter(this);
-		//closeButton->installEventFilter(this);
 	}
 
 	void Panel::setTitle(QString name)
@@ -62,29 +60,6 @@ namespace Jui
 
 		qDebug("Panel::resizeEvent");
 	}
-
-	/*
-	bool Panel::eventFilter(QObject* target, QEvent* event)
-	{
-	if (target == this) {
-	if (event->type() == QEvent::Resize) {
-	closeButton->setGeometry(width() - 30, 10, 20, 20);
-	//QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-	//QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
-	qDebug() << "Panel: closeButton resized";//<< resizeEvent ->key();
-	return true;
-	}
-	else {
-	return false;
-	}
-	}
-	else {
-	// pass the event on to the parent class
-	return QWidget::eventFilter(target, event);
-	}
-	}
-	*/
-
 
 	Panel::~Panel()
 	{

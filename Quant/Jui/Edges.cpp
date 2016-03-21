@@ -16,6 +16,10 @@ namespace Jui
 
 		timer = new QTimer(this);
 
+		mCursorGlobal = new QPoint(0, 0);
+		mCursorLocal = new QPoint(0, 0);
+		mFrameOriginGlobal = new QPoint(0, 0);
+
 		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
 	}
 
@@ -97,6 +101,59 @@ namespace Jui
 		qDebug("EdgeControler::resizeEvent");
 	}
 
+	void EdgeControler::mousePressEvent(QMouseEvent *mouseEvent)
+	{
+		*mCursorGlobal = mouseEvent->globalPos();
+		*mCursorLocal = mouseEvent->pos();
+		*mFrameOriginGlobal = QPoint(
+			mCursorGlobal->x() - mCursorLocal->x(),
+			mCursorGlobal->y() - mCursorLocal->y()
+			);
+
+		qDebug() << tr("pressedGlobal [%1,%2]").arg(
+			QString::number(mCursorGlobal->x()),
+			QString::number(mCursorGlobal->y())
+			);
+
+		//msgConsole(tr("pressedLocal [%1,%2]").arg(QString::number(mCursorLocal->x()), QString::number(mCursorLocal->y())));
+		//msgConsole(tr("frameOriginGlobal [%1,%2]").arg(QString::number(mFrameOriginGlobal->x()), QString::number(mFrameOriginGlobal->y())));
+	}
+
+	void EdgeControler::mouseMoveEvent(QMouseEvent *mouseEvent)
+	{
+		QPoint mouseCurrentGlobal = mouseEvent->globalPos();
+		//int posX = mFrameOriginGlobal->x() - mCursorGlobal->x() + mouseCurrentGlobal.x();
+		int posX = -mCursorGlobal->x() + mouseCurrentGlobal.x();
+		int posY = 0;
+
+		//msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
+
+
+		//this->move(posX, 0);
+		this->parentWidget()->setGeometry(posX, 0, this->parentWidget()->width(), this->parentWidget()->height());
+
+		switch (side)
+		{
+		case Jui::LEFT:
+			//this->setGeometry(0, 0, edgeOffset, this->parentWidget()->height());
+			//	this->parent.move(posX, posY);
+			break;
+		case Jui::TOP:
+			break;
+		case Jui::RIGHT:
+			this->move(posX, 0);
+
+			break;
+		case Jui::BOTTOM:
+			break;
+		case Jui::ALL:
+			break;
+		default:
+			break;
+		}
+
+	}
+
 	void EdgeControler::enterEvent(QEvent *event)
 	{
 		timer->stop();
@@ -130,7 +187,7 @@ namespace Jui
 	Edges::Edges(QWidget *parent) : QWidget(parent)
 	{
 		setGeometry(0, 0, parent->width(), parent->height());
-		setEdgeOffset(15);
+		setEdgeOffset(10);
 
 		//setAttribute(Qt::WA_TransparentForMouseEvents, true);
 		//setAttribute(Qt::WA_NoMousePropagation);
@@ -139,7 +196,9 @@ namespace Jui
 		testEdge = new EdgeControler(this);
 		testEdge->setGeometry(0, 0, 150, 150);
 		testEdge->setDirection(EdgePosition::LEFT);
-		//testEdge->setDirection(EdgePosition::RIGHT);
+		//	testEdge->setDirection(EdgePosition::RIGHT);
+		testEdge->setEdgeOffset(edgeOffset);
+
 
 		testButton = new Button(this);
 		testButton->setGeometry(100, 100, 50, 50);
@@ -191,11 +250,12 @@ namespace Jui
 
 	void Edges::resizeEvent(QResizeEvent *resizeEvent)
 	{
-
 		QRegion r1(bounds());
 		QRegion r2(bounds().adjusted(edgeOffset, edgeOffset, -edgeOffset, -edgeOffset));
 		QRegion r3 = r1.subtracted(r2);
 		this->setMask(r3);
+
+//		this->parentWidget()->resize(this->size());
 
 		qDebug("Edges::resizeEvent");
 	}

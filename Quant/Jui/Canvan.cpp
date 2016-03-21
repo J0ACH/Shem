@@ -77,7 +77,6 @@ namespace Jui
 		
 		edges->setGeometry(0, 0, width(), height());
 
-
 		closeButton->setGeometry(width() - 40, 10, 30, 30);
 		maximizeButton->setGeometry(width() - 75, 10, 30, 30);
 		minimizeButton->setGeometry(width() - 110, 10, 30, 30);
@@ -86,7 +85,7 @@ namespace Jui
 		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize - headerSize);
 		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
 
-		panelConsole->setGeometry(this->width() - 300, headerSize + 5, 300, this->height() - headerSize - tailSize - 10);
+		panelConsole->setGeometry(this->width() - 310, headerSize + 5, 300, this->height() - headerSize - tailSize - 10);
 
 
 		msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
