@@ -56,20 +56,19 @@ namespace Jui
 		//edges = new Edges(this);
 
 		closeButton = new Button(header);
-		closeButton->setText("Canvan_close");
-		closeButton->setIcon(QImage(":/close32.png"), 0);
-		//closeButton->setIcon(QImage(":/test128.png"), 6);
+		closeButton->setIcon(QImage(":/close16.png"), 0);
+		
+		maximizeButton = new Button(header);
+		maximizeButton->setIcon(QImage(":/maximize16.png"), 0);
 
 		minimizeButton = new Button(header);
-		maximizeButton = new Button(header);
+		minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
 
 		panelConsole = new Panel(this);
 		//panelConsole->installEventFilter(this);
 		panelConsole->setTitle("Console");
 		panelConsole->setBackground(QColor(30, 30, 30));
-		panelConsole->setGeometry(0, 0, 150, 150);
-
-		
+		panelConsole->setGeometry(0, 0, 150, 150);		
 	}
 
 	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
@@ -78,9 +77,9 @@ namespace Jui
 		
 		//edges->setGeometry(0, 0, width(), height());
 
-		closeButton->setGeometry(width() - 40, 10, 30, 30);
-		maximizeButton->setGeometry(width() - 75, 10, 30, 30);
-		minimizeButton->setGeometry(width() - 110, 10, 30, 30);
+		closeButton->setGeometry(width() - 35, 10, 25, 25);
+		maximizeButton->setGeometry(width() - 65, 10, 25, 25);
+		minimizeButton->setGeometry(width() - 95, 10, 25, 25);
 
 		header->setGeometry(0, 0, this->width(), headerSize);
 		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize - headerSize);

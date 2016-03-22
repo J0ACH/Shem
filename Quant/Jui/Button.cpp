@@ -10,12 +10,14 @@ namespace Jui
 		isPressed = false;
 		isOver = false;
 
-		//name = "";
-		//icon = new QString();
+		normalColor = QColor(90, 90, 90);
+		overColor = QColor(230, 230, 230);
+		activeColor = QColor(20, 180, 240);
+
 		iconOffset = 0;
 
 		backgroundAlpha = 0;
-		fadeTimeIn = 1000;
+		fadeTimeIn = 500;
 		fadeTimeOut = 250;
 		fps = 25;
 
@@ -27,6 +29,10 @@ namespace Jui
 	void Button::setText(QString buttonName) { name = buttonName; }
 
 	void Button::setIcon(QImage img, int offset = 0) { icon = img; iconOffset = offset; }
+
+	void Button::setNormalColor(QColor color){ normalColor = color; }
+	void Button::setOverColor(QColor color){ overColor = color; }
+	void Button::setActiveColor(QColor color){ activeColor = color; }
 
 	QRect Button::bounds()
 	{
@@ -77,26 +83,40 @@ namespace Jui
 		}
 
 		if (!icon.isNull()){
-			/*
+			float moveX = (this->width() - icon.width()) / 2 - 1;
+			float moveY = (this->height() - icon.height()) / 2;
+
 			painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
+
+			/*
+			QRectF target(
+			iconOffset,
+			iconOffset,
+			this->width() - 2 * iconOffset - 1,
+			this->height() - 2 * iconOffset - 1
+			);
 			*/
 
-			QRectF target(
-				iconOffset,
-				iconOffset,
-				this->width() - 2 * iconOffset - 1,
-				this->height() - 2 * iconOffset - 1
-				);
+			QRectF target(moveX, moveY, icon.width(), icon.height());
 			QRectF source(0, 0, icon.width(), icon.height());
 			//painter.drawImage(target, icon, source);
 
 			QImage renderedIcon(icon);
 			// fill with color
-			renderedIcon.fill(QColor(90,90,240));
+			if (isOver)
+			{
+				renderedIcon.fill(overColor);
+			}
+			else
+			{
+				if (isPressed) { renderedIcon.fill(activeColor); }
+				else { renderedIcon.fill(normalColor); };
+			}
+			//renderedIcon.fill(QColor(90, 90, 90));
 			// set alpha-map, black pixels -> opacity of 0, white pixels -> opacity 1
 			renderedIcon.setAlphaChannel(icon);
 			painter.drawImage(target, renderedIcon, source);  // draw image to QWidget
-			
+
 		}
 		else
 		{

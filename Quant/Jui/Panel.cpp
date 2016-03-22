@@ -24,7 +24,7 @@ namespace Jui
 	{
 		closeButton = new Button(this);
 		closeButton->setGeometry(this->width() - 30, 10, 20, 20);
-		closeButton->setIcon(QImage(":/close16.png"), 0);
+		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
 		closeButton->setText("X");
 
 		edges = new Edges(this);

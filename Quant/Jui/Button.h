@@ -23,6 +23,10 @@ namespace Jui
 		void setIcon(QImage, int);
 		void setText(QString name);
 
+		void setNormalColor(QColor);
+		void setOverColor(QColor);
+		void setActiveColor(QColor);
+
 	signals:
 		void pressAct();
 		//void enterAct(QString name);
@@ -39,6 +43,7 @@ namespace Jui
 
 		QString name;
 		QImage icon;
+		QColor normalColor, overColor, activeColor;
 		int iconOffset;
 		
 		void mousePressEvent(QMouseEvent *event);

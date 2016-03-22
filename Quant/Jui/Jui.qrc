@@ -1,8 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file alias="close128.png">Images/IconClose_128px.png</file>
-    <file alias="close64.png">Images/IconClose_64px.png</file>
-    <file alias="close32.png">Images/IconClose_32px.png</file>
     <file alias="close16.png">Images/IconClose_16px.png</file>
+    <file alias="smallClose16.png">Images/IconSmallClose_16px.png</file>
+    <file alias="maximize16.png">Images/IconMaximize_16px.png</file>
+    <file alias="minimize16.png">Images/IconMinimize_16px.png</file>
 </qresource>
 </RCC>
