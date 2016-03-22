@@ -57,7 +57,8 @@ namespace Jui
 
 		closeButton = new Button(header);
 		closeButton->setText("Canvan_close");
-		closeButton->setIcon(QImage(":/close128.png"), 6);
+		closeButton->setIcon(QImage(":/close32.png"), 0);
+		//closeButton->setIcon(QImage(":/test128.png"), 6);
 
 		minimizeButton = new Button(header);
 		maximizeButton = new Button(header);

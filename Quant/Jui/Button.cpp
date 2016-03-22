@@ -77,8 +77,9 @@ namespace Jui
 		}
 
 		if (!icon.isNull()){
-
+			/*
 			painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
+			*/
 
 			QRectF target(
 				iconOffset,
@@ -87,8 +88,15 @@ namespace Jui
 				this->height() - 2 * iconOffset - 1
 				);
 			QRectF source(0, 0, icon.width(), icon.height());
+			//painter.drawImage(target, icon, source);
 
-			painter.drawImage(target, icon, source);
+			QImage renderedIcon(icon);
+			// fill with color
+			renderedIcon.fill(QColor(90,90,240));
+			// set alpha-map, black pixels -> opacity of 0, white pixels -> opacity 1
+			renderedIcon.setAlphaChannel(icon);
+			painter.drawImage(target, renderedIcon, source);  // draw image to QWidget
+			
 		}
 		else
 		{
