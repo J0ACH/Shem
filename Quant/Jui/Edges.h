@@ -14,8 +14,8 @@
 
 namespace Jui
 {
-		
-	class Edges : public QWidget
+
+	class Edges : public QObject
 	{
 		Q_OBJECT
 
@@ -26,21 +26,28 @@ namespace Jui
 		QRect bounds();
 		void setEdgeOffset(int);
 
+	public slots:
+		void edgeMoved(EdgePosition);
+		
 	private:
+		QWidget *collParent;
 		QVector<EdgeControler*> *collEdges;
-		QVector<QRect> *collRect;
+		//QVector<QRect> *collRect;
 		EdgeControler *testEdge;
-		Button *testButton;
+		//Button *testButton;
 		int edgeOffset;
-		bool drawRegion;
-		QRegion maskRegion;
+		//bool drawRegion;
+		//QRegion maskRegion;
+
+		//QWidget *testWidget;
 
 		void addManipulator(EdgePosition);
-		
+
 	protected:
-		void paintEvent(QPaintEvent *event);
-		void resizeEvent(QResizeEvent *event);
-		void moveEvent(QMoveEvent * event);
+		//bool eventFilter(QObject *obj, QEvent *event);
+		//void paintEvent(QPaintEvent *event);
+		//void resizeEvent(QResizeEvent *event);
+		//void moveEvent(QMoveEvent * event);
 	};
 
 

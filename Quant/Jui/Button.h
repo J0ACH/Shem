@@ -44,6 +44,7 @@ namespace Jui
 		QString name;
 		QImage icon;
 		QColor normalColor, overColor, activeColor;
+		QColor blendColor(QColor, QColor, qreal);
 		int iconOffset;
 		
 		void mousePressEvent(QMouseEvent *event);

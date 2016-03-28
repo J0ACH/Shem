@@ -3,8 +3,16 @@
 namespace Jui
 {
 	// EdgeControler musi byt nacten pred Edge
-	EdgeControler::EdgeControler(QWidget *parent) : QWidget(parent)
+		EdgeControler::EdgeControler(QWidget *parent) : QWidget(parent)
 	{
+
+		setObjectName("EdgeControler");
+		qDebug("Class(%s) -> parent(%s)",
+			qPrintable(objectName()),
+			qPrintable(this->parent()->objectName())
+			//qPrintable(this->parentWidget()->objectName())
+			);
+
 		setEdgeOffset(15);
 
 		isOver = false;
@@ -21,7 +29,17 @@ namespace Jui
 		mFrameOriginGlobal = new QPoint(0, 0);
 
 		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
+		
 	}
+
+		
+	void EdgeControler::setParentObject(QObject *parentConteiner)
+	{
+		conteiner = parentConteiner;
+		//connect(this, SIGNAL(moveAct()), conteiner, SLOT(edgeMoved2()));
+		connect(this, SIGNAL(moveAct(EdgePosition)), conteiner, SLOT(edgeMoved(EdgePosition)));
+	}
+		
 
 	QRect EdgeControler::bounds()
 	{
@@ -33,7 +51,6 @@ namespace Jui
 		side = direction;
 		this->fitGeometry();
 		//		update();
-
 	}
 
 	void EdgeControler::fitGeometry()
@@ -104,31 +121,6 @@ namespace Jui
 	void EdgeControler::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		this->fitGeometry();
-		/*
-		switch (side)
-		{
-		case Jui::LEFT:
-			this->setGeometry(0, 0, edgeOffset, this->parentWidget()->height());
-			break;
-		case Jui::TOP:
-			break;
-		case Jui::RIGHT:
-			this->setGeometry(
-				this->parentWidget()->width() - edgeOffset,
-				0,
-				edgeOffset,
-				this->parentWidget()->height()
-				);
-			break;
-		case Jui::BOTTOM:
-			break;
-		case Jui::ALL:
-			break;
-		default:
-			break;
-		}
-		*/
-
 		qDebug("EdgeControler::resizeEvent");
 	}
 
@@ -182,7 +174,9 @@ namespace Jui
 		default:
 			break;
 		}
-
+				
+		emit moveAct(side);
+		qDebug("Signal moveAct send...");
 	}
 
 	void EdgeControler::enterEvent(QEvent *event)

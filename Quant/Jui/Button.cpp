@@ -63,10 +63,19 @@ namespace Jui
 		update();
 	}
 
+	static QColor blendColorAA(const QColor& color1, const QColor& color2, qreal ratio)
+	{
+		int r = color1.red()*(1 - ratio) + color2.red()*ratio;
+		int g = color1.green()*(1 - ratio) + color2.green()*ratio;
+		int b = color1.blue()*(1 - ratio) + color2.blue()*ratio;
+
+		return QColor(r, g, b, 255);
+	}
+
 	void Button::paintEvent(QPaintEvent *)
 	{
 		QPainter painter(this);
-
+		
 		QPen *pen;
 		if (isPressed){
 			pen = new QPen(Qt::red, 3);

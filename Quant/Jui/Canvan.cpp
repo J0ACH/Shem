@@ -53,7 +53,7 @@ namespace Jui
 
 	void Canvan::initControl()
 	{
-		//edges = new Edges(this);
+		edges = new Edges(this);
 
 		closeButton = new Button(header);
 		closeButton->setIcon(QImage(":/close16.png"), 0);

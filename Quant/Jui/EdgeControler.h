@@ -31,12 +31,16 @@ namespace Jui
 		EdgeControler(QWidget *parent = 0);
 		~EdgeControler();
 
+
 		QRect bounds();
 
 		void setDirection(EdgePosition);
 		void setEdgeOffset(int);
-
+		void setParentObject(QObject*);
 		void fitGeometry();
+
+	signals:
+		void moveAct(EdgePosition);
 
 	public slots:
 		void alphaUpdate();
@@ -50,7 +54,7 @@ namespace Jui
 	private:
 		bool isOver;
 		EdgePosition side;
-		
+		QObject *conteiner;
 
 		int fadeTimeIn;
 		int fadeTimeOut;
@@ -70,6 +74,7 @@ namespace Jui
 
 	};
 }
+
 #endif // EDGECONTROLER_H
 
 

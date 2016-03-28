@@ -6,6 +6,7 @@ namespace Jui
 	Panel::Panel(QWidget *parent) : QWidget(parent)
 	{
 		this->setParent(parent);
+		setObjectName("Panel");
 
 		title = "panel";
 		backColor = QColor(120, 120, 120);
@@ -56,7 +57,7 @@ namespace Jui
 	{
 		closeButton->setGeometry(this->width() - 30, 10, 20, 20);
 
-		edges->setGeometry(0, 0, width(), height());
+//		edges->setGeometry(0, 0, width(), height());
 
 		qDebug("Panel::resizeEvent");
 	}

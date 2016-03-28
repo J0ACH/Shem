@@ -28,7 +28,7 @@ namespace Jui
 		void setBackground(QColor);
 
 		//bool eventFilter(QObject *target, QEvent *event);
-
+	
 	protected:
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
