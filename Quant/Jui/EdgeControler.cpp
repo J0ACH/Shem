@@ -3,7 +3,7 @@
 namespace Jui
 {
 	// EdgeControler musi byt nacten pred Edge
-		EdgeControler::EdgeControler(QWidget *parent) : QWidget(parent)
+	EdgeControler::EdgeControler(QWidget *parent) : QWidget(parent)
 	{
 
 		setObjectName("EdgeControler");
@@ -29,17 +29,17 @@ namespace Jui
 		mFrameOriginGlobal = new QPoint(0, 0);
 
 		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
-		
+
 	}
 
-		
+
 	void EdgeControler::setParentObject(QObject *parentConteiner)
 	{
 		conteiner = parentConteiner;
 		//connect(this, SIGNAL(moveAct()), conteiner, SLOT(edgeMoved2()));
-		connect(this, SIGNAL(moveAct(EdgePosition)), conteiner, SLOT(edgeMoved(EdgePosition)));
+		connect(this, SIGNAL(moveAct(EdgePosition, int)), conteiner, SLOT(edgeMoved(EdgePosition, int)));
 	}
-		
+
 
 	QRect EdgeControler::bounds()
 	{
@@ -153,19 +153,20 @@ namespace Jui
 
 
 		//this->move(posX, 0);
-		this->parentWidget()->setGeometry(posX, 0, this->parentWidget()->width(), this->parentWidget()->height());
-
+		//this->parentWidget()->setGeometry(posX, 0, this->parentWidget()->width(), this->parentWidget()->height());
+		int newValue;
 		switch (side)
 		{
 		case Jui::LEFT:
 			//this->setGeometry(0, 0, edgeOffset, this->parentWidget()->height());
 			//	this->parent.move(posX, posY);
+			newValue = mouseCurrentGlobal.x();
 			break;
 		case Jui::TOP:
 			break;
 		case Jui::RIGHT:
-			this->move(posX, 0);
-
+			//this->move(posX, 0);
+			newValue = mouseCurrentGlobal.x();
 			break;
 		case Jui::BOTTOM:
 			break;
@@ -174,9 +175,10 @@ namespace Jui
 		default:
 			break;
 		}
-				
-		emit moveAct(side);
-		qDebug("Signal moveAct send...");
+
+		emit moveAct(side, newValue);
+		this->fitGeometry();
+		qDebug("Signal moveAct send... ");
 	}
 
 	void EdgeControler::enterEvent(QEvent *event)

@@ -8,7 +8,7 @@
 #include <QList>
 #include <QEvent>
 #include <QMouseEvent>
-//#include <list>
+
 #include "EdgeControler.h"
 
 
@@ -27,10 +27,10 @@ namespace Jui
 		void setEdgeOffset(int);
 
 	public slots:
-		void edgeMoved(EdgePosition);
+		void edgeMoved(EdgePosition, int);
 		
 	private:
-		QWidget *collParent;
+		QWidget *widgetParent;
 		QVector<EdgeControler*> *collEdges;
 		//QVector<QRect> *collRect;
 		EdgeControler *testEdge;

@@ -8,9 +8,9 @@
 #include <QList>
 #include <QEvent>
 #include <QMouseEvent>
-//#include <list>
+#include <QDebug>
 
-#include "Button.h"
+//#include "Edges.h"
 
 namespace Jui
 {
@@ -31,7 +31,6 @@ namespace Jui
 		EdgeControler(QWidget *parent = 0);
 		~EdgeControler();
 
-
 		QRect bounds();
 
 		void setDirection(EdgePosition);
@@ -40,7 +39,7 @@ namespace Jui
 		void fitGeometry();
 
 	signals:
-		void moveAct(EdgePosition);
+		void moveAct(EdgePosition, int);
 
 	public slots:
 		void alphaUpdate();
