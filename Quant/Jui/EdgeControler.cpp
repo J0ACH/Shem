@@ -71,6 +71,12 @@ namespace Jui
 				);
 			break;
 		case Jui::BOTTOM:
+			this->setGeometry(
+				0,
+				this->parentWidget()->height() - edgeOffset,
+				this->parentWidget()->width(),
+				edgeOffset
+				);
 			break;
 		case Jui::ALL:
 			break;
@@ -150,17 +156,11 @@ namespace Jui
 		int posY = 0;
 
 		//msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
-
-
-		//this->move(posX, 0);
-		//this->parentWidget()->setGeometry(posX, 0, this->parentWidget()->width(), this->parentWidget()->height());
 		int newValue;
 		switch (side)
 		{
 		case Jui::LEFT:
-			//this->setGeometry(0, 0, edgeOffset, this->parentWidget()->height());
-			//	this->parent.move(posX, posY);
-			newValue = mouseCurrentGlobal.x();
+			newValue = posX;
 			break;
 		case Jui::TOP:
 			break;
@@ -169,6 +169,7 @@ namespace Jui
 			newValue = mouseCurrentGlobal.x();
 			break;
 		case Jui::BOTTOM:
+			newValue = mouseCurrentGlobal.y();
 			break;
 		case Jui::ALL:
 			break;
@@ -178,7 +179,7 @@ namespace Jui
 
 		emit moveAct(side, newValue);
 		this->fitGeometry();
-		qDebug("Signal moveAct send... ");
+		//qDebug("Signal moveAct send... ");
 	}
 
 	void EdgeControler::enterEvent(QEvent *event)

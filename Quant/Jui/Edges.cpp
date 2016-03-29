@@ -25,6 +25,7 @@ namespace Jui
 
 		this->addManipulator(EdgePosition::LEFT);
 		this->addManipulator(EdgePosition::RIGHT);
+		this->addManipulator(EdgePosition::BOTTOM);
 
 	}
 
@@ -53,14 +54,18 @@ namespace Jui
 		{
 		case EdgePosition::LEFT:
 			qDebug("Slot EdgeMoved (%s) recived... [gMouse:%i]", "LEFT", newValue);
+			widgetParent->move(newValue - frameOriginGlobal.x(), originalGeometry.y());
 			break;
 		case EdgePosition::TOP:
 			break;
 		case EdgePosition::RIGHT:
-			qDebug("Slot EdgeMoved (%s) recived... [gMouse:%i]", "RIGHT", newValue);
+			// OK
+			//qDebug("Slot EdgeMoved (%s) recived... [gMouse:%i]", "RIGHT", newValue);
 			widgetParent->setFixedWidth(newValue - frameOriginGlobal.x());
 			break;
 		case EdgePosition::BOTTOM:
+			// OK
+			widgetParent->setFixedHeight(newValue - frameOriginGlobal.y());
 			break;
 		case EdgePosition::ALL:
 			break;
@@ -69,11 +74,12 @@ namespace Jui
 			break;
 		}
 
+		for each (QWidget oneChildern var in widgetParent->children())
+		{
+			oneChildern.update();
+		};
 		//widgetParent->update();
-		//widgetParent->setGeometry(10, 10, 200, 200);
-
 	}
-
 
 	Edges::~Edges()
 	{
