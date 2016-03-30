@@ -5,19 +5,19 @@ namespace Jui
 {
 	Canvan::Canvan(QWidget *window) : QWidget(window)
 	{
-		parent = window;
+		win = window;
 		setObjectName("Canvan");
 
 #ifdef JUI_CANVAN_SYSTEMFRAME
-		//parent->setWindowFlags(Qt::CustomizeWindowHint);
-		parent->setWindowFlags(Qt::FramelessWindowHint);
+		//win->setWindowFlags(Qt::CustomizeWindowHint);
+		win->setWindowFlags(Qt::FramelessWindowHint);
 #else
-		parent->setWindowFlags(Qt::FramelessWindowHint);
+		win->setWindowFlags(Qt::FramelessWindowHint);
 #endif
-		parent->setWindowTitle("New Title");
-		parent->window()->setWindowOpacity(0.95);
+		win->setWindowTitle("New Title");
+		win->window()->setWindowOpacity(0.95);
 
-		setGeometry(0, 0, parent->width(), parent->height());
+		setGeometry(0, 0, win->width(), win->height());
 
 		//this->setMouseTracking(true);
 
@@ -73,7 +73,7 @@ namespace Jui
 
 	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
 	{
-		this->setGeometry(0, 0, parent->width(), parent->height());
+		this->setGeometry(0, 0, win->width(), win->height());
 		
 		//edges->setGeometry(0, 0, width(), height());
 
@@ -180,7 +180,7 @@ namespace Jui
 
 		msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
 
-		parent->move(posX, posY);
+		win->move(posX, posY);
 	}
 
 
@@ -314,7 +314,7 @@ namespace Jui
 		*/
 	}
 
-	void Canvan::closeCanvan() { /*close();*/ parent->close(); }
+	void Canvan::closeCanvan() { /*close();*/ win->close(); }
 	void Canvan::minimizeCanvan()
 	{
 		//emit minimizeAct();

@@ -18,7 +18,7 @@ namespace Jui
 	class Edges : public QObject
 	{
 		Q_OBJECT
-			
+
 	public:
 		enum ParentType
 		{
@@ -32,18 +32,15 @@ namespace Jui
 		QRect bounds();
 		void setEdgeOffset(int);
 
-		public slots:
+	public slots:
 		void edgeMoved(EdgeControler::Direction, int);
-		void parentResized();
+
 
 	private:
-		QWidget *widgetParent;
-		//QVector<EdgeControler*> *collEdges;
-		//QVector<QRect> *collRect;
-		//EdgeControler *testEdge;
-		//Button *testButton;
-		int edgeOffset;
+		QWidget *parent;
 		ParentType parentType;
+		
+		int edgeOffset;
 
 		void addManipulator(EdgeControler::Direction);
 

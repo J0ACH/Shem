@@ -59,7 +59,7 @@ namespace Jui
 
 		emit resizeAct();
 
-		qDebug("Panel::resizeEvent");
+		//qDebug("Panel::resizeEvent");
 	}
 
 	Panel::~Panel()

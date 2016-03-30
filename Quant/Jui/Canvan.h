@@ -41,6 +41,7 @@ namespace Jui
 
 		Console *console;
 
+		QWidget *win;
 		QWidget *header;
 		QWidget *screen;
 		QWidget *tail;
@@ -48,10 +49,10 @@ namespace Jui
 		void setHeaderHeight(int);
 		void setTailHeight(int);
 		void setLogo(QImage);
+
 		
 	signals:
 		void resizeAct();
-		void actDraw();
 		void sendToConsole(QString);
 
 	public slots:
@@ -59,10 +60,10 @@ namespace Jui
 		void closeCanvan();
 		void minimizeCanvan();
 		void maximizeCanvan();
-
-		void resizeEvent(QResizeEvent *event);
-
+		//void resizeWin(QSize);
+		
 	protected:
+		void resizeEvent(QResizeEvent *event);
 		void mousePressEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
 		void paintEvent(QPaintEvent *event);
@@ -71,7 +72,6 @@ namespace Jui
 		//Ui::CanvanClass ui;
 
 		//QMenuBar *menu;
-		QWidget *parent;
 		
 		int headerSize;
 		int tailSize;
