@@ -82,6 +82,16 @@ namespace Jui
 		case EdgeControler::BOTTOM:
 			// OK
 			parent->setFixedHeight(newValue - frameOriginGlobal.y());
+			if (parentType == WIN)
+			{
+				QRect winRect = parent->parentWidget()->geometry();
+				parent->parentWidget()->setGeometry(
+					winRect.left(),
+					winRect.top(),
+					winRect.width(),
+					parent->height()
+					);
+			};
 			break;
 		case EdgeControler::ALL:
 			break;
