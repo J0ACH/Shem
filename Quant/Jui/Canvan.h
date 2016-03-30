@@ -50,6 +50,7 @@ namespace Jui
 		void setLogo(QImage);
 		
 	signals:
+		void resizeAct();
 		void actDraw();
 		void sendToConsole(QString);
 

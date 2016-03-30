@@ -57,7 +57,7 @@ namespace Jui
 	{
 		closeButton->setGeometry(this->width() - 30, 10, 20, 20);
 
-//		edges->setGeometry(0, 0, width(), height());
+		emit resizeAct();
 
 		qDebug("Panel::resizeEvent");
 	}

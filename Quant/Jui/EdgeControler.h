@@ -14,35 +14,37 @@
 
 namespace Jui
 {
-	enum EdgePosition
-	{
-		LEFT,
-		TOP,
-		RIGHT,
-		BOTTOM,
-		ALL
-	};
+
 
 	class EdgeControler : public QWidget
 	{
 		Q_OBJECT
 
 	public:
+		enum Direction
+		{
+			LEFT,
+			TOP,
+			RIGHT,
+			BOTTOM,
+			ALL
+		};
+
 		EdgeControler(QWidget *parent = 0);
 		~EdgeControler();
 
 		QRect bounds();
 
-		void setDirection(EdgePosition);
+		void setDirection(Direction);
 		void setEdgeOffset(int);
 		void setParentObject(QObject*);
-		void fitGeometry();
 
 	signals:
-		void moveAct(EdgePosition, int);
+		void moveAct(EdgeControler::Direction, int);
 
-	public slots:
+		public slots:
 		void alphaUpdate();
+		void fitGeometry();
 
 	protected:
 		void paintEvent(QPaintEvent *event);
@@ -52,7 +54,7 @@ namespace Jui
 
 	private:
 		bool isOver;
-		EdgePosition side;
+		Direction side;
 		QObject *conteiner;
 
 		int fadeTimeIn;

@@ -18,30 +18,34 @@ namespace Jui
 	class Edges : public QObject
 	{
 		Q_OBJECT
-
+			
 	public:
+		enum ParentType
+		{
+			WIN,
+			WIDGET
+		};
+
 		Edges(QWidget *parent = 0);
 		~Edges();
 
 		QRect bounds();
 		void setEdgeOffset(int);
 
-	public slots:
-		void edgeMoved(EdgePosition, int);
-		
+		public slots:
+		void edgeMoved(EdgeControler::Direction, int);
+		void parentResized();
+
 	private:
 		QWidget *widgetParent;
-		QVector<EdgeControler*> *collEdges;
+		//QVector<EdgeControler*> *collEdges;
 		//QVector<QRect> *collRect;
-		EdgeControler *testEdge;
+		//EdgeControler *testEdge;
 		//Button *testButton;
 		int edgeOffset;
-		//bool drawRegion;
-		//QRegion maskRegion;
+		ParentType parentType;
 
-		//QWidget *testWidget;
-
-		void addManipulator(EdgePosition);
+		void addManipulator(EdgeControler::Direction);
 
 	protected:
 		//bool eventFilter(QObject *obj, QEvent *event);

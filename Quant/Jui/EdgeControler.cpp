@@ -7,11 +7,13 @@ namespace Jui
 	{
 
 		setObjectName("EdgeControler");
+		/*
 		qDebug("Class(%s) -> parent(%s)",
 			qPrintable(objectName()),
 			qPrintable(this->parent()->objectName())
 			//qPrintable(this->parentWidget()->objectName())
 			);
+		*/
 
 		setEdgeOffset(15);
 
@@ -32,12 +34,14 @@ namespace Jui
 
 	}
 
-
 	void EdgeControler::setParentObject(QObject *parentConteiner)
 	{
 		conteiner = parentConteiner;
 		//connect(this, SIGNAL(moveAct()), conteiner, SLOT(edgeMoved2()));
-		connect(this, SIGNAL(moveAct(EdgePosition, int)), conteiner, SLOT(edgeMoved(EdgePosition, int)));
+		connect(
+			this, SIGNAL(moveAct(EdgeControler::Direction, int)),
+			conteiner, SLOT(edgeMoved(EdgeControler::Direction, int))
+			);
 	}
 
 
@@ -46,39 +50,49 @@ namespace Jui
 		return QRect(0, 0, width() - 1, height() - 1);
 	}
 
-	void EdgeControler::setDirection(EdgePosition direction)
+	void EdgeControler::setDirection(Direction direction)
 	{
 		side = direction;
 		this->fitGeometry();
-		//		update();
 	}
 
 	void EdgeControler::fitGeometry()
 	{
 		switch (side)
 		{
-		case Jui::LEFT:
-			this->setGeometry(0, 0, edgeOffset, this->parentWidget()->height());
-			break;
-		case Jui::TOP:
-			break;
-		case Jui::RIGHT:
+		case LEFT:
 			this->setGeometry(
-				this->parentWidget()->width() - edgeOffset,
 				0,
 				edgeOffset,
-				this->parentWidget()->height()
+				edgeOffset,
+				this->parentWidget()->height() - 2 * edgeOffset
 				);
 			break;
-		case Jui::BOTTOM:
+		case TOP:
 			this->setGeometry(
+				edgeOffset,
 				0,
-				this->parentWidget()->height() - edgeOffset,
-				this->parentWidget()->width(),
+				this->parentWidget()->width() - 2 * edgeOffset,
 				edgeOffset
 				);
 			break;
-		case Jui::ALL:
+		case RIGHT:
+			this->setGeometry(
+				this->parentWidget()->width() - edgeOffset,
+				edgeOffset,
+				edgeOffset,
+				this->parentWidget()->height() - 2 * edgeOffset
+				);
+			break;
+		case BOTTOM:
+			this->setGeometry(
+				edgeOffset,
+				this->parentWidget()->height() - edgeOffset,
+				this->parentWidget()->width() - 2 * edgeOffset,
+				edgeOffset
+				);
+			break;
+		case ALL:
 			break;
 		default:
 			break;
@@ -126,8 +140,8 @@ namespace Jui
 
 	void EdgeControler::resizeEvent(QResizeEvent *resizeEvent)
 	{
-		this->fitGeometry();
-		qDebug("EdgeControler::resizeEvent");
+	//	this->fitGeometry();
+//		qDebug("EdgeControler::resizeEvent");
 	}
 
 	void EdgeControler::mousePressEvent(QMouseEvent *mouseEvent)
@@ -138,11 +152,12 @@ namespace Jui
 			mCursorGlobal->x() - mCursorLocal->x(),
 			mCursorGlobal->y() - mCursorLocal->y()
 			);
-
+		/*
 		qDebug() << tr("pressedGlobal [%1,%2]").arg(
 			QString::number(mCursorGlobal->x()),
 			QString::number(mCursorGlobal->y())
 			);
+		*/
 
 		//msgConsole(tr("pressedLocal [%1,%2]").arg(QString::number(mCursorLocal->x()), QString::number(mCursorLocal->y())));
 		//msgConsole(tr("frameOriginGlobal [%1,%2]").arg(QString::number(mFrameOriginGlobal->x()), QString::number(mFrameOriginGlobal->y())));
@@ -159,19 +174,19 @@ namespace Jui
 		int newValue;
 		switch (side)
 		{
-		case Jui::LEFT:
+		case LEFT:
 			newValue = posX;
 			break;
-		case Jui::TOP:
+		case TOP:
 			break;
-		case Jui::RIGHT:
+		case RIGHT:
 			//this->move(posX, 0);
 			newValue = mouseCurrentGlobal.x();
 			break;
-		case Jui::BOTTOM:
+		case BOTTOM:
 			newValue = mouseCurrentGlobal.y();
 			break;
-		case Jui::ALL:
+		case ALL:
 			break;
 		default:
 			break;
@@ -191,7 +206,7 @@ namespace Jui
 		isOver = true;
 		//emit enterAct(tr("Button_EnterAct [%1]").arg(name));
 
-		qDebug("EdgeControler::enterEvent");
+	//	qDebug("EdgeControler::enterEvent");
 	}
 
 	void EdgeControler::leaveEvent(QEvent *event)
@@ -202,7 +217,7 @@ namespace Jui
 
 		isOver = false;
 		//emit leaveAct(tr("Button_LeaveAct [%1]").arg(name));
-		qDebug("EdgeControler::leaveEvent");
+	//	qDebug("EdgeControler::leaveEvent");
 	}
 
 	EdgeControler::~EdgeControler()	{	}

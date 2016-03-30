@@ -6,7 +6,7 @@ namespace Jui
 	Canvan::Canvan(QWidget *window) : QWidget(window)
 	{
 		parent = window;
-
+		setObjectName("Canvan");
 
 #ifdef JUI_CANVAN_SYSTEMFRAME
 		//parent->setWindowFlags(Qt::CustomizeWindowHint);
@@ -87,6 +87,7 @@ namespace Jui
 
 		panelConsole->setGeometry(this->width() - 310, headerSize + 5, 300, this->height() - headerSize - tailSize - 10);
 
+		emit resizeAct();
 
 		msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
 	}
