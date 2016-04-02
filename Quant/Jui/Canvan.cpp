@@ -8,14 +8,10 @@ namespace Jui
 		win = window;
 		setObjectName("Canvan");
 
-#ifdef JUI_CANVAN_SYSTEMFRAME
-		//win->setWindowFlags(Qt::CustomizeWindowHint);
 		win->setWindowFlags(Qt::FramelessWindowHint);
-#else
-		win->setWindowFlags(Qt::FramelessWindowHint);
-#endif
 		win->setWindowTitle("New Title");
-		win->window()->setWindowOpacity(0.95);
+		//win->window()->setWindowOpacity(0.95);
+		
 
 		setGeometry(0, 0, win->width(), win->height());
 
@@ -33,19 +29,11 @@ namespace Jui
 		headerSize = 100;
 		tailSize = 50;
 
+		//this->setStyleSheet("QTextEdit{background-color: QColor(Qt::transparent);}");
 		this->initControl();
+		this->mySetPalette();
 
-		//console = new QDockWidget(QString("Console"), this);
-
-		dock = new QDockWidget(tr("Console"), screen);
-		dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-
-		console = new Console(dock);
-		dock->setWidget(console);
-		//addDockWidget(Qt::RightDockWidgetArea, dock);
-
-
-		connect(this, SIGNAL(sendToConsole(QString)), console, SLOT(addLine(QString)));
+		connect(this, SIGNAL(sendToConsole(QString)), panelConsole, SLOT(addLine(QString)));
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(closeCanvan()));
 
 		msgConsole(tr("start"));
@@ -64,7 +52,7 @@ namespace Jui
 		minimizeButton = new Button(header);
 		minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
 
-		panelConsole = new Panel(this);
+		panelConsole = new Console(this);
 		//panelConsole->installEventFilter(this);
 		panelConsole->setTitle("Console");
 		panelConsole->setBackground(QColor(30, 30, 30));
@@ -75,8 +63,6 @@ namespace Jui
 	{
 		this->setGeometry(0, 0, win->width(), win->height());
 		
-		//edges->setGeometry(0, 0, width(), height());
-
 		closeButton->setGeometry(width() - 35, 10, 25, 25);
 		maximizeButton->setGeometry(width() - 65, 10, 25, 25);
 		minimizeButton->setGeometry(width() - 95, 10, 25, 25);
@@ -85,7 +71,7 @@ namespace Jui
 		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize - headerSize);
 		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
 
-		panelConsole->setGeometry(this->width() - 310, headerSize + 5, 300, this->height() - headerSize - tailSize - 10);
+		panelConsole->setGeometry(this->width() - 510, headerSize + 5, 500, this->height() - headerSize - tailSize - 10);
 
 		emit resizeAct();
 
@@ -213,7 +199,7 @@ namespace Jui
 		screen->setStyleSheet(
 			tr("background-color: QColor(%1,%2,%3); color: white;").arg(strR, strG, strB)
 			);
-		console->setStyleSheet(strBackColor);
+		panelConsole->setStyleSheet(strBackColor);
 		//menu->setStyleSheet(strBackColor2);
 		tail->setStyleSheet(strBackColor2);
 
@@ -232,7 +218,7 @@ namespace Jui
 		QString strFrontColor = tr("color: QColor(%1,%2,%3);").arg(strR, strG, strB);
 
 		screen->setStyleSheet(strFrontColor);
-		console->setStyleSheet(strFrontColor);
+		panelConsole->setStyleSheet(strFrontColor);
 		//menu->setStyleSheet(strFrontColor);
 		//tail->setStyleSheet(strFrontColor);
 

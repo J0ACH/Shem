@@ -28,6 +28,7 @@ namespace QuantIDE
 	public slots:
 		void consoleAddMsg(QString);
 		void addNode();
+		//void startLang();
 
 	protected:
 		void resizeEvent(QResizeEvent *event);
@@ -39,7 +40,8 @@ namespace QuantIDE
 
 		ScBridge *bridge;
 		Canvan *canvan;
-		Button *buttAddNode;
+		
+		Button *buttLang, *buttServer, *buttAddNode;
 
 		Panel *testPanel, *testPanel2;
 

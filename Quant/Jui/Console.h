@@ -3,13 +3,14 @@
 
 //#include <QtWidgets/QMainWindow>
 //#include <QtWidgets/QDockWidget>
+#include "Panel.h"
 #include <QtGui>
 #include <QTextEdit>
 
 namespace Jui
 {
 
-	class Console : public QTextEdit
+	class Console : public Panel
 	{
 		Q_OBJECT
 
@@ -20,8 +21,9 @@ namespace Jui
 
 		~Console();
 
-		public slots:
+	public slots:
 		void addLine(QString newLine);
+		void fitTextSize();
 
 	protected:
 		//void paintEvent(QPaintEvent *event);

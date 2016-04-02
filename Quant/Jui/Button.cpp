@@ -136,7 +136,10 @@ namespace Jui
 
 			if (!name.isNull())
 			{
-				painter.drawText(10, 15, name);
+				QTextOption opt;
+				opt.setAlignment(Qt::AlignCenter);
+
+				painter.drawText(bounds(), name, opt);
 			}
 			else
 			{

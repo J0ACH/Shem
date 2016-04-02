@@ -114,7 +114,7 @@ namespace Jui
 		QPainter painter(this);
 
 		if (isOver){
-			painter.setPen(QPen(Qt::white, 2));
+			painter.setPen(QPen(Qt::white, 1));
 		}
 		else
 		{

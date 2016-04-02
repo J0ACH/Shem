@@ -5,7 +5,7 @@ namespace Jui
 
 	Panel::Panel(QWidget *parent) : QWidget(parent)
 	{
-		this->setParent(parent);
+		//this->setParent(parent);
 		setObjectName("Panel");
 
 		title = "panel";
@@ -47,7 +47,7 @@ namespace Jui
 		painter.fillRect(bounds(), backColor);
 
 		painter.setPen(QPen(QColor(200, 200, 200), 1));
-		painter.drawRect(bounds().adjusted(5, 5, -5, -5));
+		//painter.drawRect(bounds().adjusted(5, 5, -5, -5));
 		painter.drawText(15, 25, title);
 
 		//qDebug("Panel::paintEvent");

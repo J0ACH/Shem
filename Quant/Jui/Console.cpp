@@ -3,21 +3,36 @@
 namespace Jui
 {
 
-	Console::Console(QWidget *parent):QTextEdit(parent)
+	Console::Console(QWidget *parent) : Panel(parent)
 	{
-		//text = new QTextEdit(this);
-		setReadOnly(true);
-		setOverwriteMode(false);
-		setFont(QFont("Consolas", 8));
+		setObjectName("Console");
 
-		append(tr("ahoj"));
-		append(tr("zdur"));
+		//setGeometry(this->width() - 310, headerSize + 5, 300, this->height() - headerSize - tailSize - 10);
+
+		text = new QTextEdit(this);
+		//text->setGeometry(10, 45, this->width() - 20, this->height() - 55);
+		text->setReadOnly(true);
+		text->setOverwriteMode(false);
+		text->setFont(QFont("Consolas", 8));
+
+		text->append(tr("ahoj"));
+		text->append(tr("zdur"));
 		//update();
 
-		setFrameStyle(QFrame::NoFrame);
+		text->setFrameStyle(QFrame::NoFrame);
+		//text->setStyleSheet("QTextEdit{background-color: Qt::transparent;}");
+		text->setStyleSheet("background-color: QColor(Qt::transparent);");
+
+		connect(this, SIGNAL(resizeAct()), this, SLOT(fitTextSize()));
 	}
 
-	void Console::addLine(QString newLine) { append(newLine); }
+	void Console::addLine(QString newLine) { text->append(newLine); }
+
+	void Console::fitTextSize()
+	{
+//		qDebug() << "Console::fitTextSize";
+		text->setGeometry(10, 45, this->width() - 20, this->height() - 55);
+	}
 
 	/*
 	void Console::paintEvent(QPaintEvent *event)

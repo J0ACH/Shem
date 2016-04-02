@@ -39,7 +39,7 @@ namespace Jui
 		void drawCanvan(QPaintEvent *event);
 		void addScreen(QWidget *inScreen);
 
-		Console *console;
+		//Console *console;
 
 		QWidget *win;
 		QWidget *header;
@@ -79,11 +79,9 @@ namespace Jui
 		Button *maximizeButton;
 		Button *minimizeButton;
 
-		Panel *panelConsole;
+		Console *panelConsole;
 
 		Edges *edges;
-
-		QDockWidget *dock;
 
 		QImage logo;
 		//QLabel *title;
