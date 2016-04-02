@@ -113,13 +113,35 @@ namespace Jui
 	{
 		QPainter painter(this);
 
-		painter.setPen(QPen(Qt::yellow, 3));
-		painter.drawRect(bounds());
-
 		if (isOver){
-			painter.fillRect(bounds(), QColor(120, 120, 20, backgroundAlpha));
-		};
-		//qDebug("EdgesControler::paintEvent");
+			painter.setPen(QPen(Qt::white, 2));
+		}
+		else
+		{
+			painter.setPen(QPen(QColor(90, 90, 90), 1));
+		}
+
+		int lineOffset = 3;
+		switch (side)
+		{
+		case LEFT:
+			painter.drawLine(QLine(lineOffset, 0, lineOffset, height()));
+			break;
+		case TOP:
+			painter.drawLine(QLine(0, lineOffset, width(), lineOffset));
+			break;
+		case RIGHT:
+			painter.drawLine(QLine(width() - lineOffset-1, 0, width() - lineOffset-1, height()));
+			break;
+		case BOTTOM:
+			painter.drawLine(QLine(0, height() - lineOffset-1, width(), height() - lineOffset-1));
+			break;
+		default:
+			painter.drawRect(bounds());
+			break;
+		}
+
+
 	}
 
 	void EdgeControler::mousePressEvent(QMouseEvent *mouseEvent)
