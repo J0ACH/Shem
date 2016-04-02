@@ -41,7 +41,7 @@ namespace QuantIDE
 		Canvan *canvan;
 		Button *buttAddNode;
 
-		Panel *testPanel;
+		Panel *testPanel, *testPanel2;
 
 	};
 }

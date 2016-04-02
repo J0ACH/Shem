@@ -40,15 +40,15 @@ namespace Jui
 		void setParentObject(QObject*);
 
 	signals:
+		void pressAct();
 		void moveAct(EdgeControler::Direction, int);
 
-		public slots:
+	public slots:
 		void alphaUpdate();
 		void fitGeometry();
 
 	protected:
 		void paintEvent(QPaintEvent *event);
-		void resizeEvent(QResizeEvent *event);
 		void mousePressEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
 

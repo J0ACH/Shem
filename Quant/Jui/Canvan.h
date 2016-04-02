@@ -60,8 +60,7 @@ namespace Jui
 		void closeCanvan();
 		void minimizeCanvan();
 		void maximizeCanvan();
-		//void resizeWin(QSize);
-		
+				
 	protected:
 		void resizeEvent(QResizeEvent *event);
 		void mousePressEvent(QMouseEvent *event);

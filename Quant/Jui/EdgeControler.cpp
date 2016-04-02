@@ -9,10 +9,10 @@ namespace Jui
 		setObjectName("EdgeControler");
 		/*
 		qDebug("Class(%s) -> parent(%s)",
-			qPrintable(objectName()),
-			qPrintable(this->parent()->objectName())
-			//qPrintable(this->parentWidget()->objectName())
-			);
+		qPrintable(objectName()),
+		qPrintable(this->parent()->objectName())
+		//qPrintable(this->parentWidget()->objectName())
+		);
 		*/
 
 		setEdgeOffset(15);
@@ -31,7 +31,6 @@ namespace Jui
 		mFrameOriginGlobal = new QPoint(0, 0);
 
 		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
-
 	}
 
 	void EdgeControler::setParentObject(QObject *parentConteiner)
@@ -42,6 +41,8 @@ namespace Jui
 			this, SIGNAL(moveAct(EdgeControler::Direction, int)),
 			conteiner, SLOT(edgeMoved(EdgeControler::Direction, int))
 			);
+
+		connect(this, SIGNAL(pressAct()), conteiner, SLOT(edgePressed()));
 	}
 
 
@@ -93,6 +94,7 @@ namespace Jui
 				);
 			break;
 		case ALL:
+
 			break;
 		default:
 			break;
@@ -138,12 +140,6 @@ namespace Jui
 		//qDebug("EdgesControler::paintEvent");
 	}
 
-	void EdgeControler::resizeEvent(QResizeEvent *resizeEvent)
-	{
-	//	this->fitGeometry();
-//		qDebug("EdgeControler::resizeEvent");
-	}
-
 	void EdgeControler::mousePressEvent(QMouseEvent *mouseEvent)
 	{
 		*mCursorGlobal = mouseEvent->globalPos();
@@ -152,11 +148,15 @@ namespace Jui
 			mCursorGlobal->x() - mCursorLocal->x(),
 			mCursorGlobal->y() - mCursorLocal->y()
 			);
+
+		emit pressAct();
+
+		//*mFrameOriginGlobal = QWidget::mapToGlobal(mouseEvent->screenPos()).
 		/*
 		qDebug() << tr("pressedGlobal [%1,%2]").arg(
-			QString::number(mCursorGlobal->x()),
-			QString::number(mCursorGlobal->y())
-			);
+		QString::number(mCursorGlobal->x()),
+		QString::number(mCursorGlobal->y())
+		);
 		*/
 
 		//msgConsole(tr("pressedLocal [%1,%2]").arg(QString::number(mCursorLocal->x()), QString::number(mCursorLocal->y())));
@@ -166,25 +166,42 @@ namespace Jui
 	void EdgeControler::mouseMoveEvent(QMouseEvent *mouseEvent)
 	{
 		QPoint mouseCurrentGlobal = mouseEvent->globalPos();
+		QPoint mouseCurrentLocal = mouseEvent->pos();
 		//int posX = mFrameOriginGlobal->x() - mCursorGlobal->x() + mouseCurrentGlobal.x();
-		int posX = -mCursorGlobal->x() + mouseCurrentGlobal.x();
-		int posY = 0;
+		//int posX = -mCursorGlobal->x() + mouseCurrentGlobal.x();
+		//int posY = 0;
 
 		//msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
 		int newValue;
 		switch (side)
 		{
 		case LEFT:
-			newValue = posX;
+
+			//newValue = mouseCurrentGlobal.x();
+			newValue = mouseEvent->globalX();
+
+			//qDebug() << "NewValue globX: " << mouseCurrentGlobal.x();
+			//qDebug() << "NewValue locX: " << mCursorLocal->x();
+			//qDebug() << "NewValue X: " << newValue;
+
+			//qDebug() << "NewValue X: " << mouseEvent->screenPos();
+
+
+			//qDebug() << "mFrameOriginGlobal.x()" << mFrameOriginGlobal->x();
+			//mCursorGlobal = new QPoint(newValue, mouseEvent->globalPos().y());
 			break;
 		case TOP:
+			newValue = mouseCurrentGlobal.y();
+			qDebug() << "NewValue gY: " << newValue;
 			break;
 		case RIGHT:
 			//this->move(posX, 0);
 			newValue = mouseCurrentGlobal.x();
+			qDebug() << "NewValue gX: " << newValue;
 			break;
 		case BOTTOM:
 			newValue = mouseCurrentGlobal.y();
+			qDebug() << "NewValue gY: " << newValue;
 			break;
 		case ALL:
 			break;
@@ -206,7 +223,7 @@ namespace Jui
 		isOver = true;
 		//emit enterAct(tr("Button_EnterAct [%1]").arg(name));
 
-	//	qDebug("EdgeControler::enterEvent");
+		//	qDebug("EdgeControler::enterEvent");
 	}
 
 	void EdgeControler::leaveEvent(QEvent *event)
@@ -217,7 +234,7 @@ namespace Jui
 
 		isOver = false;
 		//emit leaveAct(tr("Button_LeaveAct [%1]").arg(name));
-	//	qDebug("EdgeControler::leaveEvent");
+		//	qDebug("EdgeControler::leaveEvent");
 	}
 
 	EdgeControler::~EdgeControler()	{	}

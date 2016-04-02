@@ -49,9 +49,14 @@ namespace QuantIDE
 		buttAddNode->setText("AddNode");
 	
 		testPanel = new Panel(this);
-		testPanel->setGeometry(100, 100, 300, 300);
+		testPanel->setGeometry(100, 100, 500, 500);
 		testPanel->setTitle("Test");
 		testPanel->setBackground(Qt::black);
+
+		testPanel2 = new Panel(testPanel);
+		testPanel2->setGeometry(50, 50, 200, 200);
+		testPanel2->setTitle("Test");
+		testPanel2->setBackground(QColor(120,30,30));
 
 	}
 	
