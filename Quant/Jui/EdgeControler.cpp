@@ -176,27 +176,15 @@ namespace Jui
 		switch (side)
 		{
 		case LEFT:
-
-			//newValue = mouseCurrentGlobal.x();
 			newValue = mouseEvent->globalX();
-
-			//qDebug() << "NewValue globX: " << mouseCurrentGlobal.x();
-			//qDebug() << "NewValue locX: " << mCursorLocal->x();
-			//qDebug() << "NewValue X: " << newValue;
-
-			//qDebug() << "NewValue X: " << mouseEvent->screenPos();
-
-
-			//qDebug() << "mFrameOriginGlobal.x()" << mFrameOriginGlobal->x();
-			//mCursorGlobal = new QPoint(newValue, mouseEvent->globalPos().y());
 			break;
 		case TOP:
 			newValue = mouseCurrentGlobal.y();
 			qDebug() << "NewValue gY: " << newValue;
 			break;
 		case RIGHT:
-			//this->move(posX, 0);
-			newValue = mouseCurrentGlobal.x();
+			newValue = mouseEvent->globalX();
+			//newValue = mouseCurrentGlobal.x();
 			qDebug() << "NewValue gX: " << newValue;
 			break;
 		case BOTTOM:

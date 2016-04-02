@@ -48,61 +48,37 @@ namespace Jui
 
 	void Edges::edgePressed()
 	{
-		mEdgePressActParentOriginGlobal = parent->parentWidget()->mapToGlobal(QPoint(0, 0));
-		qDebug() << "EdgePressed parent originGlobal " << mEdgePressActParentOriginGlobal;
+		mEdgePressActGrandParentOriginGlobal = parent->parentWidget()->mapToGlobal(QPoint(0, 0));
+		qDebug() << "EdgePressed grandParent originGlobal " << mEdgePressActGrandParentOriginGlobal;
 	}
 
 	void Edges::edgeMoved(EdgeControler::Direction direction, int newValue)
 	{
-		
-
 		QRect originalGeometry = parent->geometry();
-		
-		//	qDebug() << "Slot EdgeMoved " << originalGeometry;
 
 		QPoint frameOriginGlobal = parent->mapToGlobal(QPoint(0, 0));
-		//QPoint frameOriginGlobal = parent->mapToGlobal(QPoint(0, 0));
-
-		//	qDebug() << "Slot EdgeMoved " << frameOriginGlobal;
 
 		QPoint parentPoint;
 		QRect newRect;
-		//int newX;
+
 
 		switch (direction)
 		{
 		case EdgeControler::LEFT:
-			qDebug() << "NewValue X: " << newValue;
-
-			//	qDebug("Slot EdgeMoved (%s) recived... [gMouse:%i]", "LEFT", newValue);
-			//parentPoint = parent->mapFrom(parent, QPoint(0, 0));
-			//newX = newValue - originalGeometry.left();
-			originalGeometry.setLeft(newValue - mEdgePressActParentOriginGlobal.x());
-			qDebug() << "originalGeometry.left()" << originalGeometry.left();	
-			qDebug() << "mPressActParentOrigin" << mEdgePressActParentOriginGlobal;
+			originalGeometry.setLeft(newValue - mEdgePressActGrandParentOriginGlobal.x());
+			qDebug() << "NewValue X: " << newValue - mEdgePressActGrandParentOriginGlobal.x();
 			parent->setGeometry(originalGeometry);
-
-			//newRect = parent->geometry();
-			//newRect = parent->geometry().adjusted(newValue, 0, 0, 0);
-			//qDebug() << "newRect:" << newRect;
-			//parent->setGeometry(parentPoint.x(), originalGeometry.top(), originalGeometry.width(), originalGeometry.height());
-			//parent->setGeometry(newRect.adjusted(newValue, 0, 0, 0));
-			//parent->setGeometry(newRect);
-			//parent->move(newX, originalGeometry.y());
-			//	parent->setFixedWidth(newValue - frameOriginGlobal.x());
-
 			break;
+
 		case EdgeControler::TOP:
-			originalGeometry.setTop(newValue);
-			qDebug() << "originalGeometry.top()" << originalGeometry.top();
+			originalGeometry.setTop(newValue - mEdgePressActGrandParentOriginGlobal.y());
+			qDebug() << "NewValue Y: " << newValue - mEdgePressActGrandParentOriginGlobal.y();
 			parent->setGeometry(originalGeometry);
 			break;
 
 		case EdgeControler::RIGHT:
-			// OK
-			//parent->setFixedWidth(newValue - frameOriginGlobal.x());
-			originalGeometry.setRight(newValue);
-			qDebug() << "originalGeometry.right()" << originalGeometry.right();
+			originalGeometry.setRight(newValue - mEdgePressActGrandParentOriginGlobal.x());
+			qDebug() << "NewValue X: " << newValue - mEdgePressActGrandParentOriginGlobal.x();
 			parent->setGeometry(originalGeometry);
 
 			if (parentType == WIN)
@@ -119,9 +95,8 @@ namespace Jui
 			break;
 		case EdgeControler::BOTTOM:
 			// OK
-			//parent->setFixedHeight(newValue - frameOriginGlobal.y());
-			originalGeometry.setBottom(newValue);
-			qDebug() << "originalGeometry.bottom()" << originalGeometry.bottom();
+			originalGeometry.setBottom(newValue - mEdgePressActGrandParentOriginGlobal.y());
+			qDebug() << "NewValue Y: " << newValue - mEdgePressActGrandParentOriginGlobal.y();
 			parent->setGeometry(originalGeometry);
 
 			if (parentType == WIN)

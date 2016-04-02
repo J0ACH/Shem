@@ -41,7 +41,7 @@ namespace Jui
 		QWidget *parent;
 		ParentType parentType;
 
-		QPoint mEdgePressActParentOriginGlobal;
+		QPoint mEdgePressActGrandParentOriginGlobal;
 		int edgeOffset;
 
 		void addManipulator(EdgeControler::Direction);
