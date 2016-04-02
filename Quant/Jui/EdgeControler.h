@@ -26,8 +26,7 @@ namespace Jui
 			LEFT,
 			TOP,
 			RIGHT,
-			BOTTOM,
-			ALL
+			BOTTOM
 		};
 
 		EdgeControler(QWidget *parent = 0);
@@ -53,9 +52,10 @@ namespace Jui
 		void mouseMoveEvent(QMouseEvent *event);
 
 	private:
-		bool isOver;
-		Direction side;
 		QObject *conteiner;
+		Direction side;
+		bool isOver;
+		int edgeOffset;
 
 		int fadeTimeIn;
 		int fadeTimeOut;
@@ -66,12 +66,6 @@ namespace Jui
 
 		void enterEvent(QEvent *event);
 		void leaveEvent(QEvent *event);
-
-		int edgeOffset;
-
-		QPoint *mCursorGlobal;
-		QPoint *mCursorLocal;
-		QPoint *mFrameOriginGlobal;
 
 	};
 }

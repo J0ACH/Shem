@@ -49,75 +49,81 @@ namespace Jui
 	void Edges::edgePressed()
 	{
 		mEdgePressActGrandParentOriginGlobal = parent->parentWidget()->mapToGlobal(QPoint(0, 0));
-		qDebug() << "EdgePressed grandParent originGlobal " << mEdgePressActGrandParentOriginGlobal;
 	}
 
 	void Edges::edgeMoved(EdgeControler::Direction direction, int newValue)
 	{
 		QRect originalGeometry = parent->geometry();
 
-		QPoint frameOriginGlobal = parent->mapToGlobal(QPoint(0, 0));
-
-		QPoint parentPoint;
-		QRect newRect;
-
-
 		switch (direction)
 		{
 		case EdgeControler::LEFT:
-			originalGeometry.setLeft(newValue - mEdgePressActGrandParentOriginGlobal.x());
-			qDebug() << "NewValue X: " << newValue - mEdgePressActGrandParentOriginGlobal.x();
-			parent->setGeometry(originalGeometry);
+			switch (parentType)
+			{
+			case WIDGET:
+				originalGeometry.setLeft(newValue - mEdgePressActGrandParentOriginGlobal.x());
+				parent->setGeometry(originalGeometry);
+				break;
+			case WIN:
+				QRect winRect = parent->parentWidget()->geometry();
+				winRect.setLeft(newValue);
+				parent->parentWidget()->setGeometry(winRect);
+				parent->setGeometry(0, 0, winRect.width(), winRect.height());
+				break;
+			}
 			break;
 
 		case EdgeControler::TOP:
-			originalGeometry.setTop(newValue - mEdgePressActGrandParentOriginGlobal.y());
-			qDebug() << "NewValue Y: " << newValue - mEdgePressActGrandParentOriginGlobal.y();
-			parent->setGeometry(originalGeometry);
+			switch (parentType)
+			{
+			case WIDGET:
+				originalGeometry.setTop(newValue - mEdgePressActGrandParentOriginGlobal.y());
+				parent->setGeometry(originalGeometry);
+				break;
+			case WIN:
+				QRect winRect = parent->parentWidget()->geometry();
+				winRect.setTop(newValue);
+				parent->parentWidget()->setGeometry(winRect);
+				parent->setGeometry(0, 0, winRect.width(), winRect.height());
+				break;
+			}
 			break;
 
 		case EdgeControler::RIGHT:
-			originalGeometry.setRight(newValue - mEdgePressActGrandParentOriginGlobal.x());
-			qDebug() << "NewValue X: " << newValue - mEdgePressActGrandParentOriginGlobal.x();
-			parent->setGeometry(originalGeometry);
-
-			if (parentType == WIN)
+			switch (parentType)
 			{
+			case WIDGET:
+				originalGeometry.setRight(newValue - mEdgePressActGrandParentOriginGlobal.x());
+				parent->setGeometry(originalGeometry);
+				break;
+			case WIN:
 				QRect winRect = parent->parentWidget()->geometry();
-				//	qDebug() << "Rect" << parent->parentWidget()->geometry();
-				parent->parentWidget()->setGeometry(
-					winRect.left(),
-					winRect.top(),
-					parent->width(),
-					winRect.height()
-					);
-			};
+				winRect.setRight(newValue);
+				parent->parentWidget()->setGeometry(winRect);
+				parent->setGeometry(0, 0, winRect.width(), winRect.height());
+				break;
+			}
 			break;
+
 		case EdgeControler::BOTTOM:
-			// OK
-			originalGeometry.setBottom(newValue - mEdgePressActGrandParentOriginGlobal.y());
-			qDebug() << "NewValue Y: " << newValue - mEdgePressActGrandParentOriginGlobal.y();
-			parent->setGeometry(originalGeometry);
-
-			if (parentType == WIN)
+			switch (parentType)
 			{
+			case WIDGET:
+				originalGeometry.setBottom(newValue - mEdgePressActGrandParentOriginGlobal.y());
+				parent->setGeometry(originalGeometry);
+				break;
+			case WIN:
 				QRect winRect = parent->parentWidget()->geometry();
-				parent->parentWidget()->setGeometry(
-					winRect.left(),
-					winRect.top(),
-					winRect.width(),
-					parent->height()
-					);
-			};
+				winRect.setBottom(newValue);
+				parent->parentWidget()->setGeometry(winRect);
+				parent->setGeometry(0, 0, winRect.width(), winRect.height());
+				break;
+			}
 			break;
-		case EdgeControler::ALL:
-			break;
+
 		default:
-			//	qDebug("Slot EdgeMoved (%s) recived...", "SOME");
 			break;
 		}
-
-		qDebug() << "Rect" << parent->geometry();
 
 	}
 

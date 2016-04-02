@@ -2,19 +2,10 @@
 
 namespace Jui
 {
-	// EdgeControler musi byt nacten pred Edge
 	EdgeControler::EdgeControler(QWidget *parent) : QWidget(parent)
 	{
 
 		setObjectName("EdgeControler");
-		/*
-		qDebug("Class(%s) -> parent(%s)",
-		qPrintable(objectName()),
-		qPrintable(this->parent()->objectName())
-		//qPrintable(this->parentWidget()->objectName())
-		);
-		*/
-
 		setEdgeOffset(15);
 
 		isOver = false;
@@ -26,25 +17,19 @@ namespace Jui
 
 		timer = new QTimer(this);
 
-		mCursorGlobal = new QPoint(0, 0);
-		mCursorLocal = new QPoint(0, 0);
-		mFrameOriginGlobal = new QPoint(0, 0);
-
 		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
 	}
 
 	void EdgeControler::setParentObject(QObject *parentConteiner)
 	{
 		conteiner = parentConteiner;
-		//connect(this, SIGNAL(moveAct()), conteiner, SLOT(edgeMoved2()));
+
+		connect(this, SIGNAL(pressAct()), conteiner, SLOT(edgePressed()));
 		connect(
 			this, SIGNAL(moveAct(EdgeControler::Direction, int)),
 			conteiner, SLOT(edgeMoved(EdgeControler::Direction, int))
 			);
-
-		connect(this, SIGNAL(pressAct()), conteiner, SLOT(edgePressed()));
 	}
-
 
 	QRect EdgeControler::bounds()
 	{
@@ -93,9 +78,6 @@ namespace Jui
 				edgeOffset
 				);
 			break;
-		case ALL:
-
-			break;
 		default:
 			break;
 		}
@@ -142,36 +124,11 @@ namespace Jui
 
 	void EdgeControler::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		*mCursorGlobal = mouseEvent->globalPos();
-		*mCursorLocal = mouseEvent->pos();
-		*mFrameOriginGlobal = QPoint(
-			mCursorGlobal->x() - mCursorLocal->x(),
-			mCursorGlobal->y() - mCursorLocal->y()
-			);
-
 		emit pressAct();
-
-		//*mFrameOriginGlobal = QWidget::mapToGlobal(mouseEvent->screenPos()).
-		/*
-		qDebug() << tr("pressedGlobal [%1,%2]").arg(
-		QString::number(mCursorGlobal->x()),
-		QString::number(mCursorGlobal->y())
-		);
-		*/
-
-		//msgConsole(tr("pressedLocal [%1,%2]").arg(QString::number(mCursorLocal->x()), QString::number(mCursorLocal->y())));
-		//msgConsole(tr("frameOriginGlobal [%1,%2]").arg(QString::number(mFrameOriginGlobal->x()), QString::number(mFrameOriginGlobal->y())));
 	}
 
 	void EdgeControler::mouseMoveEvent(QMouseEvent *mouseEvent)
 	{
-		QPoint mouseCurrentGlobal = mouseEvent->globalPos();
-		QPoint mouseCurrentLocal = mouseEvent->pos();
-		//int posX = mFrameOriginGlobal->x() - mCursorGlobal->x() + mouseCurrentGlobal.x();
-		//int posX = -mCursorGlobal->x() + mouseCurrentGlobal.x();
-		//int posY = 0;
-
-		//msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
 		int newValue;
 		switch (side)
 		{
@@ -179,19 +136,13 @@ namespace Jui
 			newValue = mouseEvent->globalX();
 			break;
 		case TOP:
-			newValue = mouseCurrentGlobal.y();
-			qDebug() << "NewValue gY: " << newValue;
+			newValue = mouseEvent->globalY();
 			break;
 		case RIGHT:
 			newValue = mouseEvent->globalX();
-			//newValue = mouseCurrentGlobal.x();
-			qDebug() << "NewValue gX: " << newValue;
 			break;
 		case BOTTOM:
-			newValue = mouseCurrentGlobal.y();
-			qDebug() << "NewValue gY: " << newValue;
-			break;
-		case ALL:
+			newValue = mouseEvent->globalY();
 			break;
 		default:
 			break;
@@ -199,7 +150,6 @@ namespace Jui
 
 		emit moveAct(side, newValue);
 		this->fitGeometry();
-		//qDebug("Signal moveAct send... ");
 	}
 
 	void EdgeControler::enterEvent(QEvent *event)

@@ -31,12 +31,11 @@ namespace Jui
 
 		QRect bounds();
 		void setEdgeOffset(int);
-
-		public slots:
+		
+	public slots:
 		void edgePressed();
 		void edgeMoved(EdgeControler::Direction, int);
-
-
+		
 	private:
 		QWidget *parent;
 		ParentType parentType;
