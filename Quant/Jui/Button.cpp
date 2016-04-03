@@ -72,7 +72,7 @@ namespace Jui
 		return QColor(r, g, b, 255);
 	}
 
-	void Button::paintEvent(QPaintEvent *)
+	void Button::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
 		
@@ -146,6 +146,7 @@ namespace Jui
 				painter.drawText(10, 15, QString::number(backgroundAlpha));
 			}
 		}
+		
 	}
 
 	void Button::mousePressEvent(QMouseEvent *event)
@@ -160,6 +161,7 @@ namespace Jui
 
 		emit pressAct();
 		qDebug() << tr("Button (%1) pressed").arg(name);
+		
 	}
 
 	void Button::mouseReleaseEvent(QMouseEvent *event)

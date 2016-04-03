@@ -257,29 +257,46 @@ namespace Jui
 		panelColor = QColor(20, 20, 20);
 		textColor = QColor(230, 230, 230);
 		activeColor = QColor(20, 180, 240);
-		
-		//qDebug() << "backHex:" << backColor.name();
-		
+
 		QString txt;
-		txt.append(tr("QTextEdit { color: %1; background-color: %2; selection-background-color: %3;}").arg(textColor.name(), backColor.name(), activeColor.name()));
+		txt.append(tr("QPushButton { background-color: %1; }").arg(backColor.name()));
+		txt.append(tr("QPushButton { color: %1; }").arg(textColor.name()));
+		txt.append(tr("QPushButton { border-style: outset; border-width: 1px; border-color: %1}").arg(textColor.name()));
+		txt.append(tr("QPushButton:pressed{ background-color: %1; border-style: inset; }").arg(activeColor.name()));		
+
+		txt.append(tr("QTextEdit { color: %1; }").arg(textColor.name()));
+		txt.append(tr("QTextEdit { background-color: %1; }").arg(backColor.name()));
+		txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(activeColor.name()));
+
+		txt.append("QScrollBar:vertical { width: 5px; }");
+		txt.append("QScrollBar:horizontal { height: 5px; }");
+		txt.append(tr("QScrollBar:vertical { background: %1; }").arg(backColor.name()));
+		txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 20px; }").arg(textColor.name()));
+		//txt.append("QScrollBar:vertical { margin: 50px 0 50px 0; }");
+	
+	
+		//txt.append(tr("QScrollBar:vertical { border: 1px solid %1; }").arg(activeColor.name()));
+
+		//txt.append(tr("QScrollBar::add-line:vertical { border: 2px solid grey; background: %1; height: 20px; subcontrol-position: bottom; subcontrol-origin: margin; }}").arg(activeColor.name()));
 		
-		txt.append("QScrollBar:vertical { border: 2px solid grey; background: #32CC99; width: 15px;	margin: 22px 0 22px 0; }");
+		
+		//txt.append("QScrollBar:vertical { border: 2px solid grey; background: #32CC99; width: 15px;	margin: 22px 0 22px 0; }");
 
 		qDebug() << "TXT:" << txt;
-		
-		this->setStyleSheet(txt);
-		
-		//this->setStyleSheet();
-			/*
-			"QTextEdit{background-color: };}"
 
-			"QScrollBar:vertical{ border: 2px solid grey; background: #32CC99; width: 15px;	margin: 22px 0 22px 0; }"
-			"QScrollBar::handle:vertical{background: white;min-height: 20px;}"
-			"QScrollBar::add-line:vertical{border: 2px solid grey; background: #32CC99; height: 20px; subcontrol-position: bottom; subcontrol-origin: margin;}"
-			"QScrollBar::sub-line:vertical{border: 2px solid grey; background: #32CC99; height: 20px; subcontrol-position: top; subcontrol-origin: margin;}"
-			"QScrollBar::up-arrow:vertical, QScrollBar::down-arrow : vertical{ border: 2px solid grey; width: 3px; height: 3px; background: white;}"
-			);
-			*/
+		this->setStyleSheet(txt);
+
+		//this->setStyleSheet();
+		/*
+		"QTextEdit{background-color: };}"
+
+		"QScrollBar:vertical{ border: 2px solid grey; background: #32CC99; width: 15px;	margin: 22px 0 22px 0; }"
+		"QScrollBar::handle:vertical{background: white;min-height: 20px;}"
+		"QScrollBar::add-line:vertical{border: 2px solid grey; background: #32CC99; height: 20px; subcontrol-position: bottom; subcontrol-origin: margin;}"
+		"QScrollBar::sub-line:vertical{border: 2px solid grey; background: #32CC99; height: 20px; subcontrol-position: top; subcontrol-origin: margin;}"
+		"QScrollBar::up-arrow:vertical, QScrollBar::down-arrow : vertical{ border: 2px solid grey; width: 3px; height: 3px; background: white;}"
+		);
+		*/
 	}
 
 	void Canvan::setCanvanPalette()

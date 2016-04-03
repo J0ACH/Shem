@@ -45,6 +45,8 @@ namespace QuantIDE
 		connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(startServer()));
 		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
 
+		connect(testButton, SIGNAL(pressed()), this, SLOT(beep()));
+
 	}
 
 	void Quant::initControl()
@@ -62,7 +64,7 @@ namespace QuantIDE
 		buttAddNode->setGeometry(400, 5, 80, 30);
 		buttAddNode->setText("AddNode");
 
-		testPanel = new Panel(this);
+		testPanel = new Panel(canvan->screen);
 		testPanel->setGeometry(200, 100, 400, 500);
 		testPanel->setTitle("Test");
 		testPanel->setBackground(Qt::black);
@@ -71,6 +73,11 @@ namespace QuantIDE
 		testPanel2->setGeometry(50, 50, 200, 200);
 		testPanel2->setTitle("Test");
 		testPanel2->setBackground(QColor(120, 30, 30));
+
+		testButton = new QPushButton(canvan->screen);
+		testButton->setGeometry(15, 70, 80, 30);
+		testButton->setText("BEEP!");
+
 
 	}
 
@@ -88,6 +95,12 @@ namespace QuantIDE
 	void Quant::addNode()
 	{
 		canvan->msgConsole(QString("Node add..."));
+	}
+
+	void Quant::beep()
+	{
+		bridge->evaluateCode("().play;");
+		canvan->msgConsole(QString("Beep code"));
 	}
 	/*
 	void Quant::startLang()

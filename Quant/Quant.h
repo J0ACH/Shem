@@ -29,6 +29,7 @@ namespace QuantIDE
 		void consoleAddMsg(QString);
 		void addNode();
 		//void startLang();
+		void beep();
 
 	protected:
 		void resizeEvent(QResizeEvent *event);
@@ -42,7 +43,7 @@ namespace QuantIDE
 		Canvan *canvan;
 		
 		Button *buttLang, *buttServer, *buttAddNode;
-
+		QPushButton *testButton;
 		Panel *testPanel, *testPanel2;
 
 	};
