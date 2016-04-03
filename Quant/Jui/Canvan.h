@@ -29,11 +29,7 @@ namespace Jui
 		~Canvan();
 
 		void initControl();
-		/*
-		void setTitle(QString titleName);
-		void setVersion(int major, int minor, int patch);
-		*/
-
+		
 		void setColor_background(QColor);
 		void setColor_foreground(QColor);
 		void drawCanvan(QPaintEvent *event);
@@ -48,9 +44,11 @@ namespace Jui
 
 		void setHeaderHeight(int);
 		void setTailHeight(int);
+		void setTitle(QString titleName);
 		void setLogo(QImage);
-		void setCanvanPalette();
+		//void setCanvanPalette();
 		void setCanvanStyleSheet();
+		void setVersion(int major, int minor, int patch);
 		
 	signals:
 		void resizeAct();
@@ -85,9 +83,8 @@ namespace Jui
 		Edges *edges;
 
 		QImage logo;
+		QLabel *version;
 		//QLabel *title;
-		//QLabel *version;
-
 		
 		QPalette *palette;
 		QColor textColor;

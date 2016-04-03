@@ -5,10 +5,14 @@ CMAKE_MINIMUM_REQUIRED ( VERSION 3.4 )
 # INCLUDE #######################################################
 INCLUDE("QuantVersion.txt" ${QT_USE_FILE})
 SET(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH}")
+MESSAGE(STATUS "\nQuant [${PROJECT_VERSION}] init...")
+
+CONFIGURE_FILE (
+  ${CMAKE_CURRENT_SOURCE_DIR}/QuantConfig.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/QuantConfig.h
+)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/Jui)
-
-MESSAGE(STATUS "\nQuant [${PROJECT_VERSION}] init...")
 
 # FIND QT #############################################
 
@@ -26,8 +30,16 @@ ADD_SUBDIRECTORY(Jui)
 
 # SOURCES ##################################################
 
-SET(Quant_hdr Quant.h)
-SET(Quant_src Quant.cpp)
+SET(Quant_hdr 
+  Quant.h
+  NodePanel.h
+  Node.h
+)
+SET(Quant_src 
+  Quant.cpp
+  NodePanel.cpp
+  Node.cpp
+)
 SET(Quant_res 
 	Quant.qrc
 	Jui/Jui.qrc
@@ -54,6 +66,8 @@ IF(WIN32)
 ENDIF()
 
 # LINKER #######################################################
+
+TARGET_INCLUDE_DIRECTORIES(Quant PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 TARGET_LINK_LIBRARIES(Quant
 	${QT_LIBRARIES}

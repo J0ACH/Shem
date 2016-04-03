@@ -1,4 +1,6 @@
 #include "Quant.h"
+#include "QuantConfig.h"
+
 #include <QApplication>
 
 //using namespace Jui;
@@ -35,8 +37,8 @@ namespace QuantIDE
 
 		//this->setMouseTracking(true);
 
-		//canvan->setTitle("Quant");
-		//canvan.setVersion(Qnt_VERSION_MAJOR, Qnt_VERSION_MINOR, Qnt_VERSION_PATCH);
+		canvan->setTitle("Quant");
+		canvan->setVersion(Quant_VERSION_MAJOR, Quant_VERSION_MINOR, Quant_VERSION_PATCH);
 
 		connect(bridge, SIGNAL(statusMessage(QString)), canvan, SLOT(msgConsole(QString)));
 		connect(bridge, SIGNAL(scPost(QString)), canvan, SLOT(msgConsole(QString)));
@@ -64,6 +66,12 @@ namespace QuantIDE
 		buttAddNode->setGeometry(400, 5, 80, 30);
 		buttAddNode->setText("AddNode");
 
+		nodePanel = new Panel(canvan);
+		nodePanel->setGeometry(100, 100, 500, 500);
+		nodePanel->setTitle("NodePanel");
+		nodePanel->setBackground(Qt::black);
+
+		/*
 		testPanel = new Panel(canvan->screen);
 		testPanel->setGeometry(200, 100, 400, 500);
 		testPanel->setTitle("Test");
@@ -73,11 +81,14 @@ namespace QuantIDE
 		testPanel2->setGeometry(50, 50, 200, 200);
 		testPanel2->setTitle("Test");
 		testPanel2->setBackground(QColor(120, 30, 30));
+		*/
 
 		testButton = new QPushButton(canvan->screen);
 		testButton->setGeometry(15, 70, 80, 30);
 		testButton->setText("BEEP!");
 
+		testNode = new Node(nodePanel);
+		testNode->setGeometry(15, 35, 400, 200);
 
 	}
 
