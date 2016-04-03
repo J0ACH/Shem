@@ -11,7 +11,7 @@ namespace Jui
 		win->setWindowFlags(Qt::FramelessWindowHint);
 		win->setWindowTitle("New Title");
 		//win->window()->setWindowOpacity(0.95);
-		
+
 
 		setGeometry(0, 0, win->width(), win->height());
 
@@ -31,7 +31,8 @@ namespace Jui
 
 		//this->setStyleSheet("QTextEdit{background-color: QColor(Qt::transparent);}");
 		this->initControl();
-		this->mySetPalette();
+		//this->setCanvanPalette();
+		this->setCanvanStyleSheet();
 
 		connect(this, SIGNAL(sendToConsole(QString)), panelConsole, SLOT(addLine(QString)));
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(closeCanvan()));
@@ -45,7 +46,7 @@ namespace Jui
 
 		closeButton = new Button(header);
 		closeButton->setIcon(QImage(":/close16.png"), 0);
-		
+
 		maximizeButton = new Button(header);
 		maximizeButton->setIcon(QImage(":/maximize16.png"), 0);
 
@@ -56,13 +57,13 @@ namespace Jui
 		//panelConsole->installEventFilter(this);
 		panelConsole->setTitle("Console");
 		panelConsole->setBackground(QColor(30, 30, 30));
-		panelConsole->setGeometry(0, 0, 150, 150);		
+		panelConsole->setGeometry(0, 0, 150, 150);
 	}
 
 	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		this->setGeometry(0, 0, win->width(), win->height());
-		
+
 		closeButton->setGeometry(width() - 35, 10, 25, 25);
 		maximizeButton->setGeometry(width() - 65, 10, 25, 25);
 		minimizeButton->setGeometry(width() - 95, 10, 25, 25);
@@ -228,6 +229,9 @@ namespace Jui
 	{
 		emit sendToConsole(text);
 	}
+
+
+
 	/*
 	void Canvan::setTitle(QString name)
 	{
@@ -247,57 +251,58 @@ namespace Jui
 	}
 	*/
 
-
-	void Canvan::mySetPalette()
+	void Canvan::setCanvanStyleSheet()
 	{
-		//	menu->setStyle(QStyleFactory::create("Fusion"));
+		backColor = QColor(30, 30, 30);
+		panelColor = QColor(20, 20, 20);
+		textColor = QColor(230, 230, 230);
+		activeColor = QColor(20, 180, 240);
+		
+		//qDebug() << "backHex:" << backColor.name();
+		
+		QString txt;
+		txt.append(tr("QTextEdit { color: %1; background-color: %2; selection-background-color: %3;}").arg(textColor.name(), backColor.name(), activeColor.name()));
+		
+		txt.append("QScrollBar:vertical { border: 2px solid grey; background: #32CC99; width: 15px;	margin: 22px 0 22px 0; }");
 
-		backColor = new QColor(40, 40, 40);
-		panelColor = new QColor(20, 20, 20);
-		textColor = new QColor(230, 230, 230);
-		activeColor = new QColor(20, 180, 240);
+		qDebug() << "TXT:" << txt;
+		
+		this->setStyleSheet(txt);
+		
+		//this->setStyleSheet();
+			/*
+			"QTextEdit{background-color: };}"
+
+			"QScrollBar:vertical{ border: 2px solid grey; background: #32CC99; width: 15px;	margin: 22px 0 22px 0; }"
+			"QScrollBar::handle:vertical{background: white;min-height: 20px;}"
+			"QScrollBar::add-line:vertical{border: 2px solid grey; background: #32CC99; height: 20px; subcontrol-position: bottom; subcontrol-origin: margin;}"
+			"QScrollBar::sub-line:vertical{border: 2px solid grey; background: #32CC99; height: 20px; subcontrol-position: top; subcontrol-origin: margin;}"
+			"QScrollBar::up-arrow:vertical, QScrollBar::down-arrow : vertical{ border: 2px solid grey; width: 3px; height: 3px; background: white;}"
+			);
+			*/
+	}
+
+	void Canvan::setCanvanPalette()
+	{
+		backColor = QColor(40, 40, 40);
+		panelColor = QColor(20, 20, 20);
+		textColor = QColor(230, 230, 230);
+		activeColor = QColor(20, 180, 240);
 
 		palette = new QPalette();
-		palette->setColor(QPalette::Window, *backColor);
+		palette->setColor(QPalette::Window, backColor);
 		palette->setColor(QPalette::WindowText, Qt::white);
 		palette->setColor(QPalette::Base, Qt::transparent);
 		palette->setColor(QPalette::AlternateBase, QColor(53, 53, 53));
 		palette->setColor(QPalette::ToolTipBase, Qt::white);
 		palette->setColor(QPalette::ToolTipText, Qt::white);
-		palette->setColor(QPalette::WindowText, *textColor);
-		palette->setColor(QPalette::Text, *textColor);
-		palette->setColor(QPalette::Highlight, *activeColor);
+		palette->setColor(QPalette::WindowText, textColor);
+		palette->setColor(QPalette::Text, textColor);
+		palette->setColor(QPalette::Highlight, activeColor);
 		palette->setColor(QPalette::Button, Qt::transparent);
-		palette->setColor(QPalette::Background, *panelColor);
+		palette->setColor(QPalette::Background, panelColor);
 
-		//palette->setBrush(QPalette::Button, QBrush((130, 30, 30), Qt::SolidPattern));
-
-		qApp->setPalette(*palette);
-
-
-		//qApp->setStyle(QStyleFactory::create("Fusion"));
-		/*
-		QPalette darkPalette;
-		darkPalette.setColor(QPalette::Window, QColor(53,53,53));
-		darkPalette.setColor(QPalette::WindowText, Qt::white);
-		darkPalette.setColor(QPalette::Base, QColor(25,25,25));
-		darkPalette.setColor(QPalette::AlternateBase, QColor(53,53,53));
-		darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-		darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-		darkPalette.setColor(QPalette::Text, Qt::white);
-		darkPalette.setColor(QPalette::Button, QColor(53,53,53));
-		darkPalette.setColor(QPalette::ButtonText, Qt::white);
-		darkPalette.setColor(QPalette::BrightText, Qt::red);
-		darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-
-		darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-		darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-
-		//	setPalette(darkPalette);
-		qApp->setPalette(darkPalette);
-
-		// qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
-		*/
+		this->setPalette(*palette);
 	}
 
 	void Canvan::closeCanvan() { /*close();*/ win->close(); }

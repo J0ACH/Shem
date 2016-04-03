@@ -7,21 +7,28 @@ namespace Jui
 	{
 		setObjectName("Console");
 
-		//setGeometry(this->width() - 310, headerSize + 5, 300, this->height() - headerSize - tailSize - 10);
-
 		text = new QTextEdit(this);
-		//text->setGeometry(10, 45, this->width() - 20, this->height() - 55);
 		text->setReadOnly(true);
 		text->setOverwriteMode(false);
 		text->setFont(QFont("Consolas", 8));
-
-		text->append(tr("ahoj"));
-		text->append(tr("zdur"));
-		//update();
-
 		text->setFrameStyle(QFrame::NoFrame);
-		//text->setStyleSheet("QTextEdit{background-color: Qt::transparent;}");
-		text->setStyleSheet("background-color: QColor(Qt::transparent);");
+		//text->setStyleSheet("background-color: QColor(Qt::transparent);");
+		//text->setStyleSheet("QTextEdit{background-color: QColor(30,30,30)};}");
+		/*
+		text->setStyleSheet(
+			"QTextEdit{background-color: QColor(30,30,30)};}"
+			"QScrollBar:vertical{ border: 2px solid grey; background: #32CC99; width: 15px;	margin: 22px 0 22px 0; }"
+			"QScrollBar::handle:vertical{background: white;min-height: 20px;}"
+			"QScrollBar::add-line:vertical{border: 2px solid grey; background: #32CC99; height: 20px; subcontrol-position: bottom; subcontrol-origin: margin;}"
+			"QScrollBar::sub-line:vertical{border: 2px solid grey; background: #32CC99; height: 20px; subcontrol-position: top; subcontrol-origin: margin;}"
+			"QScrollBar::up-arrow:vertical, QScrollBar::down-arrow : vertical{ border: 2px solid grey; width: 3px; height: 3px; background: white;}"
+			);
+		*/
+
+		//QString textStyle = tr("QTextEdit{background-color: QColor(30,30,30); color: QColor(230,30,30);}");
+
+
+		text->append(tr("Console init..."));
 
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitTextSize()));
 	}
@@ -30,24 +37,8 @@ namespace Jui
 
 	void Console::fitTextSize()
 	{
-//		qDebug() << "Console::fitTextSize";
-		text->setGeometry(10, 45, this->width() - 20, this->height() - 55);
+		text->setGeometry(10, 35, this->width() - 20, this->height() - 45);
 	}
-
-	/*
-	void Console::paintEvent(QPaintEvent *event)
-	{
-	QPainter painter(this);
-
-	QPen frame(QColor(20, 180, 240), 1);
-	QBrush brush(QColor(125, 25, 25), Qt::SolidPattern);
-
-	painter.setPen(Qt::NoPen);
-	painter.setBrush(brush);
-	painter.drawRect(QRect(0, 0, width(), height()));
-	}
-	*/
-
 
 	Console::~Console()
 	{

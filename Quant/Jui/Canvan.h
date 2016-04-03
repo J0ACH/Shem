@@ -49,7 +49,8 @@ namespace Jui
 		void setHeaderHeight(int);
 		void setTailHeight(int);
 		void setLogo(QImage);
-
+		void setCanvanPalette();
+		void setCanvanStyleSheet();
 		
 	signals:
 		void resizeAct();
@@ -87,13 +88,12 @@ namespace Jui
 		//QLabel *title;
 		//QLabel *version;
 
-		void mySetPalette();
 		
 		QPalette *palette;
-		QColor *textColor;
-		QColor *activeColor;
-		QColor *backColor;
-		QColor *panelColor;
+		QColor textColor;
+		QColor activeColor;
+		QColor backColor;
+		QColor panelColor;
 
 		QPoint *mCursorGlobal;
 		QPoint *mCursorLocal;
