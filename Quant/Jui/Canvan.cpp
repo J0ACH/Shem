@@ -14,6 +14,7 @@ namespace Jui
 
 
 		setGeometry(0, 0, win->width(), win->height());
+		setAttribute(Qt::WA_NoMousePropagation);
 
 		//this->setMouseTracking(true);
 
@@ -28,12 +29,16 @@ namespace Jui
 
 		headerSize = 100;
 		tailSize = 50;
+		isPressed = false;
 
 		this->initControl();
 		this->setCanvanStyleSheet();
 
 		connect(this, SIGNAL(sendToConsole(QString)), panelConsole, SLOT(addLine(QString)));
+
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(closeCanvan()));
+		connect(maximizeButton, SIGNAL(pressAct()), this, SLOT(maximizeCanvan()));
+		connect(minimizeButton, SIGNAL(pressAct()), this, SLOT(minimizeCanvan()));
 
 		msgConsole(tr("start"));
 	}
@@ -50,9 +55,9 @@ namespace Jui
 
 		minimizeButton = new Button(header);
 		minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
-		
+
 		version = new QLabel(tail);
-		version->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+		version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
 		panelConsole = new Console(this);
 		//panelConsole->installEventFilter(this);
@@ -73,7 +78,7 @@ namespace Jui
 		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize - headerSize);
 		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
 
-		version->setGeometry(tail->width()-180, 0, 170, tail->height() - 5);
+		version->setGeometry(tail->width() - 180, 0, 170, tail->height() - 5);
 
 		panelConsole->setGeometry(this->width() - 510, headerSize + 5, 500, this->height() - headerSize - tailSize - 10);
 
@@ -117,6 +122,7 @@ namespace Jui
 
 	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)
 	{
+		isPressed = true;
 		*mCursorGlobal = mouseEvent->globalPos();
 		*mCursorLocal = mouseEvent->pos();
 		*mFrameOriginGlobal = QPoint(
@@ -125,20 +131,24 @@ namespace Jui
 			);
 
 		msgConsole(tr("pressedGlobal [%1,%2]").arg(QString::number(mCursorGlobal->x()), QString::number(mCursorGlobal->y())));
-		msgConsole(tr("pressedLocal [%1,%2]").arg(QString::number(mCursorLocal->x()), QString::number(mCursorLocal->y())));
-		msgConsole(tr("frameOriginGlobal [%1,%2]").arg(QString::number(mFrameOriginGlobal->x()), QString::number(mFrameOriginGlobal->y())));
+		//	msgConsole(tr("pressedLocal [%1,%2]").arg(QString::number(mCursorLocal->x()), QString::number(mCursorLocal->y())));
+		//	msgConsole(tr("frameOriginGlobal [%1,%2]").arg(QString::number(mFrameOriginGlobal->x()), QString::number(mFrameOriginGlobal->y())));
 	}
 
 	void Canvan::mouseMoveEvent(QMouseEvent *mouseEvent)
 	{
-		QPoint mouseCurrentGlobal = mouseEvent->globalPos();
-		int posX = mFrameOriginGlobal->x() - mCursorGlobal->x() + mouseCurrentGlobal.x();
-		int posY = mFrameOriginGlobal->y() - mCursorGlobal->y() + mouseCurrentGlobal.y();
+		if (isPressed)
+		{
+			QPoint mouseCurrentGlobal = mouseEvent->globalPos();
+			int posX = mFrameOriginGlobal->x() - mCursorGlobal->x() + mouseCurrentGlobal.x();
+			int posY = mFrameOriginGlobal->y() - mCursorGlobal->y() + mouseCurrentGlobal.y();
+			//msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
 
-		msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
-
-		win->move(posX, posY);
+			win->move(posX, posY);
+		}
 	}
+
+	void Canvan::mouseReleaseEvent(QMouseEvent *mouseEvent) { isPressed = false; }
 
 	void Canvan::addScreen(QWidget *inScreen)
 	{
@@ -154,12 +164,9 @@ namespace Jui
 
 	void Canvan::setVersion(int major = 0, int minor = 0, int patch = 0)
 	{
-		QString text = tr("version %1.%2%3").arg(QString::number(major), QString::number(minor), QString::number(patch));
-
-		msgConsole(text);
+		QString text = tr("v%1.%2%3").arg(QString::number(major), QString::number(minor), QString::number(patch));
 		version->setText(text);
 	}
-
 
 	void Canvan::setCanvanStyleSheet()
 	{
@@ -186,21 +193,37 @@ namespace Jui
 		txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 20px; }").arg(textColor.name()));
 		//txt.append("QScrollBar:vertical { margin: 50px 0 50px 0; }");
 
-		qDebug() << "TXT:" << txt;
+		//qDebug() << "TXT:" << txt;
 		this->setStyleSheet(txt);
 	}
 
-	void Canvan::closeCanvan() { /*close();*/ win->close(); }
+	void Canvan::closeCanvan() { win->close(); }
 	void Canvan::minimizeCanvan()
 	{
+		qDebug() << "Minimize canvan";
 		//emit minimizeAct();
-		//showMinimized();
+		win->showMinimized();
+
 	}
 	void Canvan::maximizeCanvan()
 	{
-		//qDebug() << "Maximize canvan";
+		qDebug() << "Canvan state" << win->windowState();
+		if (win->windowState() == Qt::WindowNoState) {
+			qDebug() << "Maximize canvan";
+			win->move(0, 0);
+			win->showMaximized();
+			win->setWindowState(Qt::WindowMaximized);
+		}
+		if (win->windowState() == Qt::WindowMaximized) { win->showNormal(); }
+
+
+		//resize(win->rect().size());
+		//setGeometry(0, 0, win->width(), win->height());
+		//		win->move(0, 0);
+		//	win->resize(Qt:showFullScreen win->width(), win->height());
 		//resizeCanvan();
-		//emit maximizeAct();
+		//emit resizeAct();
+		//update();
 	}
 
 	/*

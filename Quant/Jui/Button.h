@@ -7,6 +7,8 @@
 #include <QTimer>
 #include <QDebug>
 
+#include <QMouseEvent>
+
 namespace Jui
 {
 
@@ -47,8 +49,8 @@ namespace Jui
 		QColor blendColor(QColor, QColor, qreal);
 		int iconOffset;
 		
-		void mousePressEvent(QMouseEvent *event);
-		void mouseReleaseEvent(QMouseEvent *event);
+		void mousePressEvent(QMouseEvent *mouseEvent);
+		void mouseReleaseEvent(QMouseEvent *mouseEvent);
 		void enterEvent(QEvent *event);
 		void leaveEvent(QEvent *event);
 

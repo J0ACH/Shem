@@ -145,11 +145,10 @@ namespace Jui
 			{
 				painter.drawText(10, 15, QString::number(backgroundAlpha));
 			}
-		}
-		
+		}		
 	}
 
-	void Button::mousePressEvent(QMouseEvent *event)
+	void Button::mousePressEvent(QMouseEvent *mouseEvent)
 	{
 		isPressed = true;
 		update();
@@ -160,16 +159,15 @@ namespace Jui
 		float stemAdd = 1 / frames;
 
 		emit pressAct();
-		qDebug() << tr("Button (%1) pressed").arg(name);
-		
+		qDebug() << "Button (%1) pressed" << name;
+		mouseEvent->accept();
 	}
 
-	void Button::mouseReleaseEvent(QMouseEvent *event)
+	void Button::mouseReleaseEvent(QMouseEvent *mouseEvent)
 	{
 		isPressed = false;
 		update();
-
-		QWidget::mouseReleaseEvent(event);
+		mouseEvent->accept();
 	}
 
 	void Button::enterEvent(QEvent *event)
@@ -181,9 +179,10 @@ namespace Jui
 		isOver = true;
 		//emit enterAct(tr("Button_EnterAct [%1]").arg(name));
 
+		qDebug() << "Button (%s) pressed" << name;
 		qDebug() << tr("Button::enterEvent");
 
-		QWidget::enterEvent(event);
+		//QWidget::enterEvent(event);
 	}
 
 	void Button::leaveEvent(QEvent *event)
@@ -196,7 +195,7 @@ namespace Jui
 		//emit leaveAct(tr("Button_LeaveAct [%1]").arg(name));
 		qDebug() << tr("Button (%1, icon: %2)::leaveEvent");
 
-		QWidget::leaveEvent(event);
+		//QWidget::leaveEvent(event);
 	}
 
 	Button::~Button()

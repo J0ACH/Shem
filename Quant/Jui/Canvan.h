@@ -61,16 +61,19 @@ namespace Jui
 		void maximizeCanvan();
 				
 	protected:
-		void resizeEvent(QResizeEvent *event);
-		void mousePressEvent(QMouseEvent *event);
-		void mouseMoveEvent(QMouseEvent *event);
-		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent *resizeEvent);
+		void mousePressEvent(QMouseEvent *mouseEvent);
+		void mouseReleaseEvent(QMouseEvent *mouseEvent);
+		//void mouseMoveEvent(QMoveEvent *moveEvent);
+		void mouseMoveEvent(QMouseEvent *mouseEvent);
+		void paintEvent(QPaintEvent *paintEvent);
 
 	private:
 		//Ui::CanvanClass ui;
 
 		//QMenuBar *menu;
-		
+		bool isPressed;
+
 		int headerSize;
 		int tailSize;
 		

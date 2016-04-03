@@ -31,15 +31,11 @@ namespace Jui
 		edges = new Edges(this);
 	}
 
-	void Panel::setTitle(QString name)
-	{
-		title = name;
-	}
+	void Panel::setTitle(QString name) { title = name; }
 
-	void Panel::setBackground(QColor backgroundColor)
-	{
-		backColor = backgroundColor;
-	}
+	void Panel::setBackground(QColor backgroundColor) { backColor = backgroundColor; }
+
+	void Panel::mousePressEvent(QMouseEvent *mouseEvent) { mouseEvent->accept(); }
 
 	void Panel::paintEvent(QPaintEvent *event)
 	{

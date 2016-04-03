@@ -32,6 +32,7 @@ namespace Jui
 		void resizeAct();
 	
 	protected:
+		void mousePressEvent(QMouseEvent *mouseEvent);
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
 

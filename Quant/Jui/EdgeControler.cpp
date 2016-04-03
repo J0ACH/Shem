@@ -131,22 +131,21 @@ namespace Jui
 			painter.drawLine(QLine(0, lineOffset, width(), lineOffset));
 			break;
 		case RIGHT:
-			painter.drawLine(QLine(width() - lineOffset-1, 0, width() - lineOffset-1, height()));
+			painter.drawLine(QLine(width() - lineOffset - 1, 0, width() - lineOffset - 1, height()));
 			break;
 		case BOTTOM:
-			painter.drawLine(QLine(0, height() - lineOffset-1, width(), height() - lineOffset-1));
+			painter.drawLine(QLine(0, height() - lineOffset - 1, width(), height() - lineOffset - 1));
 			break;
 		default:
 			painter.drawRect(bounds());
 			break;
 		}
-
-
 	}
 
 	void EdgeControler::mousePressEvent(QMouseEvent *mouseEvent)
 	{
 		emit pressAct();
+		mouseEvent->accept();
 	}
 
 	void EdgeControler::mouseMoveEvent(QMouseEvent *mouseEvent)
@@ -172,6 +171,7 @@ namespace Jui
 
 		emit moveAct(side, newValue);
 		this->fitGeometry();
+		mouseEvent->accept();
 	}
 
 	void EdgeControler::enterEvent(QEvent *event)
@@ -181,9 +181,6 @@ namespace Jui
 		timer->start();
 
 		isOver = true;
-		//emit enterAct(tr("Button_EnterAct [%1]").arg(name));
-
-		//	qDebug("EdgeControler::enterEvent");
 	}
 
 	void EdgeControler::leaveEvent(QEvent *event)
@@ -193,8 +190,6 @@ namespace Jui
 		timer->start();
 
 		isOver = false;
-		//emit leaveAct(tr("Button_LeaveAct [%1]").arg(name));
-		//	qDebug("EdgeControler::leaveEvent");
 	}
 
 	EdgeControler::~EdgeControler()	{	}
