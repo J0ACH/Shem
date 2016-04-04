@@ -1,7 +1,10 @@
 #ifndef NODEPANEL_H
 #define NODEPANEL_H
 
+#include "Button.h"
 #include "Panel.h"
+#include "Node.h"
+
 #include <QWidget>
 #include <QPushButton>
 #include <QLabel>
@@ -22,14 +25,15 @@ namespace QuantIDE
 
 		QRect bounds();
 
+		Button *buttAddNode;
+
 	protected:
 		//void paintEvent(QPaintEvent *event);
 
 	private:
 		void initControl();
-
-		QPushButton *testButton;
-		QLabel *nameLabel;
+		
+		Node *testNode;
 	};
 }
 

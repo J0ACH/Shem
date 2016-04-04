@@ -31,6 +31,8 @@ namespace Jui
 
 		QRect bounds();
 		void setEdgeOffset(int);
+		void addManipulator(EdgeControler::Direction);
+		void removeManipulator(EdgeControler::Direction);
 		
 	public slots:
 		void edgePressed();
@@ -43,7 +45,6 @@ namespace Jui
 		QPoint mEdgePressActGrandParentOriginGlobal;
 		int edgeOffset;
 
-		void addManipulator(EdgeControler::Direction);
 	};
 }
 #endif // EDGES_H

@@ -10,10 +10,12 @@ namespace Jui
 
 		setObjectName("Edges");
 
+		/*
 		qDebug("Class(%s) -> parent(%s)",
 			qPrintable(objectName()),
 			qPrintable(parent->objectName())
 			);
+		*/
 
 		parent->installEventFilter(this);
 
@@ -28,10 +30,10 @@ namespace Jui
 
 		this->setEdgeOffset(10);
 
-		this->addManipulator(EdgeControler::LEFT);
-		this->addManipulator(EdgeControler::TOP);
-		this->addManipulator(EdgeControler::RIGHT);
-		this->addManipulator(EdgeControler::BOTTOM);
+		//this->addManipulator(EdgeControler::LEFT);
+		//this->addManipulator(EdgeControler::TOP);
+		//this->addManipulator(EdgeControler::RIGHT);
+		//this->addManipulator(EdgeControler::BOTTOM);
 	}
 
 	void Edges::addManipulator(EdgeControler::Direction direction)
@@ -42,6 +44,11 @@ namespace Jui
 		manipulator->setEdgeOffset(edgeOffset);
 
 		connect(parent, SIGNAL(resizeAct()), manipulator, SLOT(fitGeometry()));
+	}
+
+	void Edges::removeManipulator(EdgeControler::Direction direction)
+	{
+
 	}
 
 	void Edges::setEdgeOffset(int offset) { edgeOffset = offset; }

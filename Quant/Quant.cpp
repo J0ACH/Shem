@@ -27,7 +27,6 @@ namespace QuantIDE
 
 		canvan->msgConsole(QString("ScBridge init..."));
 
-
 		canvan->setHeaderHeight(50);
 		canvan->setTailHeight(30);
 		canvan->setLogo(QImage(":/logo128.png"));
@@ -45,7 +44,8 @@ namespace QuantIDE
 
 		connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(startLang()));
 		connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(startServer()));
-		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
+		
+		//connect(nodePanel->buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
 
 		connect(testButton, SIGNAL(pressed()), this, SLOT(beep()));
 
@@ -61,12 +61,8 @@ namespace QuantIDE
 		buttServer = new Button(canvan->screen);
 		buttServer->setGeometry(15, 35, 80, 20);
 		buttServer->setText("Server");
-
-		buttAddNode = new Button(canvan->screen);
-		buttAddNode->setGeometry(400, 5, 80, 30);
-		buttAddNode->setText("AddNode");
-
-		nodePanel = new Panel(canvan);
+		
+		nodePanel = new NodePanel(canvan);
 		nodePanel->setGeometry(100, 100, 500, 500);
 		nodePanel->setTitle("NodePanel");
 		nodePanel->setBackground(Qt::black);
@@ -87,8 +83,7 @@ namespace QuantIDE
 		testButton->setGeometry(15, 70, 80, 30);
 		testButton->setText("BEEP!");
 
-		testNode = new Node(nodePanel);
-		testNode->setGeometry(15, 35, 400, 200);
+		
 
 	}
 

@@ -35,6 +35,23 @@ namespace Jui
 
 	void Panel::setBackground(QColor backgroundColor) { backColor = backgroundColor; }
 
+	void Panel::setEdgeControler(EdgeControler::Direction direction, bool visible)
+	{
+		switch (direction)
+		{
+		case EdgeControler::Direction::LEFT:
+			if (visible)
+			{
+				edges->addManipulator(EdgeControler::Direction::LEFT);
+			}
+			break;
+		default:
+			break;
+		}
+
+
+	}
+
 	void Panel::mousePressEvent(QMouseEvent *mouseEvent) { mouseEvent->accept(); }
 
 	void Panel::paintEvent(QPaintEvent *event)

@@ -11,6 +11,7 @@
 #include "Panel.h"
 #include "Edges.h"
 
+#include "NodePanel.h"
 #include "Node.h"
 
 using namespace SupercolliderBridge;
@@ -43,13 +44,13 @@ namespace QuantIDE
 
 		ScBridge *bridge;
 		Canvan *canvan;
-		Panel *nodePanel;
+		NodePanel *nodePanel;
 
-		Button *buttLang, *buttServer, *buttAddNode;
+		Button *buttLang, *buttServer;
 		QPushButton *testButton;
 		Panel *testPanel, *testPanel2;
 
-		Node *testNode;
+		
 	};
 }
 #endif // QUANT

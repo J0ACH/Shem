@@ -9,6 +9,7 @@ namespace QuantIDE
 	//	this->initControl();
 
 		//connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
+		
 	}
 
 	QRect NodePanel::bounds()
@@ -18,13 +19,12 @@ namespace QuantIDE
 
 	void NodePanel::initControl()
 	{
-		nameLabel = new QLabel(this);
-		nameLabel->setGeometry(5, 5, 80, 30);
-		nameLabel->setText("Node1");
+		buttAddNode = new Button(this);
+		buttAddNode->setGeometry(200, 5, 80, 30);
+		buttAddNode->setText("AddNode");
 
-		testButton = new QPushButton(this);
-		testButton->setGeometry(15, 15, 80, 30);
-		testButton->setText("test");
+		testNode = new Node(this);
+		testNode->setGeometry(15, 35, 400, 200);
 	}
 
 	/*

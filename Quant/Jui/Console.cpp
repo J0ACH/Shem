@@ -7,6 +7,8 @@ namespace Jui
 	{
 		setObjectName("Console");
 
+		setEdgeControler(EdgeControler::Direction::LEFT, true);
+
 		text = new QTextEdit(this);
 		text->setReadOnly(true);
 		text->setOverwriteMode(false);
@@ -14,6 +16,8 @@ namespace Jui
 		text->setFrameStyle(QFrame::NoFrame);
 	
 		text->append(tr("Console init..."));
+
+
 
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitTextSize()));
 	}

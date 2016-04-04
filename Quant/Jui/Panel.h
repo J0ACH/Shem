@@ -27,6 +27,8 @@ namespace Jui
 		void setTitle(QString);
 		void setBackground(QColor);
 
+		void setEdgeControler(EdgeControler::Direction, bool);
+
 		//bool eventFilter(QObject *target, QEvent *event);
 	signals:
 		void resizeAct();
