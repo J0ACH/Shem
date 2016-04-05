@@ -20,6 +20,10 @@ namespace Jui
 		Button(QWidget *parent);
 		~Button();
 
+		enum State { OFF, ON };
+		enum StateDisplay { NORMAL, OVER, PRESSED };
+		enum StateKeeping {	TOUCH, HOLD };
+
 		QRect bounds();
 
 		void setIcon(QImage, int);
@@ -29,24 +33,31 @@ namespace Jui
 		void setOverColor(QColor);
 		void setActiveColor(QColor);
 
+		void setStateKeeping(StateKeeping);
+
 	signals:
 		void pressAct();
 		//void enterAct(QString name);
 		//void leaveAct(QString name);
 
 	public slots:
-		void alphaUpdate();
+		void fadeRatio();
 
 	protected:
 		void paintEvent(QPaintEvent *);
 
 	private:
+		State buttonState;
+		StateDisplay buttonDisplay;
+		StateKeeping buttonKeeping;
+
 		bool isPressed, isOver;
 
 		QString name;
 		QImage icon;
 		QColor normalColor, overColor, activeColor;
 		QColor blendColor(QColor, QColor, qreal);
+		QColor penColor, fillColor;
 		int iconOffset;
 		
 		void mousePressEvent(QMouseEvent *mouseEvent);
@@ -58,7 +69,8 @@ namespace Jui
 		int fadeTimeIn;
 		int fadeTimeOut;
 		int fps;
-		int backgroundAlpha;
+		//int backgroundAlpha;
+		double ratio;
 
 		QTimer *timer;
 

@@ -51,6 +51,7 @@ namespace Jui
 
 		maximizeButton = new Button(header);
 		maximizeButton->setIcon(QImage(":/maximize16.png"), 0);
+		maximizeButton->setStateKeeping(Button::StateKeeping::HOLD);
 
 		minimizeButton = new Button(header);
 		minimizeButton->setIcon(QImage(":/minimize16.png"), 0);

@@ -68,12 +68,18 @@ namespace QuantIDE
 
 		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
+		buttLang->setStateKeeping(Button::StateKeeping::HOLD);
 
 		buttServer = new Button(canvan->tail);
 		buttServer->setText("Server");
+		buttServer->setStateKeeping(Button::StateKeeping::HOLD);
 
-		testButton = new QPushButton(canvan->tail);
-		testButton->setText("BEEP!");
+		testButton = new Button(canvan->screen);
+		testButton->setText("TEST");
+
+		testButton2 = new Button(canvan->screen);
+		testButton2->setText("TEST");
+		testButton2->setStateKeeping(Button::StateKeeping::HOLD);
 	}
 
 	void Quant::fitGeometry()
@@ -83,7 +89,8 @@ namespace QuantIDE
 
 		buttLang->setGeometry(5, 5, 50, 20);
 		buttServer->setGeometry(60, 5, 50, 20);
-		testButton->setGeometry(115, 5, 50, 20);
+		testButton->setGeometry(315, 10, 60, 30);
+		testButton2->setGeometry(385, 10, 60, 30);
 	}
 
 	void Quant::paintEvent(QPaintEvent *paintEvent)

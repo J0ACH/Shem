@@ -48,7 +48,7 @@ namespace QuantIDE
 		NodePanel *nodePanel;
 
 		Button *buttLang, *buttServer;
-		QPushButton *testButton;
+		Button *testButton, *testButton2;
 		Panel *testPanel, *testPanel2;
 
 		

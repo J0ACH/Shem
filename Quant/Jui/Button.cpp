@@ -7,23 +7,30 @@ namespace Jui
 
 	Button::Button(QWidget *parent) : QWidget(parent)
 	{
+		buttonState = OFF;
+		buttonDisplay = NORMAL;
+		buttonKeeping = TOUCH;
+
+		name = "button";
 		isPressed = false;
 		isOver = false;
 
 		normalColor = QColor(90, 90, 90);
 		overColor = QColor(230, 230, 230);
 		activeColor = QColor(20, 180, 240);
+		penColor = normalColor;
 
 		iconOffset = 0;
 
-		backgroundAlpha = 0;
-		fadeTimeIn = 500;
-		fadeTimeOut = 250;
+		ratio = 0;
+		//backgroundAlpha = 0;
+		fadeTimeIn = 350;
+		fadeTimeOut = 150;
 		fps = 25;
 
 		timer = new QTimer(this);
 
-		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
+		connect(timer, SIGNAL(timeout()), this, SLOT(fadeRatio()));
 	}
 
 	void Button::setText(QString buttonName) { name = buttonName; }
@@ -34,36 +41,35 @@ namespace Jui
 	void Button::setOverColor(QColor color){ overColor = color; }
 	void Button::setActiveColor(QColor color){ activeColor = color; }
 
-	QRect Button::bounds()
-	{
-		return QRect(0, 0, width() - 1, height() - 1);
-	}
+	void Button::setStateKeeping(StateKeeping mode) { buttonKeeping = mode; }
 
-	void Button::alphaUpdate()
+	QRect Button::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+
+	void Button::fadeRatio()
 	{
 		if (isOver)
 		{
-			backgroundAlpha += 255 / fps;
-			if (backgroundAlpha >= 255)
+			ratio += 1.0 / fps;
+			if (ratio >= 1)
 			{
 				timer->stop();
-				backgroundAlpha = 255;
+				ratio = 1;
 			}
 		}
 		else
 		{
-			backgroundAlpha -= 255 / fps;
-			if (backgroundAlpha <= 0)
+			ratio -= 1.0 / fps;
+			if (ratio <= 0)
 			{
 				timer->stop();
-				backgroundAlpha = 0;
+				ratio = 0;
 			}
 		}
-		//qDebug() << tr("buttonAlpha %1").arg(QString::number(backgroundAlpha));
+		//qDebug() << tr("buttonAlpha %1").arg(QString::number(ratio));
 		update();
 	}
 
-	static QColor blendColorAA(const QColor& color1, const QColor& color2, qreal ratio)
+	QColor Button::blendColor(QColor color1, QColor color2, double ratio)
 	{
 		int r = color1.red()*(1 - ratio) + color2.red()*ratio;
 		int g = color1.green()*(1 - ratio) + color2.green()*ratio;
@@ -75,82 +81,63 @@ namespace Jui
 	void Button::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
-		
-		QPen *pen;
-		if (isPressed){
-			pen = new QPen(Qt::red, 3);
+
+		switch (buttonState)
+		{
+		case ON:
+			fillColor = activeColor;
+			break;
+		case OFF:
+			fillColor = Qt::transparent;;
+			break;
+		}
+		painter.fillRect(bounds(), fillColor);
+
+		penColor = blendColor(normalColor, overColor, ratio);
+		painter.setPen(QPen(penColor, 1));
+
+		if (icon.isNull())
+		{
+			QTextOption opt;
+			opt.setAlignment(Qt::AlignCenter);
+			painter.drawText(bounds(), name, opt);
 		}
 		else
 		{
-			if (isOver){
-				pen = new QPen(Qt::white, 3);
-			}
-			else
-			{
-				pen = new QPen(Qt::white, 1);
-			}
-		}
-
-		if (!icon.isNull()){
-			float moveX = (this->width() - icon.width()) / 2 - 1;
+			float moveX = (this->width() - icon.width()) / 2+1;
 			float moveY = (this->height() - icon.height()) / 2;
 
-			painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
-
-			/*
-			QRectF target(
-			iconOffset,
-			iconOffset,
-			this->width() - 2 * iconOffset - 1,
-			this->height() - 2 * iconOffset - 1
-			);
-			*/
+			//painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
 
 			QRectF target(moveX, moveY, icon.width(), icon.height());
 			QRectF source(0, 0, icon.width(), icon.height());
-			//painter.drawImage(target, icon, source);
 
 			QImage renderedIcon(icon);
-			// fill with color
-			if (isOver)
-			{
-				renderedIcon.fill(overColor);
-			}
+			if (isOver)	{ renderedIcon.fill(penColor); }
 			else
 			{
 				if (isPressed) { renderedIcon.fill(activeColor); }
 				else { renderedIcon.fill(normalColor); };
 			}
-			//renderedIcon.fill(QColor(90, 90, 90));
-			// set alpha-map, black pixels -> opacity of 0, white pixels -> opacity 1
+
 			renderedIcon.setAlphaChannel(icon);
 			painter.drawImage(target, renderedIcon, source);  // draw image to QWidget
-
-		}
-		else
-		{
-			painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
-			painter.setPen(*pen);
-			painter.setBrush(QBrush(QColor(120, 20, 20, backgroundAlpha), Qt::SolidPattern));
-			painter.drawRect(bounds());
-
-			if (!name.isNull())
-			{
-				QTextOption opt;
-				opt.setAlignment(Qt::AlignCenter);
-
-				painter.drawText(bounds(), name, opt);
-			}
-			else
-			{
-				painter.drawText(10, 15, QString::number(backgroundAlpha));
-			}
-		}		
+		};
+		painter.drawRect(bounds());
 	}
 
 	void Button::mousePressEvent(QMouseEvent *mouseEvent)
 	{
 		isPressed = true;
+
+		switch (buttonState)
+		{
+		case OFF: buttonState = ON; /*qDebug("Button STATE(ON)");*/ break;
+		case ON: buttonState = OFF;	/*qDebug("Button STATE(OFF)");*/ break;
+		};
+
+		buttonDisplay = PRESSED; /*qDebug("Button Display(PRESSED)");*/
+
 		update();
 
 		float time = 1.5;
@@ -159,13 +146,30 @@ namespace Jui
 		float stemAdd = 1 / frames;
 
 		emit pressAct();
-		qDebug() << "Button (%1) pressed" << name;
+		//qDebug() << "Button (%1) pressed" << name;
 		mouseEvent->accept();
 	}
 
 	void Button::mouseReleaseEvent(QMouseEvent *mouseEvent)
 	{
 		isPressed = false;
+
+		if (buttonKeeping == TOUCH)
+		{
+			//qDebug("Button Keeping(TOUCH)");
+			switch (buttonState)
+			{
+			case ON: buttonState = OFF;	/*qDebug("Button STATE(OFF)");*/ break;
+			case OFF: buttonState = ON;/* qDebug("Button STATE(ON)");*/ break;
+			};
+		}
+
+		switch (buttonState)
+		{
+		case ON: buttonDisplay = PRESSED; /*qDebug("Button Display(PRESSED)");*/ break;
+		case OFF: buttonDisplay = OVER; /*qDebug("Button Display(OVER)");*/ break;
+		}
+
 		update();
 		mouseEvent->accept();
 	}
@@ -177,12 +181,9 @@ namespace Jui
 		timer->start();
 
 		isOver = true;
-		//emit enterAct(tr("Button_EnterAct [%1]").arg(name));
-
-		qDebug() << "Button (%s) pressed" << name;
-		qDebug() << tr("Button::enterEvent");
-
-		//QWidget::enterEvent(event);
+		buttonDisplay = OVER;
+		//qDebug("Button Display(OVER)");
+		//qDebug() << tr("Button::enterEvent");
 	}
 
 	void Button::leaveEvent(QEvent *event)
@@ -192,14 +193,15 @@ namespace Jui
 		timer->start();
 
 		isOver = false;
-		//emit leaveAct(tr("Button_LeaveAct [%1]").arg(name));
-		qDebug() << tr("Button (%1, icon: %2)::leaveEvent");
+		switch (buttonState)
+		{
+		case OFF: buttonDisplay = NORMAL; break;
+		case ON: buttonDisplay = PRESSED; break;
+		}
 
-		//QWidget::leaveEvent(event);
+		//qDebug("Button Display(NORMAL)");
+		//qDebug() << tr("Button (%1, icon: %2)::leaveEvent");
 	}
 
-	Button::~Button()
-	{
-
-	}
+	Button::~Button() {	}
 }
