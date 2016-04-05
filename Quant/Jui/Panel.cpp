@@ -45,11 +45,27 @@ namespace Jui
 				edges->addManipulator(EdgeControler::Direction::LEFT);
 			}
 			break;
+		case EdgeControler::Direction::TOP:
+			if (visible)
+			{
+				edges->addManipulator(EdgeControler::Direction::TOP);
+			}
+			break;
+		case EdgeControler::Direction::RIGHT:
+			if (visible)
+			{
+				edges->addManipulator(EdgeControler::Direction::RIGHT);
+			}
+			break;
+		case EdgeControler::Direction::BOTTOM:
+			if (visible)
+			{
+				edges->addManipulator(EdgeControler::Direction::BOTTOM);
+			}
+			break;
 		default:
 			break;
 		}
-
-
 	}
 
 	void Panel::mousePressEvent(QMouseEvent *mouseEvent) { mouseEvent->accept(); }

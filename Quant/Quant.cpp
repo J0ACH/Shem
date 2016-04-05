@@ -32,6 +32,8 @@ namespace QuantIDE
 		canvan->setLogo(QImage(":/logo128.png"));
 
 		this->initControl();
+		this->fitGeometry();
+
 		canvan->msgConsole(QString("Control init..."));
 
 		//this->setMouseTracking(true);
@@ -44,47 +46,38 @@ namespace QuantIDE
 
 		connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(startLang()));
 		connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(startServer()));
-		
+
 		//connect(nodePanel->buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
 
 		connect(testButton, SIGNAL(pressed()), this, SLOT(beep()));
 
+		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
 	}
 
 	void Quant::initControl()
 	{
+		nodePanel = new NodePanel(canvan->screen);
+		nodePanel->setTitle("NodePanel");
+		nodePanel->setBackground(QColor(20,20,20));
 
-		buttLang = new Button(canvan->screen);
-		buttLang->setGeometry(15, 5, 80, 20);
+		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
 
-		buttServer = new Button(canvan->screen);
-		buttServer->setGeometry(15, 35, 80, 20);
+		buttServer = new Button(canvan->tail);
 		buttServer->setText("Server");
-		
-		nodePanel = new NodePanel(canvan);
-		nodePanel->setGeometry(100, 100, 500, 500);
-		nodePanel->setTitle("NodePanel");
-		nodePanel->setBackground(Qt::black);
 
-		/*
-		testPanel = new Panel(canvan->screen);
-		testPanel->setGeometry(200, 100, 400, 500);
-		testPanel->setTitle("Test");
-		testPanel->setBackground(Qt::black);
-
-		testPanel2 = new Panel(testPanel);
-		testPanel2->setGeometry(50, 50, 200, 200);
-		testPanel2->setTitle("Test");
-		testPanel2->setBackground(QColor(120, 30, 30));
-		*/
-
-		testButton = new QPushButton(canvan->screen);
-		testButton->setGeometry(15, 70, 80, 30);
+		testButton = new QPushButton(canvan->tail);
 		testButton->setText("BEEP!");
+	}
 
-		
+	void Quant::fitGeometry()
+	{
+		QRect screenRect = canvan->screen->rect();
+		nodePanel->setGeometry(1, 0, screenRect.width(), screenRect.height());
 
+		buttLang->setGeometry(5, 5, 50, 20);
+		buttServer->setGeometry(60, 5, 50, 20);
+		testButton->setGeometry(115, 5, 50, 20);
 	}
 
 	void Quant::paintEvent(QPaintEvent *paintEvent)
@@ -95,7 +88,7 @@ namespace QuantIDE
 
 	void Quant::resizeEvent(QResizeEvent *resizeEvent)
 	{
-		canvan->msgConsole(tr("TOPView resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
+		//canvan->msgConsole(tr("TOPView resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
 	}
 
 	void Quant::addNode()
@@ -111,8 +104,8 @@ namespace QuantIDE
 	/*
 	void Quant::startLang()
 	{
-		canvan->msgConsole(QString("SClang started..."));
-		bridge->startLang();
+	canvan->msgConsole(QString("SClang started..."));
+	bridge->startLang();
 	}
 	*/
 

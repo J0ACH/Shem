@@ -6,10 +6,12 @@ namespace QuantIDE
 	{
 		setObjectName("NodePanel");
 
-	//	this->initControl();
+		this->initControl();
+		this->fitGeometry();
 
-		//connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
-		
+		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
+		connect(this, SIGNAL(resizeAct()), testNode1, SLOT(fitGeometry()));
+		connect(this, SIGNAL(resizeAct()), testNode2, SLOT(fitGeometry()));
 	}
 
 	QRect NodePanel::bounds()
@@ -20,20 +22,18 @@ namespace QuantIDE
 	void NodePanel::initControl()
 	{
 		buttAddNode = new Button(this);
-		buttAddNode->setGeometry(200, 5, 80, 30);
 		buttAddNode->setText("AddNode");
 
-		testNode = new Node(this);
-		testNode->setGeometry(15, 35, 400, 200);
+		testNode1 = new Node(this);
+		testNode2 = new Node(this);
 	}
 
-	/*
-	void NodePanel::paintEvent(QPaintEvent *paintEvent)
+	void NodePanel::fitGeometry()
 	{
-	QPainter painter(this);
-	painter.fillRect(QRect(0, 0, width() - 1, height() - 1), QColor(120, 20, 20));
+		buttAddNode->setGeometry(200, 10, 50, 20);
+		testNode1->setGeometry(10, 50, this->width() - 20, 200);
+		testNode2->setGeometry(10, 260, this->width() - 20, 200);
 	}
-	*/
 
 	NodePanel::~NodePanel()
 	{

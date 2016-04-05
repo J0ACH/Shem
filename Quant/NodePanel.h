@@ -27,13 +27,13 @@ namespace QuantIDE
 
 		Button *buttAddNode;
 
-	protected:
-		//void paintEvent(QPaintEvent *event);
+	public slots:
+		void fitGeometry();
 
 	private:
 		void initControl();
 		
-		Node *testNode;
+		Node *testNode1, *testNode2;
 	};
 }
 

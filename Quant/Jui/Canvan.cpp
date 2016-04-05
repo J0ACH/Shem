@@ -30,6 +30,7 @@ namespace Jui
 		headerSize = 100;
 		tailSize = 50;
 		isPressed = false;
+		showScreen = false;
 
 		this->initControl();
 		this->setCanvanStyleSheet();
@@ -40,13 +41,11 @@ namespace Jui
 		connect(maximizeButton, SIGNAL(pressAct()), this, SLOT(maximizeCanvan()));
 		connect(minimizeButton, SIGNAL(pressAct()), this, SLOT(minimizeCanvan()));
 
-		msgConsole(tr("start"));
+		connect(panelConsole, SIGNAL(resizeAct()), this, SLOT(fitScreen()));
 	}
 
 	void Canvan::initControl()
 	{
-		edges = new Edges(this);
-
 		closeButton = new Button(header);
 		closeButton->setIcon(QImage(":/close16.png"), 0);
 
@@ -60,10 +59,48 @@ namespace Jui
 		version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
 		panelConsole = new Console(this);
-		//panelConsole->installEventFilter(this);
 		panelConsole->setTitle("Console");
 		panelConsole->setBackground(QColor(30, 30, 30));
-		panelConsole->setGeometry(0, 0, 150, 150);
+		panelConsole->setGeometry(0, 0, 500, 150);
+
+		edges = new Edges(this);
+		setEdgeControler(EdgeControler::Direction::LEFT, true);
+		setEdgeControler(EdgeControler::Direction::TOP, true);
+		setEdgeControler(EdgeControler::Direction::RIGHT, true);
+		setEdgeControler(EdgeControler::Direction::BOTTOM, true);
+	}
+
+	void Canvan::setEdgeControler(EdgeControler::Direction direction, bool visible)
+	{
+		switch (direction)
+		{
+		case EdgeControler::Direction::LEFT:
+			if (visible)
+			{
+				edges->addManipulator(EdgeControler::Direction::LEFT);
+			}
+			break;
+		case EdgeControler::Direction::TOP:
+			if (visible)
+			{
+				edges->addManipulator(EdgeControler::Direction::TOP);
+			}
+			break;
+		case EdgeControler::Direction::RIGHT:
+			if (visible)
+			{
+				edges->addManipulator(EdgeControler::Direction::RIGHT);
+			}
+			break;
+		case EdgeControler::Direction::BOTTOM:
+			if (visible)
+			{
+				edges->addManipulator(EdgeControler::Direction::BOTTOM);
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
 	void Canvan::resizeEvent(QResizeEvent *resizeEvent)
@@ -75,16 +112,32 @@ namespace Jui
 		minimizeButton->setGeometry(width() - 95, 10, 25, 25);
 
 		header->setGeometry(0, 0, this->width(), headerSize);
-		screen->setGeometry(0, headerSize, this->width(), this->height() - tailSize - headerSize);
+		this->fitScreen();
 		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
 
 		version->setGeometry(tail->width() - 180, 0, 170, tail->height() - 5);
 
-		panelConsole->setGeometry(this->width() - 510, headerSize + 5, 500, this->height() - headerSize - tailSize - 10);
+		panelConsole->setGeometry(
+			this->width() - panelConsole->width(),
+			headerSize + 1,
+			panelConsole->width(),
+			this->height() - headerSize - tailSize - 1
+			);
 
 		emit resizeAct();
 
 		//msgConsole(tr("resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
+	}
+
+	void Canvan::fitScreen()
+	{
+		screen->setGeometry(
+			0,
+			headerSize,
+			this->width() - panelConsole->width(),
+			this->height() - tailSize - headerSize
+			);
+		emit resizeScreenAct();
 	}
 
 	void Canvan::paintEvent(QPaintEvent *event)
@@ -100,6 +153,13 @@ namespace Jui
 		painter.setPen(QPen(QColor(200, 200, 200), 1));
 		painter.setBrush(Qt::NoBrush);
 		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+
+		if (showScreen)
+		{
+			painter.setPen(QColor(230, 30, 30));
+			painter.drawLine(screen->geometry().topLeft(), screen->geometry().bottomRight());
+			painter.drawLine(screen->geometry().bottomLeft(), screen->geometry().topRight());
+		}
 
 		//painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
 		//painter.drawText(100, 15, title->text());

@@ -29,11 +29,13 @@ namespace Jui
 		~Canvan();
 
 		void initControl();
+		void setEdgeControler(EdgeControler::Direction, bool);
 		
 		void setColor_background(QColor);
 		void setColor_foreground(QColor);
 		void drawCanvan(QPaintEvent *event);
 		void addScreen(QWidget *inScreen);
+
 
 		//Console *console;
 
@@ -52,6 +54,7 @@ namespace Jui
 		
 	signals:
 		void resizeAct();
+		void resizeScreenAct();
 		void sendToConsole(QString);
 
 	public slots:
@@ -59,6 +62,8 @@ namespace Jui
 		void closeCanvan();
 		void minimizeCanvan();
 		void maximizeCanvan();
+
+		void fitScreen();
 				
 	protected:
 		void resizeEvent(QResizeEvent *resizeEvent);
@@ -73,6 +78,7 @@ namespace Jui
 
 		//QMenuBar *menu;
 		bool isPressed;
+		bool showScreen;
 
 		int headerSize;
 		int tailSize;

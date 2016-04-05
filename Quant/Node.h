@@ -21,6 +21,9 @@ namespace QuantIDE
 
 		QRect bounds();
 
+	public slots:		
+		void fitGeometry();
+
 	protected:
 		void paintEvent(QPaintEvent *event);
 

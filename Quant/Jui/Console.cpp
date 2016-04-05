@@ -16,9 +16,7 @@ namespace Jui
 		text->setFrameStyle(QFrame::NoFrame);
 	
 		text->append(tr("Console init..."));
-
-
-
+		
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitTextSize()));
 	}
 

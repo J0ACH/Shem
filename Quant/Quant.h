@@ -33,6 +33,7 @@ namespace QuantIDE
 		void addNode();
 		//void startLang();
 		void beep();
+		void fitGeometry();
 
 	protected:
 		void resizeEvent(QResizeEvent *event);
