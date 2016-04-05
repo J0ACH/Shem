@@ -52,6 +52,9 @@ namespace QuantIDE
 		connect(testButton, SIGNAL(pressed()), this, SLOT(beep()));
 
 		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
+
+		//connect(nodePanel->testNode1, SIGNAL(evaluateAct(QString)), this, SLOT(consoleAddMsg(QString)));
+		//connect(nodePanel->testNode2, SIGNAL(evaluateAct(QString)), this, SLOT(consoleAddMsg(QString)));
 	}
 
 	void Quant::initControl()
@@ -59,6 +62,9 @@ namespace QuantIDE
 		nodePanel = new NodePanel(canvan->screen);
 		nodePanel->setTitle("NodePanel");
 		nodePanel->setBackground(QColor(20,20,20));
+		nodePanel->setTargetCanvan(canvan);
+		nodePanel->setTargetBridge(bridge);
+		
 
 		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
@@ -111,6 +117,7 @@ namespace QuantIDE
 
 	void Quant::consoleAddMsg(QString msg)
 	{
+		qDebug() << "Quant::consoleAddMsg: " << msg;
 		canvan->msgConsole(msg);
 	}
 

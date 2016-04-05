@@ -35,10 +35,7 @@ namespace Jui
 		void setColor_foreground(QColor);
 		void drawCanvan(QPaintEvent *event);
 		void addScreen(QWidget *inScreen);
-
-
-		//Console *console;
-
+		
 		QWidget *win;
 		QWidget *header;
 		QWidget *screen;
@@ -69,7 +66,6 @@ namespace Jui
 		void resizeEvent(QResizeEvent *resizeEvent);
 		void mousePressEvent(QMouseEvent *mouseEvent);
 		void mouseReleaseEvent(QMouseEvent *mouseEvent);
-		//void mouseMoveEvent(QMoveEvent *moveEvent);
 		void mouseMoveEvent(QMouseEvent *mouseEvent);
 		void paintEvent(QPaintEvent *paintEvent);
 

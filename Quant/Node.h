@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QPainter>
+#include <QTextEdit>
+#include <QDebug>
 
 //#include "Quant.h"
 
@@ -19,10 +21,18 @@ namespace QuantIDE
 		Node(QWidget *parent = 0);
 		~Node();
 
+		void setName(QString);
+		void setSourceCode(QString);
+
 		QRect bounds();
+		
+
+	signals:
+		void evaluateAct(QString);
 
 	public slots:		
 		void fitGeometry();
+		void evaluateCode();
 
 	protected:
 		void paintEvent(QPaintEvent *event);
@@ -30,8 +40,9 @@ namespace QuantIDE
 	private:
 		void initControl();
 
-		QPushButton *testButton;
 		QLabel *nameLabel;
+		QPushButton *buttEvaluate;
+		QTextEdit *sourceCode;
 	};
 }
 

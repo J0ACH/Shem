@@ -4,6 +4,8 @@
 #include "Button.h"
 #include "Panel.h"
 #include "Node.h"
+#include "Canvan.h"
+#include "ScBridge.h"
 
 #include <QWidget>
 #include <QPushButton>
@@ -11,6 +13,7 @@
 #include <QPainter>
 
 using namespace Jui;
+using namespace SupercolliderBridge;
 
 namespace QuantIDE
 {
@@ -26,14 +29,16 @@ namespace QuantIDE
 		QRect bounds();
 
 		Button *buttAddNode;
+		Node *testNode1, *testNode2;
+
+		void setTargetCanvan(Canvan*);
+		void setTargetBridge(ScBridge*);
 
 	public slots:
 		void fitGeometry();
 
 	private:
 		void initControl();
-		
-		Node *testNode1, *testNode2;
 	};
 }
 

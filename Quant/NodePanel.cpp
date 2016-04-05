@@ -25,7 +25,24 @@ namespace QuantIDE
 		buttAddNode->setText("AddNode");
 
 		testNode1 = new Node(this);
+		testNode1->setName("Node1");
+		testNode1->setSourceCode("SinOsc.ar(90!2)");
+
 		testNode2 = new Node(this);
+		testNode2->setName("Node2");
+		testNode2->setSourceCode("Saw.ar(120!2)");
+	}
+
+	void NodePanel::setTargetCanvan(Canvan *target) 
+	{
+		connect(testNode1, SIGNAL(evaluateAct(QString)), target, SLOT(msgConsole(QString)));
+		connect(testNode2, SIGNAL(evaluateAct(QString)), target, SLOT(msgConsole(QString)));
+	}
+
+	void NodePanel::setTargetBridge(ScBridge *target)
+	{
+		connect(testNode1, SIGNAL(evaluateAct(QString)), target, SLOT(evaluateCode(QString)));
+		connect(testNode2, SIGNAL(evaluateAct(QString)), target, SLOT(evaluateCode(QString)));
 	}
 
 	void NodePanel::fitGeometry()
