@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file alias="logo128.png">Resources/Quant_Logo_128px.png</file>
+    <file alias="logo32.png">Resources/LogoQuant_32px.png</file>
 </qresource>
 </RCC>

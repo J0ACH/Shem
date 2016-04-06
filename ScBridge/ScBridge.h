@@ -14,6 +14,8 @@
 
 namespace SupercolliderBridge
 {
+	enum class StateInterpret{ OFF, RUNNING };
+	enum class StateServer{ OFF, RUNNING };
 
 	class ScBridge : public QProcess
 	{
@@ -22,6 +24,9 @@ namespace SupercolliderBridge
 	public:
 		ScBridge(QObject *parent);
 		~ScBridge();
+
+		StateInterpret stateInterpret;
+		StateServer stateServer;
 		
 	public slots:
 		void startLang();
@@ -51,9 +56,7 @@ namespace SupercolliderBridge
 
 		bool mTerminationRequested;
 		QDateTime mTerminationRequestTime;
-		bool mCompiled;
-
-		
+		bool mCompiled;		
 	};
 
 }

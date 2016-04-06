@@ -28,8 +28,17 @@ namespace QuantIDE
 		 Quant(QWidget *parent = 0);
 		~Quant();
 
+	signals:
+		void bootInterpretrAct();
+		void bootServerAct();
+		void killInterpretrAct();
+		void killServerAct();
+
 	public slots:
 		void consoleAddMsg(QString);
+		void switchInterpretr();
+		void switchServer();
+
 		void addNode();
 		//void startLang();
 		void beep();

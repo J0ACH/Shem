@@ -15,6 +15,9 @@ namespace SupercolliderBridge
 	{
 		//this->startLang();
 
+		stateInterpret = StateInterpret::OFF;
+		stateServer = StateServer::OFF;
+
 		connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 		//connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
 
@@ -25,25 +28,34 @@ namespace SupercolliderBridge
 
 	void ScBridge::startLang()
 	{
-		QString sclangCommand = "sclang";
-		QString configFile;
-
-		QStringList sclangArguments;
-		if (!configFile.isEmpty())
-			sclangArguments << "-l" << configFile;
-		sclangArguments << "-i" << "scqt";
-
-		QProcess::start(sclangCommand, sclangArguments);
-		bool processStarted = QProcess::waitForStarted();
-		if (!processStarted)
+		if (stateInterpret == StateInterpret::OFF)
 		{
-			emit statusMessage(tr("Failed to start interpreter!"));
+
+			QString sclangCommand = "sclang";
+			QString configFile;
+
+			QStringList sclangArguments;
+			if (!configFile.isEmpty())
+				sclangArguments << "-l" << configFile;
+			sclangArguments << "-i" << "scqt";
+
+			QProcess::start(sclangCommand, sclangArguments);
+			bool processStarted = QProcess::waitForStarted();
+			if (!processStarted)
+			{
+				emit statusMessage(tr("Failed to start interpreter!"));
+			}
+			else
+			{
+				emit statusMessage(tr("Starting ScLang ..."));
+				emit bootedLang(true);
+				stateInterpret = StateInterpret::RUNNING;
+			}
 		}
 		else
 		{
-			emit statusMessage(tr("Starting ScLang ..."));
-			emit bootedLang(true);
-		}
+			emit statusMessage(tr("Interpret already running"));
+		};
 	}
 
 	void ScBridge::killLang()
@@ -78,6 +90,7 @@ namespace SupercolliderBridge
 			{
 				emit statusMessage(tr("MOMENT kdy LANG umrel...."));
 				emit bootedLang(false);
+				stateInterpret = StateInterpret::OFF;
 			}
 		}
 		mTerminationRequested = false;
@@ -85,18 +98,25 @@ namespace SupercolliderBridge
 
 	void ScBridge::startServer()
 	{
-		
-		evaluateCode("Server.local = Server.default = s;");
-		evaluateCode("s.boot;");
-		evaluateCode("s.waitForBoot({ 'MOMENT kdy Server nastartoval....'.postln; })");
-		emit bootedServer(true);
+		if (stateInterpret == StateInterpret::RUNNING)
+		{
+			evaluateCode("Server.local = Server.default = s;");
+			evaluateCode("s.boot;");
+			evaluateCode("s.waitForBoot({ 'MOMENT kdy Server nastartoval....'.postln; })");
+			emit bootedServer(true);
+			stateServer = StateServer::RUNNING;
+		}
 	}
 
 	void ScBridge::killServer()
 	{
-		//evaluateCode("Server.killAll;"); // not working?
-		evaluateCode("s.quit;");
-		emit bootedServer(false);
+		if (stateServer == StateServer::RUNNING)
+		{
+			//evaluateCode("Server.killAll;"); // not working?
+			evaluateCode("s.quit;");
+			emit bootedServer(false);
+			stateServer = StateServer::OFF;
+		}
 	}
 
 	void ScBridge::evaluateCode(QString const & commandString, bool silent)

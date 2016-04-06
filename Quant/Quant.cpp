@@ -29,7 +29,7 @@ namespace QuantIDE
 
 		canvan->setHeaderHeight(50);
 		canvan->setTailHeight(30);
-		canvan->setLogo(QImage(":/logo128.png"));
+		canvan->setLogo(QImage(":/logo32.png"));
 
 		this->initControl();
 		this->fitGeometry();
@@ -44,8 +44,13 @@ namespace QuantIDE
 		connect(bridge, SIGNAL(statusMessage(QString)), canvan, SLOT(msgConsole(QString)));
 		connect(bridge, SIGNAL(scPost(QString)), canvan, SLOT(msgConsole(QString)));
 
-		connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(startLang()));
-		connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(startServer()));
+		connect(buttLang, SIGNAL(pressAct()), this, SLOT(switchInterpretr()));
+		connect(buttServer, SIGNAL(pressAct()), this, SLOT(switchServer()));
+
+		connect(this, SIGNAL(bootInterpretrAct()), bridge, SLOT(startLang()));
+		connect(this, SIGNAL(killInterpretrAct()), bridge, SLOT(killLang()));
+		connect(this, SIGNAL(bootServerAct()), bridge, SLOT(startServer()));
+		connect(this, SIGNAL(killServerAct()), bridge, SLOT(killServer()));
 
 		//connect(nodePanel->buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
 
@@ -61,10 +66,10 @@ namespace QuantIDE
 	{
 		nodePanel = new NodePanel(canvan->screen);
 		nodePanel->setTitle("NodePanel");
-		nodePanel->setBackground(QColor(20,20,20));
+		nodePanel->setBackground(QColor(20, 20, 20));
 		nodePanel->setTargetCanvan(canvan);
 		nodePanel->setTargetBridge(bridge);
-		
+
 
 		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
@@ -72,7 +77,7 @@ namespace QuantIDE
 
 		buttServer = new Button(canvan->tail);
 		buttServer->setText("Server");
-		buttServer->setStateKeeping(Button::StateKeeping::HOLD);
+		buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
 
 		testButton = new Button(canvan->screen);
 		testButton->setText("TEST");
@@ -91,6 +96,38 @@ namespace QuantIDE
 		buttServer->setGeometry(60, 5, 50, 20);
 		testButton->setGeometry(315, 10, 60, 30);
 		testButton2->setGeometry(385, 10, 60, 30);
+	}
+
+	void Quant::switchInterpretr()
+	{
+		switch (bridge->stateInterpret)
+		{
+		case StateInterpret::OFF:
+			emit bootInterpretrAct();
+			qDebug("switchInterpretr:bootInterpret");
+			buttServer->setStateKeeping(Button::StateKeeping::HOLD);
+			break;
+		case StateInterpret::RUNNING:
+			emit killInterpretrAct();
+			buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
+			qDebug("switchInterpretr:killInterpret");
+			break;
+		}
+	}
+
+	void Quant::switchServer()
+	{
+		switch (bridge->stateServer)
+		{
+		case StateServer::OFF:
+			emit bootServerAct(); 
+			qDebug("switchServer:bootServer");
+			break;
+		case StateServer::RUNNING: 
+			emit killServerAct(); 
+			qDebug("switchServer:killServer"); 
+			break;
+		}
 	}
 
 	void Quant::paintEvent(QPaintEvent *paintEvent)

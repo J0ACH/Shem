@@ -164,10 +164,22 @@ namespace Jui
 
 		//painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
 		//painter.drawText(100, 15, title->text());
-
+		/*
 		QRectF target(5, 5, 56, 43);
 		QRectF source(0, 0, 168, 128);
 		painter.drawImage(target, logo, source);
+		*/
+
+		QRectF target(10, 10, logo.width(), logo.height());
+		QRectF source(0, 0, logo.width(), logo.height());
+
+		QImage renderedIcon(logo);
+		renderedIcon.fill(QColor(120,120,120));
+
+		renderedIcon.setAlphaChannel(logo);
+		painter.drawImage(target, renderedIcon, source);
+
+		//painter.drawRect(target);
 
 		//qDebug("Canvan::paintEvent");
 		//msgConsole("Canvan draw...");
