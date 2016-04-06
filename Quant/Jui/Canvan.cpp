@@ -3,8 +3,6 @@
 
 namespace Jui
 {
-	enum class StateCanvanInterpret{ OFF, RUNNING };
-
 	Canvan::Canvan(QWidget *window) : QWidget(window)
 	{
 		win = window;
