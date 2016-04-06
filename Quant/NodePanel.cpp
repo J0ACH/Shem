@@ -35,8 +35,8 @@ namespace QuantIDE
 
 	void NodePanel::setTargetCanvan(Canvan *target) 
 	{
-		connect(testNode1, SIGNAL(evaluateAct(QString)), target, SLOT(msgConsole(QString)));
-		connect(testNode2, SIGNAL(evaluateAct(QString)), target, SLOT(msgConsole(QString)));
+		connect(testNode1, SIGNAL(evaluateAct(QString)), target, SLOT(println(QString)));
+		connect(testNode2, SIGNAL(evaluateAct(QString)), target, SLOT(println(QString)));
 	}
 
 	void NodePanel::setTargetBridge(ScBridge *target)

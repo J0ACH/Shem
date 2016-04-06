@@ -10,6 +10,7 @@
 #include "Canvan.h"
 #include "Panel.h"
 #include "Edges.h"
+#include "CodeEditor.h"
 
 #include "NodePanel.h"
 #include "Node.h"
@@ -60,8 +61,9 @@ namespace QuantIDE
 
 		QTextEdit *globalCode;
 		Button *buttEvaluate;
-
 		Button *buttLang, *buttServer;
+
+		CodeEditor *testCode;
 	};
 }
 #endif // QUANT

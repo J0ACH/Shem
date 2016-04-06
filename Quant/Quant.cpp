@@ -57,6 +57,8 @@ namespace QuantIDE
 		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
 
 		connect(buttEvaluate, SIGNAL(pressAct()), this, SLOT(evaluateCode()));
+
+		connect(testCode, SIGNAL(cursorPositionChanged()), this, SLOT(evaluateCode())); // testBlbost
 	}
 
 	void Quant::initControl()
@@ -78,6 +80,8 @@ namespace QuantIDE
 		buttServer = new Button(canvan->tail);
 		buttServer->setText("Server");
 		buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
+
+		testCode = new CodeEditor(nodePanel);
 	}
 
 	void Quant::fitGeometry()
@@ -90,6 +94,8 @@ namespace QuantIDE
 
 		buttLang->setGeometry(5, 5, 50, 20);
 		buttServer->setGeometry(60, 5, 50, 20);
+
+		testCode->setGeometry(10, nodePanel->height() - 100, 350, 50);
 	}
 
 	void Quant::switchInterpretr()
