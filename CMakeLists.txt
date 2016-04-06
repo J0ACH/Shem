@@ -19,6 +19,10 @@ IF(CMAKE_GENERATOR MATCHES "Visual Studio 12 2013")
     )
 ENDIF()
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+      add_definitions(-std=c++11)
+    endif()
+
 ### Modules setup ########################
 
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Modules)
