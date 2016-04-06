@@ -23,9 +23,7 @@ namespace SupercolliderBridge
 
 		//connect(this, SIGNAL(started()), this, SLOT(testStart()));
 	}
-
-
-
+	
 	void ScBridge::startLang()
 	{
 		if (stateInterpret == StateInterpret::OFF)
@@ -135,7 +133,7 @@ namespace SupercolliderBridge
 
 		char commandChar = silent ? '\x1b' : '\x0c';
 
-		emit scPost(tr("userCmd: %1").arg(commandString));
+		emit evaluatedCode(tr("evalCode: %1").arg(commandString));
 
 		write(&commandChar, 1);
 	}
@@ -151,6 +149,7 @@ namespace SupercolliderBridge
 		QByteArray out = QProcess::readAll();
 		QString postString = QString::fromUtf8(out);
 
+		//emit scPost(tr("scPost: %1").arg(postString));
 		emit scPost(postString);
 	}
 

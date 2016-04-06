@@ -41,6 +41,7 @@ namespace SupercolliderBridge
 
 		void scPost(QString const &);
 		void statusMessage(QString const &);
+		void evaluatedCode(QString const &);
 		//void response(const QString & selector, const QString & data);
 
 	private slots:

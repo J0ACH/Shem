@@ -35,13 +35,13 @@ namespace Jui
 		this->initControl();
 		this->setCanvanStyleSheet();
 
-		connect(this, SIGNAL(sendToConsole(QString)), panelConsole, SLOT(addLine(QString)));
+		connect(this, SIGNAL(consolePrintAct(QString, bool)), mConsole, SLOT(addText(QString, bool)));
 
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(closeCanvan()));
 		connect(maximizeButton, SIGNAL(pressAct()), this, SLOT(maximizeCanvan()));
 		connect(minimizeButton, SIGNAL(pressAct()), this, SLOT(minimizeCanvan()));
 
-		connect(panelConsole, SIGNAL(resizeAct()), this, SLOT(fitScreen()));
+		connect(mConsole, SIGNAL(resizeAct()), this, SLOT(fitScreen()));
 	}
 
 	void Canvan::initControl()
@@ -59,10 +59,10 @@ namespace Jui
 		version = new QLabel(tail);
 		version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
-		panelConsole = new Console(this);
-		panelConsole->setTitle("Console");
-		panelConsole->setBackground(QColor(30, 30, 30));
-		panelConsole->setGeometry(0, 0, 500, 150);
+		mConsole = new Console(this);
+		mConsole->setTitle("Console");
+		mConsole->setBackground(QColor(30, 30, 30));
+		mConsole->setGeometry(0, 0, 500, 150);
 
 		edges = new Edges(this);
 		setEdgeControler(EdgeControler::Direction::LEFT, true);
@@ -70,6 +70,9 @@ namespace Jui
 		setEdgeControler(EdgeControler::Direction::RIGHT, true);
 		setEdgeControler(EdgeControler::Direction::BOTTOM, true);
 	}
+	
+	void Canvan::print(QString text) { emit consolePrintAct(text, false); }
+	void Canvan::println(QString text) { emit consolePrintAct(text, true); }
 
 	void Canvan::setEdgeControler(EdgeControler::Direction direction, bool visible)
 	{
@@ -118,10 +121,10 @@ namespace Jui
 
 		version->setGeometry(tail->width() - 180, 0, 170, tail->height() - 5);
 
-		panelConsole->setGeometry(
-			this->width() - panelConsole->width(),
+		mConsole->setGeometry(
+			this->width() - mConsole->width(),
 			headerSize + 1,
-			panelConsole->width(),
+			mConsole->width(),
 			this->height() - headerSize - tailSize - 1
 			);
 
@@ -135,7 +138,7 @@ namespace Jui
 		screen->setGeometry(
 			0,
 			headerSize,
-			this->width() - panelConsole->width(),
+			this->width() - mConsole->width(),
 			this->height() - tailSize - headerSize
 			);
 		emit resizeScreenAct();
@@ -166,7 +169,7 @@ namespace Jui
 		QRectF source(0, 0, logo.width(), logo.height());
 
 		QImage renderedIcon(logo);
-		renderedIcon.fill(QColor(120,120,120));
+		renderedIcon.fill(QColor(120, 120, 120));
 
 		renderedIcon.setAlphaChannel(logo);
 		painter.drawImage(target, renderedIcon, source);
@@ -195,9 +198,12 @@ namespace Jui
 			mCursorGlobal->y() - mCursorLocal->y()
 			);
 
-		msgConsole(tr("pressedGlobal [%1,%2]").arg(QString::number(mCursorGlobal->x()), QString::number(mCursorGlobal->y())));
-		//	msgConsole(tr("pressedLocal [%1,%2]").arg(QString::number(mCursorLocal->x()), QString::number(mCursorLocal->y())));
-		//	msgConsole(tr("frameOriginGlobal [%1,%2]").arg(QString::number(mFrameOriginGlobal->x()), QString::number(mFrameOriginGlobal->y())));
+		emit consolePrintAct(
+			tr("pressedGlobal [%1,%2]").arg(
+			QString::number(mCursorGlobal->x()),
+			QString::number(mCursorGlobal->y())
+			), true);
+
 	}
 
 	void Canvan::mouseMoveEvent(QMouseEvent *mouseEvent)
@@ -214,7 +220,7 @@ namespace Jui
 	}
 
 	void Canvan::mouseReleaseEvent(QMouseEvent *mouseEvent) { isPressed = false; }
-
+	
 	void Canvan::addScreen(QWidget *inScreen)
 	{
 		inScreen->setGeometry(100, 100, 300, 300);
@@ -224,8 +230,6 @@ namespace Jui
 	void Canvan::setColor_background(QColor color) { }
 
 	void Canvan::setColor_foreground(QColor color) { }
-
-	void Canvan::msgConsole(QString text) { emit sendToConsole(text); }
 
 	void Canvan::setVersion(int major = 0, int minor = 0, int patch = 0)
 	{
@@ -351,10 +355,5 @@ namespace Jui
 	}
 	*/
 
-
-	Canvan::~Canvan()
-	{
-
-	}
-
+	Canvan::~Canvan() {	}
 }

@@ -34,18 +34,20 @@ namespace QuantIDE
 		void killInterpretrAct();
 		void killServerAct();
 
-		public slots:
-		void consoleAddMsg(QString);
+	public slots:
+		//void consoleAddMsg(QString);
 		void switchInterpretr();
 		void switchServer();
 
 		void addNode();
-		//void startLang();
-		void beep();
 		void fitGeometry();
 
+		//void evaluateAct(QString);
+
+	public slots:
+		void evaluateCode();
+
 	protected:
-		//void resizeEvent(QResizeEvent *event);
 		void closeEvent(QCloseEvent *event);
 		void paintEvent(QPaintEvent *event);
 
@@ -55,6 +57,9 @@ namespace QuantIDE
 		ScBridge *bridge;
 		Canvan *canvan;
 		NodePanel *nodePanel;
+
+		QTextEdit *globalCode;
+		Button *buttEvaluate;
 
 		Button *buttLang, *buttServer;
 	};

@@ -25,7 +25,8 @@ namespace QuantIDE
 		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
 
-		canvan->msgConsole(QString("ScBridge init..."));
+		canvan->println("ScBridge init...");
+
 
 		canvan->setHeaderHeight(42);
 		canvan->setTailHeight(30);
@@ -34,15 +35,16 @@ namespace QuantIDE
 		this->initControl();
 		this->fitGeometry();
 
-		canvan->msgConsole(QString("Control init..."));
+		canvan->println("Control init...");
 
 		//this->setMouseTracking(true);
 
 		canvan->setTitle("Quant");
 		canvan->setVersion(Quant_VERSION_MAJOR, Quant_VERSION_MINOR, Quant_VERSION_PATCH);
 
-		connect(bridge, SIGNAL(statusMessage(QString)), canvan, SLOT(msgConsole(QString)));
-		connect(bridge, SIGNAL(scPost(QString)), canvan, SLOT(msgConsole(QString)));
+		connect(bridge, SIGNAL(statusMessage(QString)), canvan, SLOT(println(QString)));
+		connect(bridge, SIGNAL(evaluatedCode(QString)), canvan, SLOT(println(QString)));
+		connect(bridge, SIGNAL(scPost(QString)), canvan, SLOT(println(QString)));
 
 		connect(buttLang, SIGNAL(pressAct()), this, SLOT(switchInterpretr()));
 		connect(buttServer, SIGNAL(pressAct()), this, SLOT(switchServer()));
@@ -53,7 +55,8 @@ namespace QuantIDE
 		connect(this, SIGNAL(killServerAct()), bridge, SLOT(killServer()));
 
 		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
-			
+
+		connect(buttEvaluate, SIGNAL(pressAct()), this, SLOT(evaluateCode()));
 	}
 
 	void Quant::initControl()
@@ -63,6 +66,10 @@ namespace QuantIDE
 		nodePanel->setBackground(QColor(20, 20, 20));
 		nodePanel->setTargetCanvan(canvan);
 		nodePanel->setTargetBridge(bridge);
+
+		globalCode = new QTextEdit(nodePanel);
+		buttEvaluate = new Button(nodePanel);
+		buttEvaluate->setText("evaluateGlobal");
 
 		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
@@ -78,8 +85,11 @@ namespace QuantIDE
 		QRect screenRect = canvan->screen->rect();
 		nodePanel->setGeometry(1, 0, screenRect.width(), screenRect.height());
 
+		globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
+		buttEvaluate->setGeometry(globalCode->geometry().right() + 5, nodePanel->height() - 40, 90, 30);
+
 		buttLang->setGeometry(5, 5, 50, 20);
-		buttServer->setGeometry(60, 5, 50, 20);		
+		buttServer->setGeometry(60, 5, 50, 20);
 	}
 
 	void Quant::switchInterpretr()
@@ -104,12 +114,12 @@ namespace QuantIDE
 		switch (bridge->stateServer)
 		{
 		case StateServer::OFF:
-			emit bootServerAct(); 
+			emit bootServerAct();
 			qDebug("switchServer:bootServer");
 			break;
-		case StateServer::RUNNING: 
-			emit killServerAct(); 
-			qDebug("switchServer:killServer"); 
+		case StateServer::RUNNING:
+			emit killServerAct();
+			qDebug("switchServer:killServer");
 			break;
 		}
 	}
@@ -120,34 +130,20 @@ namespace QuantIDE
 		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), QColor(20, 20, 20));
 	}
 
-	/*
-	void Quant::resizeEvent(QResizeEvent *resizeEvent)
-	{
-		//canvan->msgConsole(tr("TOPView resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
-	}
-	*/
 
 	void Quant::addNode()
 	{
-		canvan->msgConsole(QString("Node add..."));
+		canvan->println("Node add...");
 	}
 
-	void Quant::beep()
+	void Quant::evaluateCode()
 	{
-		bridge->evaluateCode("().play;");
-		canvan->msgConsole(QString("Beep code"));
-	}
-	
-	void Quant::consoleAddMsg(QString msg)
-	{
-		qDebug() << "Quant::consoleAddMsg: " << msg;
-		canvan->msgConsole(msg);
+		QString code = globalCode->toPlainText();
+		qDebug() << "EvaluateAct: " << code;
+		bridge->evaluateCode(code);
 	}
 
-	Quant::~Quant()
-	{
-
-	}
+	Quant::~Quant() { }
 
 	void Quant::closeEvent(QCloseEvent *event)
 	{

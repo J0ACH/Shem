@@ -16,8 +16,8 @@ namespace Jui
 		~Console();
 
 	public slots:
-		void addLine(QString newLine);
-		void fitTextSize();
+		void addText(QString text, bool newLine);
+		void fitGeometry();
 
 	private:
 		QTextEdit *text;
