@@ -25,7 +25,7 @@ namespace QuantIDE
 		Q_OBJECT
 
 	public:
-		 Quant(QWidget *parent = 0);
+		Quant(QWidget *parent = 0);
 		~Quant();
 
 	signals:
@@ -34,7 +34,7 @@ namespace QuantIDE
 		void killInterpretrAct();
 		void killServerAct();
 
-	public slots:
+		public slots:
 		void consoleAddMsg(QString);
 		void switchInterpretr();
 		void switchServer();
@@ -45,7 +45,7 @@ namespace QuantIDE
 		void fitGeometry();
 
 	protected:
-		void resizeEvent(QResizeEvent *event);
+		//void resizeEvent(QResizeEvent *event);
 		void closeEvent(QCloseEvent *event);
 		void paintEvent(QPaintEvent *event);
 
@@ -57,10 +57,6 @@ namespace QuantIDE
 		NodePanel *nodePanel;
 
 		Button *buttLang, *buttServer;
-		Button *testButton, *testButton2;
-		Panel *testPanel, *testPanel2;
-
-		
 	};
 }
 #endif // QUANT

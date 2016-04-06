@@ -24,7 +24,7 @@ namespace Jui
 	void Panel::initControl()
 	{
 		closeButton = new Button(this);
-		closeButton->setGeometry(this->width() - 30, 10, 20, 20);
+		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
 		closeButton->setText("X");
 
@@ -84,7 +84,7 @@ namespace Jui
 
 	void Panel::resizeEvent(QResizeEvent *resizeEvent)
 	{
-		closeButton->setGeometry(this->width() - 30, 10, 20, 20);
+		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 
 		emit resizeAct();
 

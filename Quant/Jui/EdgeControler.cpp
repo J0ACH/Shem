@@ -11,8 +11,8 @@ namespace Jui
 		isOver = false;
 
 		backgroundAlpha = 0;
-		fadeTimeIn = 1000;
-		fadeTimeOut = 250;
+		fadeTimeIn = 150;
+		fadeTimeOut = 800;
 		fps = 25;
 
 		timer = new QTimer(this);
@@ -114,11 +114,11 @@ namespace Jui
 		QPainter painter(this);
 
 		if (isOver){
-			painter.setPen(QPen(Qt::white, 1));
+			painter.setPen(QPen(QColor(255, 255, 255, backgroundAlpha), 1));
 		}
 		else
 		{
-			painter.setPen(QPen(QColor(90, 90, 90), 1));
+			painter.setPen(QPen(QColor(255,255,255,backgroundAlpha), 1));
 		}
 
 		int lineOffset = 3;

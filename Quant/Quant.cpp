@@ -27,7 +27,7 @@ namespace QuantIDE
 
 		canvan->msgConsole(QString("ScBridge init..."));
 
-		canvan->setHeaderHeight(50);
+		canvan->setHeaderHeight(42);
 		canvan->setTailHeight(30);
 		canvan->setLogo(QImage(":/logo32.png"));
 
@@ -52,14 +52,8 @@ namespace QuantIDE
 		connect(this, SIGNAL(bootServerAct()), bridge, SLOT(startServer()));
 		connect(this, SIGNAL(killServerAct()), bridge, SLOT(killServer()));
 
-		//connect(nodePanel->buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
-
-		connect(testButton, SIGNAL(pressed()), this, SLOT(beep()));
-
 		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
-
-		//connect(nodePanel->testNode1, SIGNAL(evaluateAct(QString)), this, SLOT(consoleAddMsg(QString)));
-		//connect(nodePanel->testNode2, SIGNAL(evaluateAct(QString)), this, SLOT(consoleAddMsg(QString)));
+			
 	}
 
 	void Quant::initControl()
@@ -70,7 +64,6 @@ namespace QuantIDE
 		nodePanel->setTargetCanvan(canvan);
 		nodePanel->setTargetBridge(bridge);
 
-
 		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
 		buttLang->setStateKeeping(Button::StateKeeping::HOLD);
@@ -78,13 +71,6 @@ namespace QuantIDE
 		buttServer = new Button(canvan->tail);
 		buttServer->setText("Server");
 		buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
-
-		testButton = new Button(canvan->screen);
-		testButton->setText("TEST");
-
-		testButton2 = new Button(canvan->screen);
-		testButton2->setText("TEST");
-		testButton2->setStateKeeping(Button::StateKeeping::HOLD);
 	}
 
 	void Quant::fitGeometry()
@@ -93,9 +79,7 @@ namespace QuantIDE
 		nodePanel->setGeometry(1, 0, screenRect.width(), screenRect.height());
 
 		buttLang->setGeometry(5, 5, 50, 20);
-		buttServer->setGeometry(60, 5, 50, 20);
-		testButton->setGeometry(315, 10, 60, 30);
-		testButton2->setGeometry(385, 10, 60, 30);
+		buttServer->setGeometry(60, 5, 50, 20);		
 	}
 
 	void Quant::switchInterpretr()
@@ -136,10 +120,12 @@ namespace QuantIDE
 		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), QColor(20, 20, 20));
 	}
 
+	/*
 	void Quant::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		//canvan->msgConsole(tr("TOPView resize [%1, %2]").arg(QString::number(width()), QString::number(height())));
 	}
+	*/
 
 	void Quant::addNode()
 	{
@@ -151,14 +137,7 @@ namespace QuantIDE
 		bridge->evaluateCode("().play;");
 		canvan->msgConsole(QString("Beep code"));
 	}
-	/*
-	void Quant::startLang()
-	{
-	canvan->msgConsole(QString("SClang started..."));
-	bridge->startLang();
-	}
-	*/
-
+	
 	void Quant::consoleAddMsg(QString msg)
 	{
 		qDebug() << "Quant::consoleAddMsg: " << msg;

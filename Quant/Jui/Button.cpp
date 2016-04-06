@@ -15,17 +15,17 @@ namespace Jui
 		isPressed = false;
 		isOver = false;
 
-		normalColor = QColor(90, 90, 90);
+		normalColor = QColor(120, 120, 120);
 		overColor = QColor(230, 230, 230);
-		activeColor = QColor(20, 180, 240);
+		activeColor = QColor(50, 65, 95);
 		penColor = normalColor;
 
 		iconOffset = 0;
 
 		ratio = 0;
 		//backgroundAlpha = 0;
-		fadeTimeIn = 350;
-		fadeTimeOut = 150;
+		fadeTimeIn = 150;
+		fadeTimeOut = 800;
 		fps = 25;
 
 		timer = new QTimer(this);
@@ -34,16 +34,13 @@ namespace Jui
 	}
 
 	void Button::setText(QString buttonName) { name = buttonName; }
-
 	void Button::setIcon(QImage img, int offset = 0) { icon = img; iconOffset = offset; }
-
 	void Button::setNormalColor(QColor color){ normalColor = color; }
 	void Button::setOverColor(QColor color){ overColor = color; }
 	void Button::setActiveColor(QColor color){ activeColor = color; }
-
 	void Button::setStateKeeping(StateKeeping mode) { buttonKeeping = mode; }
 
-	QRect Button::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+	QRect Button::bounds() { return QRect(1, 1, width()-2, height()-2); }
 
 	void Button::fadeRatio()
 	{
@@ -101,29 +98,21 @@ namespace Jui
 			QTextOption opt;
 			opt.setAlignment(Qt::AlignCenter);
 			painter.drawText(bounds(), name, opt);
+			painter.drawRect(bounds());
 		}
 		else
 		{
-			float moveX = (this->width() - icon.width()) / 2+1;
+			float moveX = (this->width() - icon.width()) / 2;
 			float moveY = (this->height() - icon.height()) / 2;
-
-			//painter.fillRect(bounds(), QColor(120, 20, 20, backgroundAlpha));
 
 			QRectF target(moveX, moveY, icon.width(), icon.height());
 			QRectF source(0, 0, icon.width(), icon.height());
 
 			QImage renderedIcon(icon);
-			if (isOver)	{ renderedIcon.fill(penColor); }
-			else
-			{
-				if (isPressed) { renderedIcon.fill(activeColor); }
-				else { renderedIcon.fill(normalColor); };
-			}
-
+			renderedIcon.fill(penColor);
 			renderedIcon.setAlphaChannel(icon);
 			painter.drawImage(target, renderedIcon, source);  // draw image to QWidget
-		};
-		painter.drawRect(bounds());
+		};		
 	}
 
 	void Button::mousePressEvent(QMouseEvent *mouseEvent)

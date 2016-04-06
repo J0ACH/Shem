@@ -3,6 +3,8 @@
 
 namespace Jui
 {
+	enum class StateCanvanInterpret{ OFF, RUNNING };
+
 	Canvan::Canvan(QWidget *window) : QWidget(window)
 	{
 		win = window;
@@ -108,9 +110,9 @@ namespace Jui
 	{
 		this->setGeometry(0, 0, win->width(), win->height());
 
-		closeButton->setGeometry(width() - 35, 10, 25, 25);
-		maximizeButton->setGeometry(width() - 65, 10, 25, 25);
-		minimizeButton->setGeometry(width() - 95, 10, 25, 25);
+		closeButton->setGeometry(width() - 36, 10, 24, 24);
+		maximizeButton->setGeometry(width() - 60, 10, 24, 24);
+		minimizeButton->setGeometry(width() - 84, 10, 24, 24);
 
 		header->setGeometry(0, 0, this->width(), headerSize);
 		this->fitScreen();
@@ -162,15 +164,7 @@ namespace Jui
 			painter.drawLine(screen->geometry().bottomLeft(), screen->geometry().topRight());
 		}
 
-		//painter.setBrush(QBrush(QColor(130, 130, 30), Qt::SolidPattern));
-		//painter.drawText(100, 15, title->text());
-		/*
-		QRectF target(5, 5, 56, 43);
-		QRectF source(0, 0, 168, 128);
-		painter.drawImage(target, logo, source);
-		*/
-
-		QRectF target(10, 10, logo.width(), logo.height());
+		QRectF target(5, 5, logo.width(), logo.height());
 		QRectF source(0, 0, logo.width(), logo.height());
 
 		QImage renderedIcon(logo);

@@ -43,11 +43,9 @@ namespace SupercolliderBridge
 		void statusMessage(QString const &);
 		//void response(const QString & selector, const QString & data);
 
-
 	private slots:
 		void onReadyRead(void);
-		//void testStart();
-
+		
 	private:
 		QLocalServer *mIpcServer;
 		QLocalSocket *mIpcSocket;
