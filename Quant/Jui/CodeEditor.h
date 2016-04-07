@@ -4,6 +4,8 @@
 #include "Panel.h"
 #include <QWidget>
 #include <QTextEdit>
+#include <QSyntaxHighlighter>
+#include <QDebug>
 
 namespace Jui
 {
@@ -16,11 +18,16 @@ namespace Jui
 		~CodeEditor();
 
 	public slots:
-	//	void addText(QString text, bool newLine);
-	//	void fitGeometry();
+		void fitTextFormat();
+
+	signals:
+		void evaluate(QString);
+
+	protected:
+		virtual bool eventFilter(QObject * watched, QEvent * event);
 
 	private:
-		//QTextEdit *text;
+		void highlightText(const QString &);
 	};
 
 }

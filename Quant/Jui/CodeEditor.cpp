@@ -6,35 +6,44 @@ namespace Jui
 	CodeEditor::CodeEditor(QWidget *parent) : QTextEdit(parent)
 	{
 		setObjectName("CodeEditor");
+		installEventFilter(this);
 
-		
-
-		//text = new QTextEdit(this);
-		//text->setReadOnly(true);
-		//text->setOverwriteMode(false);
 		setFont(QFont("Consolas", 8));
 		setFrameStyle(QFrame::NoFrame);
 
 		append(tr("CodeEditor init..."));
-
-		//connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
+		
+		connect(this, SIGNAL(textChanged()), this, SLOT(fitFormat()));
 	}
-	/*
-	void CodeEditor::addText(QString newText, bool newLine)
+
+	void CodeEditor::fitTextFormat()
 	{
-		if (newLine) { text->append(newText); }
-		else
-		{
-			//QString old = text->toPlainText();
-			//text->setText(old.operator+=(newText.toLatin1()));
-			//	text->setPlainText(old.operator+=(newText));
-			//text->append(newText);
-			text->insertPlainText(newText); // problem s udrzeni pohledu na konci konzole
-		}
+		highlightText(this->toPlainText());
 	}
 
-	void CodeEditor::fitGeometry() { text->setGeometry(10, 35, this->width() - 20, this->height() - 45); }
-	*/
+	bool CodeEditor::eventFilter(QObject* _o, QEvent* _e)
+	{
+		if (_e->type() == QEvent::KeyPress)
+		{
+			QKeyEvent* eventKey = static_cast<QKeyEvent*>(_e);
+			if (eventKey->key() == Qt::Key_Return)
+			{
+				emit evaluate(this->toPlainText());
+				qDebug() << "event: ENTER PRESSED";
+				return true;
+			}
+		}
+		return QTextEdit::eventFilter(_o, _e);
+	}
+
+	void CodeEditor::highlightText(const QString &text)
+	{
+		for (int i = 0; i < text.length(); ++i) {
+			if (!text.at(i).isLetterOrNumber())
+				//setFormat(i, 1, Qt::green);
+				qDebug() << "highlight: " << text.at(i);
+		}
+	}	
 
 	CodeEditor::~CodeEditor()	{ }
 

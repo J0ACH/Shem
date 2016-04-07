@@ -58,7 +58,7 @@ namespace QuantIDE
 
 		connect(buttEvaluate, SIGNAL(pressAct()), this, SLOT(evaluateCode()));
 
-		connect(testCode, SIGNAL(cursorPositionChanged()), this, SLOT(evaluateCode())); // testBlbost
+		connect(testCode, SIGNAL(evaluate(QString)), canvan, SLOT(println(QString)));
 	}
 
 	void Quant::initControl()
