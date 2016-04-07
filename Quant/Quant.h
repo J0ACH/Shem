@@ -36,17 +36,14 @@ namespace QuantIDE
 		void killServerAct();
 
 	public slots:
-		//void consoleAddMsg(QString);
 		void switchInterpretr();
 		void switchServer();
 
-		void addNode();
 		void fitGeometry();
-
-		//void evaluateAct(QString);
+		void addNode();
 
 	public slots:
-		void evaluateCode();
+		
 
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -59,11 +56,8 @@ namespace QuantIDE
 		Canvan *canvan;
 		NodePanel *nodePanel;
 
-		QTextEdit *globalCode;
-		Button *buttEvaluate;
 		Button *buttLang, *buttServer;
-
-		CodeEditor *testCode;
+		CodeEditor *globalCode;
 	};
 }
 #endif // QUANT

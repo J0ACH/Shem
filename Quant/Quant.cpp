@@ -56,9 +56,8 @@ namespace QuantIDE
 
 		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
 
-		connect(buttEvaluate, SIGNAL(pressAct()), this, SLOT(evaluateCode()));
-
-		connect(testCode, SIGNAL(evaluate(QString)), canvan, SLOT(println(QString)));
+		connect(globalCode, SIGNAL(sendText(QString)), canvan, SLOT(println(QString)));
+		connect(globalCode, SIGNAL(sendText(QString)), bridge, SLOT(evaluateCode(QString)));
 	}
 
 	void Quant::initControl()
@@ -69,10 +68,6 @@ namespace QuantIDE
 		nodePanel->setTargetCanvan(canvan);
 		nodePanel->setTargetBridge(bridge);
 
-		globalCode = new QTextEdit(nodePanel);
-		buttEvaluate = new Button(nodePanel);
-		buttEvaluate->setText("evaluateGlobal");
-
 		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
 		buttLang->setStateKeeping(Button::StateKeeping::HOLD);
@@ -81,7 +76,8 @@ namespace QuantIDE
 		buttServer->setText("Server");
 		buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
 
-		testCode = new CodeEditor(nodePanel);
+		globalCode = new CodeEditor(nodePanel);
+		globalCode->setText("ScGlobal editor (use Ctrl+Enter to evaluate code)");
 	}
 
 	void Quant::fitGeometry()
@@ -89,13 +85,10 @@ namespace QuantIDE
 		QRect screenRect = canvan->screen->rect();
 		nodePanel->setGeometry(1, 0, screenRect.width(), screenRect.height());
 
-		globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
-		buttEvaluate->setGeometry(globalCode->geometry().right() + 5, nodePanel->height() - 40, 90, 30);
-
 		buttLang->setGeometry(5, 5, 50, 20);
 		buttServer->setGeometry(60, 5, 50, 20);
 
-		testCode->setGeometry(10, nodePanel->height() - 100, 350, 50);
+		globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
 	}
 
 	void Quant::switchInterpretr()
@@ -135,27 +128,19 @@ namespace QuantIDE
 		QPainter painter(this);
 		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), QColor(20, 20, 20));
 	}
-
-
+	
 	void Quant::addNode()
 	{
 		canvan->println("Node add...");
 	}
-
-	void Quant::evaluateCode()
-	{
-		QString code = globalCode->toPlainText();
-		qDebug() << "EvaluateAct: " << code;
-		bridge->evaluateCode(code);
-	}
-
-	Quant::~Quant() { }
-
+	
 	void Quant::closeEvent(QCloseEvent *event)
 	{
 		bridge->evaluateCode("Server.local.quit;"); // not working?
 		bridge->killLang();
 
 	}
+
+	Quant::~Quant() { }
 }
 

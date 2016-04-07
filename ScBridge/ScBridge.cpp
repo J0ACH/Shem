@@ -133,7 +133,7 @@ namespace SupercolliderBridge
 
 		char commandChar = silent ? '\x1b' : '\x0c';
 
-		emit evaluatedCode(tr("evalCode: %1").arg(commandString));
+		//emit evaluatedCode(tr("evalCode: %1").arg(commandString));
 
 		write(&commandChar, 1);
 	}

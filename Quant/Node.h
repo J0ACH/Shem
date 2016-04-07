@@ -8,7 +8,8 @@
 #include <QTextEdit>
 #include <QDebug>
 
-//#include "Quant.h"
+#include "CodeEditor.h"
+using namespace Jui;
 
 namespace QuantIDE
 {
@@ -25,14 +26,13 @@ namespace QuantIDE
 		void setSourceCode(QString);
 
 		QRect bounds();
-		
+
+	public slots:
+		void fitGeometry();
+		void reciveText(QString);
 
 	signals:
 		void evaluateAct(QString);
-
-	public slots:		
-		void fitGeometry();
-		void evaluateCode();
 
 	protected:
 		void paintEvent(QPaintEvent *event);
@@ -41,8 +41,10 @@ namespace QuantIDE
 		void initControl();
 
 		QLabel *nameLabel;
-		QPushButton *buttEvaluate;
-		QTextEdit *sourceCode;
+		CodeEditor *sourceCode;
+
+		//QPushButton *buttEvaluate;
+		//QTextEdit *sourceCode;
 	};
 }
 

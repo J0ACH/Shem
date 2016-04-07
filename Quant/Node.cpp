@@ -10,7 +10,7 @@ namespace QuantIDE
 		this->initControl();
 		this->fitGeometry();
 
-		connect(buttEvaluate, SIGNAL(pressed()), this, SLOT(evaluateCode()));
+		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(reciveText(QString)));
 	}
 
 	QRect Node::bounds()
@@ -23,10 +23,7 @@ namespace QuantIDE
 		nameLabel = new QLabel(this);
 		nameLabel->setText("Node1");
 
-		buttEvaluate = new QPushButton(this);
-		buttEvaluate->setText("evaluate");
-
-		sourceCode = new QTextEdit(this);
+		sourceCode = new CodeEditor(this);
 	}
 
 	void Node::setName(QString name)
@@ -39,20 +36,21 @@ namespace QuantIDE
 		sourceCode->setText(code);
 	}
 
-	void Node::evaluateCode()
+
+	void Node::reciveText(QString text)
 	{
 		QString name = nameLabel->text();
-		QString text = sourceCode->toPlainText();
 		QString code = tr("Ndef('%1', {%2}).play").arg(name, text);
-		qDebug() << "EvaluateAct: " << code;
+		//qDebug() << "EvaluateAct: " << code;
 		emit evaluateAct(code);
 	}
+
 
 	void Node::fitGeometry()
 	{
 		nameLabel->setGeometry(10, 5, 80, 30);
-		buttEvaluate->setGeometry(10, 35, 80, 20);
-		sourceCode->setGeometry(10, 60, 300, 120);
+		sourceCode->setGeometry(10, 45, 300, 80);
+		
 	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)

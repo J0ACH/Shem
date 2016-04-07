@@ -17,17 +17,28 @@ namespace Jui
 		CodeEditor(QWidget *parent);
 		~CodeEditor();
 
+		void setBackground(const QColor &);
+
 	public slots:
 		void fitTextFormat();
+		void alphaUpdate();
 
 	signals:
-		void evaluate(QString);
+		void sendText(QString);
 
 	protected:
 		virtual bool eventFilter(QObject * watched, QEvent * event);
+		void paintEvent(QPaintEvent *paintEvent);
 
 	private:
 		void highlightText(const QString &);
+
+		int fadeTimeOut;
+		int fps;
+		int backgroundAlpha;
+		QTimer *timer;
+		
+		QColor normalColor, overColor, activeColor;
 	};
 
 }

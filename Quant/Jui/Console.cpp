@@ -14,7 +14,7 @@ namespace Jui
 		text->setOverwriteMode(false);
 		text->setFont(QFont("Consolas", 8));
 		text->setFrameStyle(QFrame::NoFrame);
-
+		
 		text->append(tr("Console init..."));
 
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
