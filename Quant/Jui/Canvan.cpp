@@ -261,6 +261,10 @@ namespace Jui
 		txt.append(tr("QScrollBar:vertical { background: %1; }").arg(backColor.name()));
 		txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 20px; }").arg(textColor.name()));
 		//txt.append("QScrollBar:vertical { margin: 50px 0 50px 0; }");
+
+		txt.append(tr("QToolTip { color: %1; }").arg(textColor.name()));
+		txt.append(tr("QToolTip { background-color:  %1; }").arg(backColor.name()));
+		txt.append(tr("QToolTip { border: 1px solid white; }"));
 			
 		//qDebug() << "TXT:" << txt;
 		this->setStyleSheet(txt);

@@ -17,7 +17,8 @@ namespace Jui
 
 		normalColor = QColor(120, 120, 120);
 		overColor = QColor(230, 230, 230);
-		activeColor = QColor(50, 65, 95);
+		//activeColor = QColor(50, 65, 95);
+		activeColor = QColor(70, 140, 210);
 		penColor = normalColor;
 
 		iconOffset = 0;
@@ -79,22 +80,24 @@ namespace Jui
 	{
 		QPainter painter(this);
 
-		switch (buttonState)
-		{
-		case ON:
-			fillColor = activeColor;
-			break;
-		case OFF:
-			fillColor = Qt::transparent;;
-			break;
-		}
-		painter.fillRect(bounds(), fillColor);
+		
 
 		penColor = blendColor(normalColor, overColor, ratio);
 		painter.setPen(QPen(penColor, 1));
 
 		if (icon.isNull())
 		{
+			switch (buttonState)
+			{
+			case ON:
+				fillColor = activeColor;
+				break;
+			case OFF:
+				fillColor = Qt::transparent;;
+				break;
+			}
+			painter.fillRect(bounds(), fillColor);
+
 			QTextOption opt;
 			opt.setAlignment(Qt::AlignCenter);
 			painter.drawText(bounds(), name, opt);
@@ -102,6 +105,7 @@ namespace Jui
 		}
 		else
 		{
+			if (buttonState == ON) { penColor = activeColor;  };
 			float moveX = (this->width() - icon.width()) / 2;
 			float moveY = (this->height() - icon.height()) / 2;
 

@@ -29,7 +29,7 @@ namespace QuantIDE
 
 
 		canvan->setHeaderHeight(42);
-		canvan->setTailHeight(30);
+		canvan->setTailHeight(34);
 		canvan->setLogo(QImage(":/logo32.png"));
 
 		this->initControl();
@@ -71,10 +71,14 @@ namespace QuantIDE
 		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
 		buttLang->setStateKeeping(Button::StateKeeping::HOLD);
+		buttLang->setIcon(QImage(":/lang_16px.png"), 0);
+		buttLang->setToolTip("Interpreter");
 
 		buttServer = new Button(canvan->tail);
 		buttServer->setText("Server");
 		buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
+		buttServer->setIcon(QImage(":/server_16px.png"), 0);
+		buttServer->setToolTip("Server");
 
 		globalCode = new CodeEditor(nodePanel);
 		globalCode->setText("ScGlobal editor (use Ctrl+Enter to evaluate code)");
@@ -85,8 +89,8 @@ namespace QuantIDE
 		QRect screenRect = canvan->screen->rect();
 		nodePanel->setGeometry(1, 0, screenRect.width(), screenRect.height());
 
-		buttLang->setGeometry(5, 5, 50, 20);
-		buttServer->setGeometry(60, 5, 50, 20);
+		buttLang->setGeometry(5, 5, 24, 24);
+		buttServer->setGeometry(34, 5, 24, 24);
 
 		globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
 	}
