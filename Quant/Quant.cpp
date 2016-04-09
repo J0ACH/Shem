@@ -26,8 +26,6 @@ namespace QuantIDE
 		bridge = new ScBridge(this);
 
 		canvan->println("ScBridge init...");
-
-
 		canvan->setHeaderHeight(42);
 		canvan->setTailHeight(34);
 		canvan->setLogo(QImage(":/logo32.png"));
@@ -35,7 +33,8 @@ namespace QuantIDE
 		this->initControl();
 		this->fitGeometry();
 
-		canvan->println("Control init...");
+		canvan->println("Quant control init...");
+		
 
 		//this->setMouseTracking(true);
 
@@ -45,6 +44,8 @@ namespace QuantIDE
 		connect(bridge, SIGNAL(statusMessage(QString)), canvan, SLOT(println(QString)));
 		connect(bridge, SIGNAL(evaluatedCode(QString)), canvan, SLOT(println(QString)));
 		connect(bridge, SIGNAL(scPost(QString)), canvan, SLOT(println(QString)));
+
+		connect(bridge, SIGNAL(bootedServer(bool)), this, SLOT(changedServerStage(bool)));
 
 		connect(buttLang, SIGNAL(pressAct()), this, SLOT(switchInterpretr()));
 		connect(buttServer, SIGNAL(pressAct()), this, SLOT(switchServer()));
@@ -124,6 +125,20 @@ namespace QuantIDE
 			emit killServerAct();
 			qDebug("switchServer:killServer");
 			break;
+		}
+	}
+
+	void Quant::changedServerStage(bool booted)
+	{
+		if (booted)
+		{
+			canvan->println("Quant SCserver boot done...");
+			bridge->evaluateCode("p = ProxySpace.push()");
+
+		}
+		else
+		{
+			canvan->println("Quant SCserver killed...");
 		}
 	}
 

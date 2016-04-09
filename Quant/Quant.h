@@ -39,6 +39,8 @@ namespace QuantIDE
 		void switchInterpretr();
 		void switchServer();
 
+		void changedServerStage(bool);
+
 		void fitGeometry();
 		void addNode();
 

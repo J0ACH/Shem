@@ -246,7 +246,8 @@ namespace Jui
 
 		QString txt;
 		txt.append(tr("QLabel { color: %1; }").arg(textColor.name()));
-
+		txt.append("QLabel { font-weight: bold; }");
+		
 		txt.append(tr("QPushButton { background-color: %1; }").arg(backColor.name()));
 		txt.append(tr("QPushButton { color: %1; }").arg(textColor.name()));
 		txt.append(tr("QPushButton { border-style: outset; border-width: 1px; border-color: %1}").arg(textColor.name()));

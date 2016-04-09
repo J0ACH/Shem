@@ -23,7 +23,7 @@ namespace SupercolliderBridge
 
 		//connect(this, SIGNAL(started()), this, SLOT(testStart()));
 	}
-	
+
 	void ScBridge::startLang()
 	{
 		if (stateInterpret == StateInterpret::OFF)
@@ -99,10 +99,10 @@ namespace SupercolliderBridge
 		if (stateInterpret == StateInterpret::RUNNING)
 		{
 			evaluateCode("Server.local = Server.default = s;");
-			evaluateCode("s.boot;");
+			//evaluateCode("s.boot;");
 			evaluateCode("s.waitForBoot({ 'MOMENT kdy Server nastartoval....'.postln; })");
-			emit bootedServer(true);
 			stateServer = StateServer::RUNNING;
+			emit bootedServer(true);
 		}
 	}
 
@@ -112,8 +112,8 @@ namespace SupercolliderBridge
 		{
 			//evaluateCode("Server.killAll;"); // not working?
 			evaluateCode("s.quit;");
-			emit bootedServer(false);
 			stateServer = StateServer::OFF;
+			emit bootedServer(false);
 		}
 	}
 
