@@ -31,7 +31,6 @@ namespace QuantIDE
 		Button *buttAddNode;
 		Node *testNode1, *testNode2;
 
-		void setTargetCanvan(Canvan*);
 		void setTargetBridge(ScBridge*);
 
 	public slots:

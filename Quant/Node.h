@@ -13,6 +13,7 @@ using namespace Jui;
 
 namespace QuantIDE
 {
+	enum class StateNodePlay{ PLAY, STOP, FREE };
 
 	class Node : public QWidget
 	{
@@ -22,14 +23,20 @@ namespace QuantIDE
 		Node(QWidget *parent = 0);
 		~Node();
 
+		StateNodePlay stateNodePlay;
+
 		void setName(QString);
 		void setSourceCode(QString);
+
+		QString name();
 
 		QRect bounds();
 
 	public slots:
 		void fitGeometry();
 		void reciveText(QString);
+
+		void changeNodePlay();
 
 	signals:
 		void evaluateAct(QString);
@@ -42,9 +49,8 @@ namespace QuantIDE
 
 		QLabel *nameLabel;
 		CodeEditor *sourceCode;
-
-		//QPushButton *buttEvaluate;
-		//QTextEdit *sourceCode;
+		Button *buttNodePlay;
+		
 	};
 }
 

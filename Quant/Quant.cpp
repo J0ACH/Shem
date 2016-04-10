@@ -76,7 +76,6 @@ namespace QuantIDE
 		nodePanel = new NodePanel(canvan->screen);
 		nodePanel->setTitle("NodePanel");
 		nodePanel->setBackground(QColor(20, 20, 20));
-		nodePanel->setTargetCanvan(canvan);
 		nodePanel->setTargetBridge(bridge);
 
 		buttLang = new Button(canvan->tail);

@@ -38,13 +38,7 @@ namespace QuantIDE
 		longCode.append("\nPan2.ar(sig * \\amp.kr(0.3), \\pan.kr(0));");
 		testNode2->setSourceCode(longCode);
 	}
-
-	void NodePanel::setTargetCanvan(Canvan *target)
-	{
-		connect(testNode1, SIGNAL(evaluateAct(QString)), target, SLOT(println(QString)));
-		connect(testNode2, SIGNAL(evaluateAct(QString)), target, SLOT(println(QString)));
-	}
-
+	
 	void NodePanel::setTargetBridge(ScBridge *target)
 	{
 		connect(testNode1, SIGNAL(evaluateAct(QString)), target, SLOT(evaluateCode(QString)));
