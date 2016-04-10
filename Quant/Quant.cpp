@@ -49,6 +49,8 @@ namespace QuantIDE
 		connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
 		connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
 		connect(bridge, SIGNAL(msgAnswerAct(QString)), this, SLOT(onMsgAnswer(QString)));
+		connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
+		connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
 
 		// INTERPRET actions
 		connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(changeInterpretState()));
@@ -107,6 +109,8 @@ namespace QuantIDE
 	void Quant::onMsgStatus(QString msg) { emit println(msg, QColor(230, 230, 230)); }
 	void Quant::onMsgEvaluate(QString msg) { emit println(msg, QColor(30, 130, 230)); }
 	void Quant::onMsgAnswer(QString msg) { emit println(msg, QColor(30, 230, 30)); }
+	void Quant::onMsgError(QString msg) { emit println(msg, QColor(230, 30, 30)); }
+	void Quant::onMsgWarning(QString msg) { emit println(msg, QColor(230, 130, 30)); }
 	
 	// INTERPRET
 

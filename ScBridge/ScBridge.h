@@ -47,8 +47,8 @@ namespace SupercolliderBridge
 		void serverKillInitAct();
 		void serverKillDoneAct();
 		
-		//void msgErrorAct(QString const &);
-		//void msgWarningAct(QString const &);
+		void msgErrorAct(QString const &);
+		void msgWarningAct(QString const &);
 		void msgNormalAct(QString const &);
 		void msgStatusAct(QString const &);
 		void msgEvaluateAct(QString const &);

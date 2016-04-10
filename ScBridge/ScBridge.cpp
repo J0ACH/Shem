@@ -140,22 +140,45 @@ namespace SupercolliderBridge
 		QByteArray out = QProcess::readAll();
 		QString postString = QString::fromUtf8(out);
 
-		QStringList msgLines = postString.split("\n");
-
-		for (int i = 0; i < msgLines.size()-1; i = i + 1)
+		if (postString.startsWith("ERROR:"))
 		{
-			emit msgNormalAct(tr("line[%1]: %2").arg(QString::number(i), msgLines.at(i)));
-		};
+			//QString msg = postString.remove(0, 7);
+			//emit msgErrorAct(tr("ERROR: %1").arg(msg));
 
-		//static QString msgTypeError("defaultServerRunningChanged");
-		if (postString.startsWith("->"))
+			QStringList msgLines = postString.split("\n");
+			for (int i = 0; i < msgLines.size(); i = i + 1)
+			{
+				QString msg = msgLines.at(i);
+				msg = msg.replace("\r", "");
+
+				if (msg.startsWith("ERROR:"))
+				{
+					emit msgErrorAct(msg);
+				}
+				else if (msg.startsWith("->"))
+				{
+					msg = msg.remove(0, 3);
+					emit msgAnswerAct(tr("ANSWER: %1").arg(msg));
+				}
+				else
+				{
+					emit msgNormalAct(tr("\t- %1").arg(msg));
+				}
+			};
+		}
+		else if (postString.startsWith("WARNING:"))
+		{
+			emit msgWarningAct(postString);
+		}
+		else if (postString.startsWith("->"))
 		{
 			QString msg = postString.remove(0, 3);
 			emit msgAnswerAct(tr("ANSWER: %1").arg(msg));
 		}
-
-		emit msgNormalAct(postString);
-		//emit scPost(postString);
+		else
+		{
+			emit msgNormalAct(postString);
+		};
 	}
 
 	void ScBridge::onNewIpcConnection()
