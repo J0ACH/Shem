@@ -26,23 +26,21 @@ namespace QuantIDE
 	{
 		Q_OBJECT
 
-	public:											
+	public:
 		Quant(QWidget *parent = 0);
 		~Quant();
 
-	signals:
-		void bootInterpretrAct();
-		void killInterpretrAct();
-		
+	public slots :
+		void onInterpretBootInit();
+		void onInterpretBootDone();
+		void onInterpretKillInit();
+		void onInterpretKillDone();
 
-	public slots:
 		void onServerBootInit();
 		void onServerBootDone();
 		void onServerKillInit();
 		void onServerKillDone();
-		
-		void switchInterpretr();
-		
+
 		void fitGeometry();
 		void addNode();
 

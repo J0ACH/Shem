@@ -86,7 +86,6 @@ namespace Jui
 		Button *maximizeButton;
 		Button *minimizeButton;
 
-
 		Edges *edges;
 
 		QImage logo;

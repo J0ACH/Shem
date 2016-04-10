@@ -25,9 +25,7 @@ namespace QuantIDE
 
 		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
-		qDebug() << "bridge state" << bridge->state();
-		//		qDebug() << "HURRRRRRRRRAAAAAAAA2 ipcServerName" << bridge->mIpcServer->isListening();
-
+				
 		canvan->println("ScBridge init...");
 		canvan->setHeaderHeight(42);
 		canvan->setTailHeight(34);
@@ -49,10 +47,12 @@ namespace QuantIDE
 		connect(bridge, SIGNAL(evaluatedCode(QString)), canvan, SLOT(println(QString)));
 		connect(bridge, SIGNAL(scPost(QString)), canvan, SLOT(println(QString)));
 
-		// LANG actions
-		connect(buttLang, SIGNAL(pressAct()), this, SLOT(switchInterpretr()));
-		connect(this, SIGNAL(bootInterpretrAct()), bridge, SLOT(startLang()));
-		connect(this, SIGNAL(killInterpretrAct()), bridge, SLOT(killLang()));
+		// INTERPRET actions
+		connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(changeInterpretState()));
+		connect(bridge, SIGNAL(interpretBootInitAct()), this, SLOT(onInterpretBootInit()));
+		connect(bridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onInterpretBootDone()));
+		connect(bridge, SIGNAL(interpretKillInitAct()), this, SLOT(onInterpretKillInit()));
+		connect(bridge, SIGNAL(interpretKillDoneAct()), this, SLOT(onInterpretKillDone()));
 		
 		// SERVER actions
 		connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(changeServerState()));
@@ -101,41 +101,46 @@ namespace QuantIDE
 
 		globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
 	}
+	
+	//INTERPRET
 
-	void Quant::switchInterpretr()
+	void Quant::onInterpretBootInit()
 	{
-		switch (bridge->stateInterpret)
-		{
-		case StateInterpret::OFF:
-			emit bootInterpretrAct();
-			qDebug("switchInterpretr:bootInterpret");
-			buttServer->setStateKeeping(Button::StateKeeping::HOLD);
-			break;
-		case StateInterpret::RUNNING:
-			emit killInterpretrAct();
-			buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
-			qDebug("switchInterpretr:killInterpret");
-			break;
-		}
+		canvan->println("Interpret boot init...");
 	}
+	void Quant::onInterpretBootDone()
+	{
+		canvan->println("Interpret boot done...");
+		buttServer->setStateKeeping(Button::StateKeeping::HOLD);
+	}
+	void Quant::onInterpretKillInit()
+	{
+		canvan->println("Interpret kill init...");
+	}
+	void Quant::onInterpretKillDone()
+	{
+		canvan->println("Interpret kill done...");
+		buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
+	}
+
+	// SERVER
 
 	void Quant::onServerBootInit()
 	{
-		canvan->println("Quant SCserver boot init...");
+		canvan->println("ScServer boot init...");
 	}
 	void Quant::onServerBootDone()
 	{
-		canvan->println("Quant SCserver boot done...");
+		canvan->println("ScServer boot done...");
 		bridge->evaluateCode("p = ProxySpace.push()");
 	}
-
 	void Quant::onServerKillInit()
 	{
-		canvan->println("Quant SCserver kill init...");
+		canvan->println("ScServer kill init...");
 	}
 	void Quant::onServerKillDone()
 	{
-		canvan->println("Quant SCserver kill done...");
+		canvan->println("ScServer kill done...");
 	}
 
 
@@ -153,7 +158,7 @@ namespace QuantIDE
 	void Quant::closeEvent(QCloseEvent *event)
 	{
 		bridge->evaluateCode("Server.local.quit;"); // not working?
-		bridge->killLang();
+//		bridge->killLang();
 
 	}
 

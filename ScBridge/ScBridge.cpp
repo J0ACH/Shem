@@ -22,102 +22,21 @@ namespace SupercolliderBridge
 		connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
 	}
 
-
-	void ScBridge::onStart()
-	{
-		if (!mIpcServer->isListening()) // avoid a warning on stderr
-			mIpcServer->listen(mIpcServerName);
-
-		QString command = QStringLiteral("ScIDE.connect(\"%1\")").arg(mIpcServerName);
-		evaluateCode(command, true);
-		qDebug("onStart");
-		emit statusMessage("ScBridge::onStart()");
-	}
-
-	void ScBridge::startLang()
-	{
-		if (stateInterpret == StateInterpret::OFF)
-		{
-
-			QString sclangCommand = "sclang";
-			QString configFile;
-
-			QStringList sclangArguments;
-			if (!configFile.isEmpty())
-				sclangArguments << "-l" << configFile;
-			sclangArguments << "-i" << "scqt";
-
-			QProcess::start(sclangCommand, sclangArguments);
-			bool processStarted = QProcess::waitForStarted();
-			if (!processStarted)
-			{
-				emit statusMessage(tr("Failed to start interpreter!"));
-			}
-			else
-			{
-				emit statusMessage(tr("Starting ScLang ..."));
-				emit bootedLang(true);
-				stateInterpret = StateInterpret::RUNNING;
-				onStart();
-			}
-		}
-		else
-		{
-			emit statusMessage(tr("Interpret already running"));
-		};
-	}
-
-	void ScBridge::killLang()
-	{
-		//this->killServer();
-
-		//evaluateCode("Server.local.quit;");
-
-		if (state() != QProcess::Running) {
-			emit statusMessage(tr("Interpreter is not running!"));
-			return;
-		}
-
-		evaluateCode("0.exit", true);
-		closeWriteChannel();
-
-		mCompiled = false;
-		mTerminationRequested = true;
-		mTerminationRequestTime = QDateTime::currentDateTimeUtc();
-
-		bool finished = waitForFinished(200);
-		if (!finished && (state() != QProcess::NotRunning)) {
-#ifdef Q_OS_WIN32
-			kill();
-#else
-			terminate();
-#endif
-			bool reallyFinished = waitForFinished(200);
-			if (!reallyFinished)
-				emit statusMessage(tr("Failed to stop interpreter!"));
-			else
-			{
-				emit statusMessage(tr("MOMENT kdy LANG umrel...."));
-				emit bootedLang(false);
-				stateInterpret = StateInterpret::OFF;
-			}
-		}
-		mTerminationRequested = false;
-	}
-
 	void ScBridge::changeInterpretState()
 	{
 		switch (stateInterpret)
 		{
 		case StateInterpret::OFF:
-
+			emit interpretBootInitAct();
+			startInterpretr();
 			break;
-		case StateInterpret::RUNNING:
 
+		case StateInterpret::RUNNING:
+			emit interpretKillInitAct();
+			killInterpreter();
 			break;
 		}
 	}
-
 	void ScBridge::changeServerState()
 	{
 		switch (stateServer)
@@ -149,8 +68,65 @@ namespace SupercolliderBridge
 		}
 
 		char commandChar = silent ? '\x1b' : '\x0c';
-		
+
 		write(&commandChar, 1);
+	}
+
+	void ScBridge::startInterpretr()
+	{
+		QString sclangCommand = "sclang";
+		QString configFile;
+
+		QStringList sclangArguments;
+		if (!configFile.isEmpty())
+			sclangArguments << "-l" << configFile;
+		sclangArguments << "-i" << "scqt";
+
+		QProcess::start(sclangCommand, sclangArguments);
+		bool processStarted = QProcess::waitForStarted();
+		if (!processStarted)
+		{
+			emit statusMessage(tr("Failed to start interpreter!"));
+		}
+		else
+		{
+			if (!mIpcServer->isListening()) // avoid a warning on stderr
+				mIpcServer->listen(mIpcServerName);
+
+			QString command = QStringLiteral("ScIDE.connect(\"%1\")").arg(mIpcServerName);
+			evaluateCode(command, true);
+		}
+	}
+	void ScBridge::killInterpreter()
+	{
+		if (state() != QProcess::Running) {
+			emit statusMessage(tr("Interpreter is not running!"));
+			return;
+		}
+
+		evaluateCode("0.exit", true);
+		closeWriteChannel();
+
+		mCompiled = false;
+		mTerminationRequested = true;
+		mTerminationRequestTime = QDateTime::currentDateTimeUtc();
+
+		bool finished = waitForFinished(200);
+		if (!finished && (state() != QProcess::NotRunning)) {
+#ifdef Q_OS_WIN32
+			kill();
+#else
+			terminate();
+#endif
+			bool reallyFinished = waitForFinished(200);
+			if (!reallyFinished)
+				emit statusMessage(tr("Failed to stop interpreter!"));
+			else
+			{
+				stateInterpret = StateInterpret::OFF;
+			}
+		}
+		mTerminationRequested = false;
 	}
 
 	void ScBridge::onReadyRead()
@@ -163,7 +139,7 @@ namespace SupercolliderBridge
 
 		QByteArray out = QProcess::readAll();
 		QString postString = QString::fromUtf8(out);
-				
+
 		emit scPost(postString);
 	}
 
@@ -177,14 +153,17 @@ namespace SupercolliderBridge
 
 		connect(mIpcSocket, SIGNAL(disconnected()), this, SLOT(finalizeConnection()));
 		connect(mIpcSocket, SIGNAL(readyRead()), this, SLOT(onIpcData()));
+
+		stateInterpret = StateInterpret::RUNNING;
+		emit interpretBootDoneAct();
 	}
 
 	void ScBridge::finalizeConnection()
 	{
-		emit statusMessage("ScBridge::finalizeConnection()");
 		mIpcData.clear();
 		mIpcSocket->deleteLater();
 		mIpcSocket = NULL;
+		emit interpretKillDoneAct();
 	}
 
 	void ScBridge::onIpcData()
@@ -220,7 +199,7 @@ namespace SupercolliderBridge
 		static QString introspectionSelector("introspection");
 		static QString classLibraryRecompiledSelector("classLibraryRecompiled");
 		static QString requestCurrentPathSelector("requestCurrentPath");
-		
+
 		if (selector == serverRunningSelector)
 		{
 			// DATA O STAVU SERVERU - msg[0] bool STATE; msg[1] int IP; msg[2] int PORT!!!!!!!!!!!
@@ -258,7 +237,6 @@ namespace SupercolliderBridge
 			//emit statusMessage(tr("IPC message: %1").arg(data));
 		}
 	}
-
 
 	ScBridge::~ScBridge() {	}
 }
