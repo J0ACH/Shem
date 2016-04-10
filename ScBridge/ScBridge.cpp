@@ -13,9 +13,7 @@ namespace SupercolliderBridge
 		mTerminationRequested(false),
 		mCompiled(false)
 	{
-		//mIpcServer = new QLocalServer(this);
 		//mIpcServerName("SCBridge_" + QString::number(QCoreApplication::applicationPid())),
-		//this->startLang();
 
 		stateInterpret = StateInterpret::OFF;
 		stateServer = StateServer::OFF;
@@ -33,10 +31,9 @@ namespace SupercolliderBridge
 		QString command = QStringLiteral("ScIDE.connect(\"%1\")").arg(mIpcServerName);
 		evaluateCode(command, true);
 		qDebug("onStart");
-		emit statusMessage("onStart");
-		//Main::documentManager()->sendActiveDocument();
+		emit statusMessage("ScBridge::onStart()");
 	}
-	
+
 	void ScBridge::startLang()
 	{
 		if (stateInterpret == StateInterpret::OFF)
@@ -72,7 +69,7 @@ namespace SupercolliderBridge
 
 	void ScBridge::killLang()
 	{
-		this->killServer();
+		//this->killServer();
 
 		//evaluateCode("Server.local.quit;");
 
@@ -107,28 +104,34 @@ namespace SupercolliderBridge
 		}
 		mTerminationRequested = false;
 	}
-	
-	void ScBridge::startServer()
+
+	void ScBridge::changeInterpretState()
 	{
-		//if (stateInterpret == StateInterpret::RUNNING)
-		//{
-			evaluateCode("Server.local = Server.default = s;");
-			evaluateCode("s.boot;");
-//			evaluateCode("s.waitForBoot({ 'MOMENT kdy Server nastartoval....'.postln; })");
-			//stateServer = StateServer::RUNNING;
-			//emit bootedServer(true);
-		//}
+		switch (stateInterpret)
+		{
+		case StateInterpret::OFF:
+
+			break;
+		case StateInterpret::RUNNING:
+
+			break;
+		}
 	}
 
-	void ScBridge::killServer()
+	void ScBridge::changeServerState()
 	{
-		//if (stateServer == StateServer::RUNNING)
-		//{
-			//evaluateCode("Server.killAll;"); // not working?
+		switch (stateServer)
+		{
+		case StateServer::OFF:
+			emit serverBootInitAct();
+			evaluateCode("Server.local = Server.default = s;");
+			evaluateCode("s.boot;");
+			break;
+		case StateServer::RUNNING:
+			emit serverKillInitAct();
 			evaluateCode("s.quit;");
-			//stateServer = StateServer::OFF;
-			//emit bootedServer(false);
-		//}
+			break;
+		}
 	}
 
 	void ScBridge::evaluateCode(QString const & commandString, bool silent)
@@ -146,9 +149,7 @@ namespace SupercolliderBridge
 		}
 
 		char commandChar = silent ? '\x1b' : '\x0c';
-
-		//emit evaluatedCode(tr("evalCode: %1").arg(commandString));
-
+		
 		write(&commandChar, 1);
 	}
 
@@ -162,12 +163,9 @@ namespace SupercolliderBridge
 
 		QByteArray out = QProcess::readAll();
 		QString postString = QString::fromUtf8(out);
-
-		//emit scPost(tr("scPost: %1").arg(postString));
+				
 		emit scPost(postString);
 	}
-
-	/////////////////////////////////////////////////////////////////////////
 
 	void ScBridge::onNewIpcConnection()
 	{
@@ -176,9 +174,6 @@ namespace SupercolliderBridge
 			mIpcSocket->disconnect();
 
 		mIpcSocket = mIpcServer->nextPendingConnection();
-
-		emit statusMessage("ScBridge::onNewIpcConnection()");
-		emit statusMessage(QString::number(mIpcSocket->socketDescriptor()));
 
 		connect(mIpcSocket, SIGNAL(disconnected()), this, SLOT(finalizeConnection()));
 		connect(mIpcSocket, SIGNAL(readyRead()), this, SLOT(onIpcData()));
@@ -214,7 +209,7 @@ namespace SupercolliderBridge
 			mIpcData.remove(0, receivedData.pos());
 
 			onResponse(selector, message);
-			emit response(selector, message);
+			//emit response(selector, message);
 		}
 	}
 
@@ -225,11 +220,7 @@ namespace SupercolliderBridge
 		static QString introspectionSelector("introspection");
 		static QString classLibraryRecompiledSelector("classLibraryRecompiled");
 		static QString requestCurrentPathSelector("requestCurrentPath");
-
-		emit statusMessage("ScBridge::onResponse()");
-
-		emit statusMessage(tr("IPC selector: %1").arg(selector));
-
+		
 		if (selector == serverRunningSelector)
 		{
 			// DATA O STAVU SERVERU - msg[0] bool STATE; msg[1] int IP; msg[2] int PORT!!!!!!!!!!!
@@ -244,17 +235,15 @@ namespace SupercolliderBridge
 			//emit statusMessage(tr("SERVER msg[1]: %1").arg(msg[1]));
 			//emit statusMessage(tr("SERVER msg[2]: %1").arg(msg[2]));
 
-			if (msg[0] == "- false") 
+			if (msg[0] == "- false")
 			{
 				stateServer = StateServer::OFF;
-				emit bootedServer(false);
-				emit statusMessage("ScServer not running...");
+				emit serverKillDoneAct();
 			}
-			else if (msg[0] == "- true") 
+			else if (msg[0] == "- true")
 			{
 				stateServer = StateServer::RUNNING;
-				emit bootedServer(true);
-				emit statusMessage("ScServer start run...");
+				emit serverBootDoneAct();
 			}
 
 			//emit statusMessage(tr("SERVER: %1").arg(data));
@@ -266,28 +255,11 @@ namespace SupercolliderBridge
 		}
 		else
 		{
-			emit statusMessage(tr("IPC message: %1").arg(data));
+			//emit statusMessage(tr("IPC message: %1").arg(data));
 		}
-
-
-		/*
-		if (selector == introspectionSelector)
-		mIntrospectionParser->process(data);
-
-		else if (selector == classLibraryRecompiledSelector){
-		mCompiled = true;
-		emit classLibraryRecompiled();
-		}
-
-		else if (selector == requestCurrentPathSelector)
-		Main::documentManager()->sendActiveDocument();
-		*/
 	}
 
 
-	ScBridge::~ScBridge()
-	{
-
-	}
+	ScBridge::~ScBridge() {	}
 }
 

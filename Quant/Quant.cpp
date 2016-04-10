@@ -26,7 +26,7 @@ namespace QuantIDE
 		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
 		qDebug() << "bridge state" << bridge->state();
-//		qDebug() << "HURRRRRRRRRAAAAAAAA2 ipcServerName" << bridge->mIpcServer->isListening();
+		//		qDebug() << "HURRRRRRRRRAAAAAAAA2 ipcServerName" << bridge->mIpcServer->isListening();
 
 		canvan->println("ScBridge init...");
 		canvan->setHeaderHeight(42);
@@ -37,26 +37,29 @@ namespace QuantIDE
 		this->fitGeometry();
 
 		canvan->println("Quant control init...");
-		
+
 
 		//this->setMouseTracking(true);
 
 		canvan->setTitle("Quant");
 		canvan->setVersion(Quant_VERSION_MAJOR, Quant_VERSION_MINOR, Quant_VERSION_PATCH);
 
+		// MSG actions
 		connect(bridge, SIGNAL(statusMessage(QString)), canvan, SLOT(println(QString)));
 		connect(bridge, SIGNAL(evaluatedCode(QString)), canvan, SLOT(println(QString)));
 		connect(bridge, SIGNAL(scPost(QString)), canvan, SLOT(println(QString)));
 
-		connect(bridge, SIGNAL(bootedServer(bool)), this, SLOT(changedServerStage(bool)));
-
+		// LANG actions
 		connect(buttLang, SIGNAL(pressAct()), this, SLOT(switchInterpretr()));
-		connect(buttServer, SIGNAL(pressAct()), this, SLOT(switchServer()));
-
 		connect(this, SIGNAL(bootInterpretrAct()), bridge, SLOT(startLang()));
 		connect(this, SIGNAL(killInterpretrAct()), bridge, SLOT(killLang()));
-		connect(this, SIGNAL(bootServerAct()), bridge, SLOT(startServer()));
-		connect(this, SIGNAL(killServerAct()), bridge, SLOT(killServer()));
+		
+		// SERVER actions
+		connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(changeServerState()));
+		connect(bridge, SIGNAL(serverBootInitAct()), this, SLOT(onServerBootInit()));
+		connect(bridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
+		connect(bridge, SIGNAL(serverKillInitAct()), this, SLOT(onServerKillInit()));
+		connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
 
 		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
 
@@ -116,48 +119,37 @@ namespace QuantIDE
 		}
 	}
 
-	void Quant::switchServer()
+	void Quant::onServerBootInit()
 	{
-		switch (bridge->stateServer)
-		{
-		case StateServer::OFF:
-			emit bootServerAct();
-			canvan->println("Quant switchServer:bootServerAct");
-			qDebug("switchServer:bootServer");
-			break;
-		case StateServer::RUNNING:
-			emit killServerAct();
-			canvan->println("Quant switchServer:killServerAct");
-			qDebug("switchServer:killServer");
-			break;
-		}
+		canvan->println("Quant SCserver boot init...");
+	}
+	void Quant::onServerBootDone()
+	{
+		canvan->println("Quant SCserver boot done...");
+		bridge->evaluateCode("p = ProxySpace.push()");
 	}
 
-	void Quant::changedServerStage(bool booted)
+	void Quant::onServerKillInit()
 	{
-		if (booted)
-		{
-			canvan->println("Quant SCserver boot done...");
-			bridge->evaluateCode("p = ProxySpace.push()");
-
-		}
-		else
-		{
-			canvan->println("Quant SCserver killed...");
-		}
+		canvan->println("Quant SCserver kill init...");
 	}
+	void Quant::onServerKillDone()
+	{
+		canvan->println("Quant SCserver kill done...");
+	}
+
 
 	void Quant::paintEvent(QPaintEvent *paintEvent)
 	{
 		QPainter painter(this);
 		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), QColor(20, 20, 20));
 	}
-	
+
 	void Quant::addNode()
 	{
 		canvan->println("Node add...");
 	}
-	
+
 	void Quant::closeEvent(QCloseEvent *event)
 	{
 		bridge->evaluateCode("Server.local.quit;"); // not working?

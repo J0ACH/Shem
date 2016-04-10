@@ -33,19 +33,23 @@ namespace SupercolliderBridge
 		void startLang();
 		void killLang();
 		
-		void startServer();
-		void killServer();
-
+		void changeInterpretState();
+		void changeServerState();
+		
 		void evaluateCode(QString const & commandString, bool silent = false);
 
 	signals:
 		void bootedLang(bool);
-		void bootedServer(bool);
-
+		
+		void serverBootInitAct();
+		void serverBootDoneAct();
+		void serverKillInitAct();
+		void serverKillDoneAct();
+		
 		void scPost(QString const &);
 		void statusMessage(QString const &);
 		void evaluatedCode(QString const &);
-		void response(const QString & selector, const QString & data);
+		//void response(const QString & selector, const QString & data);
 
 	private slots:
 		void onReadyRead(void);
