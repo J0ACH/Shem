@@ -21,7 +21,7 @@ namespace QuantIDE
 	void Node::initControl()
 	{
 		nameLabel = new QLabel(this);
-		nameLabel->setText("Node1");
+		nameLabel->setText("node1");
 
 		sourceCode = new CodeEditor(this);
 	}
@@ -40,17 +40,24 @@ namespace QuantIDE
 	void Node::reciveText(QString text)
 	{
 		QString name = nameLabel->text();
-		QString code = tr("Ndef('%1', {%2}).play").arg(name, text);
-		//qDebug() << "EvaluateAct: " << code;
+		//QString code = tr("Ndef('%1', {%2}).play").arg(name, text);
+		QString code;
+		code = tr("~%1 = NodeProxy.audio(s, 2)").arg(name);
 		emit evaluateAct(code);
+		
+		code = tr("~%1[0] = {%2}").arg(name, text);
+		emit evaluateAct(code);
+		
+		code = tr("~%1.play").arg(name);
+		emit evaluateAct(code);
+		//qDebug() << "EvaluateAct: " << code;
 	}
 
 
 	void Node::fitGeometry()
 	{
 		nameLabel->setGeometry(10, 5, 80, 30);
-		sourceCode->setGeometry(10, 45, 300, 80);
-		
+		sourceCode->setGeometry(10, 45, width() - 20, 80);		
 	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)

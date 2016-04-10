@@ -25,15 +25,21 @@ namespace QuantIDE
 		buttAddNode->setText("AddNode");
 
 		testNode1 = new Node(this);
-		testNode1->setName("Node1");
-		testNode1->setSourceCode("SinOsc.ar(90!2)");
+		testNode1->setName("node1");
+		testNode1->setSourceCode("SinOsc.ar(90!2, mul: Saw.kr(2, 0.5, 0.5))");
 
 		testNode2 = new Node(this);
-		testNode2->setName("Node2");
-		testNode2->setSourceCode("Saw.ar(120!2)");
+		testNode2->setName("node2");
+
+		QString longCode;
+		longCode = "var osc = SinOsc.ar(( \\freq.kr(160) + Saw.kr(1/4, 5, 10) ), mul: 1, add: 0);";
+		longCode.append("\nvar noise = BrownNoise.ar(\\noise.kr(0.1), (1 - \\noise.kr(0.1)));");
+		longCode.append("\nvar sig = osc * noise;");
+		longCode.append("\nPan2.ar(sig * \\amp.kr(0.3), \\pan.kr(0));");
+		testNode2->setSourceCode(longCode);
 	}
 
-	void NodePanel::setTargetCanvan(Canvan *target) 
+	void NodePanel::setTargetCanvan(Canvan *target)
 	{
 		connect(testNode1, SIGNAL(evaluateAct(QString)), target, SLOT(println(QString)));
 		connect(testNode2, SIGNAL(evaluateAct(QString)), target, SLOT(println(QString)));

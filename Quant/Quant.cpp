@@ -144,7 +144,7 @@ namespace QuantIDE
 	void Quant::onServerBootDone()
 	{
 		onMsgStatus("ScServer boot done...");
-		bridge->evaluateCode("p = ProxySpace.push()");
+		bridge->evaluateCode("p = ProxySpace.push(s)");
 	}
 	void Quant::onServerKillInit()
 	{
