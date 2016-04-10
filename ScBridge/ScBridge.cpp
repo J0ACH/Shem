@@ -56,19 +56,19 @@ namespace SupercolliderBridge
 	void ScBridge::evaluateCode(QString const & commandString, bool silent)
 	{
 		if (state() != QProcess::Running) {
-			emit statusMessage(tr("Interpreter is not running!"));
+			emit msgStatusAct(tr("Interpreter is not running!"));
 			return;
 		}
 
 		QByteArray bytesToWrite = commandString.toUtf8();
 		size_t writtenBytes = write(bytesToWrite);
 		if (writtenBytes != bytesToWrite.size()) {
-			emit statusMessage(tr("Error when passing data to interpreter!"));
+			emit msgStatusAct(tr("Error when passing data to interpreter!"));
 			return;
 		}
 
 		char commandChar = silent ? '\x1b' : '\x0c';
-
+		emit msgEvaluateAct(tr("EVALUATE: %1").arg(commandString));
 		write(&commandChar, 1);
 	}
 
@@ -86,7 +86,7 @@ namespace SupercolliderBridge
 		bool processStarted = QProcess::waitForStarted();
 		if (!processStarted)
 		{
-			emit statusMessage(tr("Failed to start interpreter!"));
+			emit msgStatusAct(tr("Failed to start interpreter!"));
 		}
 		else
 		{
@@ -100,7 +100,7 @@ namespace SupercolliderBridge
 	void ScBridge::killInterpreter()
 	{
 		if (state() != QProcess::Running) {
-			emit statusMessage(tr("Interpreter is not running!"));
+			emit msgStatusAct(tr("Interpreter is not running!"));
 			return;
 		}
 
@@ -120,7 +120,7 @@ namespace SupercolliderBridge
 #endif
 			bool reallyFinished = waitForFinished(200);
 			if (!reallyFinished)
-				emit statusMessage(tr("Failed to stop interpreter!"));
+				emit msgStatusAct(tr("Failed to stop interpreter!"));
 			else
 			{
 				stateInterpret = StateInterpret::OFF;
@@ -140,7 +140,22 @@ namespace SupercolliderBridge
 		QByteArray out = QProcess::readAll();
 		QString postString = QString::fromUtf8(out);
 
-		emit scPost(postString);
+		QStringList msgLines = postString.split("\n");
+
+		for (int i = 0; i < msgLines.size()-1; i = i + 1)
+		{
+			emit msgNormalAct(tr("line[%1]: %2").arg(QString::number(i), msgLines.at(i)));
+		};
+
+		//static QString msgTypeError("defaultServerRunningChanged");
+		if (postString.startsWith("->"))
+		{
+			QString msg = postString.remove(0, 3);
+			emit msgAnswerAct(tr("ANSWER: %1").arg(msg));
+		}
+
+		emit msgNormalAct(postString);
+		//emit scPost(postString);
 	}
 
 	void ScBridge::onNewIpcConnection()
@@ -195,7 +210,6 @@ namespace SupercolliderBridge
 	void ScBridge::onResponse(const QString & selector, const QString & data)
 	{
 		static QString serverRunningSelector("defaultServerRunningChanged");
-
 		static QString introspectionSelector("introspection");
 		static QString classLibraryRecompiledSelector("classLibraryRecompiled");
 		static QString requestCurrentPathSelector("requestCurrentPath");
@@ -209,10 +223,10 @@ namespace SupercolliderBridge
 			//int ip;
 			//int port;
 
-			//emit statusMessage(tr("SERVER msg size: %1").arg(msg.size()));
-			//emit statusMessage(tr("SERVER msg[0]: %1").arg(msg[0]));
-			//emit statusMessage(tr("SERVER msg[1]: %1").arg(msg[1]));
-			//emit statusMessage(tr("SERVER msg[2]: %1").arg(msg[2]));
+			//emit msgStatusAct(tr("SERVER msg size: %1").arg(msg.size()));
+			//emit msgStatusAct(tr("SERVER msg[0]: %1").arg(msg[0]));
+			//emit msgStatusAct(tr("SERVER msg[1]: %1").arg(msg[1]));
+			//emit msgStatusAct(tr("SERVER msg[2]: %1").arg(msg[2]));
 
 			if (msg[0] == "- false")
 			{
@@ -225,16 +239,16 @@ namespace SupercolliderBridge
 				emit serverBootDoneAct();
 			}
 
-			//emit statusMessage(tr("SERVER: %1").arg(data));
+			//emit msgStatusAct(tr("STATUS: %1").arg(data));
 		}
 		else if (selector == introspectionSelector)
 		{
 			// DATA O VSECH CLASS PRO SUPERCOLIDER!!!!!!
-			//emit statusMessage(tr("INTROSPECTION message: %1").arg(data));
+			//emit msgStatusAct(tr("INTROSPECTION message: %1").arg(data));
 		}
 		else
 		{
-			//emit statusMessage(tr("IPC message: %1").arg(data));
+			//emit msgStatusAct(tr("IPC message: %1").arg(data));
 		}
 	}
 

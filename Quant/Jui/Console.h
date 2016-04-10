@@ -16,7 +16,7 @@ namespace Jui
 		~Console();
 
 	public slots:
-		void addText(QString text, bool newLine);
+		void addText(QString text, QColor color, bool newLine);
 		void fitGeometry();
 
 	private:

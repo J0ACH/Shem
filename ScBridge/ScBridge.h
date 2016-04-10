@@ -47,8 +47,15 @@ namespace SupercolliderBridge
 		void serverKillInitAct();
 		void serverKillDoneAct();
 		
-		void scPost(QString const &);
-		void statusMessage(QString const &);
+		//void msgErrorAct(QString const &);
+		//void msgWarningAct(QString const &);
+		void msgNormalAct(QString const &);
+		void msgStatusAct(QString const &);
+		void msgEvaluateAct(QString const &);
+		void msgAnswerAct(QString const &);
+
+		//void scPost(QString const &);
+		//void statusMessage(QString const &);
 		void evaluatedCode(QString const &);
 		//void response(const QString & selector, const QString & data);
 

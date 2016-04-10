@@ -30,7 +30,16 @@ namespace QuantIDE
 		Quant(QWidget *parent = 0);
 		~Quant();
 
+	signals:
+		void print(QString, QColor);
+		void println(QString, QColor);
+
 	public slots :
+		void onMsgNormal(QString);
+		void onMsgStatus(QString);
+		void onMsgEvaluate(QString);
+		void onMsgAnswer(QString);
+
 		void onInterpretBootInit();
 		void onInterpretBootDone();
 		void onInterpretKillInit();

@@ -55,13 +55,13 @@ namespace Jui
 		void resizeAct();
 		void resizeScreenAct();
 
-		void consolePrintAct(QString, bool);
-		
+		void consolePrintAct(QString, QColor, bool);
+				
 	public slots:
 		//void msgConsole(QString);
-		void print(QString);
-		void println(QString);
-
+		void print(QString, QColor);
+		void println(QString, QColor);
+		
 		void closeCanvan();
 		void minimizeCanvan();
 		void maximizeCanvan();

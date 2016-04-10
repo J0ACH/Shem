@@ -35,8 +35,8 @@ namespace Jui
 		this->initControl();
 		this->setCanvanStyleSheet();
 
-		connect(this, SIGNAL(consolePrintAct(QString, bool)), mConsole, SLOT(addText(QString, bool)));
-
+		connect(this, SIGNAL(consolePrintAct(QString, QColor, bool)), mConsole, SLOT(addText(QString, QColor, bool)));
+		
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(closeCanvan()));
 		connect(maximizeButton, SIGNAL(pressAct()), this, SLOT(maximizeCanvan()));
 		connect(minimizeButton, SIGNAL(pressAct()), this, SLOT(minimizeCanvan()));
@@ -62,7 +62,7 @@ namespace Jui
 		mConsole = new Console(this);
 		mConsole->setTitle("Console");
 		mConsole->setBackground(QColor(30, 30, 30));
-		mConsole->setGeometry(0, 0, 500, 150);
+		mConsole->setGeometry(0, 0, 800, 150);
 
 		edges = new Edges(this);
 		setEdgeControler(EdgeControler::Direction::LEFT, true);
@@ -71,9 +71,9 @@ namespace Jui
 		setEdgeControler(EdgeControler::Direction::BOTTOM, true);
 	}
 	
-	void Canvan::print(QString text) { emit consolePrintAct(text, false); }
-	void Canvan::println(QString text) { emit consolePrintAct(text, true); }
-
+	void Canvan::print(QString text, QColor col) { emit consolePrintAct(text, col, false); }
+	void Canvan::println(QString text, QColor col) { emit consolePrintAct(text, col, true); }
+	
 	void Canvan::setEdgeControler(EdgeControler::Direction direction, bool visible)
 	{
 		switch (direction)
@@ -202,7 +202,7 @@ namespace Jui
 			tr("pressedGlobal [%1,%2]").arg(
 			QString::number(mCursorGlobal->x()),
 			QString::number(mCursorGlobal->y())
-			), true);
+			), QColor(120,120,120), true);
 
 	}
 

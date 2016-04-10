@@ -14,15 +14,22 @@ namespace Jui
 		text->setOverwriteMode(false);
 		text->setFont(QFont("Consolas", 8));
 		text->setFrameStyle(QFrame::NoFrame);
-		
+
 		text->append(tr("Console init..."));
 
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
 	}
 
-	void Console::addText(QString newText, bool newLine)
+	void Console::addText(QString newText, QColor color, bool newLine)
 	{
-		if (newLine) { text->append(newText); }
+		
+		QTextCharFormat format;
+		format.setForeground(QBrush(color, Qt::SolidPattern));
+		text->setCurrentCharFormat(format);
+
+		if (newLine) {
+			text->append(newText);
+		}
 		else
 		{
 			//QString old = text->toPlainText();
@@ -31,6 +38,10 @@ namespace Jui
 			//text->append(newText);
 			text->insertPlainText(newText); // problem s udrzeni pohledu na konci konzole
 		}
+
+		format.setForeground(QBrush(QColor(230, 230, 230), Qt::SolidPattern));
+		text->setCurrentCharFormat(format);
+		
 	}
 
 	void Console::fitGeometry() { text->setGeometry(10, 35, this->width() - 20, this->height() - 45); }

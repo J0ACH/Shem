@@ -11,7 +11,7 @@ int main(int argc, char** argv){
 	QApplication app(argc, argv);
 
 	QuantIDE::Quant *win = new QuantIDE::Quant();
-	win->setGeometry(50, 50, 1200, 700);
+	win->setGeometry(50, 50, 1400, 700);
 	win->show();
 
 	return app.exec();
@@ -26,7 +26,6 @@ namespace QuantIDE
 		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
 				
-		canvan->println("ScBridge init...");
 		canvan->setHeaderHeight(42);
 		canvan->setTailHeight(34);
 		canvan->setLogo(QImage(":/logo32.png"));
@@ -34,18 +33,22 @@ namespace QuantIDE
 		this->initControl();
 		this->fitGeometry();
 
-		canvan->println("Quant control init...");
-
-
 		//this->setMouseTracking(true);
 
 		canvan->setTitle("Quant");
 		canvan->setVersion(Quant_VERSION_MAJOR, Quant_VERSION_MINOR, Quant_VERSION_PATCH);
 
+		// CONTROLS
+		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
+		connect(globalCode, SIGNAL(sendText(QString)), bridge, SLOT(evaluateCode(QString)));
+
 		// MSG actions
-		connect(bridge, SIGNAL(statusMessage(QString)), canvan, SLOT(println(QString)));
-		connect(bridge, SIGNAL(evaluatedCode(QString)), canvan, SLOT(println(QString)));
-		connect(bridge, SIGNAL(scPost(QString)), canvan, SLOT(println(QString)));
+		connect(this, SIGNAL(print(QString, QColor)), canvan, SLOT(print(QString, QColor)));
+		connect(this, SIGNAL(println(QString, QColor)), canvan, SLOT(println(QString, QColor)));
+		connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
+		connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
+		connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
+		connect(bridge, SIGNAL(msgAnswerAct(QString)), this, SLOT(onMsgAnswer(QString)));
 
 		// INTERPRET actions
 		connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(changeInterpretState()));
@@ -61,10 +64,7 @@ namespace QuantIDE
 		connect(bridge, SIGNAL(serverKillInitAct()), this, SLOT(onServerKillInit()));
 		connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
 
-		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
-
-		connect(globalCode, SIGNAL(sendText(QString)), canvan, SLOT(println(QString)));
-		connect(globalCode, SIGNAL(sendText(QString)), bridge, SLOT(evaluateCode(QString)));
+		onMsgStatus("Quant init...");
 	}
 
 	void Quant::initControl()
@@ -101,25 +101,31 @@ namespace QuantIDE
 
 		globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
 	}
+
+	// MSG
+	void Quant::onMsgNormal(QString msg) { emit println(msg, QColor(120, 120, 120)); }
+	void Quant::onMsgStatus(QString msg) { emit println(msg, QColor(230, 230, 230)); }
+	void Quant::onMsgEvaluate(QString msg) { emit println(msg, QColor(30, 130, 230)); }
+	void Quant::onMsgAnswer(QString msg) { emit println(msg, QColor(30, 230, 30)); }
 	
-	//INTERPRET
+	// INTERPRET
 
 	void Quant::onInterpretBootInit()
 	{
-		canvan->println("Interpret boot init...");
+		onMsgStatus("Interpret boot init...");
 	}
 	void Quant::onInterpretBootDone()
 	{
-		canvan->println("Interpret boot done...");
+		onMsgStatus("Interpret boot done...");
 		buttServer->setStateKeeping(Button::StateKeeping::HOLD);
 	}
 	void Quant::onInterpretKillInit()
 	{
-		canvan->println("Interpret kill init...");
+		onMsgStatus("Interpret kill init...");
 	}
 	void Quant::onInterpretKillDone()
 	{
-		canvan->println("Interpret kill done...");
+		onMsgStatus("Interpret kill done...");
 		buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
 	}
 
@@ -127,20 +133,20 @@ namespace QuantIDE
 
 	void Quant::onServerBootInit()
 	{
-		canvan->println("ScServer boot init...");
+		onMsgStatus("ScServer boot init...");
 	}
 	void Quant::onServerBootDone()
 	{
-		canvan->println("ScServer boot done...");
+		onMsgStatus("ScServer boot done...");
 		bridge->evaluateCode("p = ProxySpace.push()");
 	}
 	void Quant::onServerKillInit()
 	{
-		canvan->println("ScServer kill init...");
+		onMsgStatus("ScServer kill init...");
 	}
 	void Quant::onServerKillDone()
 	{
-		canvan->println("ScServer kill done...");
+		onMsgStatus("ScServer kill done...");
 	}
 
 
@@ -152,7 +158,7 @@ namespace QuantIDE
 
 	void Quant::addNode()
 	{
-		canvan->println("Node add...");
+		onMsgStatus("Node add...");
 	}
 
 	void Quant::closeEvent(QCloseEvent *event)
