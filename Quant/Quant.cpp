@@ -22,8 +22,11 @@ namespace QuantIDE
 
 	Quant::Quant(QWidget *parent) : QWidget(parent)
 	{
+
 		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
+		qDebug() << "bridge state" << bridge->state();
+//		qDebug() << "HURRRRRRRRRAAAAAAAA2 ipcServerName" << bridge->mIpcServer->isListening();
 
 		canvan->println("ScBridge init...");
 		canvan->setHeaderHeight(42);
@@ -119,10 +122,12 @@ namespace QuantIDE
 		{
 		case StateServer::OFF:
 			emit bootServerAct();
+			canvan->println("Quant switchServer:bootServerAct");
 			qDebug("switchServer:bootServer");
 			break;
 		case StateServer::RUNNING:
 			emit killServerAct();
+			canvan->println("Quant switchServer:killServerAct");
 			qDebug("switchServer:killServer");
 			break;
 		}

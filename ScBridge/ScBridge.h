@@ -11,6 +11,7 @@
 #include <QtNetwork/QLocalSocket>
 #include <QtNetwork/QLocalServer>
 #include <QBuffer>
+#include <QDebug>
 
 namespace SupercolliderBridge
 {
@@ -31,8 +32,10 @@ namespace SupercolliderBridge
 	public slots:
 		void startLang();
 		void killLang();
+		
 		void startServer();
 		void killServer();
+
 		void evaluateCode(QString const & commandString, bool silent = false);
 
 	signals:
@@ -42,11 +45,14 @@ namespace SupercolliderBridge
 		void scPost(QString const &);
 		void statusMessage(QString const &);
 		void evaluatedCode(QString const &);
-		//void response(const QString & selector, const QString & data);
+		void response(const QString & selector, const QString & data);
 
 	private slots:
 		void onReadyRead(void);
-		
+		void onNewIpcConnection();
+		void finalizeConnection();
+		void onIpcData();
+				
 	private:
 		QLocalServer *mIpcServer;
 		QLocalSocket *mIpcSocket;
@@ -56,6 +62,9 @@ namespace SupercolliderBridge
 		bool mTerminationRequested;
 		QDateTime mTerminationRequestTime;
 		bool mCompiled;		
+		void onStart();
+
+		void onResponse(const QString & selector, const QString & data);
 	};
 
 }

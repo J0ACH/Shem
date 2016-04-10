@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QDebug>
 
 #include "ScBridge.h"
 
