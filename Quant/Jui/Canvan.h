@@ -54,6 +54,7 @@ namespace Jui
 	signals:
 		void resizeAct();
 		void resizeScreenAct();
+		void closeAct();
 
 		void consolePrintAct(QString, QColor, bool);
 				

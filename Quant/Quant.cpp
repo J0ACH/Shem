@@ -40,6 +40,8 @@ namespace QuantIDE
 
 		// CONTROLS
 		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
+		connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
+		connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(close()));
 		connect(globalCode, SIGNAL(sendText(QString)), bridge, SLOT(evaluateCode(QString)));
 
 		// MSG actions
@@ -167,9 +169,11 @@ namespace QuantIDE
 
 	void Quant::closeEvent(QCloseEvent *event)
 	{
-		bridge->evaluateCode("Server.local.quit;"); // not working?
+		//bridge->evaluateCode("Server.local.quit;"); // not working?
 //		bridge->killLang();
-
+		//emit 
+	//	event->accept();
+		canvan->close();
 	}
 
 	Quant::~Quant() { }

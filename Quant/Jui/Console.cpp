@@ -21,8 +21,7 @@ namespace Jui
 	}
 
 	void Console::addText(QString newText, QColor color, bool newLine)
-	{
-		
+	{		
 		QTextCharFormat format;
 		format.setForeground(QBrush(color, Qt::SolidPattern));
 		text->setCurrentCharFormat(format);

@@ -22,6 +22,30 @@ namespace SupercolliderBridge
 		connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
 	}
 
+	void ScBridge::killBridge()
+	{
+		if (stateServer == StateServer::RUNNING)
+		{
+			connect(this, SIGNAL(serverKillDoneAct()), this, SLOT(killBridge())); // second loop for interpreter
+			emit changeServerState();
+			emit msgStatusAct("1st round killing");
+			return;
+		};
+
+		if (stateInterpret == StateInterpret::RUNNING)
+		{
+			connect(this, SIGNAL(interpretrKillDoneAct()), this, SLOT(killBridge())); // third loop for emit signal
+			emit changeInterpretState();
+			emit msgStatusAct("2nd round killing");
+		};
+
+		if (stateInterpret == StateInterpret::OFF)
+		{
+			emit msgStatusAct("3rd round killing");
+			emit killBridgeDoneAct();
+		};
+	}
+
 	void ScBridge::changeInterpretState()
 	{
 		switch (stateInterpret)
@@ -142,9 +166,6 @@ namespace SupercolliderBridge
 
 		if (postString.startsWith("ERROR:"))
 		{
-			//QString msg = postString.remove(0, 7);
-			//emit msgErrorAct(tr("ERROR: %1").arg(msg));
-
 			QStringList msgLines = postString.split("\n");
 			for (int i = 0; i < msgLines.size(); i = i + 1)
 			{

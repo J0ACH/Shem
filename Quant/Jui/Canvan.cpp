@@ -271,7 +271,10 @@ namespace Jui
 		this->setStyleSheet(txt);
 	}
 
-	void Canvan::closeCanvan() { win->close(); }
+	void Canvan::closeCanvan() { 
+	//	win->close();
+		emit closeAct();
+	}
 	void Canvan::minimizeCanvan()
 	{
 		qDebug() << "Minimize canvan";
