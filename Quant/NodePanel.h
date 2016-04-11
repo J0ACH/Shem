@@ -31,7 +31,6 @@ namespace QuantIDE
 
 		QRect bounds();
 
-		Button *buttAddNode;
 		//Node *testNode1, *testNode2;
 
 		void setTargetBridge(ScBridge*);
@@ -40,9 +39,11 @@ namespace QuantIDE
 		void fitGeometry();
 
 		void addNode();
+		void deleteNode(QString name);
 
 	private:
 		void initControl();
+		Button *buttAddNode;
 		QMap<QString, Node*> dictNode;
 		ScBridge *mBridge;
 		int testID;

@@ -40,8 +40,10 @@ namespace QuantIDE
 
 	signals:
 		void evaluateAct(QString);
+		void killAct(QString);
 
 	protected:
+		void closeEvent(QCloseEvent *event);
 		void paintEvent(QPaintEvent *event);
 
 	private:
@@ -49,6 +51,7 @@ namespace QuantIDE
 
 		QLabel *nameLabel;
 		CodeEditor *sourceCode;
+		Button *closeButton;
 		Button *buttNodePlay;
 		
 	};

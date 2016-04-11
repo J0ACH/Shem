@@ -13,6 +13,7 @@ namespace QuantIDE
 
 		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(reciveText(QString)));
 		connect(buttNodePlay, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
+		connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
 	}
 
 	QRect Node::bounds()
@@ -24,6 +25,11 @@ namespace QuantIDE
 	{
 		nameLabel = new QLabel(this);
 		nameLabel->setText("node1");
+
+		closeButton = new Button(this);
+		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
+		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
+		closeButton->setText("X");
 
 		buttNodePlay = new Button(this);
 		buttNodePlay->setText("play");
@@ -73,6 +79,7 @@ namespace QuantIDE
 	void Node::fitGeometry()
 	{
 		nameLabel->setGeometry(10, 5, 80, 30);
+		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		buttNodePlay->setGeometry(90, 10, 40, 20);
 		sourceCode->setGeometry(10, 45, width() - 20, 80);
 	}
@@ -85,6 +92,15 @@ namespace QuantIDE
 		painter.setPen(QColor(230, 230, 230));
 		painter.drawLine(0, 0, width(), 0);
 		painter.drawLine(0, height() - 1, width(), height() - 1);
+	}
+
+	void Node::closeEvent(QCloseEvent *event)
+	{
+		QString code = tr("~%1.free;").arg(name());
+		stateNodePlay = StateNodePlay::FREE;
+		emit evaluateAct(code);
+		emit killAct(name());
+		qDebug("Node::closeEvent()");
 	}
 
 	Node::~Node()

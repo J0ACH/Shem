@@ -52,6 +52,7 @@ namespace QuantIDE
 
 		connect(this, SIGNAL(resizeAct()), newNode, SLOT(fitGeometry()));
 		connect(newNode, SIGNAL(evaluateAct(QString)), mBridge, SLOT(evaluateCode(QString)));
+		connect(newNode, SIGNAL(killAct(QString)), this, SLOT(deleteNode(QString)));
 
 		dictNode.insert(newNode->name(), newNode);
 
@@ -59,23 +60,29 @@ namespace QuantIDE
 		testID += 1;
 	}
 
+	void NodePanel::deleteNode(QString nodeName)
+	{
+		dictNode.remove(nodeName);
+		emit resizeAct();
+	}
 
 	void NodePanel::fitGeometry()
 	{
 		int nextNodeOriginY = 50;
 		buttAddNode->setGeometry(200, 10, 50, 20);
-	//	testNode1->setGeometry(10, 50, this->width() - 20, 200);
-	//	testNode2->setGeometry(10, 260, this->width() - 20, 200);
 
 		for (auto e : dictNode.keys())
 		{
-		//	fout << e << "," << dictNode->value(e) << '\n';
+			Node *oneNode = dictNode.value(e);
+			//	fout << e << "," << dictNode->value(e) << '\n';
 			//Node &oneNode = dictNode.value(e);
-			dictNode.value(e)->setGeometry(10, nextNodeOriginY, this->width() - 20, 200);
+			//dictNode.value(e)->setGeometry(10, nextNodeOriginY, this->width() - 20, 200);
+			//nextNodeOriginY = dictNode.value(e)->geometry().top() + dictNode.value(e)->height() + 10;
+			oneNode->setGeometry(10, nextNodeOriginY, this->width() - 20, 200);
 			nextNodeOriginY = dictNode.value(e)->geometry().top() + dictNode.value(e)->height() + 10;
 		}
 	}
-
+	
 	NodePanel::~NodePanel()
 	{
 
