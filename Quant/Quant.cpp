@@ -43,7 +43,6 @@ namespace QuantIDE
 		connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
 		connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(close()));
 		connect(globalCode, SIGNAL(sendText(QString)), bridge, SLOT(evaluateCode(QString)));
-		connect(questionCode, SIGNAL(sendText(QString)), bridge, SLOT(evaluateCode(QString)));
 
 		// MSG actions
 		connect(this, SIGNAL(print(QString, QColor)), canvan, SLOT(print(QString, QColor)));
@@ -93,9 +92,6 @@ namespace QuantIDE
 
 		globalCode = new CodeEditor(nodePanel);
 		globalCode->setText("ScGlobal editor (use Ctrl+Enter to evaluate code)");
-		
-		questionCode = new CodeEditor(nodePanel);
-		questionCode->setText("s.peakCPU");
 	}
 
 	void Quant::fitGeometry()
@@ -107,7 +103,6 @@ namespace QuantIDE
 		buttServer->setGeometry(34, 5, 24, 24);
 
 		globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
-		questionCode->setGeometry(10, nodePanel->height() - 80, 350, 30);
 	}
 
 	// MSG

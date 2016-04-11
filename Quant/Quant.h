@@ -67,7 +67,7 @@ namespace QuantIDE
 		NodePanel *nodePanel;
 
 		Button *buttLang, *buttServer;
-		CodeEditor *globalCode, *questionCode;
+		CodeEditor *globalCode;
 	};
 }
 #endif // QUANT

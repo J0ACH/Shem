@@ -56,20 +56,20 @@ ENDFOREACH(ONE_BRGLINK)
 
 ### Project semaphore ########################
 
-OPTION(Build_Demo "Build basic example of using ScBridge" OFF)
+OPTION(Build_Demo "Build basic example of using ScBridge" ON)
 IF(Build_Demo)
 	MESSAGE(STATUS "Building the Demo")
 	ADD_SUBDIRECTORY(Demo)
 ENDIF()
 
-OPTION(Build_Editor "Build code editor test" OFF)
+OPTION(Build_Editor "Build code editor test" ON)
 IF(Build_Editor)
 	MESSAGE(STATUS "Building the Editor")
 	ADD_SUBDIRECTORY(Editor)
 ENDIF()
 
 
-OPTION(Build_Quant "Build project Quant" ON)
+OPTION(Build_Quant "Build project Quant" OFF)
 IF(Build_Quant)
 	MESSAGE(STATUS "Building the Quant IDE")
 	ADD_SUBDIRECTORY(Quant)
