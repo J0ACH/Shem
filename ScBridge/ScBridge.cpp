@@ -20,6 +20,10 @@ namespace SupercolliderBridge
 
 		connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 		connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
+
+		/////////////////
+
+		connect(this, SIGNAL(response(QString, QString)), this, SLOT(sendQuestion(QString, QString)));
 	}
 
 	void ScBridge::killBridge()
@@ -247,7 +251,7 @@ namespace SupercolliderBridge
 			mIpcData.remove(0, receivedData.pos());
 
 			onResponse(selector, message);
-			//emit response(selector, message);
+			emit response(selector, message);
 		}
 	}
 
@@ -295,6 +299,23 @@ namespace SupercolliderBridge
 			//emit msgStatusAct(tr("IPC message: %1").arg(data));
 		}
 	}
+
+	//////////////////////
+	// question/answer test
+
+	void ScBridge::sendRequest(const QString &id, const QString &command, const QString &data)
+	{
+		QString cmd = QStringLiteral("ScIDE.request(\"%1\",'%2',\"%3\")")
+			.arg(id)
+			.arg(command)
+			.arg(data);
+		emit msgNormalAct(tr("ScIDE.request: %1").arg(cmd));
+		evaluateCode(cmd, true);
+	}
+
+
+	////////////////////////
+
 
 	ScBridge::~ScBridge() {	}
 }
