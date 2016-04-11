@@ -11,6 +11,9 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QPainter>
+#include <QMap>
+#include <QDebug>
+
 
 using namespace Jui;
 using namespace SupercolliderBridge;
@@ -29,15 +32,20 @@ namespace QuantIDE
 		QRect bounds();
 
 		Button *buttAddNode;
-		Node *testNode1, *testNode2;
+		//Node *testNode1, *testNode2;
 
 		void setTargetBridge(ScBridge*);
 
 	public slots:
 		void fitGeometry();
 
+		void addNode();
+
 	private:
 		void initControl();
+		QMap<QString, Node*> dictNode;
+		ScBridge *mBridge;
+		int testID;
 	};
 }
 
