@@ -36,7 +36,7 @@ namespace Jui
 		this->setCanvanStyleSheet();
 
 		connect(this, SIGNAL(consolePrintAct(QString, QColor, bool)), mConsole, SLOT(addText(QString, QColor, bool)));
-		
+
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(closeCanvan()));
 		connect(maximizeButton, SIGNAL(pressAct()), this, SLOT(maximizeCanvan()));
 		connect(minimizeButton, SIGNAL(pressAct()), this, SLOT(minimizeCanvan()));
@@ -70,10 +70,10 @@ namespace Jui
 		setEdgeControler(EdgeControler::Direction::RIGHT, true);
 		setEdgeControler(EdgeControler::Direction::BOTTOM, true);
 	}
-	
+
 	void Canvan::print(QString text, QColor col) { emit consolePrintAct(text, col, false); }
 	void Canvan::println(QString text, QColor col) { emit consolePrintAct(text, col, true); }
-	
+
 	void Canvan::setEdgeControler(EdgeControler::Direction direction, bool visible)
 	{
 		switch (direction)
@@ -202,7 +202,7 @@ namespace Jui
 			tr("pressedGlobal [%1,%2]").arg(
 			QString::number(mCursorGlobal->x()),
 			QString::number(mCursorGlobal->y())
-			), QColor(120,120,120), true);
+			), QColor(120, 120, 120), true);
 
 	}
 
@@ -220,7 +220,7 @@ namespace Jui
 	}
 
 	void Canvan::mouseReleaseEvent(QMouseEvent *mouseEvent) { isPressed = false; }
-	
+
 	void Canvan::addScreen(QWidget *inScreen)
 	{
 		inScreen->setGeometry(100, 100, 300, 300);
@@ -247,7 +247,7 @@ namespace Jui
 		QString txt;
 		txt.append(tr("QLabel { color: %1; }").arg(textColor.name()));
 		txt.append("QLabel { font-weight: bold; }");
-		
+
 		txt.append(tr("QPushButton { background-color: %1; }").arg(backColor.name()));
 		txt.append(tr("QPushButton { color: %1; }").arg(textColor.name()));
 		txt.append(tr("QPushButton { border-style: outset; border-width: 1px; border-color: %1}").arg(textColor.name()));
@@ -257,22 +257,33 @@ namespace Jui
 		txt.append(tr("QTextEdit { background-color: %1; }").arg(backColor.name()));
 		txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(activeColor.name()));
 
-		txt.append("QScrollBar:vertical { width: 5px; }");
-		txt.append("QScrollBar:horizontal { height: 5px; }");
+		//txt.append(tr("QScrollArea { background-color:%1; }").arg(backColor.name()));
+
+		txt.append("QScrollBar:vertical { width: 2px; }");
+		txt.append("QScrollBar:horizontal { height: 2px; }");
 		txt.append(tr("QScrollBar:vertical { background: %1; }").arg(backColor.name()));
-		txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 20px; }").arg(textColor.name()));
-		//txt.append("QScrollBar:vertical { margin: 50px 0 50px 0; }");
+		txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(backColor.name()));
+		txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(textColor.name()));
+		txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(textColor.name()));
+		txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
+		txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
+		txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
+		txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
+		txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
+		txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
+		txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
+		txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
 
 		txt.append(tr("QToolTip { color: %1; }").arg(textColor.name()));
 		txt.append(tr("QToolTip { background-color:  %1; }").arg(backColor.name()));
 		txt.append(tr("QToolTip { border: 1px solid white; }"));
-			
+
 		//qDebug() << "TXT:" << txt;
 		this->setStyleSheet(txt);
 	}
 
-	void Canvan::closeCanvan() { 
-	//	win->close();
+	void Canvan::closeCanvan() {
+		//	win->close();
 		emit closeAct();
 	}
 	void Canvan::minimizeCanvan()

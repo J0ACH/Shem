@@ -13,6 +13,7 @@
 #include <QPainter>
 #include <QMap>
 #include <QDebug>
+#include <QScrollArea>
 
 
 using namespace Jui;
@@ -44,6 +45,8 @@ namespace QuantIDE
 	private:
 		void initControl();
 		Button *buttAddNode;
+		QScrollArea *scrollArea;
+		QWidget *scrollWidget;
 		QMap<QString, Node*> dictNode;
 		ScBridge *mBridge;
 		int testID;

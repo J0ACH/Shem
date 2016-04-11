@@ -82,8 +82,10 @@ namespace Jui
 	{
 		for (int i = 0; i < text.length(); ++i) {
 			if (!text.at(i).isLetterOrNumber())
+			{
 				//setFormat(i, 1, Qt::green);
-				qDebug() << "highlight: " << text.at(i);
+				//qDebug() << "highlight: " << text.at(i);
+			}
 		}
 	}
 
