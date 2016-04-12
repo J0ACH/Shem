@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QTextEdit>
 #include <QList>
+#include <QVariant>
 #include <QDebug>
 
 namespace Jui
@@ -54,3 +55,4 @@ namespace Jui
 
 }
 #endif // CONSOLE_H
+

@@ -70,6 +70,7 @@ namespace Jui
 		QStringList answ;
 			
 		QList<QPair<int, int>*> answ2;		
+		QList<QList<QVariant>*> answ3;
 
 		QRegExp rule(regexpRule);
 		int count = 0;
@@ -80,24 +81,43 @@ namespace Jui
 			range->first = pos;
 			range->second = rule.matchedLength();
 			answ2.append(range);
+
+
 		
 			qDebug() << count << ") class pos" << range->first << " to " << range->second;
 			//qDebug() << count << ") class pos [" << pos << " size " << rule.matchedLength() << "]";
 			QStringRef subString(&text, pos, rule.matchedLength());
 			answ.append(subString.toString());
+
+
+			QList<QVariant> *oneReg = new QList<QVariant>();
+			oneReg->append(subString.toString());
+			oneReg->append(pos);
+			oneReg->append(rule.matchedLength());
+			answ3.append(oneReg);
+
 			++count;
 			pos += rule.matchedLength();
 		}
 
-		
+		/*
 		QListIterator<QPair<int, int>*> i(answ2);
 		while (i.hasNext())
 		{
 			QPair<int, int> *pair = i.next();
-			qDebug() << count << ") 2NDtry class pos" << pair->first << " to " << pair->second;
-			//qDebug() << i.next();
-		}
+			//qDebug() << count << ") 2NDtry class pos" << pair->first << " to " << pair->second;
+				}
+		*/
 		
+		QListIterator<QList<QVariant>*> j(answ3);
+		while (j.hasNext())
+		{
+			QList<QVariant> *test = j.next();
+			
+			qDebug() << "3NDtry class " << test->at(0) << " pos " << test->at(1) << " to " << test->at(2);
+
+		}
+
 
 		return answ;
 	}
