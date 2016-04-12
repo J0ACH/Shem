@@ -68,16 +68,37 @@ namespace Jui
 
 		QString text = this->toPlainText();
 		QStringList answ;
+			
+		QList<QPair<int, int>*> answ2;		
+
 		QRegExp rule(regexpRule);
 		int count = 0;
 		int pos = 0;
 		while ((pos = rule.indexIn(text, pos)) != -1) {
-			qDebug() << count << ") class pos [" << pos << " size " << rule.matchedLength() << "]";
+			
+			QPair<int, int> *range = new QPair<int, int>();
+			range->first = pos;
+			range->second = rule.matchedLength();
+			answ2.append(range);
+		
+			qDebug() << count << ") class pos" << range->first << " to " << range->second;
+			//qDebug() << count << ") class pos [" << pos << " size " << rule.matchedLength() << "]";
 			QStringRef subString(&text, pos, rule.matchedLength());
 			answ.append(subString.toString());
 			++count;
 			pos += rule.matchedLength();
 		}
+
+		
+		QListIterator<QPair<int, int>*> i(answ2);
+		while (i.hasNext())
+		{
+			QPair<int, int> *pair = i.next();
+			qDebug() << count << ") 2NDtry class pos" << pair->first << " to " << pair->second;
+			//qDebug() << i.next();
+		}
+		
+
 		return answ;
 	}
 
@@ -176,7 +197,7 @@ namespace Jui
 		{
 			//if (!prEdit)
 			//{
-				highlightText(this->toPlainText(), Qt::red);
+			highlightText(this->toPlainText(), Qt::red);
 			//}
 		}
 

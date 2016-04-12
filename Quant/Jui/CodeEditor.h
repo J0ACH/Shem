@@ -4,7 +4,7 @@
 #include "Panel.h"
 #include <QWidget>
 #include <QTextEdit>
-#include <QSyntaxHighlighter>
+#include <QList>
 #include <QDebug>
 
 namespace Jui
