@@ -9,6 +9,8 @@
 
 namespace Jui
 {
+	enum class HighLights {CLASS, CONTROL, NODE, DIGIT};
+
 	class CodeEditor : public QTextEdit
 	{
 		Q_OBJECT
@@ -44,7 +46,10 @@ namespace Jui
 		QColor normalColor, overColor, activeColor;
 
 		QStringList regexpText(const QString &, QString regexpRule);
+		QStringList regexpText2(HighLights type);
 		void highlightText(QString, QColor);
+
+		bool prEdit;
 	};
 
 }

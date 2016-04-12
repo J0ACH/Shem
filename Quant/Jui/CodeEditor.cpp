@@ -15,6 +15,8 @@ namespace Jui
 		overColor = QColor(230, 230, 230);
 		activeColor = QColor(50, 65, 95);
 
+		prEdit = false;
+
 		append(tr("CodeEditor init..."));
 
 		backgroundAlpha = 0;
@@ -38,11 +40,45 @@ namespace Jui
 		qDebug() << "found nodes: " << nodes;
 		qDebug() << "found floats: " << floats;
 
-		emit classesAct(classes);
-		emit symbolsAct(symbols);
-		emit floatsAct(floats);
+		emit classesAct(regexpText2(HighLights::CLASS));
+		emit symbolsAct(regexpText2(HighLights::CONTROL));
+		emit floatsAct(regexpText2(HighLights::DIGIT));
 
 		highlightText(this->toPlainText(), Qt::red);
+	}
+
+	QStringList CodeEditor::regexpText2(HighLights typeHighLights)
+	{
+		QString regexpRule;
+		switch (typeHighLights)
+		{
+		case Jui::HighLights::CLASS:
+			regexpRule = "\\b[A-Z]\\w*";
+			break;
+		case Jui::HighLights::CONTROL:
+			regexpRule = "\\\\\\w*";
+			break;
+		case Jui::HighLights::NODE:
+			regexpRule = "~\\w+";
+			break;
+		case Jui::HighLights::DIGIT:
+			regexpRule = "\\b((\\d+(\\.\\d+)?([eE][-+]?\\d+)?(pi)?)|pi)\\b";
+			break;
+		}
+
+		QString text = this->toPlainText();
+		QStringList answ;
+		QRegExp rule(regexpRule);
+		int count = 0;
+		int pos = 0;
+		while ((pos = rule.indexIn(text, pos)) != -1) {
+			qDebug() << count << ") class pos [" << pos << " size " << rule.matchedLength() << "]";
+			QStringRef subString(&text, pos, rule.matchedLength());
+			answ.append(subString.toString());
+			++count;
+			pos += rule.matchedLength();
+		}
+		return answ;
 	}
 
 	QStringList CodeEditor::regexpText(const QString &text, QString regexpRule)
@@ -63,16 +99,32 @@ namespace Jui
 
 	void CodeEditor::highlightText(QString text, QColor color)
 	{
-		QTextFormat format;
-		format.setForeground(QBrush(color, Qt::SolidPattern));
+		if (!prEdit)
+		{
+			//QString txt = this->toPlainText();
+			prEdit = true;
+			QTextCursor cursor = this->textCursor();
+			int pos = cursor.position();
 
+			qDebug() << cursor.position();
 
-		for (int i = 0; i < text.length(); ++i) {
-			if (!text.at(i).isLetterOrNumber())
-			{
-				//setFormat(i, 1, Qt::green);
-				//qDebug() << "highlight: " << text.at(i);
-			}
+			QTextCharFormat format;
+			format.setFontWeight(QFont::Normal);
+			format.setForeground(QBrush(QColor("white")));
+
+			cursor.setPosition(0, QTextCursor::MoveMode::MoveAnchor);
+			cursor.setPosition(text.size(), QTextCursor::MoveMode::KeepAnchor);
+			cursor.setCharFormat(format);
+
+			format.setFontWeight(QFont::DemiBold);
+			format.setForeground(QBrush(QColor("red")));
+
+			cursor.setPosition(pos, QTextCursor::MoveMode::MoveAnchor);
+			cursor.setPosition(pos + 2, QTextCursor::MoveMode::KeepAnchor);
+			cursor.setCharFormat(format);
+
+			cursor.setPosition(pos, QTextCursor::MoveMode::MoveAnchor);
+			prEdit = false;
 		}
 	}
 
@@ -83,10 +135,12 @@ namespace Jui
 
 	bool CodeEditor::eventFilter(QObject* target, QEvent* event)
 	{
+
 		if (event->type() == QEvent::KeyPress)
 		{
-			QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
+			prEdit = false;
 
+			QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
 			quint32 modifers = eventKey->nativeModifiers();
 
 			switch (eventKey->key())
@@ -105,6 +159,7 @@ namespace Jui
 
 					emit sendText(this->toPlainText());
 
+
 					qDebug() << "KeyEvent: Ctrl+ENTER PRESSED (modifer" << eventKey->modifiers() << ")";
 					return true;
 					break;
@@ -115,6 +170,14 @@ namespace Jui
 				return true;
 				break;
 			}
+		}
+
+		if (event->type() == QEvent::KeyRelease)
+		{
+			//if (!prEdit)
+			//{
+				highlightText(this->toPlainText(), Qt::red);
+			//}
 		}
 
 		return QTextEdit::eventFilter(target, event);
