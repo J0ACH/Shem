@@ -34,12 +34,10 @@ namespace QuantIDE
 
 	public slots:
 		void fitGeometry();
-		void reciveText(QString);
 
-		void onClasses(QStringList);
-		void onSymbol(QStringList);
-		void onFloat(QStringList);
-
+		void onReciveText(QString);
+		void onRecivedControls(QStringList);
+		
 		void changeNodePlay();
 
 	signals:
@@ -54,10 +52,10 @@ namespace QuantIDE
 		void initControl();
 
 		QLabel *nameLabel;
+		QLabel *labelControls;
 		CodeEditor *sourceCode;
 		Button *closeButton, *playButton;
 		
-		QLabel *labelClasses, *labelSymbols, *labelFloats;
 	};
 }
 

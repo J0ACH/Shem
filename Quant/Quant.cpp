@@ -89,7 +89,7 @@ namespace QuantIDE
 		buttServer->setToolTip("Server");
 
 		globalCode = new CodeEditor(nodePanel);
-		globalCode->setText("ScGlobal editor (use Ctrl+Enter to evaluate code)");
+		globalCode->setText("scGlobal editor (use ctrl+enter to evaluate code)");
 	}
 
 	void Quant::fitGeometry()

@@ -11,13 +11,12 @@ namespace QuantIDE
 
 		stateNodePlay = StateNodePlay::FREE;
 
-		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(reciveText(QString)));
 		connect(playButton, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
 
-		connect(sourceCode, SIGNAL(classesAct(QStringList)), this, SLOT(onClasses(QStringList)));
-		connect(sourceCode, SIGNAL(symbolsAct(QStringList)), this, SLOT(onSymbol(QStringList)));
-		connect(sourceCode, SIGNAL(floatsAct(QStringList)), this, SLOT(onFloat(QStringList)));
+		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(onReciveText(QString)));
+		connect(sourceCode, SIGNAL(sendControlsAct(QStringList)), this, SLOT(onRecivedControls(QStringList)));
+		
 	}
 
 	QRect Node::bounds()
@@ -40,11 +39,7 @@ namespace QuantIDE
 		playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
 
 		sourceCode = new CodeEditor(this);
-
-		labelClasses = new QLabel(this);
-		labelSymbols = new QLabel(this);
-		labelFloats = new QLabel(this);
-		
+		labelControls = new QLabel(this);
 	}
 
 	void Node::setName(QString name) { nameLabel->setText(name); }
@@ -52,7 +47,7 @@ namespace QuantIDE
 
 	void Node::setSourceCode(QString code) { sourceCode->setText(code); }
 
-	void Node::reciveText(QString text)
+	void Node::onReciveText(QString text)
 	{
 		QString code;
 		code = tr("~%1 = NodeProxy.audio(s, 2)").arg(name());
@@ -62,35 +57,15 @@ namespace QuantIDE
 		emit evaluateAct(code);
 	}
 
-	void Node::onClasses(QStringList classes) 
-	{ 
-		QString txt = "Classes: ";
-		for (int i = 0; i < classes.size(); i = i+1)
-		{
-			txt += classes.at(i);
-			txt += "; ";
-		}		
-		labelClasses->setText(txt);
-	}
-	void Node::onSymbol(QStringList controls) 
+	void Node::onRecivedControls(QStringList controls)
 	{
-		QString txt = "Controls: ";
+		QString txt = "NamedControls: ";
 		for (int i = 0; i < controls.size(); i = i + 1)
 		{
 			txt += controls.at(i);
-			txt += "; ";
+			txt += " ; ";
 		}
-		labelSymbols->setText(txt);
-	}
-	void Node::onFloat(QStringList digits) 
-	{
-		QString txt = "Digits: ";
-		for (int i = 0; i < digits.size(); i = i + 1)
-		{
-			txt += digits.at(i);
-			txt += "; ";
-		}
-		labelFloats->setText(txt);
+		labelControls->setText(txt);
 	}
 
 	void Node::changeNodePlay()
@@ -123,9 +98,7 @@ namespace QuantIDE
 		playButton->setGeometry(90, 10, 40, 20);
 		sourceCode->setGeometry(10, 75, width() - 20, 80);
 
-		labelClasses->setGeometry(150, 5, 180, 20);
-		labelSymbols->setGeometry(150, 25, 180, 20);
-		labelFloats->setGeometry(150, 45, 180, 20);
+		labelControls->setGeometry(10, this->height() - 25, 180, 20);
 	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)

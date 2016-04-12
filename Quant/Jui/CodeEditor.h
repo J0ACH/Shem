@@ -10,7 +10,7 @@
 
 namespace Jui
 {
-	enum class HighLights {CLASS, CONTROL, NODE, DIGIT};
+	enum class HighLights { CLASS, CONTROL, NODE, DIGIT };
 
 	class CodeEditor : public QTextEdit
 	{
@@ -28,11 +28,8 @@ namespace Jui
 
 	signals:
 		void sendText(QString);
-
-		void classesAct(QStringList);
-		void symbolsAct(QStringList);
-		void floatsAct(QStringList);
-
+		void sendControlsAct(QStringList);
+		
 	protected:
 		virtual bool eventFilter(QObject * watched, QEvent * event);
 		void paintEvent(QPaintEvent *paintEvent);
@@ -46,11 +43,8 @@ namespace Jui
 
 		QColor normalColor, overColor, activeColor;
 
-		QStringList regexpText(const QString &, QString regexpRule);
-		QStringList regexpText2(HighLights type);
-		void highlightText(QString, QColor);
-
-		bool prEdit;
+		QList<QList<QVariant>*> regexpText(HighLights type);
+		void highlightText(int, int, QTextCharFormat);
 	};
 
 }

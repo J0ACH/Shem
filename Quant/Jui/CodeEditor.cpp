@@ -15,8 +15,6 @@ namespace Jui
 		overColor = QColor(230, 230, 230);
 		activeColor = QColor(50, 65, 95);
 
-		prEdit = false;
-
 		append(tr("CodeEditor init..."));
 
 		backgroundAlpha = 0;
@@ -30,144 +28,97 @@ namespace Jui
 
 	void CodeEditor::fitTextFormat()
 	{
-		QStringList classes = regexpText(this->toPlainText(), "\\b[A-Z]\\w*");
-		QStringList symbols = regexpText(this->toPlainText(), "\\\\\\w*");
-		QStringList nodes = regexpText(this->toPlainText(), "~\\w+");
-		QStringList floats = regexpText(this->toPlainText(), "\\b((\\d+(\\.\\d+)?([eE][-+]?\\d+)?(pi)?)|pi)\\b");
+		QTextCharFormat formatCommonText;
+		formatCommonText.setFontWeight(QFont::Normal);
+		formatCommonText.setForeground(QBrush(QColor(120, 120, 120)));
+		this->highlightText(0, this->toPlainText().size(), formatCommonText );
 
-		qDebug() << "found class: " << classes;
-		qDebug() << "found symbols: " << symbols;
-		qDebug() << "found nodes: " << nodes;
-		qDebug() << "found floats: " << floats;
+		QList<QList<QVariant>*> classes = regexpText(HighLights::CLASS);
+		QList<QList<QVariant>*> digits = regexpText(HighLights::DIGIT);
+		QList<QList<QVariant>*> controls = regexpText(HighLights::CONTROL);
+		//QList<QList<QVariant>*> nodes = regexpText(HighLights::NODE);
 
-		emit classesAct(regexpText2(HighLights::CLASS));
-		emit symbolsAct(regexpText2(HighLights::CONTROL));
-		emit floatsAct(regexpText2(HighLights::DIGIT));
+		
+		QStringList namedControls;
+		QListIterator<QList<QVariant>*> j(controls);
+		while (j.hasNext())
+		{
+			QList<QVariant> *test = j.next();
+			QString txt = test->at(0).toString();
+			int position = test->at(1).toInt();
+			int lenght = test->at(2).toInt();
 
-		highlightText(this->toPlainText(), Qt::red);
-	}
+			namedControls.append(txt);
+		}
+		emit sendControlsAct(namedControls);
+			}
 
-	QStringList CodeEditor::regexpText2(HighLights typeHighLights)
+	QList<QList<QVariant>*> CodeEditor::regexpText(HighLights typeHighLight)
 	{
+		QTextCharFormat format;
 		QString regexpRule;
-		switch (typeHighLights)
+		switch (typeHighLight)
 		{
 		case Jui::HighLights::CLASS:
 			regexpRule = "\\b[A-Z]\\w*";
+			format.setFontWeight(QFont::Normal);
+			format.setForeground(QBrush(QColor(180, 180, 180)));
 			break;
 		case Jui::HighLights::CONTROL:
 			regexpRule = "\\\\\\w*";
+			format.setFontWeight(QFont::DemiBold);
+			format.setForeground(QBrush(QColor(20, 180, 240)));
 			break;
 		case Jui::HighLights::NODE:
 			regexpRule = "~\\w+";
+			format.setFontWeight(QFont::Normal);
+			format.setForeground(QBrush(Qt::green));
 			break;
 		case Jui::HighLights::DIGIT:
+			format.setFontWeight(QFont::Normal);
 			regexpRule = "\\b((\\d+(\\.\\d+)?([eE][-+]?\\d+)?(pi)?)|pi)\\b";
+			format.setForeground(QBrush(QColor(20, 110, 180)));
 			break;
 		}
 
 		QString text = this->toPlainText();
-		QStringList answ;
-			
-		QList<QPair<int, int>*> answ2;		
-		QList<QList<QVariant>*> answ3;
-
+		QList<QList<QVariant>*> answ;
 		QRegExp rule(regexpRule);
 		int count = 0;
-		int pos = 0;
-		while ((pos = rule.indexIn(text, pos)) != -1) {
-			
-			QPair<int, int> *range = new QPair<int, int>();
-			range->first = pos;
-			range->second = rule.matchedLength();
-			answ2.append(range);
-
-
-		
-			qDebug() << count << ") class pos" << range->first << " to " << range->second;
-			//qDebug() << count << ") class pos [" << pos << " size " << rule.matchedLength() << "]";
-			QStringRef subString(&text, pos, rule.matchedLength());
-			answ.append(subString.toString());
-
-
+		int position = 0;
+		while ((position = rule.indexIn(text, position)) != -1)
+		{
+			QStringRef subString(&text, position, rule.matchedLength());
 			QList<QVariant> *oneReg = new QList<QVariant>();
 			oneReg->append(subString.toString());
-			oneReg->append(pos);
+			oneReg->append(position);
 			oneReg->append(rule.matchedLength());
-			answ3.append(oneReg);
+			answ.append(oneReg);
+
+			this->highlightText(position, rule.matchedLength(), format);
 
 			++count;
-			pos += rule.matchedLength();
+			position += rule.matchedLength();
 		}
-
-		/*
-		QListIterator<QPair<int, int>*> i(answ2);
-		while (i.hasNext())
-		{
-			QPair<int, int> *pair = i.next();
-			//qDebug() << count << ") 2NDtry class pos" << pair->first << " to " << pair->second;
-				}
-		*/
-		
-		QListIterator<QList<QVariant>*> j(answ3);
-		while (j.hasNext())
-		{
-			QList<QVariant> *test = j.next();
-			
-			qDebug() << "3NDtry class " << test->at(0) << " pos " << test->at(1) << " to " << test->at(2);
-
-		}
-
 
 		return answ;
 	}
-
-	QStringList CodeEditor::regexpText(const QString &text, QString regexpRule)
+	
+	void CodeEditor::highlightText(int position, int lenght, QTextCharFormat format)
 	{
-		QStringList answ;
-		QRegExp rule(regexpRule);
-		int count = 0;
-		int pos = 0;
-		while ((pos = rule.indexIn(text, pos)) != -1) {
-			//qDebug() << count << ") class pos [" << pos << " size " << rClass.matchedLength() << "]";
-			QStringRef subString(&text, pos, rule.matchedLength());
-			answ.append(subString.toString());
-			++count;
-			pos += rule.matchedLength();
-		}
-		return answ;
-	}
+			disconnect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
 
-	void CodeEditor::highlightText(QString text, QColor color)
-	{
-		if (!prEdit)
-		{
-			//QString txt = this->toPlainText();
-			prEdit = true;
 			QTextCursor cursor = this->textCursor();
-			int pos = cursor.position();
-
-			qDebug() << cursor.position();
-
-			QTextCharFormat format;
-			format.setFontWeight(QFont::Normal);
-			format.setForeground(QBrush(QColor("white")));
-
-			cursor.setPosition(0, QTextCursor::MoveMode::MoveAnchor);
-			cursor.setPosition(text.size(), QTextCursor::MoveMode::KeepAnchor);
+			int cursorPositionBackup = cursor.position();
+			
+			cursor.setPosition(position, QTextCursor::MoveMode::MoveAnchor);
+			cursor.setPosition(position + lenght, QTextCursor::MoveMode::KeepAnchor);
 			cursor.setCharFormat(format);
 
-			format.setFontWeight(QFont::DemiBold);
-			format.setForeground(QBrush(QColor("red")));
-
-			cursor.setPosition(pos, QTextCursor::MoveMode::MoveAnchor);
-			cursor.setPosition(pos + 2, QTextCursor::MoveMode::KeepAnchor);
-			cursor.setCharFormat(format);
-
-			cursor.setPosition(pos, QTextCursor::MoveMode::MoveAnchor);
-			prEdit = false;
+			cursor.setPosition(cursorPositionBackup, QTextCursor::MoveMode::MoveAnchor);
+			
+			connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
 		}
-	}
 
 	void CodeEditor::setBackground(const QColor & color)
 	{
@@ -176,11 +127,8 @@ namespace Jui
 
 	bool CodeEditor::eventFilter(QObject* target, QEvent* event)
 	{
-
 		if (event->type() == QEvent::KeyPress)
 		{
-			prEdit = false;
-
 			QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
 			quint32 modifers = eventKey->nativeModifiers();
 
@@ -215,10 +163,8 @@ namespace Jui
 
 		if (event->type() == QEvent::KeyRelease)
 		{
-			//if (!prEdit)
-			//{
-			highlightText(this->toPlainText(), Qt::red);
-			//}
+			//highlightText(this->toPlainText(), Qt::red);
+			//fitTextFormat();
 		}
 
 		return QTextEdit::eventFilter(target, event);
