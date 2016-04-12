@@ -53,8 +53,7 @@ namespace QuantIDE
 		void onServerKillDone();
 
 		void fitGeometry();
-		void addNode();
-
+		
 	protected:
 		void closeEvent(QCloseEvent *event);
 		void paintEvent(QPaintEvent *event);

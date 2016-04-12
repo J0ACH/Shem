@@ -36,6 +36,10 @@ namespace QuantIDE
 		void fitGeometry();
 		void reciveText(QString);
 
+		void onClasses(QStringList);
+		void onSymbol(QStringList);
+		void onFloat(QStringList);
+
 		void changeNodePlay();
 
 	signals:
@@ -51,9 +55,9 @@ namespace QuantIDE
 
 		QLabel *nameLabel;
 		CodeEditor *sourceCode;
-		Button *closeButton;
-		Button *buttNodePlay;
+		Button *closeButton, *playButton;
 		
+		QLabel *labelClasses, *labelSymbols, *labelFloats;
 	};
 }
 

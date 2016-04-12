@@ -227,10 +227,6 @@ namespace Jui
 		screen = inScreen;
 	}
 
-	void Canvan::setColor_background(QColor color) { }
-
-	void Canvan::setColor_foreground(QColor color) { }
-
 	void Canvan::setVersion(int major = 0, int minor = 0, int patch = 0)
 	{
 		QString text = tr("v%1.%2%3").arg(QString::number(major), QString::number(minor), QString::number(patch));
@@ -313,66 +309,6 @@ namespace Jui
 		//emit resizeAct();
 		//update();
 	}
-
-	/*
-	void Canvan::setCanvanPalette()
-	{
-	backColor = QColor(40, 40, 40);
-	panelColor = QColor(20, 20, 20);
-	textColor = QColor(230, 230, 230);
-	activeColor = QColor(20, 180, 240);
-
-	palette = new QPalette();
-	palette->setColor(QPalette::Window, backColor);
-	palette->setColor(QPalette::WindowText, Qt::white);
-	palette->setColor(QPalette::Base, Qt::transparent);
-	palette->setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-	palette->setColor(QPalette::ToolTipBase, Qt::white);
-	palette->setColor(QPalette::ToolTipText, Qt::white);
-	palette->setColor(QPalette::WindowText, textColor);
-	palette->setColor(QPalette::Text, textColor);
-	palette->setColor(QPalette::Highlight, activeColor);
-	palette->setColor(QPalette::Button, Qt::transparent);
-	palette->setColor(QPalette::Background, panelColor);
-
-	this->setPalette(*palette);
-	}
-	*/
-
-	/*
-	bool Canvan::eventFilter(QObject* target, QEvent* event)
-	{
-	if (target == panelConsole) {
-	if (event->type() == QEvent::Resize) {
-
-	//QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-	QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
-	qDebug() << "Canvan: ConsolePanel resized" << resizeEvent->size();
-	return true;
-	}
-	else {
-	return false;
-	}
-
-	if (event->type() == QEvent::Paint) {
-
-	QPaintEvent *paintEvent = static_cast<QPaintEvent*>(event);
-	qDebug() << "Canvan: ConsolePanel paint";// << paintEvent->rect();
-	}
-	else
-	{
-
-	return false;
-	}
-	}
-	else {
-	// pass the event on to the parent class
-	return QWidget::eventFilter(target, event);
-	}
-
-
-	}
-	*/
 
 	Canvan::~Canvan() {	}
 }

@@ -164,7 +164,7 @@ namespace SupercolliderBridge
 		QByteArray out = QProcess::readAll();
 		QString postString = QString::fromUtf8(out);
 
-		if (postString.startsWith("ERROR:"))
+		if (postString.startsWith("ERROR:") || postString.startsWith("!"))
 		{
 			QStringList msgLines = postString.split("\n");
 			for (int i = 0; i < msgLines.size(); i = i + 1)
@@ -187,7 +187,7 @@ namespace SupercolliderBridge
 				}
 			};
 		}
-		else if (postString.startsWith("WARNING:"))
+		else if (postString.startsWith("WARNING:") || postString.startsWith("?"))
 		{
 			emit msgWarningAct(postString);
 		}
@@ -195,6 +195,10 @@ namespace SupercolliderBridge
 		{
 			QString msg = postString.remove(0, 3);
 			emit msgAnswerAct(tr("ANSWER: %1").arg(msg));
+		}
+		else if (postString.startsWith("***"))
+		{
+			emit msgStatusAct(postString);
 		}
 		else
 		{

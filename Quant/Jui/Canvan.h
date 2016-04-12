@@ -31,15 +31,10 @@ namespace Jui
 		void initControl();
 		void setEdgeControler(EdgeControler::Direction, bool);
 		
-		void setColor_background(QColor);
-		void setColor_foreground(QColor);
-		void drawCanvan(QPaintEvent *event);
 		void addScreen(QWidget *inScreen);
 		
 		QWidget *win;
-		QWidget *header;
-		QWidget *screen;
-		QWidget *tail;
+		QWidget *header, *screen, *tail;
 		
 		Console *mConsole;
 
@@ -47,7 +42,6 @@ namespace Jui
 		void setTailHeight(int);
 		void setTitle(QString titleName);
 		void setLogo(QImage);
-		//void setCanvanPalette();
 		void setCanvanStyleSheet();
 		void setVersion(int major, int minor, int patch);
 				
@@ -59,7 +53,6 @@ namespace Jui
 		void consolePrintAct(QString, QColor, bool);
 				
 	public slots:
-		//void msgConsole(QString);
 		void print(QString, QColor);
 		void println(QString, QColor);
 		
@@ -80,24 +73,16 @@ namespace Jui
 		bool isPressed;
 		bool showScreen;
 
-		int headerSize;
-		int tailSize;
+		int headerSize, tailSize;
 		
-		Button *closeButton;
-		Button *maximizeButton;
-		Button *minimizeButton;
-
+		Button *closeButton, *maximizeButton, *minimizeButton;
 		Edges *edges;
 
 		QImage logo;
 		QLabel *version;
 		//QLabel *title;
 		
-		QPalette *palette;
-		QColor textColor;
-		QColor activeColor;
-		QColor backColor;
-		QColor panelColor;
+		QColor textColor, activeColor, backColor, panelColor;
 
 		QPoint *mCursorGlobal;
 		QPoint *mCursorLocal;

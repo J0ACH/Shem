@@ -10,13 +10,10 @@ namespace Jui
 
 		setFont(QFont("Consolas", 8));
 		setFrameStyle(QFrame::NoFrame);
-		
 
 		normalColor = QColor(120, 120, 120);
 		overColor = QColor(230, 230, 230);
 		activeColor = QColor(50, 65, 95);
-
-		
 
 		append(tr("CodeEditor init..."));
 
@@ -31,7 +28,52 @@ namespace Jui
 
 	void CodeEditor::fitTextFormat()
 	{
-		highlightText(this->toPlainText());
+		QStringList classes = regexpText(this->toPlainText(), "\\b[A-Z]\\w*");
+		QStringList symbols = regexpText(this->toPlainText(), "\\\\\\w*");
+		QStringList nodes = regexpText(this->toPlainText(), "~\\w+");
+		QStringList floats = regexpText(this->toPlainText(), "\\b((\\d+(\\.\\d+)?([eE][-+]?\\d+)?(pi)?)|pi)\\b");
+
+		qDebug() << "found class: " << classes;
+		qDebug() << "found symbols: " << symbols;
+		qDebug() << "found nodes: " << nodes;
+		qDebug() << "found floats: " << floats;
+
+		emit classesAct(classes);
+		emit symbolsAct(symbols);
+		emit floatsAct(floats);
+
+		highlightText(this->toPlainText(), Qt::red);
+	}
+
+	QStringList CodeEditor::regexpText(const QString &text, QString regexpRule)
+	{
+		QStringList answ;
+		QRegExp rule(regexpRule);
+		int count = 0;
+		int pos = 0;
+		while ((pos = rule.indexIn(text, pos)) != -1) {
+			//qDebug() << count << ") class pos [" << pos << " size " << rClass.matchedLength() << "]";
+			QStringRef subString(&text, pos, rule.matchedLength());
+			answ.append(subString.toString());
+			++count;
+			pos += rule.matchedLength();
+		}
+		return answ;
+	}
+
+	void CodeEditor::highlightText(QString text, QColor color)
+	{
+		QTextFormat format;
+		format.setForeground(QBrush(color, Qt::SolidPattern));
+
+
+		for (int i = 0; i < text.length(); ++i) {
+			if (!text.at(i).isLetterOrNumber())
+			{
+				//setFormat(i, 1, Qt::green);
+				//qDebug() << "highlight: " << text.at(i);
+			}
+		}
 	}
 
 	void CodeEditor::setBackground(const QColor & color)
@@ -78,16 +120,7 @@ namespace Jui
 		return QTextEdit::eventFilter(target, event);
 	}
 
-	void CodeEditor::highlightText(const QString &text)
-	{
-		for (int i = 0; i < text.length(); ++i) {
-			if (!text.at(i).isLetterOrNumber())
-			{
-				//setFormat(i, 1, Qt::green);
-				//qDebug() << "highlight: " << text.at(i);
-			}
-		}
-	}
+
 
 	void CodeEditor::paintEvent(QPaintEvent *event)
 	{
@@ -96,7 +129,7 @@ namespace Jui
 		QColor fillColor = activeColor;
 		fillColor.setAlpha(backgroundAlpha);
 		painter.fillRect(bounds, fillColor);
-		
+
 		painter.setPen(QColor(230, 230, 230));
 		painter.drawLine(0, 0, width(), 0);
 		painter.drawLine(0, height() - 1, width(), height() - 1);

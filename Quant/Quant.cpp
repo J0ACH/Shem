@@ -29,15 +29,13 @@ namespace QuantIDE
 		canvan->setHeaderHeight(42);
 		canvan->setTailHeight(34);
 		canvan->setLogo(QImage(":/logo32.png"));
-
-		this->initControl();
-		this->fitGeometry();
-
-		//this->setMouseTracking(true);
-
 		canvan->setTitle("Quant");
 		canvan->setVersion(Quant_VERSION_MAJOR, Quant_VERSION_MINOR, Quant_VERSION_PATCH);
 
+		this->initControl();
+		this->fitGeometry();
+		//this->setMouseTracking(true);
+		
 		// CONTROLS
 		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
 		connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
@@ -154,26 +152,12 @@ namespace QuantIDE
 		onMsgStatus("ScServer kill done...");
 	}
 
-
 	void Quant::paintEvent(QPaintEvent *paintEvent)
 	{
 		QPainter painter(this);
 		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), QColor(20, 20, 20));
 	}
-
-	void Quant::addNode()
-	{
-		onMsgStatus("Node add...");
-	}
-
-	void Quant::closeEvent(QCloseEvent *event)
-	{
-		//bridge->evaluateCode("Server.local.quit;"); // not working?
-//		bridge->killLang();
-		//emit 
-	//	event->accept();
-		canvan->close();
-	}
+	void Quant::closeEvent(QCloseEvent *event)	{ canvan->close(); }
 
 	Quant::~Quant() { }
 }

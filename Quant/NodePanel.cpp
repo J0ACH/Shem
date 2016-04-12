@@ -51,7 +51,7 @@ namespace QuantIDE
 
 		Node *newNode = new Node(scrollWidget);
 		newNode->setName(tr("test%1").arg(QString::number(testID)));
-		newNode->setSourceCode("SinOsc.ar(90!2, mul: Saw.kr(2, 0.5, 0.5))");
+		newNode->setSourceCode("SinOsc.ar(\\freq.kr(90)!2, mul: Saw.kr(2, 0.5, 0.5))");
 		newNode->show();
 
 		connect(this, SIGNAL(resizeAct()), newNode, SLOT(fitGeometry()));
