@@ -14,9 +14,6 @@ namespace QuantIDE
 		testID = 0;
 
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
-		//connect(this, SIGNAL(resizeAct()), testNode1, SLOT(fitGeometry()));
-		//connect(this, SIGNAL(resizeAct()), testNode2, SLOT(fitGeometry()));
-
 		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
 	}
 
@@ -52,6 +49,7 @@ namespace QuantIDE
 		Node *newNode = new Node(scrollWidget);
 		newNode->setName(tr("test%1").arg(QString::number(testID)));
 		newNode->setSourceCode("SinOsc.ar(\\freq.kr(90)!2, mul: Saw.kr(2, 0.5, 0.5))");
+		newNode->connectBridge(mBridge);
 		newNode->show();
 
 		connect(this, SIGNAL(resizeAct()), newNode, SLOT(fitGeometry()));

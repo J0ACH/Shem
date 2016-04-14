@@ -17,6 +17,7 @@ namespace SupercolliderBridge
 {
 	enum class StateInterpret{ OFF, RUNNING };
 	enum class StateServer{ OFF, RUNNING };
+	enum class MessageType{ ERROR, WARNING, STATUS, EVAULATE, RESULT, ANSWER};
 
 	class ScBridge : public QProcess
 	{
@@ -35,8 +36,10 @@ namespace SupercolliderBridge
 		void changeServerState();
 
 		void evaluateCode(QString const & commandString, bool silent = false);
+		void question(QString pattern, QString commandString, bool printAnswer = false);
 
 	signals:
+
 		void interpretBootInitAct();
 		void interpretBootDoneAct();
 		void interpretKillInitAct();
@@ -52,8 +55,10 @@ namespace SupercolliderBridge
 		void msgNormalAct(QString const &);
 		void msgStatusAct(QString const &);
 		void msgEvaluateAct(QString const &);
-		void msgAnswerAct(QString const &);
+		void msgResultAct(QString const &);
 		void msgBundleAct(QString const &);
+
+		void answerAct(QString pattern, QString answer);
 
 		void killBridgeDoneAct();
 
@@ -78,10 +83,10 @@ namespace SupercolliderBridge
 		void startInterpretr();
 		void killInterpreter();
 
-		void onResponse(const QString & selector, const QString & data);
+		void msgFilter(QString msg);
 
-		QString oscFullMsg;
-		bool oscMsgProcess;
+
+		void onResponse(const QString & selector, const QString & data);
 	};
 
 }

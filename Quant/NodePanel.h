@@ -32,8 +32,6 @@ namespace QuantIDE
 
 		QRect bounds();
 
-		//Node *testNode1, *testNode2;
-
 		void setTargetBridge(ScBridge*);
 
 	public slots:

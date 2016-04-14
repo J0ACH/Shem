@@ -18,9 +18,6 @@ namespace SupercolliderBridge
 		stateInterpret = StateInterpret::OFF;
 		stateServer = StateServer::OFF;
 
-		oscMsgProcess = false;
-		oscMsgProcess = "";
-
 		connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 		connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
 	}
@@ -73,18 +70,7 @@ namespace SupercolliderBridge
 		case StateServer::OFF:
 			emit serverBootInitAct();
 			evaluateCode("Server.local = Server.default = s;");
-			//evaluateCode("s.dumpOSC;");
-
-
-			oscFunc = "var msgStart = 'OSCmsgStart '.asString;";
-			oscFunc += "var msgEnd = ' OSCmsgEnd '.asString;";			
-			oscFunc += "var separator = '||'.asString;";
-			oscFunc += "f = { | msg, time, replyAddr, recvPort | if (msg[0] != '/status.reply') { Post << msgStart << separator << time << separator << msg << separator << msgEnd << Char.nl; } };";//Char.nl
-			//oscFunc += "f = { | msg, time, replyAddr, recvPort | Post << msgStart << separator << time << separator << msg << msgEnd ; };";
-			oscFunc += "thisProcess.addOSCRecvFunc(f);"; 
-
-
-			evaluateCode(oscFunc);
+			// evaluateCode("s.dumpOSC;");
 			evaluateCode("s.boot;");
 			break;
 		case StateServer::RUNNING:
@@ -111,6 +97,13 @@ namespace SupercolliderBridge
 		char commandChar = silent ? '\x1b' : '\x0c';
 		emit msgEvaluateAct(tr("EVALUATE: %1").arg(commandString));
 		write(&commandChar, 1);
+	}
+	void ScBridge::question(QString pattern, QString commandString, bool printAnswer)
+	{
+		//QString command = QStringLiteral("[ \"%1\", %2, %3 ]").arg(pattern, commandString, QString::number(printAnswer));
+		QString command = QStringLiteral("[\"QUESTION\",\"%1\",%2,%3]").arg(pattern, commandString, QString::number(printAnswer));
+		qDebug() << "ScBridge::question: " << command;
+		evaluateCode(command, false);
 	}
 
 	void ScBridge::startInterpretr()
@@ -181,103 +174,102 @@ namespace SupercolliderBridge
 		QByteArray out = QProcess::readAll();
 		QString postString = QString::fromUtf8(out);
 
-		emit msgStatusAct("NEW_MSG:");
-		//postString = postString.replace("\r", "|r|\r");
-		//postString = postString.replace("\r", "");
-		//postString = postString.replace("\n", "|n|\n");
-		//postString = postString.replace("\n", "");
-		//postString = postString.replace("\t", "|t|\t");
-		//postString = postString.replace("  ", "|2s|  ");
+		this->msgFilter(postString);
+		/*
 
 		if (postString.startsWith("ERROR:") || postString.startsWith("!"))
 		{
-			QStringList msgLines = postString.split("\n");
-			for (int i = 0; i < msgLines.size(); i = i + 1)
-			{
-				QString msg = msgLines.at(i);
-				msg = msg.replace("\r", "");
+		QStringList msgLines = postString.split("\n");
+		for (int i = 0; i < msgLines.size(); i = i + 1)
+		{
+		QString msg = msgLines.at(i);
+		msg = msg.replace("\r", "");
 
-				if (msg.startsWith("ERROR:"))
-				{
-					emit msgErrorAct(msg);
-				}
-				else if (msg.startsWith("->"))
-				{
-					msg = msg.remove(0, 3);
-					emit msgAnswerAct(tr("ANSWER: %1").arg(msg));
-				}
-				else
-				{
-					emit msgNormalAct(tr("\t- %1").arg(msg));
-				}
-			};
-		}
-		else if (postString.startsWith("WARNING:") || postString.startsWith("?"))
+		if (msg.startsWith("ERROR:"))
 		{
-			emit msgWarningAct(postString);
+		emit msgErrorAct(msg);
 		}
-		else if (postString.startsWith("->"))
+		else if (msg.startsWith("->"))
 		{
-			QString msg = postString.remove(0, 3);
-			emit msgAnswerAct(tr("ANSWER: %1").arg(msg));
-		}
-		else if (postString.startsWith("***"))
-		{
-			emit msgStatusAct(postString);
-		}
-		else if (postString.startsWith("OSCmsgStart "))
-		{
-			emit msgStatusAct("OSC_NEW");
-			oscMsgProcess = true;
-			oscMsgProcess = "";
-			//emit msgBundleAct("BUNDLE:");
-			//QString msg = postString.replace("\r", "|r|");
-			QStringList msgLines = postString.split("\r");
-			for (int i = 0; i < msgLines.size(); i = i + 1)
-			{
-				QString msg = msgLines.at(i);
-				msg = msg.replace("\n", "");
-				msg = msg.replace("\r", "");
-				oscFullMsg += msg;
-				//msg = msg.replace("\n", "|n|");
-				//emit msgBundleAct(tr("\t%1) %2").arg(QString::number(i), msg));
-				//emit msgBundleAct(msg);
-			}
-		}
-		else if (postString.endsWith(" OSCmsgEnd "))
-		{
-			//emit msgBundleAct("BUNDLE:");
-			//QString msg = postString.replace("\r", "|r|");
-			QStringList msgLines = postString.split("\r");
-			for (int i = 0; i < msgLines.size(); i = i + 1)
-			{
-				QString msg = msgLines.at(i);
-				msg = msg.replace("\n", "");
-				msg = msg.replace("\r", "");
-				//oscFullMsg += msg;
-				//msg = msg.replace("\n", "|n|");
-				
-				//emit msgBundleAct(msg);
-			}
-			emit msgBundleAct(tr("BUNDLE: %1").arg(oscFullMsg));
-			oscMsgProcess = false;
-			emit msgStatusAct("OSC_END");
+		msg = msg.remove(0, 3);
+		emit msgResultAct(tr("ANSWER: %1").arg(msg));
 		}
 		else
 		{
-			if (oscMsgProcess)
-			{ 	
-				QStringList msgLines = postString.split("\r");
-				for (int i = 0; i < msgLines.size(); i = i + 1)
-				{
-					QString msg = msgLines.at(i);
-					msg = msg.replace("\n", "");
-					msg = msg.replace("\r", "");
-					//oscFullMsg += msg;
-				}
-			};
-			emit msgNormalAct(postString);
+		emit msgNormalAct(tr("\t- %1").arg(msg));
+		}
 		};
+		}
+		else if (postString.startsWith("WARNING:") || postString.startsWith("?"))
+		{
+		emit msgWarningAct(postString);
+		}
+
+		else if (postString.startsWith("->"))
+		{
+		QString msg = postString.remove(0, 3);
+		emit msgResultAct(tr("RESULT: %1").arg(msg));
+		}
+
+		else if (postString.startsWith("***")) { emit msgStatusAct(postString); }
+		else if (postString.contains("->"))
+		{
+		qDebug() << "ANSWER: " << postString;
+		//QString msg = postString.remove(0, 3);
+		emit answerAct(postString, "TEST");
+		}
+		else if (postString.startsWith("\r\n[ \"#bundle\"")) // neni 100%
+		{
+		emit msgBundleAct(postString);
+		}
+		else { emit msgNormalAct(postString); };
+		*/
+	}
+
+	void ScBridge::msgFilter(QString msg)
+	{
+		qDebug() << "msg: " << msg;
+
+		if (msg.contains("ERROR"))
+		{
+			emit msgErrorAct(msg);
+			/*
+			QStringList msgLines = postString.split("\n");
+			for (int i = 0; i < msgLines.size(); i = i + 1)
+			{
+			QString msg = msgLines.at(i);
+			msg = msg.replace("\r", "");
+
+			if (msg.startsWith("ERROR:"))
+			{
+			emit msgErrorAct(msg);
+			}
+			else
+			{
+			//emit
+			}
+			*/
+		}
+		else if (msg.contains("WARNING")) { emit msgWarningAct(msg); }
+		else if (msg.contains("***")) { emit msgStatusAct(msg); }
+		else if (msg.contains("->"))
+		{
+			if (msg.contains("QUESTION"))
+			{
+				QStringList msgParts = msg.split(",");
+				for (int i = 0; i < msgParts.size(); i = i + 1)
+				{
+					QString onePart = msgParts.at(i);
+					qDebug() << "msgParts: " << QString::number(i) << ") " << onePart;
+				}
+				QString pattern = msgParts[1].replace(" ", "");
+				QString answer = msgParts[2].replace(" ", "");
+				emit answerAct(pattern, answer);
+			}
+			else { emit msgResultAct(msg); }
+		}
+		else if (msg.contains("bundle")) { emit msgBundleAct(msg); }
+		else { emit msgNormalAct(msg); }
 	}
 
 	void ScBridge::onNewIpcConnection()

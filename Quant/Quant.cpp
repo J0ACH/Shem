@@ -48,7 +48,7 @@ namespace QuantIDE
 		connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
 		connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
 		connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
-		connect(bridge, SIGNAL(msgAnswerAct(QString)), this, SLOT(onMsgAnswer(QString)));
+		connect(bridge, SIGNAL(msgResultAct(QString)), this, SLOT(onMsgResult(QString)));
 		connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
 		connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
 		connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
@@ -108,7 +108,7 @@ namespace QuantIDE
 	void Quant::onMsgNormal(QString msg) { emit println(msg, QColor(120, 120, 120)); }
 	void Quant::onMsgStatus(QString msg) { emit println(msg, QColor(230, 230, 230)); }
 	void Quant::onMsgEvaluate(QString msg) { emit println(msg, QColor(30, 130, 230)); }
-	void Quant::onMsgAnswer(QString msg) { emit println(msg, QColor(30, 230, 30)); }
+	void Quant::onMsgResult(QString msg) { emit println(msg, QColor(30, 230, 30)); }
 	void Quant::onMsgError(QString msg) { emit println(msg, QColor(230, 30, 30)); }
 	void Quant::onMsgWarning(QString msg) { emit println(msg, QColor(230, 130, 30)); }
 	void Quant::onMsgBundle(QString msg) { emit println(msg, QColor(170, 160, 20)); }

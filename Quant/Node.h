@@ -1,6 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include "CodeEditor.h"
+#include "ScBridge.h"
+
 #include <QWidget>
 #include <QPushButton>
 #include <QLabel>
@@ -8,8 +11,9 @@
 #include <QTextEdit>
 #include <QDebug>
 
-#include "CodeEditor.h"
+
 using namespace Jui;
+using namespace SupercolliderBridge;
 
 namespace QuantIDE
 {
@@ -25,6 +29,7 @@ namespace QuantIDE
 
 		StateNodePlay stateNodePlay;
 
+		void connectBridge(ScBridge*);
 		void setName(QString);
 		void setSourceCode(QString);
 
@@ -37,12 +42,15 @@ namespace QuantIDE
 
 		void onReciveText(QString);
 		void onRecivedControls(QStringList);
+
+		void onBridgeAnswer(QString, QString);
 		
 		void changeNodePlay();
 
 	signals:
 		void evaluateAct(QString);
 		void killAct(QString);
+		void idNodeAct(QString, QString, bool);
 
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -50,6 +58,9 @@ namespace QuantIDE
 
 	private:
 		void initControl();
+		QString objectPattern;
+
+		ScBridge *mBridge;
 
 		QLabel *nameLabel;
 		QLabel *labelControls;

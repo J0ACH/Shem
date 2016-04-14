@@ -2,9 +2,12 @@
 
 namespace QuantIDE
 {
-	Node::Node(QWidget *parent) : QWidget(parent)
+	Node::Node(QWidget *parent) :
+		QWidget(parent),
+		mBridge(NULL)
 	{
 		setObjectName("Node");
+		objectPattern = QString::null;
 
 		this->initControl();
 		this->fitGeometry();
@@ -16,7 +19,7 @@ namespace QuantIDE
 
 		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(onReciveText(QString)));
 		connect(sourceCode, SIGNAL(sendControlsAct(QStringList)), this, SLOT(onRecivedControls(QStringList)));
-		
+
 	}
 
 	QRect Node::bounds()
@@ -42,6 +45,16 @@ namespace QuantIDE
 		labelControls = new QLabel(this);
 	}
 
+	void Node::connectBridge(ScBridge *bridge)
+	{
+		mBridge = bridge;
+		connect(this, SIGNAL(idNodeAct(QString, QString, bool)), mBridge, SLOT(question(QString, QString, bool)));
+		connect(mBridge, SIGNAL(answerAct(QString, QString)), this, SLOT(onBridgeAnswer(QString, QString)));
+
+
+
+	}
+
 	void Node::setName(QString name) { nameLabel->setText(name); }
 	QString Node::name() { return nameLabel->text(); }
 
@@ -57,6 +70,13 @@ namespace QuantIDE
 		emit evaluateAct(code);
 	}
 
+	void Node::onBridgeAnswer(QString pattern, QString answer)
+	{
+		//QStringList key = pattern.split("/");
+		qDebug() << "Node::onBridgeAnswer: " << pattern << answer;
+		if (pattern == objectPattern) { labelControls->setText(tr("nodeID: %1").arg(answer)); }
+	}
+
 	void Node::onRecivedControls(QStringList controls)
 	{
 		QString txt = "NamedControls: ";
@@ -65,7 +85,7 @@ namespace QuantIDE
 			txt += controls.at(i);
 			txt += " ; ";
 		}
-		labelControls->setText(txt);
+		//labelControls->setText(txt);
 	}
 
 	void Node::changeNodePlay()
@@ -89,6 +109,11 @@ namespace QuantIDE
 			emit evaluateAct(code);
 			break;
 		}
+
+		objectPattern = tr("%1/%2").arg(this->objectName(), name());
+		QString questionCode = tr("~%1.nodeID").arg(name());
+		qDebug() << "Node::changeNodePlay: " << objectPattern << questionCode;
+		emit idNodeAct(objectPattern, questionCode, true);
 	}
 
 	void Node::fitGeometry()

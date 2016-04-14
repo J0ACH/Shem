@@ -38,7 +38,7 @@ namespace QuantIDE
 		void onMsgNormal(QString);
 		void onMsgStatus(QString);
 		void onMsgEvaluate(QString);
-		void onMsgAnswer(QString);
+		void onMsgResult(QString);
 		void onMsgError(QString);
 		void onMsgWarning(QString);
 		void onMsgBundle(QString);
