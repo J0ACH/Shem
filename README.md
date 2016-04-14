@@ -12,7 +12,7 @@ _Custom live-coding environment written in QT._
 
 ##dependencies
 
- * QT 5.3.2
+ * QT 5.5.x (64-bit)
  * SuperCollider 3.7
  * CMake 3.4
 
