@@ -3,6 +3,13 @@ _Custom live-coding environment written in QT._
 
 ![alt tag](http://i.imgur.com/qE4dD9I.png)
 
+##features and TODOs
+
+ * multiplatoform environment for livecoding practice
+ * ScBridge library, connects C++ with SuperCollider
+ * Custom GUI, for mutliuser live-coding sessions (TODO)
+ * Textual recording of session (TODO)
+
 ##dependencies
 
  * QT 5.3.2
