@@ -18,6 +18,9 @@ namespace SupercolliderBridge
 		stateInterpret = StateInterpret::OFF;
 		stateServer = StateServer::OFF;
 
+		oscMsgProcess = false;
+		oscMsgProcess = "";
+
 		connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 		connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
 	}
@@ -63,11 +66,25 @@ namespace SupercolliderBridge
 	}
 	void ScBridge::changeServerState()
 	{
+		QString oscFunc;
+
 		switch (stateServer)
 		{
 		case StateServer::OFF:
 			emit serverBootInitAct();
 			evaluateCode("Server.local = Server.default = s;");
+			//evaluateCode("s.dumpOSC;");
+
+
+			oscFunc = "var msgStart = 'OSCmsgStart '.asString;";
+			oscFunc += "var msgEnd = ' OSCmsgEnd '.asString;";			
+			oscFunc += "var separator = '||'.asString;";
+			oscFunc += "f = { | msg, time, replyAddr, recvPort | if (msg[0] != '/status.reply') { Post << msgStart << separator << time << separator << msg << separator << msgEnd << Char.nl; } };";//Char.nl
+			//oscFunc += "f = { | msg, time, replyAddr, recvPort | Post << msgStart << separator << time << separator << msg << msgEnd ; };";
+			oscFunc += "thisProcess.addOSCRecvFunc(f);"; 
+
+
+			evaluateCode(oscFunc);
 			evaluateCode("s.boot;");
 			break;
 		case StateServer::RUNNING:
@@ -164,6 +181,14 @@ namespace SupercolliderBridge
 		QByteArray out = QProcess::readAll();
 		QString postString = QString::fromUtf8(out);
 
+		emit msgStatusAct("NEW_MSG:");
+		//postString = postString.replace("\r", "|r|\r");
+		//postString = postString.replace("\r", "");
+		//postString = postString.replace("\n", "|n|\n");
+		//postString = postString.replace("\n", "");
+		//postString = postString.replace("\t", "|t|\t");
+		//postString = postString.replace("  ", "|2s|  ");
+
 		if (postString.startsWith("ERROR:") || postString.startsWith("!"))
 		{
 			QStringList msgLines = postString.split("\n");
@@ -200,8 +225,57 @@ namespace SupercolliderBridge
 		{
 			emit msgStatusAct(postString);
 		}
+		else if (postString.startsWith("OSCmsgStart "))
+		{
+			emit msgStatusAct("OSC_NEW");
+			oscMsgProcess = true;
+			oscMsgProcess = "";
+			//emit msgBundleAct("BUNDLE:");
+			//QString msg = postString.replace("\r", "|r|");
+			QStringList msgLines = postString.split("\r");
+			for (int i = 0; i < msgLines.size(); i = i + 1)
+			{
+				QString msg = msgLines.at(i);
+				msg = msg.replace("\n", "");
+				msg = msg.replace("\r", "");
+				oscFullMsg += msg;
+				//msg = msg.replace("\n", "|n|");
+				//emit msgBundleAct(tr("\t%1) %2").arg(QString::number(i), msg));
+				//emit msgBundleAct(msg);
+			}
+		}
+		else if (postString.endsWith(" OSCmsgEnd "))
+		{
+			//emit msgBundleAct("BUNDLE:");
+			//QString msg = postString.replace("\r", "|r|");
+			QStringList msgLines = postString.split("\r");
+			for (int i = 0; i < msgLines.size(); i = i + 1)
+			{
+				QString msg = msgLines.at(i);
+				msg = msg.replace("\n", "");
+				msg = msg.replace("\r", "");
+				//oscFullMsg += msg;
+				//msg = msg.replace("\n", "|n|");
+				
+				//emit msgBundleAct(msg);
+			}
+			emit msgBundleAct(tr("BUNDLE: %1").arg(oscFullMsg));
+			oscMsgProcess = false;
+			emit msgStatusAct("OSC_END");
+		}
 		else
 		{
+			if (oscMsgProcess)
+			{ 	
+				QStringList msgLines = postString.split("\r");
+				for (int i = 0; i < msgLines.size(); i = i + 1)
+				{
+					QString msg = msgLines.at(i);
+					msg = msg.replace("\n", "");
+					msg = msg.replace("\r", "");
+					//oscFullMsg += msg;
+				}
+			};
 			emit msgNormalAct(postString);
 		};
 	}
@@ -261,6 +335,8 @@ namespace SupercolliderBridge
 		static QString introspectionSelector("introspection");
 		static QString classLibraryRecompiledSelector("classLibraryRecompiled");
 		static QString requestCurrentPathSelector("requestCurrentPath");
+
+		emit msgStatusAct(tr("SELECTOR: %1").arg(selector));
 
 		if (selector == serverRunningSelector)
 		{

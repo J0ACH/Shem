@@ -12,6 +12,7 @@ namespace Jui
 		text = new QTextEdit(this);
 		text->setReadOnly(true);
 		text->setOverwriteMode(false);
+		text->setTabStopWidth(30);
 		text->setFont(QFont("Consolas", 8));
 		text->setFrameStyle(QFrame::NoFrame);
 

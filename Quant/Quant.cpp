@@ -51,6 +51,7 @@ namespace QuantIDE
 		connect(bridge, SIGNAL(msgAnswerAct(QString)), this, SLOT(onMsgAnswer(QString)));
 		connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
 		connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
+		connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
 
 		// INTERPRET actions
 		connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(changeInterpretState()));
@@ -89,7 +90,7 @@ namespace QuantIDE
 		buttServer->setToolTip("Server");
 
 		globalCode = new CodeEditor(nodePanel);
-		globalCode->setText("scGlobal editor (use ctrl+enter to evaluate code)");
+		globalCode->setText("s.sendMsg('/g_dumpTree', 0, 1)");
 	}
 
 	void Quant::fitGeometry()
@@ -110,6 +111,7 @@ namespace QuantIDE
 	void Quant::onMsgAnswer(QString msg) { emit println(msg, QColor(30, 230, 30)); }
 	void Quant::onMsgError(QString msg) { emit println(msg, QColor(230, 30, 30)); }
 	void Quant::onMsgWarning(QString msg) { emit println(msg, QColor(230, 130, 30)); }
+	void Quant::onMsgBundle(QString msg) { emit println(msg, QColor(170, 160, 20)); }
 	
 	// INTERPRET
 
@@ -161,4 +163,5 @@ namespace QuantIDE
 
 	Quant::~Quant() { }
 }
+
 

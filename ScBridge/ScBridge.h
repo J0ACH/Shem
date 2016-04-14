@@ -53,6 +53,7 @@ namespace SupercolliderBridge
 		void msgStatusAct(QString const &);
 		void msgEvaluateAct(QString const &);
 		void msgAnswerAct(QString const &);
+		void msgBundleAct(QString const &);
 
 		void killBridgeDoneAct();
 
@@ -78,6 +79,9 @@ namespace SupercolliderBridge
 		void killInterpreter();
 
 		void onResponse(const QString & selector, const QString & data);
+
+		QString oscFullMsg;
+		bool oscMsgProcess;
 	};
 
 }
