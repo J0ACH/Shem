@@ -18,16 +18,18 @@ using namespace SupercolliderBridge;
 namespace QuantIDE
 {
 	enum class StateNodePlay{ PLAY, STOP, FREE };
-
+	
 	class Node : public QWidget
 	{
 		Q_OBJECT
+
 
 	public:
 		Node(QWidget *parent = 0);
 		~Node();
 
 		StateNodePlay stateNodePlay;
+		enum QuestionType {nodeID, namedControls};
 
 		void connectBridge(ScBridge*);
 		void setName(QString);
@@ -41,17 +43,16 @@ namespace QuantIDE
 		void fitGeometry();
 
 		void onReciveText(QString);
-		void onRecivedControls(QStringList);
-
-		void onBridgeAnswer(QString, QString);
+		void onBridgeQuestion(QuestionType);
+		void onBridgeAnswer(QString pattern, int selectorNum, QString answer);
 		
 		void changeNodePlay();
 
 	signals:
 		void evaluateAct(QString);
 		void killAct(QString);
-		void idNodeAct(QString, QString, bool);
-
+		void bridgeQuestionAct(QString pattern, int selectorNum, QString question, bool print);
+		
 	protected:
 		void closeEvent(QCloseEvent *event);
 		void paintEvent(QPaintEvent *event);
@@ -63,9 +64,11 @@ namespace QuantIDE
 		ScBridge *mBridge;
 
 		QLabel *nameLabel;
-		QLabel *labelControls;
+		QLabel *labelNodeID, *labelNamedControls;
 		CodeEditor *sourceCode;
 		Button *closeButton, *playButton;
+
+		
 		
 	};
 }

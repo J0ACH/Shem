@@ -98,10 +98,14 @@ namespace SupercolliderBridge
 		emit msgEvaluateAct(tr("EVALUATE: %1").arg(commandString));
 		write(&commandChar, 1);
 	}
-	void ScBridge::question(QString pattern, QString commandString, bool printAnswer)
+	void ScBridge::question(QString pattern, int selector, QString commandString, bool printAnswer)
 	{
 		//QString command = QStringLiteral("[ \"%1\", %2, %3 ]").arg(pattern, commandString, QString::number(printAnswer));
-		QString command = QStringLiteral("[\"QUESTION\",\"%1\",%2,%3]").arg(pattern, commandString, QString::number(printAnswer));
+		QString command = QStringLiteral("[\"QUESTION\",\"%1\",%2,%3,%4]").arg(
+			pattern,
+			QString::number(selector),
+			commandString,
+			QString::number(printAnswer));
 		qDebug() << "ScBridge::question: " << command;
 		evaluateCode(command, false);
 	}
@@ -228,7 +232,7 @@ namespace SupercolliderBridge
 
 	void ScBridge::msgFilter(QString msg)
 	{
-		qDebug() << "msg: " << msg;
+	//	qDebug() << "msg: " << msg;
 
 		if (msg.contains("ERROR"))
 		{
@@ -263,8 +267,10 @@ namespace SupercolliderBridge
 					qDebug() << "msgParts: " << QString::number(i) << ") " << onePart;
 				}
 				QString pattern = msgParts[1].replace(" ", "");
-				QString answer = msgParts[2].replace(" ", "");
-				emit answerAct(pattern, answer);
+				int selector = msgParts[2].replace(" ", "").toInt();
+				QString answer = msgParts[3].replace(" ", "");
+				//int iSelector = selector.toInt();
+				emit answerAct(pattern, selector, answer);
 			}
 			else { emit msgResultAct(msg); }
 		}
@@ -328,7 +334,7 @@ namespace SupercolliderBridge
 		static QString classLibraryRecompiledSelector("classLibraryRecompiled");
 		static QString requestCurrentPathSelector("requestCurrentPath");
 
-		emit msgStatusAct(tr("SELECTOR: %1").arg(selector));
+	//	emit msgStatusAct(tr("SELECTOR: %1").arg(selector));
 
 		if (selector == serverRunningSelector)
 		{

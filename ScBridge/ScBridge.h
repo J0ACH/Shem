@@ -36,7 +36,7 @@ namespace SupercolliderBridge
 		void changeServerState();
 
 		void evaluateCode(QString const & commandString, bool silent = false);
-		void question(QString pattern, QString commandString, bool printAnswer = false);
+		void question(QString pattern, int selector, QString commandString, bool printAnswer = false);
 
 	signals:
 
@@ -58,7 +58,7 @@ namespace SupercolliderBridge
 		void msgResultAct(QString const &);
 		void msgBundleAct(QString const &);
 
-		void answerAct(QString pattern, QString answer);
+		void answerAct(QString pattern, int selector, QString answer);
 
 		void killBridgeDoneAct();
 

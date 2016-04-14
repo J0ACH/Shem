@@ -18,8 +18,6 @@ namespace QuantIDE
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
 
 		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(onReciveText(QString)));
-		connect(sourceCode, SIGNAL(sendControlsAct(QStringList)), this, SLOT(onRecivedControls(QStringList)));
-
 	}
 
 	QRect Node::bounds()
@@ -42,20 +40,22 @@ namespace QuantIDE
 		playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
 
 		sourceCode = new CodeEditor(this);
-		labelControls = new QLabel(this);
+		labelNodeID = new QLabel(this);
+		labelNamedControls = new QLabel(this);
 	}
 
 	void Node::connectBridge(ScBridge *bridge)
 	{
 		mBridge = bridge;
-		connect(this, SIGNAL(idNodeAct(QString, QString, bool)), mBridge, SLOT(question(QString, QString, bool)));
-		connect(mBridge, SIGNAL(answerAct(QString, QString)), this, SLOT(onBridgeAnswer(QString, QString)));
-
-
-
+		connect(this, SIGNAL(bridgeQuestionAct(QString, int, QString, bool)), mBridge, SLOT(question(QString, int, QString, bool)));
+		connect(mBridge, SIGNAL(answerAct(QString, int, QString)), this, SLOT(onBridgeAnswer(QString, int, QString)));
 	}
 
-	void Node::setName(QString name) { nameLabel->setText(name); }
+	void Node::setName(QString name)
+	{
+		nameLabel->setText(name);
+		objectPattern = tr("%1/%2").arg(this->objectName(), name);
+	}
 	QString Node::name() { return nameLabel->text(); }
 
 	void Node::setSourceCode(QString code) { sourceCode->setText(code); }
@@ -70,22 +70,47 @@ namespace QuantIDE
 		emit evaluateAct(code);
 	}
 
-	void Node::onBridgeAnswer(QString pattern, QString answer)
+	void Node::onBridgeQuestion(QuestionType selector)
 	{
-		//QStringList key = pattern.split("/");
-		qDebug() << "Node::onBridgeAnswer: " << pattern << answer;
-		if (pattern == objectPattern) { labelControls->setText(tr("nodeID: %1").arg(answer)); }
+		QString questionCode;
+		int selectorNum;
+		
+		switch (selector)
+		{
+		case nodeID:
+			selectorNum = QuestionType::nodeID;
+			questionCode = tr("~%1.nodeID").arg(name());
+			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
+			break;
+		case namedControls:
+			selectorNum = QuestionType::namedControls;
+			questionCode = tr("~%1.source.def.constants").arg(name());
+			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
+			break;
+		}
 	}
 
-	void Node::onRecivedControls(QStringList controls)
+	void Node::onBridgeAnswer(QString pattern, int selectorNum, QString answer)
 	{
-		QString txt = "NamedControls: ";
-		for (int i = 0; i < controls.size(); i = i + 1)
+		qDebug() << "Node::onBridgeAnswer: " << pattern << answer;
+		if (pattern == objectPattern)
 		{
-			txt += controls.at(i);
-			txt += " ; ";
+			QuestionType selector = static_cast<QuestionType>(selectorNum);
+			switch (selector)
+			{
+			case nodeID:
+				qDebug() << "Node::onBridgeAnswer::target: " << selector;
+				labelNodeID->setText(tr("nodeID: %1").arg(answer));
+				break;
+			case namedControls:
+				qDebug() << "Node::onBridgeAnswer::target: " << selector;
+				labelNamedControls->setText(tr("controls: %1").arg(answer));
+				break;
+			default:
+				qDebug() << "Node::onBridgeAnswer::DEFAULT";
+				break;
+			}
 		}
-		//labelControls->setText(txt);
 	}
 
 	void Node::changeNodePlay()
@@ -110,10 +135,8 @@ namespace QuantIDE
 			break;
 		}
 
-		objectPattern = tr("%1/%2").arg(this->objectName(), name());
-		QString questionCode = tr("~%1.nodeID").arg(name());
-		qDebug() << "Node::changeNodePlay: " << objectPattern << questionCode;
-		emit idNodeAct(objectPattern, questionCode, true);
+			onBridgeQuestion(QuestionType::nodeID);
+			onBridgeQuestion(QuestionType::namedControls);
 	}
 
 	void Node::fitGeometry()
@@ -123,7 +146,8 @@ namespace QuantIDE
 		playButton->setGeometry(90, 10, 40, 20);
 		sourceCode->setGeometry(10, 75, width() - 20, 80);
 
-		labelControls->setGeometry(10, this->height() - 25, 180, 20);
+		labelNodeID->setGeometry(10, this->height() - 45, 180, 20);
+		labelNamedControls->setGeometry(10, this->height() - 25, 180, 20);
 	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)
