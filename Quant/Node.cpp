@@ -47,8 +47,20 @@ namespace QuantIDE
 	void Node::connectBridge(ScBridge *bridge)
 	{
 		mBridge = bridge;
+		connect(this, SIGNAL(evaluateAct(QString)), mBridge, SLOT(evaluateCode(QString)));
 		connect(this, SIGNAL(bridgeQuestionAct(QString, int, QString, bool)), mBridge, SLOT(question(QString, int, QString, bool)));
-		connect(mBridge, SIGNAL(answerAct(QString, int, QString)), this, SLOT(onBridgeAnswer(QString, int, QString)));
+		connect(mBridge, SIGNAL(answerAct(QString, int, QStringList)), this, SLOT(onBridgeAnswer(QString, int, QStringList)));
+
+		stateNodePlay = StateNodePlay::STOP;
+		QString code;
+		code = tr("~%1 = NodeProxy.audio(s, 2)").arg(name());
+		emit evaluateAct(code);
+
+		code = tr("~%1[0] = {%2}").arg(name(), sourceCode->toPlainText());
+		emit evaluateAct(code);
+
+		onBridgeQuestion(QuestionType::nodeID);
+		onBridgeQuestion(QuestionType::namedControls);
 	}
 
 	void Node::setName(QString name)
@@ -68,13 +80,15 @@ namespace QuantIDE
 
 		code = tr("~%1[0] = {%2}").arg(name(), text);
 		emit evaluateAct(code);
+
+		onBridgeQuestion(QuestionType::namedControls);
 	}
 
 	void Node::onBridgeQuestion(QuestionType selector)
 	{
 		QString questionCode;
 		int selectorNum;
-		
+
 		switch (selector)
 		{
 		case nodeID:
@@ -84,27 +98,34 @@ namespace QuantIDE
 			break;
 		case namedControls:
 			selectorNum = QuestionType::namedControls;
-			questionCode = tr("~%1.source.def.constants").arg(name());
+			//questionCode = tr("~%1.source.def.constants").arg(name());
+			questionCode = tr("~%1.controlKeys").arg(name());
 			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
 			break;
 		}
 	}
 
-	void Node::onBridgeAnswer(QString pattern, int selectorNum, QString answer)
+	void Node::onBridgeAnswer(QString pattern, int selectorNum, QStringList answer)
 	{
 		qDebug() << "Node::onBridgeAnswer: " << pattern << answer;
 		if (pattern == objectPattern)
 		{
 			QuestionType selector = static_cast<QuestionType>(selectorNum);
+			QString txt = "";
+
 			switch (selector)
 			{
 			case nodeID:
 				qDebug() << "Node::onBridgeAnswer::target: " << selector;
-				labelNodeID->setText(tr("nodeID: %1").arg(answer));
+				labelNodeID->setText(tr("nodeID: %1").arg(answer[0]));
 				break;
 			case namedControls:
+				foreach(QString oneAnsw, answer)
+				{
+					txt += tr("%1; ").arg(oneAnsw);
+				}
 				qDebug() << "Node::onBridgeAnswer::target: " << selector;
-				labelNamedControls->setText(tr("controls: %1").arg(answer));
+				labelNamedControls->setText(tr("controls: %1").arg(txt));
 				break;
 			default:
 				qDebug() << "Node::onBridgeAnswer::DEFAULT";
@@ -135,8 +156,8 @@ namespace QuantIDE
 			break;
 		}
 
-			onBridgeQuestion(QuestionType::nodeID);
-			onBridgeQuestion(QuestionType::namedControls);
+		onBridgeQuestion(QuestionType::nodeID);
+		onBridgeQuestion(QuestionType::namedControls);
 	}
 
 	void Node::fitGeometry()

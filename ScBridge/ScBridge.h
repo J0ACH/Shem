@@ -12,6 +12,7 @@
 #include <QtNetwork/QLocalServer>
 #include <QBuffer>
 #include <QDebug>
+//#include <QStringList>
 
 namespace SupercolliderBridge
 {
@@ -22,7 +23,7 @@ namespace SupercolliderBridge
 	class ScBridge : public QProcess
 	{
 		Q_OBJECT
-
+		
 	public:
 		ScBridge(QObject *parent);
 		~ScBridge();
@@ -58,7 +59,7 @@ namespace SupercolliderBridge
 		void msgResultAct(QString const &);
 		void msgBundleAct(QString const &);
 
-		void answerAct(QString pattern, int selector, QString answer);
+		void answerAct(QString pattern, int selector, QStringList answer);
 
 		void killBridgeDoneAct();
 

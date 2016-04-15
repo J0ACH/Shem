@@ -44,7 +44,7 @@ namespace QuantIDE
 
 		void onReciveText(QString);
 		void onBridgeQuestion(QuestionType);
-		void onBridgeAnswer(QString pattern, int selectorNum, QString answer);
+		void onBridgeAnswer(QString pattern, int selectorNum, QStringList answer);
 		
 		void changeNodePlay();
 

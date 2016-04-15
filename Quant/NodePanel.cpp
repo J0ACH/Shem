@@ -53,7 +53,6 @@ namespace QuantIDE
 		newNode->show();
 
 		connect(this, SIGNAL(resizeAct()), newNode, SLOT(fitGeometry()));
-		connect(newNode, SIGNAL(evaluateAct(QString)), mBridge, SLOT(evaluateCode(QString)));
 		connect(newNode, SIGNAL(killAct(QString)), this, SLOT(deleteNode(QString)));
 
 		dictNode.insert(newNode->name(), newNode);
