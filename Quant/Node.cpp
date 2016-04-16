@@ -142,12 +142,63 @@ namespace QuantIDE
 
 	void Node::initControlsEditor(QStringList namedControls)
 	{
-		/*
-		foreach(QString oneAnsw, answer)
+		//qDebug() << "conteinerControls.size: " << conteinerControls.size();
+		QStringList existKeys = conteinerControls.keys();
+		//qDebug() << "Node::initControlsEditor exist key" << existKeys.join("; ");
+		//QStringList removeKeys;
+
+		foreach(QString key, existKeys)
 		{
+			if (!namedControls.contains(key))
+			{
+				this->removeControl(key);
+				//removeKeys.append(existingKey);
+			}
+		}
+		//qDebug() << "Node::initControlsEditor removed keys" << removeKeys.join("; ");
+		//qDebug() << "conteinerControls.size: " << conteinerControls.size();
+
+
+		foreach(QString key, namedControls)
+		{
+			if (!conteinerControls.contains(key))
+			{
+				this->addControl(key);
+				//qDebug() << "Node::initControlsEditor added id" << id;
+			}
+			else
+			{
+				//qDebug() << "Node::initControlsEditor exist key" << oneName;
+			}
 
 		}
-		*/
+
+	}
+
+	void Node::addControl(QString controlName)
+	{
+		CodeEditor *controlEditor = new CodeEditor(this);
+		controlEditor->show();
+
+		QLabel * controlLabel = new QLabel(this);
+		controlLabel->setText(controlName);
+		controlLabel->setFont(QFont("Univers Condensed", 12, QFont::Normal));
+		controlLabel->show();
+
+		conteinerControls.insert(controlName, controlEditor);
+		conteinerControlsLabel.insert(controlName, controlLabel);
+
+		this->fitGeometry();
+	}
+	void Node::removeControl(QString controlName)
+	{
+		CodeEditor *removeEditor = conteinerControls.take(controlName);
+		removeEditor->close();
+
+		QLabel *removeLabel = conteinerControlsLabel.take(controlName);
+		removeLabel->close();
+		
+		this->fitGeometry();
 	}
 
 	void Node::changeNodePlay()
@@ -181,10 +232,23 @@ namespace QuantIDE
 		nameLabel->setGeometry(10, 5, 80, 30);
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		playButton->setGeometry(90, 10, 40, 20);
-		sourceCode->setGeometry(10, 45, width() - 20, 40);
+		sourceCode->setGeometry(10, 45, width() - 20, 60);
 
-		labelNodeID->setGeometry(10, this->height() - 45, 180, 20);
-		labelNamedControls->setGeometry(10, this->height() - 25, 180, 20);
+		labelNodeID->setGeometry(this->width() - 200, this->height() - 45, 180, 20);
+		labelNamedControls->setGeometry(this->width() - 200, this->height() - 25, 180, 20);
+
+		int id = 0;
+		foreach(CodeEditor *oneControler, conteinerControls)
+		{
+			oneControler->setGeometry(60, 80 + 35 * (id + 1), 200, 25);
+			id++;
+		}
+		id = 0;
+		foreach(QLabel *oneLabel, conteinerControlsLabel)
+		{
+			oneLabel->setGeometry(15, 80 + 35 * (id + 1), 40, 25);
+			id++;
+		}
 	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)

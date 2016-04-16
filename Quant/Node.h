@@ -62,6 +62,9 @@ namespace QuantIDE
 		void initControl();
 		void initControlsEditor(QStringList namedControls);
 
+		void addControl(QString name);
+		void removeControl(QString name);
+
 		QString objectPattern;
 
 		ScBridge *mBridge;
@@ -72,6 +75,7 @@ namespace QuantIDE
 		Button *closeButton, *playButton;
 
 		QMap<QString, CodeEditor*> conteinerControls;
+		QMap<QString, QLabel*> conteinerControlsLabel;
 		
 	};
 }

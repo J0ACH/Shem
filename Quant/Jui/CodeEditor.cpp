@@ -182,7 +182,7 @@ namespace Jui
 		fillColor.setAlpha(backgroundAlpha);
 		painter.fillRect(bounds, fillColor);
 
-		painter.setPen(QColor(230, 230, 230));
+		painter.setPen(QColor(120, 120, 120));
 		painter.drawLine(0, 0, width(), 0);
 		painter.drawLine(0, height() - 1, width(), height() - 1);
 
@@ -202,6 +202,11 @@ namespace Jui
 		update();
 	}
 
-	CodeEditor::~CodeEditor() { }
+	CodeEditor::~CodeEditor() 
+	{
+		this->setVisible(false);
+
+		qDebug() << "CodeEditor deleted";
+	}
 
 }
