@@ -27,8 +27,9 @@ namespace Jui
 		void alphaUpdate();
 
 	signals:
+		void evaluateAct();
 		void sendText(QString);
-		void sendControlsAct(QStringList);
+		//void sendControlsAct(QStringList);
 		
 	protected:
 		virtual bool eventFilter(QObject * watched, QEvent * event);

@@ -89,6 +89,22 @@ namespace QuantIDE
 		onBridgeQuestion(QuestionType::namedControls);
 	}
 
+	void Node::onEvaluateNode()
+	{
+		QString code;
+		code = tr("~%1 = NodeProxy.audio(s, 2);").arg(name());
+		code += tr("~%1[0] = {%2};").arg(name(), sourceCode->toPlainText());
+				
+		for (int i = 0; i < conteinerControls.size(); i++)
+		{
+			QString key = conteinerControls.keys().at(i);
+			QString value = conteinerControls[key]->toPlainText();
+			code += tr("~%1.set('%2', %3);").arg(name(), key, value);
+		}
+
+		emit evaluateAct(code);
+	}
+
 	void Node::onBridgeQuestion(QuestionType selector)
 	{
 		QString questionCode;
@@ -142,37 +158,16 @@ namespace QuantIDE
 
 	void Node::initControlsEditor(QStringList namedControls)
 	{
-		//qDebug() << "conteinerControls.size: " << conteinerControls.size();
 		QStringList existKeys = conteinerControls.keys();
-		//qDebug() << "Node::initControlsEditor exist key" << existKeys.join("; ");
-		//QStringList removeKeys;
-
 		foreach(QString key, existKeys)
 		{
-			if (!namedControls.contains(key))
-			{
-				this->removeControl(key);
-				//removeKeys.append(existingKey);
-			}
+			if (!namedControls.contains(key)) { this->removeControl(key); }
 		}
-		//qDebug() << "Node::initControlsEditor removed keys" << removeKeys.join("; ");
-		//qDebug() << "conteinerControls.size: " << conteinerControls.size();
-
 
 		foreach(QString key, namedControls)
 		{
-			if (!conteinerControls.contains(key))
-			{
-				this->addControl(key);
-				//qDebug() << "Node::initControlsEditor added id" << id;
-			}
-			else
-			{
-				//qDebug() << "Node::initControlsEditor exist key" << oneName;
-			}
-
+			if (!conteinerControls.contains(key)) { this->addControl(key); }
 		}
-
 	}
 
 	void Node::addControl(QString controlName)
@@ -180,13 +175,15 @@ namespace QuantIDE
 		CodeEditor *controlEditor = new CodeEditor(this);
 		controlEditor->show();
 
-		QLabel * controlLabel = new QLabel(this);
+		QLabel *controlLabel = new QLabel(this);
 		controlLabel->setText(controlName);
 		controlLabel->setFont(QFont("Univers Condensed", 12, QFont::Normal));
 		controlLabel->show();
 
 		conteinerControls.insert(controlName, controlEditor);
 		conteinerControlsLabel.insert(controlName, controlLabel);
+
+		connect(controlEditor, SIGNAL(evaluateAct()), this, SLOT(onEvaluateNode()));
 
 		this->fitGeometry();
 	}
@@ -197,7 +194,7 @@ namespace QuantIDE
 
 		QLabel *removeLabel = conteinerControlsLabel.take(controlName);
 		removeLabel->close();
-		
+
 		this->fitGeometry();
 	}
 
@@ -237,17 +234,17 @@ namespace QuantIDE
 		labelNodeID->setGeometry(this->width() - 200, this->height() - 45, 180, 20);
 		labelNamedControls->setGeometry(this->width() - 200, this->height() - 25, 180, 20);
 
-		int id = 0;
+		int controlID = 0;
 		foreach(CodeEditor *oneControler, conteinerControls)
 		{
-			oneControler->setGeometry(60, 80 + 35 * (id + 1), 200, 25);
-			id++;
+			oneControler->setGeometry(60, 80 + 35 * (controlID + 1), 200, 25);
+			controlID++;
 		}
-		id = 0;
+		controlID = 0;
 		foreach(QLabel *oneLabel, conteinerControlsLabel)
 		{
-			oneLabel->setGeometry(15, 80 + 35 * (id + 1), 40, 25);
-			id++;
+			oneLabel->setGeometry(15, 80 + 35 * (controlID + 1), 40, 25);
+			controlID++;
 		}
 	}
 

@@ -43,6 +43,7 @@ namespace QuantIDE
 	public slots:
 		void fitGeometry();
 
+		void onEvaluateNode();
 		void onReciveText(QString);
 		void onBridgeQuestion(QuestionType);
 		void onBridgeAnswer(QString pattern, int selectorNum, QStringList answer);

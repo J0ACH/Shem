@@ -33,14 +33,14 @@ namespace Jui
 		QTextCharFormat formatCommonText;
 		formatCommonText.setFontWeight(QFont::Normal);
 		formatCommonText.setForeground(QBrush(QColor(120, 120, 120)));
-		this->highlightText(0, this->toPlainText().size(), formatCommonText );
+		this->highlightText(0, this->toPlainText().size(), formatCommonText);
 
 		QList<QList<QVariant>*> classes = regexpText(HighLights::CLASS);
 		QList<QList<QVariant>*> digits = regexpText(HighLights::DIGIT);
 		QList<QList<QVariant>*> controls = regexpText(HighLights::CONTROL);
 		//QList<QList<QVariant>*> nodes = regexpText(HighLights::NODE);
 
-		
+		/*
 		QStringList namedControls;
 		QListIterator<QList<QVariant>*> j(controls);
 		while (j.hasNext())
@@ -52,8 +52,9 @@ namespace Jui
 
 			namedControls.append(txt);
 		}
-		emit sendControlsAct(namedControls);
-			}
+		//emit sendControlsAct(namedControls);
+		*/
+	}
 
 	QList<QList<QVariant>*> CodeEditor::regexpText(HighLights typeHighLight)
 	{
@@ -105,22 +106,22 @@ namespace Jui
 
 		return answ;
 	}
-	
+
 	void CodeEditor::highlightText(int position, int lenght, QTextCharFormat format)
 	{
-			disconnect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
+		disconnect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
 
-			QTextCursor cursor = this->textCursor();
-			int cursorPositionBackup = cursor.position();
-			
-			cursor.setPosition(position, QTextCursor::MoveMode::MoveAnchor);
-			cursor.setPosition(position + lenght, QTextCursor::MoveMode::KeepAnchor);
-			cursor.setCharFormat(format);
+		QTextCursor cursor = this->textCursor();
+		int cursorPositionBackup = cursor.position();
 
-			cursor.setPosition(cursorPositionBackup, QTextCursor::MoveMode::MoveAnchor);
-			
-			connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
-		}
+		cursor.setPosition(position, QTextCursor::MoveMode::MoveAnchor);
+		cursor.setPosition(position + lenght, QTextCursor::MoveMode::KeepAnchor);
+		cursor.setCharFormat(format);
+
+		cursor.setPosition(cursorPositionBackup, QTextCursor::MoveMode::MoveAnchor);
+
+		connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
+	}
 
 	void CodeEditor::setBackground(const QColor & color)
 	{
@@ -148,6 +149,7 @@ namespace Jui
 					timer->setInterval(fadeTimeOut / fps);
 					timer->start();
 
+					emit evaluateAct();
 					emit sendText(this->toPlainText());
 
 
@@ -202,7 +204,7 @@ namespace Jui
 		update();
 	}
 
-	CodeEditor::~CodeEditor() 
+	CodeEditor::~CodeEditor()
 	{
 		this->setVisible(false);
 
