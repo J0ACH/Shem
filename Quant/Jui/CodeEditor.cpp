@@ -9,9 +9,11 @@ namespace Jui
 		installEventFilter(this);
 
 		//QFont font = QFont("Consolas", 8);
-		QFont font = QFont("Univers 57 Condensed", 10, QFont::Normal);
-                font.setStretch(QFont::Condensed);
-		setFont(font);
+		QFont font = QFont("Monaco", 7, QFont::Normal);
+                font.setStyleStrategy(QFont::NoAntialias);
+//                font.setStretch(QFont::Condensed);
+//		qDebug() << " font.stretch : "<<font.stretch();
+                setFont(font);
 		setFrameStyle(QFrame::NoFrame);
                 //font.setHintingPreference(QFont::PreferDefault);
 
