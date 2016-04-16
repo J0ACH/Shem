@@ -2,13 +2,14 @@
 #define CANVAN_H
 
 #include <QtWidgets/QMainWindow>
-#include <QDockWidget>
-#include <QPushButton>
+//#include <QDockWidget>
+//#include <QPushButton>
 #include <QTimer>
-#include <QMenuBar>
-#include <QStatusBar>
+//#include <QMenuBar>
+//#include <QStatusBar>
 #include <QLabel>
-#include <QStyleFactory>
+//#include <QStyleFactory>
+#include <QFontDatabase>
 
 //#include "ui_canvan.h"
 
