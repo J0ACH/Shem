@@ -10,8 +10,10 @@ namespace Jui
 
 		//QFont font = QFont("Consolas", 8);
 		QFont font = QFont("Univers 57 Condensed", 10, QFont::Normal);
+                font.setStretch(QFont::Condensed);
 		setFont(font);
 		setFrameStyle(QFrame::NoFrame);
+                //font.setHintingPreference(QFont::PreferDefault);
 
 		normalColor = QColor(120, 120, 120);
 		overColor = QColor(230, 230, 230);
