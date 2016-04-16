@@ -29,8 +29,7 @@ namespace Jui
 	signals:
 		void evaluateAct();
 		void sendText(QString);
-		//void sendControlsAct(QStringList);
-		
+				
 	protected:
 		virtual bool eventFilter(QObject * watched, QEvent * event);
 		void paintEvent(QPaintEvent *paintEvent);

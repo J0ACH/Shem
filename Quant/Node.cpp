@@ -66,6 +66,7 @@ namespace QuantIDE
 
 		onBridgeQuestion(QuestionType::nodeID);
 		onBridgeQuestion(QuestionType::namedControls);
+
 	}
 
 	void Node::setName(QString name)
@@ -94,7 +95,7 @@ namespace QuantIDE
 		QString code;
 		code = tr("~%1 = NodeProxy.audio(s, 2);").arg(name());
 		code += tr("~%1[0] = {%2};").arg(name(), sourceCode->toPlainText());
-				
+
 		for (int i = 0; i < conteinerControls.size(); i++)
 		{
 			QString key = conteinerControls.keys().at(i);
@@ -105,7 +106,7 @@ namespace QuantIDE
 		emit evaluateAct(code);
 	}
 
-	void Node::onBridgeQuestion(QuestionType selector)
+	void Node::onBridgeQuestion(QuestionType selector, QString args)
 	{
 		QString questionCode;
 		int selectorNum;
@@ -119,8 +120,12 @@ namespace QuantIDE
 			break;
 		case namedControls:
 			selectorNum = QuestionType::namedControls;
-			//questionCode = tr("~%1.source.def.constants").arg(name());
 			questionCode = tr("~%1.controlKeys").arg(name());
+			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
+			break;
+		case namedValues:
+			selectorNum = QuestionType::namedValues;
+			questionCode = tr("~%1.controlKeysValues (['%2'])").arg(name(), args);
 			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
 			break;
 		}
@@ -140,6 +145,7 @@ namespace QuantIDE
 				qDebug() << "Node::onBridgeAnswer::target: " << selector;
 				labelNodeID->setText(tr("nodeID: %1").arg(answer[0]));
 				break;
+
 			case namedControls:
 				foreach(QString oneAnsw, answer)
 				{
@@ -149,6 +155,12 @@ namespace QuantIDE
 				labelNamedControls->setText(tr("controls: %1").arg(txt));
 				this->initControlsEditor(answer);
 				break;
+
+			case namedValues:
+				qDebug() << "Node::onBridgeAnswer::namedValues: " << answer[1];
+				conteinerControls[answer[0]]->setText(answer[1]);
+				break;
+
 			default:
 				qDebug() << "Node::onBridgeAnswer::DEFAULT";
 				break;
@@ -184,6 +196,8 @@ namespace QuantIDE
 		conteinerControlsLabel.insert(controlName, controlLabel);
 
 		connect(controlEditor, SIGNAL(evaluateAct()), this, SLOT(onEvaluateNode()));
+
+		onBridgeQuestion(QuestionType::namedValues, controlName);
 
 		this->fitGeometry();
 	}

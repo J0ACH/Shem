@@ -9,7 +9,7 @@ namespace Jui
 		installEventFilter(this);
 
 		//QFont font = QFont("Consolas", 8);
-		QFont font = QFont("Univers 57 Condensed", 9, QFont::Normal);
+		QFont font = QFont("Univers 57 Condensed", 10, QFont::Normal);
 		setFont(font);
 		setFrameStyle(QFrame::NoFrame);
 
@@ -39,21 +39,6 @@ namespace Jui
 		QList<QList<QVariant>*> digits = regexpText(HighLights::DIGIT);
 		QList<QList<QVariant>*> controls = regexpText(HighLights::CONTROL);
 		//QList<QList<QVariant>*> nodes = regexpText(HighLights::NODE);
-
-		/*
-		QStringList namedControls;
-		QListIterator<QList<QVariant>*> j(controls);
-		while (j.hasNext())
-		{
-			QList<QVariant> *test = j.next();
-			QString txt = test->at(0).toString();
-			int position = test->at(1).toInt();
-			int lenght = test->at(2).toInt();
-
-			namedControls.append(txt);
-		}
-		//emit sendControlsAct(namedControls);
-		*/
 	}
 
 	QList<QList<QVariant>*> CodeEditor::regexpText(HighLights typeHighLight)
@@ -199,16 +184,10 @@ namespace Jui
 			timer->stop();
 			backgroundAlpha = 0;
 		}
-
 		//qDebug() << tr("buttonAlpha %1").arg(QString::number(backgroundAlpha));
 		update();
 	}
 
-	CodeEditor::~CodeEditor()
-	{
-		this->setVisible(false);
-
-		qDebug() << "CodeEditor deleted";
-	}
+	CodeEditor::~CodeEditor() {	}
 
 }

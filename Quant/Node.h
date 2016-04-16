@@ -30,7 +30,7 @@ namespace QuantIDE
 		~Node();
 
 		StateNodePlay stateNodePlay;
-		enum QuestionType {nodeID, namedControls};
+		enum QuestionType {nodeID, namedControls, namedValues};
 
 		void connectBridge(ScBridge*);
 		void setName(QString);
@@ -45,7 +45,7 @@ namespace QuantIDE
 
 		void onEvaluateNode();
 		void onReciveText(QString);
-		void onBridgeQuestion(QuestionType);
+		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
 		void onBridgeAnswer(QString pattern, int selectorNum, QStringList answer);
 		
 		void changeNodePlay();

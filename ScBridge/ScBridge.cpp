@@ -9,11 +9,11 @@ namespace SupercolliderBridge
 		QProcess(parent),
 		mIpcServer(new QLocalServer(this)),
 		mIpcSocket(NULL),
-		mIpcServerName("SCIde_" + QString::number(QCoreApplication::applicationPid())),
+		mIpcServerName("SCBridge_" + QString::number(QCoreApplication::applicationPid())),
 		mTerminationRequested(false),
 		mCompiled(false)
 	{
-		//mIpcServerName("SCBridge_" + QString::number(QCoreApplication::applicationPid())),
+		//mIpcServerName("SCIde_" + QString::number(QCoreApplication::applicationPid())),
 
 		stateInterpret = StateInterpret::OFF;
 		stateServer = StateServer::OFF;
@@ -238,7 +238,7 @@ namespace SupercolliderBridge
 							//qDebug() << "i: " << i;
 							if (i == 0) { /* skiping marker */ }
 							else if (i == 1) { pattern = onePart; }
-							else if (i == 2) { selector = onePart.toInt();  }
+							else if (i == 2) { selector = onePart.toInt(); }
 							else if (i != msgParts.size() - 1) { answer.append(onePart); }
 							else if (i == msgParts.size() - 1) { printAnswer = onePart.toInt(); }
 
@@ -249,13 +249,13 @@ namespace SupercolliderBridge
 							<< " pattern " << QString::number(selector)
 							<< " answer " << answer
 							<< " print " << pattern;
-						if (printAnswer) { 
+						if (printAnswer) {
 							QString txt;
 							foreach(QString oneAnsw, answer)
 							{
 								txt += tr("%1; ").arg(oneAnsw);
 							}
-							emit msgResultAct(txt); 
+							emit msgResultAct(txt);
 						}
 						emit answerAct(pattern, selector, answer);
 					}
