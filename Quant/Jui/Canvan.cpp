@@ -58,11 +58,12 @@ namespace Jui
 
 		version = new QLabel(tail);
 		version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		version->setFont(QFont("Univers Condensed", 10));
 
 		mConsole = new Console(this);
 		mConsole->setTitle("Console");
 		mConsole->setBackground(QColor(30, 30, 30));
-		mConsole->setGeometry(0, 0, 800, 150);
+		mConsole->setGeometry(0, 0, 550, 150);
 
 		edges = new Edges(this);
 		setEdgeControler(EdgeControler::Direction::LEFT, true);
@@ -240,10 +241,15 @@ namespace Jui
 		textColor = QColor(230, 230, 230);
 		activeColor = QColor(20, 180, 240);
 
+		QFont textFont = QFont("Univers Condensed", 10);
+		QFont codeFont = QFont("Univers 57 Condensed", 10);
+		//QFont codeFont = QFont("Consolas", 8);
+		
 		QString txt;
 		txt.append(tr("QLabel { color: %1; }").arg(textColor.name()));
+		//txt.append(tr("QLabel { font: %1; }").arg(textFont2));
 		//txt.append("QLabel { font-weight: bold; }");
-
+		
 		txt.append(tr("QPushButton { background-color: %1; }").arg(backColor.name()));
 		txt.append(tr("QPushButton { color: %1; }").arg(textColor.name()));
 		txt.append(tr("QPushButton { border-style: outset; border-width: 1px; border-color: %1}").arg(textColor.name()));

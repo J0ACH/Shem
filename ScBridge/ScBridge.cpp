@@ -179,55 +179,6 @@ namespace SupercolliderBridge
 		QString postString = QString::fromUtf8(out);
 
 		this->msgFilter(postString);
-		/*
-
-		if (postString.startsWith("ERROR:") || postString.startsWith("!"))
-		{
-		QStringList msgLines = postString.split("\n");
-		for (int i = 0; i < msgLines.size(); i = i + 1)
-		{
-		QString msg = msgLines.at(i);
-		msg = msg.replace("\r", "");
-
-		if (msg.startsWith("ERROR:"))
-		{
-		emit msgErrorAct(msg);
-		}
-		else if (msg.startsWith("->"))
-		{
-		msg = msg.remove(0, 3);
-		emit msgResultAct(tr("ANSWER: %1").arg(msg));
-		}
-		else
-		{
-		emit msgNormalAct(tr("\t- %1").arg(msg));
-		}
-		};
-		}
-		else if (postString.startsWith("WARNING:") || postString.startsWith("?"))
-		{
-		emit msgWarningAct(postString);
-		}
-
-		else if (postString.startsWith("->"))
-		{
-		QString msg = postString.remove(0, 3);
-		emit msgResultAct(tr("RESULT: %1").arg(msg));
-		}
-
-		else if (postString.startsWith("***")) { emit msgStatusAct(postString); }
-		else if (postString.contains("->"))
-		{
-		qDebug() << "ANSWER: " << postString;
-		//QString msg = postString.remove(0, 3);
-		emit answerAct(postString, "TEST");
-		}
-		else if (postString.startsWith("\r\n[ \"#bundle\"")) // neni 100%
-		{
-		emit msgBundleAct(postString);
-		}
-		else { emit msgNormalAct(postString); };
-		*/
 	}
 
 	void ScBridge::msgFilter(QString msg)
@@ -268,10 +219,10 @@ namespace SupercolliderBridge
 					if (oneMSG.contains("ANSWER_MARKER"))
 					{
 						oneMSG = oneMSG.replace("\r\n", "");
-						qDebug() << "oneMSG: " << oneMSG;
+						//qDebug() << "oneMSG: " << oneMSG;
 
 						QStringList msgParts = oneMSG.split(",");
-						qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
+						//qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
 
 						QString pattern;
 						QStringList answer;
@@ -284,12 +235,12 @@ namespace SupercolliderBridge
 							onePart = onePart.replace("[", "");
 							onePart = onePart.replace("]", "");
 
-							qDebug() << "i: " << i;
+							//qDebug() << "i: " << i;
 							if (i == 0) { /* skiping marker */ }
-							else if (i == 1) { pattern = onePart; qDebug() << "pattern"; }
-							else if (i == 2) { selector = onePart.toInt(); qDebug() << "selector"; }
-							else if (i != msgParts.size() - 1) { answer.append(onePart); qDebug() << "answer"; }
-							else if (i == msgParts.size() - 1) { printAnswer = onePart.toInt(); qDebug() << "print"; }
+							else if (i == 1) { pattern = onePart; }
+							else if (i == 2) { selector = onePart.toInt();  }
+							else if (i != msgParts.size() - 1) { answer.append(onePart); }
+							else if (i == msgParts.size() - 1) { printAnswer = onePart.toInt(); }
 
 						}
 
@@ -298,7 +249,15 @@ namespace SupercolliderBridge
 							<< " pattern " << QString::number(selector)
 							<< " answer " << answer
 							<< " print " << pattern;
-						emit answerAct(pattern, selector, answer);			
+						if (printAnswer) { 
+							QString txt;
+							foreach(QString oneAnsw, answer)
+							{
+								txt += tr("%1; ").arg(oneAnsw);
+							}
+							emit msgResultAct(txt); 
+						}
+						emit answerAct(pattern, selector, answer);
 					}
 
 				}

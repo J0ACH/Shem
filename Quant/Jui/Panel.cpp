@@ -27,11 +27,16 @@ namespace Jui
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
 		closeButton->setText("X");
+		/*
+		labelName = new QLabel(this);
+		labelName->setFont(QFont("Univers Condensed", 12, QFont::Normal));
+		labelName->setText("labelName");
+		*/
 
 		edges = new Edges(this);
 	}
 
-	void Panel::setTitle(QString name) { title = name; }
+	void Panel::setTitle(QString name) { title = name; /* labelName->setText(name);*/  }
 
 	void Panel::setBackground(QColor backgroundColor) { backColor = backgroundColor; }
 
@@ -73,10 +78,12 @@ namespace Jui
 	void Panel::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
+		painter.setFont(QFont("Univers Condensed", 12, QFont::Normal));
 		painter.fillRect(bounds(), backColor);
 
 		painter.setPen(QPen(QColor(200, 200, 200), 1));
 		//painter.drawRect(bounds().adjusted(5, 5, -5, -5));
+		QTextOption option;
 		painter.drawText(15, 25, title);
 
 		//qDebug("Panel::paintEvent");
@@ -85,6 +92,7 @@ namespace Jui
 	void Panel::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
+		//labelName->setGeometry(15, 5, 80, 30);
 
 		emit resizeAct();
 

@@ -10,6 +10,7 @@
 #include <QPainter>
 #include <QTextEdit>
 #include <QDebug>
+#include <QMap>
 
 
 using namespace Jui;
@@ -59,6 +60,8 @@ namespace QuantIDE
 
 	private:
 		void initControl();
+		void initControlsEditor(QStringList namedControls);
+
 		QString objectPattern;
 
 		ScBridge *mBridge;
@@ -68,7 +71,7 @@ namespace QuantIDE
 		CodeEditor *sourceCode;
 		Button *closeButton, *playButton;
 
-		
+		QMap<QString, CodeEditor*> conteinerControls;
 		
 	};
 }

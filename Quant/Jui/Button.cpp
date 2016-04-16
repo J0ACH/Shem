@@ -79,7 +79,7 @@ namespace Jui
 	void Button::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
-
+		painter.setFont(QFont("Univers Condensed", 10, QFont::Normal));
 		
 
 		penColor = blendColor(normalColor, overColor, ratio);

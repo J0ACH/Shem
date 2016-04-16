@@ -20,15 +20,17 @@ namespace QuantIDE
 		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(onReciveText(QString)));
 	}
 
-	QRect Node::bounds()
-	{
-		return QRect(0, 0, width() - 1, height() - 1);
-	}
+	QRect Node::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 
 	void Node::initControl()
 	{
 		nameLabel = new QLabel(this);
 		nameLabel->setText("node1");
+		//QFont font = QFont("Swis721 LtCn BT", 14, QFont::Normal);
+		QFont font = QFont("Univers Condensed", 14, QFont::Normal);
+		QFont fontSmall = QFont("Univers Condensed", 10, QFont::Normal);
+		//QFont font = QFont("Teuton Normal", 18, QFont::Normal);
+		nameLabel->setFont(font);
 
 		closeButton = new Button(this);
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
@@ -40,8 +42,11 @@ namespace QuantIDE
 		playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
 
 		sourceCode = new CodeEditor(this);
+
 		labelNodeID = new QLabel(this);
+		labelNodeID->setFont(fontSmall);
 		labelNamedControls = new QLabel(this);
+		labelNamedControls->setFont(fontSmall);
 	}
 
 	void Node::connectBridge(ScBridge *bridge)
@@ -126,12 +131,23 @@ namespace QuantIDE
 				}
 				qDebug() << "Node::onBridgeAnswer::target: " << selector;
 				labelNamedControls->setText(tr("controls: %1").arg(txt));
+				this->initControlsEditor(answer);
 				break;
 			default:
 				qDebug() << "Node::onBridgeAnswer::DEFAULT";
 				break;
 			}
 		}
+	}
+
+	void Node::initControlsEditor(QStringList namedControls)
+	{
+		/*
+		foreach(QString oneAnsw, answer)
+		{
+
+		}
+		*/
 	}
 
 	void Node::changeNodePlay()
@@ -165,7 +181,7 @@ namespace QuantIDE
 		nameLabel->setGeometry(10, 5, 80, 30);
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		playButton->setGeometry(90, 10, 40, 20);
-		sourceCode->setGeometry(10, 75, width() - 20, 80);
+		sourceCode->setGeometry(10, 45, width() - 20, 40);
 
 		labelNodeID->setGeometry(10, this->height() - 45, 180, 20);
 		labelNamedControls->setGeometry(10, this->height() - 25, 180, 20);

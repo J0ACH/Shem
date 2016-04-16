@@ -8,7 +8,9 @@ namespace Jui
 		setObjectName("CodeEditor");
 		installEventFilter(this);
 
-		setFont(QFont("Consolas", 8));
+		//QFont font = QFont("Consolas", 8);
+		QFont font = QFont("Univers 57 Condensed", 9, QFont::Normal);
+		setFont(font);
 		setFrameStyle(QFrame::NoFrame);
 
 		normalColor = QColor(120, 120, 120);
