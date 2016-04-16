@@ -32,6 +32,9 @@ namespace Jui
 		isPressed = false;
 		showScreen = false;
 
+		QFontDatabase::addApplicationFont(":/fontText.ttf");
+		QFontDatabase::addApplicationFont(":/fontCode.ttf");
+
 		this->initControl();
 		this->setCanvanStyleSheet();
 
