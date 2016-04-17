@@ -69,33 +69,11 @@ namespace SupercolliderBridge
 		qDebug() << "Customize::path: " << configDir.path();
 
 		configFile = new QFile(tr("%1/ShemConfig.txt").arg(configDir.path()));
-			//if (!configFile.open(QIODevice::WriteOnly | QIODevice::Text))
-		if (configFile->exists())
-		{
-			this->readConfigFile();
-		}
-		else
-		{
-			this->writeConfigFile();
-		}
+
+		if (configFile->exists()) { this->readConfigFile(); }
+		else { this->writeConfigFile(); }
 	}
 
-	void Customize::readConfigFile()
-	{
-		qDebug() << "Customize::readConfigFile " << configFile->fileName();
-
-		configFile->open(QIODevice::ReadOnly | QIODevice::Text);
-		
-			QTextStream in(configFile);
-		while (!in.atEnd()) {
-			QString line = in.readLine();
-		
-			qDebug() << "Customize::readConfigFile line: " << line;
-			
-		}
-
-		configFile->close();
-	}
 	void Customize::writeConfigFile()
 	{
 		qDebug() << "Customize::writeConfigFile " << configFile->fileName();
@@ -103,12 +81,76 @@ namespace SupercolliderBridge
 		configFile->open(QIODevice::WriteOnly | QIODevice::Text);
 
 		QTextStream out(configFile);
-		out << "Shem config\n";
-		out << "backgroundColor: " << 49 << "\n";
+		out << "shem_backgroundColor = " << 230 << "," << 30 << "," << 30 << "\n";
+		out << "shem_textColor = " << 230 << "," << "L" << "," << 230 << "\n";
 
 		configFile->close();
 
+		this->readConfigFile();
 	}
+
+	void Customize::readConfigFile()
+	{
+		qDebug() << "Customize::readConfigFile " << configFile->fileName();
+
+		QMap<QString, QVariant*> configData;
+
+		configFile->open(QIODevice::ReadOnly | QIODevice::Text);
+		QTextStream in(configFile);
+		while (!in.atEnd()) {
+
+			QString line = in.readLine();
+			QStringList lineParts = line.remove("\n").split("=");
+
+			qDebug() << "Customize::readConfigFile line: " << line;
+
+			QString key = lineParts[0].remove(" ");
+			QStringList args = lineParts[1].remove(" ").split(",");
+			QVariant *value;
+
+			if (args.size() == 3)
+			{
+				bool isColor = true;
+				int rgb[3];
+
+				for (int i = 0; i < 3; i++)
+				{
+					bool isNumber;
+					rgb[i] = args[i].toInt(&isNumber, 10);
+					if (!isNumber) { isColor = false; break; }
+				}
+
+				if (isColor) { value = new QVariant(QColor(rgb[0], rgb[1], rgb[2])); continue; }
+				else
+				{
+					qDebug() << "neni to barva";
+				}
+			}
+			else
+			{
+
+				foreach(QString oneArg, args)
+				{
+					bool isNumber;
+					int dec = oneArg.toInt(&isNumber, 10);
+					qDebug() << "isNumber: " << isNumber;
+				}
+			}
+
+			qDebug() << "key: " << key;
+			qDebug() << "value: " << args.join(" || ");
+
+			configData.insert(key, value);
+		}
+
+		foreach(QString key, configData.keys())
+		{
+			qDebug() << "configKey [" << key << "] ->" << configData[key]->toString();
+		}
+
+		configFile->close();
+	}
+
 
 	Customize::~Customize() { }
 }
