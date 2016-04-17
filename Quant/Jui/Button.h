@@ -33,6 +33,7 @@ namespace Jui
 		void setOverColor(QColor);
 		void setActiveColor(QColor);
 
+		void setState(State);
 		void setStateKeeping(StateKeeping);
 
 	signals:

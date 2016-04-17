@@ -2,15 +2,10 @@
 #define CANVAN_H
 
 #include <QtWidgets/QMainWindow>
-//#include <QDockWidget>
-//#include <QPushButton>
 #include <QTimer>
-//#include <QMenuBar>
-//#include <QStatusBar>
 #include <QLabel>
-//#include <QStyleFactory>
 #include <QFontDatabase>
-
+#include <QMap>
 //#include "ui_canvan.h"
 
 #include "Console.h"
@@ -31,12 +26,14 @@ namespace Jui
 
 		void initControl();
 		void setEdgeControler(EdgeControler::Direction, bool);
-		
+
+		void connectWindow(QWidget*);
+
 		void addScreen(QWidget *inScreen);
-		
+
 		QWidget *win;
 		QWidget *header, *screen, *tail;
-		
+
 		Console *mConsole;
 
 		void setHeaderHeight(int);
@@ -45,24 +42,25 @@ namespace Jui
 		void setLogo(QImage);
 		void setCanvanStyleSheet();
 		void setVersion(int major, int minor, int patch);
-				
+
 	signals:
 		void resizeAct();
 		void resizeScreenAct();
 		void closeAct();
 
 		void consolePrintAct(QString, QColor, bool);
-				
+
 	public slots:
 		void print(QString, QColor);
 		void println(QString, QColor);
-		
+
 		void closeCanvan();
 		void minimizeCanvan();
 		void maximizeCanvan();
 
 		void fitScreen();
-				
+		void onConfig(QMap<QString, QVariant*> info);
+
 	protected:
 		void resizeEvent(QResizeEvent *resizeEvent);
 		void mousePressEvent(QMouseEvent *mouseEvent);
@@ -75,19 +73,22 @@ namespace Jui
 		bool showScreen;
 
 		int headerSize, tailSize;
-		
+
 		Button *closeButton, *maximizeButton, *minimizeButton;
 		Edges *edges;
+		QMap<QString, QVariant*> config;
 
 		QImage logo;
 		QLabel *version;
 		//QLabel *title;
-		
+
 		QColor textColor, activeColor, backColor, panelColor;
 
 		QPoint *mCursorGlobal;
 		QPoint *mCursorLocal;
 		QPoint *mFrameOriginGlobal;
+
+
 	};
 
 }

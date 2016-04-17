@@ -9,13 +9,14 @@ namespace Jui
 		installEventFilter(this);
 
 		//QFont font = QFont("Consolas", 8);
-		QFont font = QFont("Monaco", 7, QFont::Normal);
-                font.setStyleStrategy(QFont::NoAntialias);
-//                font.setStretch(QFont::Condensed);
-//		qDebug() << " font.stretch : "<<font.stretch();
-                setFont(font);
+		//QFont font = QFont("Monaco", 7, QFont::Normal);
+		QFont font = QFont("Univers 57 Condensed", 9, QFont::Normal);
+		//font.setStyleStrategy(QFont::NoAntialias);
+		//		qDebug() << " font.stretch : "<<font.stretch();
+		font.setStretch(QFont::Unstretched);
+		setFont(font);
 		setFrameStyle(QFrame::NoFrame);
-                //font.setHintingPreference(QFont::PreferDefault);
+		//font.setHintingPreference(QFont::PreferDefault);
 
 		normalColor = QColor(120, 120, 120);
 		overColor = QColor(230, 230, 230);

@@ -13,13 +13,10 @@ namespace Jui
 
 		this->initControl();
 
-		connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
+		connect(closeButton, SIGNAL(pressAct()), this, SLOT(hide()));
 	}
 
-	QRect Panel::bounds()
-	{
-		return QRect(0, 0, width() - 1, height() - 1);
-	}
+	QRect Panel::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 
 	void Panel::initControl()
 	{
@@ -27,16 +24,11 @@ namespace Jui
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
 		closeButton->setText("X");
-		/*
-		labelName = new QLabel(this);
-		labelName->setFont(QFont("Univers Condensed", 12, QFont::Normal));
-		labelName->setText("labelName");
-		*/
-
+		
 		edges = new Edges(this);
 	}
 
-	void Panel::setTitle(QString name) { title = name; /* labelName->setText(name);*/  }
+	void Panel::setTitle(QString name) { title = name; }
 
 	void Panel::setBackground(QColor backgroundColor) { backColor = backgroundColor; }
 
@@ -68,8 +60,6 @@ namespace Jui
 				edges->addManipulator(EdgeControler::Direction::BOTTOM);
 			}
 			break;
-		default:
-			break;
 		}
 	}
 
@@ -92,8 +82,6 @@ namespace Jui
 	void Panel::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
-		//labelName->setGeometry(15, 5, 80, 30);
-
 		emit resizeAct();
 
 		//qDebug("Panel::resizeEvent");

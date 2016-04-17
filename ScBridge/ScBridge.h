@@ -31,7 +31,12 @@ namespace SupercolliderBridge
 		StateInterpret stateInterpret;
 		StateServer stateServer;
 
-	public slots:
+	private slots:
+		void onReadyRead(void);
+		void onNewIpcConnection();
+		void finalizeConnection();
+		void onIpcData();
+
 		void killBridge();
 		void changeInterpretState();
 		void changeServerState();
@@ -40,7 +45,6 @@ namespace SupercolliderBridge
 		void question(QString pattern, int selector, QString commandString, bool printAnswer = false);
 
 	signals:
-
 		void interpretBootInitAct();
 		void interpretBootDoneAct();
 		void interpretKillInitAct();
@@ -64,12 +68,6 @@ namespace SupercolliderBridge
 		void killBridgeDoneAct();
 
 		//void response(const QString & selector, const QString & data);
-
-	private slots:
-		void onReadyRead(void);
-		void onNewIpcConnection();
-		void finalizeConnection();
-		void onIpcData();
 
 	private:
 		QLocalServer *mIpcServer;

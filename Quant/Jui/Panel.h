@@ -41,8 +41,7 @@ namespace Jui
 	private:
 		QString title;
 		QColor backColor;
-
-		//QLabel *labelName;
+				
 		Button *closeButton;
 
 		Edges *edges;

@@ -7,7 +7,7 @@
 #include <QDebug>
 
 #include "ScBridge.h"
-
+#include "Customize.h"
 #include "Canvan.h"
 #include "Panel.h"
 #include "Edges.h"
@@ -31,6 +31,8 @@ namespace QuantIDE
 		~Quant();
 
 	signals:
+		void bootInterpretAct();
+		void evaulateAct(QString);
 		void print(QString, QColor);
 		void println(QString, QColor);
 
@@ -63,10 +65,11 @@ namespace QuantIDE
 		void initControl();
 
 		ScBridge *bridge;
+		Customize *customize;
 		Canvan *canvan;
 		NodePanel *nodePanel;
 
-		Button *buttLang, *buttServer;
+		Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
 		CodeEditor *globalCode;
 	};
 }

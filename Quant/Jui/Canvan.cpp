@@ -12,7 +12,6 @@ namespace Jui
 		win->setWindowTitle("New Title");
 		//win->window()->setWindowOpacity(0.95);
 
-
 		setGeometry(0, 0, win->width(), win->height());
 		setAttribute(Qt::WA_NoMousePropagation);
 
@@ -73,6 +72,11 @@ namespace Jui
 		setEdgeControler(EdgeControler::Direction::TOP, true);
 		setEdgeControler(EdgeControler::Direction::RIGHT, true);
 		setEdgeControler(EdgeControler::Direction::BOTTOM, true);
+	}
+
+	void Canvan::onConfig(QMap<QString, QVariant*> info)
+	{
+		config = info;
 	}
 
 	void Canvan::print(QString text, QColor col) { emit consolePrintAct(text, col, false); }
@@ -233,7 +237,11 @@ namespace Jui
 
 	void Canvan::setVersion(int major = 0, int minor = 0, int patch = 0)
 	{
-		QString text = tr("v%1.%2%3").arg(QString::number(major), QString::number(minor), QString::number(patch));
+		QString strMajor = QString::number(major);
+		QString strMinor = QString::number(minor);
+		QString strPatch = QString::number(patch);
+		if (patch < 10) { strPatch.prepend(QString::number(0)); }
+		QString text = tr("v%1.%2%3").arg(strMajor, strMinor, strPatch);
 		version->setText(text);
 	}
 
@@ -247,12 +255,12 @@ namespace Jui
 		QFont textFont = QFont("Univers Condensed", 10);
 		QFont codeFont = QFont("Univers 57 Condensed", 10);
 		//QFont codeFont = QFont("Consolas", 8);
-		
+
 		QString txt;
 		txt.append(tr("QLabel { color: %1; }").arg(textColor.name()));
 		//txt.append(tr("QLabel { font: %1; }").arg(textFont2));
 		//txt.append("QLabel { font-weight: bold; }");
-		
+
 		txt.append(tr("QPushButton { background-color: %1; }").arg(backColor.name()));
 		txt.append(tr("QPushButton { color: %1; }").arg(textColor.name()));
 		txt.append(tr("QPushButton { border-style: outset; border-width: 1px; border-color: %1}").arg(textColor.name()));
