@@ -33,6 +33,7 @@ namespace QuantIDE
 	signals:
 		void bootInterpretAct();
 		void evaulateAct(QString);
+		void actConfigData(QMap<QString, QVariant*> config);
 		void print(QString, QColor);
 		void println(QString, QColor);
 

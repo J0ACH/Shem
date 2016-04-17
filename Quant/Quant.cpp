@@ -50,9 +50,7 @@ namespace QuantIDE
 		// CONFIG
 		connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
 			this, SLOT(onConfigData(QMap<QString, QVariant*>)));
-		connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-			canvan, SLOT(onConfigData(QMap<QString, QVariant*>)));
-
+		
 		// MSG actions
 		connect(this, SIGNAL(print(QString, QColor)), canvan, SLOT(print(QString, QColor)));
 		connect(this, SIGNAL(println(QString, QColor)), canvan, SLOT(println(QString, QColor)));
@@ -121,15 +119,17 @@ namespace QuantIDE
 
 	void Quant::onConfigData(QMap<QString, QVariant*> config)
 	{
+		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+			canvan, SLOT(onConfigData(QMap<QString, QVariant*>)));
+		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+			nodePanel, SLOT(onConfigData(QMap<QString, QVariant*>)));
+
 		colorAppBackground = QColor(config.value("shem_colorAppBackground")->value<QColor>());
 		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
 		colorNormal = config.value("shem_colorNormal")->value<QColor>();
 		colorOver = config.value("shem_colorOver")->value<QColor>();
 		colorActive = config.value("shem_colorActive")->value<QColor>();
 		colorText = config.value("shem_colorText")->value<QColor>();
-
-		nodePanel->setColorBackground(colorPanelBackground);
-		nodePanel->setColorTitle(colorText);
 
 		buttLang->setColorNormal(colorNormal);
 		buttServer->setColorNormal(colorNormal);
@@ -148,6 +148,9 @@ namespace QuantIDE
 		buttConsol->setColorActive(colorActive);
 		buttNodes->setColorActive(colorActive);
 		buttCustomize->setColorActive(colorActive);
+
+		emit actConfigData(config);
+		onMsgStatus("Cutomization done...");
 
 		update();
 	}

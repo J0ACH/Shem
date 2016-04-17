@@ -28,6 +28,24 @@ namespace Jui
 		edges = new Edges(this);
 	}
 
+	void Panel::onConfigData(QMap<QString, QVariant*> config)
+	{
+		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
+		colorNormal = config.value("shem_colorNormal")->value<QColor>();
+		colorOver = config.value("shem_colorOver")->value<QColor>();
+		colorActive = config.value("shem_colorActive")->value<QColor>();
+		colorText = config.value("shem_colorText")->value<QColor>();
+
+		this->setColorBackground(colorPanelBackground);
+		this->setColorTitle(colorText);
+
+		closeButton->setColorNormal(colorNormal);
+		closeButton->setColorOver(colorOver);
+		closeButton->setColorActive(colorActive);	
+
+		update();
+	}
+
 	void Panel::setTitle(QString name) { title = name; }
 
 	void Panel::setColorBackground(QColor color) { colorPanelBackground = color; update(); }

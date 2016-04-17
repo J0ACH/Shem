@@ -47,6 +47,8 @@ namespace Jui
 		void resizeScreenAct();
 		void closeAct();
 
+		void actConfigData(QMap<QString, QVariant*> config);
+
 		void consolePrintAct(QString, QColor, bool);
 
 	public slots:
@@ -78,8 +80,8 @@ namespace Jui
 		QMap<QString, QVariant*> config;
 
 		QImage logo;
-		QString version;
 		//QLabel *title;
+		QString version;
 
 		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
 

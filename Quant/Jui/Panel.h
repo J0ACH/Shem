@@ -23,14 +23,15 @@ namespace Jui
 		QRect bounds();
 
 		void initControl();
-
 		void setTitle(QString);
 		void setColorBackground(QColor);
 		void setColorTitle(QColor);
 
 		void setEdgeControler(EdgeControler::Direction, bool);
 
-		//bool eventFilter(QObject *target, QEvent *event);
+	public slots:
+		void onConfigData(QMap<QString, QVariant*> config);
+		
 	signals:
 		void resizeAct();
 	
@@ -41,11 +42,13 @@ namespace Jui
 
 	private:
 		QString title;
-		QColor colorPanelBackground, colorText;
+
+		QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
 				
 		Button *closeButton;
-
 		Edges *edges;
+
+		
 	};
 
 

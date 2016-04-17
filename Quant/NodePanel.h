@@ -36,12 +36,18 @@ namespace QuantIDE
 
 	public slots:
 		void fitGeometry();
+		void onConfigData(QMap<QString, QVariant*> config);
 
 		void addNode();
 		void deleteNode(QString name);
 
+	signals:
+		void actConfigData(QMap<QString, QVariant*> config);
+
 	private:
 		void initControl();
+		QMap<QString, QVariant*> configData;
+		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
 		Button *buttAddNode;
 		QScrollArea *scrollArea;
 		QWidget *scrollWidget;

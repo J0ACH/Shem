@@ -75,6 +75,10 @@ namespace Jui
 
 	void Canvan::onConfigData(QMap<QString, QVariant*> config)
 	{
+
+		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+			mConsole, SLOT(onConfigData(QMap<QString, QVariant*>)));
+
 		colorAppHeaderBackground = config.value("shem_colorAppHeaderBackground")->value<QColor>();
 		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
 		colorNormal = config.value("shem_colorNormal")->value<QColor>();
@@ -82,8 +86,8 @@ namespace Jui
 		colorActive = config.value("shem_colorActive")->value<QColor>();
 		colorText = config.value("shem_colorText")->value<QColor>();
 
-		mConsole->setColorBackground(colorPanelBackground);
-		mConsole->setColorTitle(colorText);
+		//mConsole->setColorBackground(colorPanelBackground);
+		//mConsole->setColorTitle(colorText);
 
 		closeButton->setColorNormal(colorNormal);
 		maximizeButton->setColorNormal(colorNormal);
@@ -130,6 +134,8 @@ namespace Jui
 		txt.append(tr("QToolTip { border: 1px solid white; }"));
 
 		this->setStyleSheet(txt);
+
+		emit actConfigData(config);
 
 		update();
 	}

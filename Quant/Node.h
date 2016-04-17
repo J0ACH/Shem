@@ -42,6 +42,7 @@ namespace QuantIDE
 
 	public slots:
 		void fitGeometry();
+		void onConfigData(QMap<QString, QVariant*> config);
 
 		void onEvaluateNode();
 		void onReciveText(QString);
@@ -67,6 +68,8 @@ namespace QuantIDE
 		void removeControl(QString name);
 
 		QString objectPattern;
+		QMap<QString, QVariant*> configData;
+		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
 
 		ScBridge *mBridge;
 
