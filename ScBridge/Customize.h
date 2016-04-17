@@ -31,6 +31,7 @@ namespace SupercolliderBridge
 
 	signals:
 		void actBridgeQuestion(QString, int, QString, bool);
+		void actConfigData(QMap<QString, QVariant*> config);
 
 	private:
 		ScBridge *mBridge;

@@ -35,6 +35,8 @@ namespace QuantIDE
 		canvan->setTitle("Quant");
 		canvan->setVersion(Quant_VERSION_MAJOR, Quant_VERSION_MINOR, Quant_VERSION_PATCH);
 
+		colorBackground = QColor(20, 220, 20);
+
 		this->initControl();
 		this->fitGeometry();
 		//this->setMouseTracking(true);
@@ -47,6 +49,12 @@ namespace QuantIDE
 		connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
 		connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(close()));
 		connect(globalCode, SIGNAL(sendText(QString)), bridge, SLOT(evaluateCode(QString)));
+
+		// CONFIG
+		connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+			this, SLOT(onConfigData(QMap<QString, QVariant*>)));
+		connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+			canvan, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
 		// MSG actions
 		connect(this, SIGNAL(print(QString, QColor)), canvan, SLOT(print(QString, QColor)));
@@ -113,6 +121,12 @@ namespace QuantIDE
 
 		globalCode = new CodeEditor(nodePanel);
 		globalCode->setText("s.sendMsg('/g_dumpTree', 0, 1)");
+	}
+
+	void Quant::onConfigData(QMap<QString, QVariant*> config)
+	{
+		colorBackground = QColor(config.value("shem_colorAppBackground")->value<QColor>());
+		update();
 	}
 
 	void Quant::fitGeometry()
@@ -184,7 +198,7 @@ namespace QuantIDE
 	void Quant::paintEvent(QPaintEvent *paintEvent)
 	{
 		QPainter painter(this);
-		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), QColor(20, 20, 20));
+		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), colorBackground);
 	}
 	void Quant::closeEvent(QCloseEvent *event)	{ canvan->close(); }
 

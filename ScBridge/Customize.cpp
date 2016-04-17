@@ -81,8 +81,11 @@ namespace SupercolliderBridge
 		configFile->open(QIODevice::WriteOnly | QIODevice::Text);
 
 		QTextStream out(configFile);
-		out << "shem_backgroundColor = " << 230 << "," << 30 << "," << 30 << "\n";
-		out << "shem_textColor = " << 230 << "," << "L" << "," << 230 << "\n";
+		out << "shem_colorAppBackground = " << 230 << "," << 30 << "," << 30 << "\n";
+		out << "shem_colorPanelBackground = " << 230 << "," << 230 << "," << 30 << "\n";
+		out << "shem_colorText = " << 230 << "," << 230 << "," << 230 << "\n";
+		out << "shem_fontText = " << "Univers Condensed" << ", " << 12 << "\n";
+		out << "shem_fontCode = " << "Univers 57 Condensed" << ", " << 9 << "\n";
 
 		configFile->close();
 
@@ -112,19 +115,27 @@ namespace SupercolliderBridge
 			{
 				bool isColor = true;
 				int rgb[3];
-
 				for (int i = 0; i < 3; i++)
 				{
 					bool isNumber;
 					rgb[i] = args[i].toInt(&isNumber, 10);
+					qDebug() << "rgb:" << rgb[i];
 					if (!isNumber) { isColor = false; break; }
 				}
 
-				if (isColor) { value = new QVariant(QColor(rgb[0], rgb[1], rgb[2])); continue; }
+				if (isColor) { 
+					value = new QVariant(QColor(rgb[0], rgb[1], rgb[2])); 
+					configData.insert(key, value);
+					continue; 
+				}
 				else
 				{
 					qDebug() << "neni to barva";
 				}
+			}
+			else if (args.size() == 2)
+			{
+				qDebug() << "mohl by by font";
 			}
 			else
 			{
@@ -148,6 +159,7 @@ namespace SupercolliderBridge
 			qDebug() << "configKey [" << key << "] ->" << configData[key]->toString();
 		}
 
+		emit actConfigData(configData);
 		configFile->close();
 	}
 

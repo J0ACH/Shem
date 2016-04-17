@@ -59,7 +59,7 @@ namespace Jui
 		void maximizeCanvan();
 
 		void fitScreen();
-		void onConfig(QMap<QString, QVariant*> info);
+		void onConfigData(QMap<QString, QVariant*> config);
 
 	protected:
 		void resizeEvent(QResizeEvent *resizeEvent);

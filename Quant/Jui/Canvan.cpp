@@ -64,7 +64,7 @@ namespace Jui
 
 		mConsole = new Console(this);
 		mConsole->setTitle("Console");
-		mConsole->setBackground(QColor(30, 30, 30));
+		
 		mConsole->setGeometry(0, 0, 550, 150);
 
 		edges = new Edges(this);
@@ -74,9 +74,10 @@ namespace Jui
 		setEdgeControler(EdgeControler::Direction::BOTTOM, true);
 	}
 
-	void Canvan::onConfig(QMap<QString, QVariant*> info)
+	void Canvan::onConfigData(QMap<QString, QVariant*> config)
 	{
-		config = info;
+		mConsole->setBackground(config.value("shem_colorPanelBackground")->value<QColor>());
+		update();
 	}
 
 	void Canvan::print(QString text, QColor col) { emit consolePrintAct(text, col, false); }

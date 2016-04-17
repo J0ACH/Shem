@@ -56,6 +56,7 @@ namespace QuantIDE
 		void onServerKillDone();
 
 		void fitGeometry();
+		void onConfigData(QMap<QString, QVariant*> config);
 		
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -68,6 +69,8 @@ namespace QuantIDE
 		Customize *customize;
 		Canvan *canvan;
 		NodePanel *nodePanel;
+
+		QColor colorBackground;
 
 		Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
 		CodeEditor *globalCode;
