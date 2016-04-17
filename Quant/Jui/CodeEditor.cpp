@@ -15,7 +15,7 @@ namespace Jui
 		//		qDebug() << " font.stretch : "<<font.stretch();
 		font.setStretch(QFont::Unstretched);
 		setFont(font);
-		setFrameStyle(QFrame::NoFrame);
+        	setFrameStyle(QFrame::NoFrame);
 		//font.setHintingPreference(QFont::PreferDefault);
 
 		normalColor = QColor(120, 120, 120);
