@@ -40,7 +40,6 @@ namespace Jui
 		void setTailHeight(int);
 		void setTitle(QString titleName);
 		void setLogo(QImage);
-		void setCanvanStyleSheet();
 		void setVersion(int major, int minor, int patch);
 
 	signals:
@@ -82,7 +81,7 @@ namespace Jui
 		QLabel *version;
 		//QLabel *title;
 
-		QColor textColor, activeColor, backColor, panelColor;
+		QColor colorText, colorActive, colorAppHeaderBackground, colorPanelBackground;
 
 		QPoint *mCursorGlobal;
 		QPoint *mCursorLocal;

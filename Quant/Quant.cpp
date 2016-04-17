@@ -35,13 +35,10 @@ namespace QuantIDE
 		canvan->setTitle("Quant");
 		canvan->setVersion(Quant_VERSION_MAJOR, Quant_VERSION_MINOR, Quant_VERSION_PATCH);
 
-		colorBackground = QColor(20, 220, 20);
-
 		this->initControl();
 		this->fitGeometry();
 		//this->setMouseTracking(true);
-
-
+		
 		// CONTROLS
 		connect(this, SIGNAL(bootInterpretAct()), bridge, SLOT(changeInterpretState()));
 		connect(this, SIGNAL(evaulateAct(QString)), bridge, SLOT(evaluateCode(QString)));
@@ -89,7 +86,6 @@ namespace QuantIDE
 	{
 		nodePanel = new NodePanel(canvan->screen);
 		nodePanel->setTitle("NodePanel");
-		nodePanel->setBackground(QColor(20, 20, 20));
 		nodePanel->setTargetBridge(bridge);
 
 		buttLang = new Button(canvan->tail);
@@ -125,7 +121,32 @@ namespace QuantIDE
 
 	void Quant::onConfigData(QMap<QString, QVariant*> config)
 	{
-		colorBackground = QColor(config.value("shem_colorAppBackground")->value<QColor>());
+		colorAppBackground = QColor(config.value("shem_colorAppBackground")->value<QColor>());
+		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
+		colorNormal = config.value("shem_colorNormal")->value<QColor>();
+		colorOver = config.value("shem_colorOver")->value<QColor>();
+		colorActive = config.value("shem_colorActive")->value<QColor>();
+
+		nodePanel->setBackground(colorPanelBackground);
+
+		buttLang->setColorNormal(colorNormal);
+		buttServer->setColorNormal(colorNormal);
+		buttConsol->setColorNormal(colorNormal);
+		buttNodes->setColorNormal(colorNormal);
+		buttCustomize->setColorNormal(colorNormal);
+
+		buttLang->setColorOver(colorOver);
+		buttServer->setColorOver(colorOver);
+		buttConsol->setColorOver(colorOver);
+		buttNodes->setColorOver(colorOver);
+		buttCustomize->setColorOver(colorOver);
+
+		buttLang->setColorActive(colorActive);
+		buttServer->setColorActive(colorActive);
+		buttConsol->setColorActive(colorActive);
+		buttNodes->setColorActive(colorActive);
+		buttCustomize->setColorActive(colorActive);
+
 		update();
 	}
 
@@ -198,7 +219,7 @@ namespace QuantIDE
 	void Quant::paintEvent(QPaintEvent *paintEvent)
 	{
 		QPainter painter(this);
-		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), colorBackground);
+		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), colorAppBackground);
 	}
 	void Quant::closeEvent(QCloseEvent *event)	{ canvan->close(); }
 

@@ -70,7 +70,7 @@ namespace QuantIDE
 		Canvan *canvan;
 		NodePanel *nodePanel;
 
-		QColor colorBackground;
+		QColor colorAppBackground, colorPanelBackground, colorNormal, colorOver, colorActive;
 
 		Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
 		CodeEditor *globalCode;
