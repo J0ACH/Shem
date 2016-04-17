@@ -15,11 +15,10 @@ namespace Jui
 		isPressed = false;
 		isOver = false;
 
-		normalColor = QColor(120, 120, 120);
-		overColor = QColor(230, 230, 230);
-		//activeColor = QColor(50, 65, 95);
-		activeColor = QColor(70, 140, 210);
-		penColor = normalColor;
+		//QColor normalColor = Qt::gray;
+		//QColor overColor = Qt::white;
+		//QColor activeColor = Qt::red;
+		//penColor = normalColor;
 
 		iconOffset = 0;
 
@@ -36,9 +35,10 @@ namespace Jui
 
 	void Button::setText(QString buttonName) { name = buttonName; }
 	void Button::setIcon(QImage img, int offset = 0) { icon = img; iconOffset = offset; }
-	void Button::setNormalColor(QColor color){ normalColor = color; }
-	void Button::setOverColor(QColor color){ overColor = color; }
-	void Button::setActiveColor(QColor color){ activeColor = color; }
+	void Button::setColorNormal(QColor color){ normalColor = color; penColor = normalColor; update(); }
+	void Button::setColorOver(QColor color){ overColor = color; update(); }
+	void Button::setColorActive(QColor color){ activeColor = color; update(); }
+	void Button::setState(State newState) { buttonState = newState; update();  }
 	void Button::setStateKeeping(StateKeeping mode) { buttonKeeping = mode; }
 
 	QRect Button::bounds() { return QRect(1, 1, width()-2, height()-2); }
@@ -79,7 +79,9 @@ namespace Jui
 	void Button::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
-		painter.setFont(QFont("Univers Condensed", 10, QFont::Normal));		
+		QFont font = QFont("Univers Condensed", 10, QFont::Normal);
+		font.setStretch(QFont::Unstretched);
+		painter.setFont(font);		
 
 		penColor = blendColor(normalColor, overColor, ratio);
 		painter.setPen(QPen(penColor, 1));

@@ -42,6 +42,24 @@ namespace QuantIDE
 		scrollWidget->show();
 	}
 
+	void NodePanel::onConfigData(QMap<QString, QVariant*> config)
+	{
+		colorNormal = config.value("shem_colorNormal")->value<QColor>();
+		colorOver = config.value("shem_colorOver")->value<QColor>();
+		colorActive = config.value("shem_colorActive")->value<QColor>();
+		
+		Panel::onConfigData(config);
+
+		buttAddNode->setColorNormal(colorNormal);
+		buttAddNode->setColorOver(colorOver);
+		buttAddNode->setColorActive(colorActive);
+
+		configData = config;
+		emit actConfigData(config);
+
+		update();
+	}
+
 	void NodePanel::addNode()
 	{
 		qDebug("NodePanel::addNode()");
@@ -54,11 +72,14 @@ namespace QuantIDE
 
 		connect(this, SIGNAL(resizeAct()), newNode, SLOT(fitGeometry()));
 		connect(newNode, SIGNAL(killAct(QString)), this, SLOT(deleteNode(QString)));
+		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+			newNode, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
 		dictNode.insert(newNode->name(), newNode);
 
 
 		emit resizeAct();
+		emit actConfigData(configData);
 		testID += 1;
 	}
 

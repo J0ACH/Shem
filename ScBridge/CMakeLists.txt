@@ -16,8 +16,14 @@ SET(QT_LIBRARIES
 	Qt5::Network
 )
 
-SET(ScBridge_hdr ScBridge.h)
-SET(ScBridge_src ScBridge.cpp)
+SET(ScBridge_hdr 
+  ScBridge.h
+  Customize.h
+)
+SET(ScBridge_src 
+  ScBridge.cpp
+  Customize.cpp
+)
 
 QT5_WRAP_CPP( ScBridge_moc ${ScBridge_hdr} )
 

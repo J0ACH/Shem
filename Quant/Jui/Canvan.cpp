@@ -12,7 +12,6 @@ namespace Jui
 		win->setWindowTitle("New Title");
 		//win->window()->setWindowOpacity(0.95);
 
-
 		setGeometry(0, 0, win->width(), win->height());
 		setAttribute(Qt::WA_NoMousePropagation);
 
@@ -36,7 +35,6 @@ namespace Jui
 		QFontDatabase::addApplicationFont(":/fontCode.ttf");
 
 		this->initControl();
-		this->setCanvanStyleSheet();
 
 		connect(this, SIGNAL(consolePrintAct(QString, QColor, bool)), mConsole, SLOT(addText(QString, QColor, bool)));
 
@@ -59,13 +57,13 @@ namespace Jui
 		minimizeButton = new Button(header);
 		minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
 
-		version = new QLabel(tail);
-		version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		version->setFont(QFont("Univers Condensed", 10));
+	//	version = new QLabel(tail);
+	//	version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//	version->setFont(QFont("Univers Condensed", 10));
 
 		mConsole = new Console(this);
 		mConsole->setTitle("Console");
-		mConsole->setBackground(QColor(30, 30, 30));
+
 		mConsole->setGeometry(0, 0, 550, 150);
 
 		edges = new Edges(this);
@@ -73,6 +71,73 @@ namespace Jui
 		setEdgeControler(EdgeControler::Direction::TOP, true);
 		setEdgeControler(EdgeControler::Direction::RIGHT, true);
 		setEdgeControler(EdgeControler::Direction::BOTTOM, true);
+	}
+
+	void Canvan::onConfigData(QMap<QString, QVariant*> config)
+	{
+
+		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+			mConsole, SLOT(onConfigData(QMap<QString, QVariant*>)));
+
+		colorAppHeaderBackground = config.value("shem_colorAppHeaderBackground")->value<QColor>();
+		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
+		colorNormal = config.value("shem_colorNormal")->value<QColor>();
+		colorOver = config.value("shem_colorOver")->value<QColor>();
+		colorActive = config.value("shem_colorActive")->value<QColor>();
+		colorText = config.value("shem_colorText")->value<QColor>();
+
+		//mConsole->setColorBackground(colorPanelBackground);
+		//mConsole->setColorTitle(colorText);
+
+		closeButton->setColorNormal(colorNormal);
+		maximizeButton->setColorNormal(colorNormal);
+		minimizeButton->setColorNormal(colorNormal);
+
+		closeButton->setColorOver(colorOver);
+		maximizeButton->setColorOver(colorOver);
+		minimizeButton->setColorOver(colorOver);
+
+		closeButton->setColorActive(colorActive);
+		maximizeButton->setColorActive(colorActive);
+		minimizeButton->setColorActive(colorActive);
+
+		// STYLESHEET SETUP
+		QString txt;
+		txt.append(tr("QLabel { color: %1; }").arg(colorText.name()));
+
+		txt.append(tr("QPushButton { background-color: %1; }").arg(colorPanelBackground.name()));
+		txt.append(tr("QPushButton { color: %1; }").arg(colorText.name()));
+		txt.append(tr("QPushButton { border-style: outset; border-width: 1px; border-color: %1}").arg(colorText.name()));
+		txt.append(tr("QPushButton:pressed{ background-color: %1; border-style: inset; }").arg(colorActive.name()));
+
+		txt.append(tr("QTextEdit { color: %1; }").arg(colorText.name()));
+		txt.append(tr("QTextEdit { background-color: %1; }").arg(colorPanelBackground.name()));
+		txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(colorActive.name()));
+
+		txt.append("QScrollBar:vertical { width: 2px; }");
+		txt.append("QScrollBar:horizontal { height: 2px; }");
+		txt.append(tr("QScrollBar:vertical { background: %1; }").arg(colorPanelBackground.name()));
+		txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(colorPanelBackground.name()));
+		txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(colorText.name()));
+		txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(colorText.name()));
+		txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
+		txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
+		txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
+		txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
+		txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
+		txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
+		txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
+		txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
+
+		txt.append(tr("QToolTip { color: %1; }").arg(colorText.name()));
+		txt.append(tr("QToolTip { background-color:  %1; }").arg(colorPanelBackground.name()));
+		txt.append(tr("QToolTip { border: 1px solid white; }"));
+
+		this->setStyleSheet(txt);
+
+		emit actConfigData(config);
+
+		update();
 	}
 
 	void Canvan::print(QString text, QColor col) { emit consolePrintAct(text, col, false); }
@@ -123,7 +188,7 @@ namespace Jui
 		this->fitScreen();
 		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
 
-		version->setGeometry(tail->width() - 180, 0, 170, tail->height() - 5);
+		//version->setGeometry(tail->width() - 180, 0, 170, tail->height() - 5);
 
 		mConsole->setGeometry(
 			this->width() - mConsole->width(),
@@ -151,14 +216,13 @@ namespace Jui
 	void Canvan::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
-		painter.setRenderHint(QPainter::SmoothPixmapTransform);
+		painter.setFont(QFont("Univers Condensed", 10, QFont::Normal));
 
 		painter.setPen(Qt::NoPen);
-		//painter.fillRect(screen->geometry(), QColor(20, 20, 20));
-		painter.fillRect(header->geometry(), QColor(40, 40, 40));
-		painter.fillRect(tail->geometry(), QColor(40, 40, 40));
+		painter.fillRect(header->geometry(), colorAppHeaderBackground);
+		painter.fillRect(tail->geometry(), colorAppHeaderBackground);
 
-		painter.setPen(QPen(QColor(200, 200, 200), 1));
+		painter.setPen(QPen(colorNormal, 1));
 		painter.setBrush(Qt::NoBrush);
 		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 
@@ -173,24 +237,15 @@ namespace Jui
 		QRectF source(0, 0, logo.width(), logo.height());
 
 		QImage renderedIcon(logo);
-		renderedIcon.fill(QColor(120, 120, 120));
-
+		renderedIcon.fill(colorNormal);
 		renderedIcon.setAlphaChannel(logo);
 		painter.drawImage(target, renderedIcon, source);
 
-		//painter.drawRect(target);
-
-		//qDebug("Canvan::paintEvent");
-		//msgConsole("Canvan draw...");
+		painter.setPen(QPen(colorText, 1));
+		QTextOption opt;
+		opt.setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		painter.drawText(tail->geometry().adjusted(tail->width()-100, 5, -10 , -5), version, opt);
 	}
-
-	void Canvan::setHeaderHeight(int height) { headerSize = height; }
-
-	void Canvan::setTailHeight(int height) { tailSize = height; }
-
-	void Canvan::setLogo(QImage img) { logo = img; }
-
-	void Canvan::setTitle(QString name)	{ win->setWindowTitle(name); }
 
 	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)
 	{
@@ -231,60 +286,18 @@ namespace Jui
 		screen = inScreen;
 	}
 
+	void Canvan::setHeaderHeight(int height) { headerSize = height; }
+	void Canvan::setTailHeight(int height) { tailSize = height; }
+	void Canvan::setLogo(QImage img) { logo = img; }
+	void Canvan::setTitle(QString name)	{ win->setWindowTitle(name); }
 	void Canvan::setVersion(int major = 0, int minor = 0, int patch = 0)
 	{
-		QString text = tr("v%1.%2%3").arg(QString::number(major), QString::number(minor), QString::number(patch));
-		version->setText(text);
-	}
-
-	void Canvan::setCanvanStyleSheet()
-	{
-		backColor = QColor(30, 30, 30);
-		panelColor = QColor(20, 20, 20);
-		textColor = QColor(230, 230, 230);
-		activeColor = QColor(20, 180, 240);
-
-		QFont textFont = QFont("Univers Condensed", 10);
-		QFont codeFont = QFont("Univers 57 Condensed", 10);
-		//QFont codeFont = QFont("Consolas", 8);
-		
-		QString txt;
-		txt.append(tr("QLabel { color: %1; }").arg(textColor.name()));
-		//txt.append(tr("QLabel { font: %1; }").arg(textFont2));
-		//txt.append("QLabel { font-weight: bold; }");
-		
-		txt.append(tr("QPushButton { background-color: %1; }").arg(backColor.name()));
-		txt.append(tr("QPushButton { color: %1; }").arg(textColor.name()));
-		txt.append(tr("QPushButton { border-style: outset; border-width: 1px; border-color: %1}").arg(textColor.name()));
-		txt.append(tr("QPushButton:pressed{ background-color: %1; border-style: inset; }").arg(activeColor.name()));
-
-		txt.append(tr("QTextEdit { color: %1; }").arg(textColor.name()));
-		txt.append(tr("QTextEdit { background-color: %1; }").arg(backColor.name()));
-		txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(activeColor.name()));
-
-		//txt.append(tr("QScrollArea { background-color:%1; }").arg(backColor.name()));
-
-		txt.append("QScrollBar:vertical { width: 2px; }");
-		txt.append("QScrollBar:horizontal { height: 2px; }");
-		txt.append(tr("QScrollBar:vertical { background: %1; }").arg(backColor.name()));
-		txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(backColor.name()));
-		txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(textColor.name()));
-		txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(textColor.name()));
-		txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
-		txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
-		txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
-		txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
-		txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
-		txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
-		txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
-		txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
-
-		txt.append(tr("QToolTip { color: %1; }").arg(textColor.name()));
-		txt.append(tr("QToolTip { background-color:  %1; }").arg(backColor.name()));
-		txt.append(tr("QToolTip { border: 1px solid white; }"));
-
-		//qDebug() << "TXT:" << txt;
-		this->setStyleSheet(txt);
+		QString strMajor = QString::number(major);
+		QString strMinor = QString::number(minor);
+		QString strPatch = QString::number(patch);
+		if (patch < 10) { strPatch.prepend(QString::number(0)); }
+		version = tr("v%1.%2%3").arg(strMajor, strMinor, strPatch);
+		//version->setText(text);
 	}
 
 	void Canvan::closeCanvan() {

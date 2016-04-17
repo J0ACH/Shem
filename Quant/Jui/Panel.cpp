@@ -9,17 +9,14 @@ namespace Jui
 		setObjectName("Panel");
 
 		title = "panel";
-		backColor = QColor(120, 120, 120);
+		colorPanelBackground = QColor(120, 120, 120);
 
 		this->initControl();
 
-		connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
+		connect(closeButton, SIGNAL(pressAct()), this, SLOT(hide()));
 	}
 
-	QRect Panel::bounds()
-	{
-		return QRect(0, 0, width() - 1, height() - 1);
-	}
+	QRect Panel::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 
 	void Panel::initControl()
 	{
@@ -27,18 +24,32 @@ namespace Jui
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
 		closeButton->setText("X");
-		/*
-		labelName = new QLabel(this);
-		labelName->setFont(QFont("Univers Condensed", 12, QFont::Normal));
-		labelName->setText("labelName");
-		*/
 
 		edges = new Edges(this);
 	}
 
-	void Panel::setTitle(QString name) { title = name; /* labelName->setText(name);*/  }
+	void Panel::onConfigData(QMap<QString, QVariant*> config)
+	{
+		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
+		colorNormal = config.value("shem_colorNormal")->value<QColor>();
+		colorOver = config.value("shem_colorOver")->value<QColor>();
+		colorActive = config.value("shem_colorActive")->value<QColor>();
+		colorText = config.value("shem_colorText")->value<QColor>();
 
-	void Panel::setBackground(QColor backgroundColor) { backColor = backgroundColor; }
+		this->setColorBackground(colorPanelBackground);
+		this->setColorTitle(colorText);
+
+		closeButton->setColorNormal(colorNormal);
+		closeButton->setColorOver(colorOver);
+		closeButton->setColorActive(colorActive);	
+
+		update();
+	}
+
+	void Panel::setTitle(QString name) { title = name; }
+
+	void Panel::setColorBackground(QColor color) { colorPanelBackground = color; update(); }
+	void Panel::setColorTitle(QColor color) { colorText = color; update(); }
 
 	void Panel::setEdgeControler(EdgeControler::Direction direction, bool visible)
 	{
@@ -68,8 +79,6 @@ namespace Jui
 				edges->addManipulator(EdgeControler::Direction::BOTTOM);
 			}
 			break;
-		default:
-			break;
 		}
 	}
 
@@ -79,21 +88,15 @@ namespace Jui
 	{
 		QPainter painter(this);
 		painter.setFont(QFont("Univers Condensed", 12, QFont::Normal));
-		painter.fillRect(bounds(), backColor);
+		painter.fillRect(bounds(), colorPanelBackground);
 
-		painter.setPen(QPen(QColor(200, 200, 200), 1));
-		//painter.drawRect(bounds().adjusted(5, 5, -5, -5));
-		QTextOption option;
+		painter.setPen(QPen(colorText, 1));
 		painter.drawText(15, 25, title);
-
-		//qDebug("Panel::paintEvent");
 	}
 
 	void Panel::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
-		//labelName->setGeometry(15, 5, 80, 30);
-
 		emit resizeAct();
 
 		//qDebug("Panel::resizeEvent");

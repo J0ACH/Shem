@@ -5,7 +5,7 @@ CMAKE_MINIMUM_REQUIRED ( VERSION 3.4 )
 # INCLUDE #######################################################
 INCLUDE("QuantVersion.txt" ${QT_USE_FILE})
 SET(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH}")
-MESSAGE(STATUS "\nQuant [${PROJECT_VERSION}] init...")
+MESSAGE(STATUS "\nQuant init...")
 
 CONFIGURE_FILE (
   ${CMAKE_CURRENT_SOURCE_DIR}/QuantConfig.h.in

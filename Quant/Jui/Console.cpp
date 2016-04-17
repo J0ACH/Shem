@@ -9,13 +9,16 @@ namespace Jui
 
 		setEdgeControler(EdgeControler::Direction::LEFT, true);
 
+		QFont font = QFont("Univers 57 Condensed", 9, QFont::Normal);
+		font.setStretch(QFont::Unstretched);
+
 		text = new QTextEdit(this);
 		text->setReadOnly(true);
 		text->setOverwriteMode(false);
 		text->setTabStopWidth(30);
 		//text->setFont(QFont("Consolas", 8));
 		//text->setFont(QFont("Univers Condensed", 10, QFont::Normal));
-		text->setFont(QFont("Univers 57 Condensed", 9, QFont::Normal));
+		text->setFont(font);
 		text->setFrameStyle(QFrame::NoFrame);
 
 		text->append(tr("Console init..."));

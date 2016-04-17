@@ -5,7 +5,7 @@
     <file alias="server_32px.png">Resources/server_32px.png</file>    
     <file alias="lang_16px.png">Resources/lang_16px.png</file>
     <file alias="server_16px.png">Resources/server_16px.png</file>
-    <file alias="fontText.ttf">Resources/Monaco.ttf</file>
-    <file alias="fontCode.ttf">Resources/Monaco.ttf</file>
+    <file alias="fontText.ttf">Resources/UniversCondensed.ttf</file>
+    <file alias="fontCode.ttf">Resources/Univers_57_condensed.ttf</file>
    </qresource>
 </RCC>

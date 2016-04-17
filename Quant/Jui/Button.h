@@ -26,15 +26,14 @@ namespace Jui
 
 		QRect bounds();
 
+		void setState(State);
+		void setStateKeeping(StateKeeping);
 		void setIcon(QImage, int);
 		void setText(QString name);
-
-		void setNormalColor(QColor);
-		void setOverColor(QColor);
-		void setActiveColor(QColor);
-
-		void setStateKeeping(StateKeeping);
-
+		void setColorNormal(QColor);
+		void setColorOver(QColor);
+		void setColorActive(QColor);
+		
 	signals:
 		void pressAct();
 		//void enterAct(QString name);

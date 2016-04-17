@@ -49,6 +49,27 @@ namespace QuantIDE
 		labelNamedControls->setFont(fontSmall);
 	}
 
+	void Node::onConfigData(QMap<QString, QVariant*> config)
+	{
+		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
+		colorNormal = config.value("shem_colorNormal")->value<QColor>();
+		colorOver = config.value("shem_colorOver")->value<QColor>();
+		colorActive = config.value("shem_colorActive")->value<QColor>();
+
+		closeButton->setColorNormal(colorNormal);
+		closeButton->setColorOver(colorOver);
+		closeButton->setColorActive(colorActive);
+
+		playButton->setColorNormal(colorNormal);
+		playButton->setColorOver(colorOver);
+		playButton->setColorActive(colorActive);
+
+		configData = config;
+		//emit actConfigData(config);
+
+		update();
+	}
+
 	void Node::connectBridge(ScBridge *bridge)
 	{
 		mBridge = bridge;
@@ -265,9 +286,9 @@ namespace QuantIDE
 	void Node::paintEvent(QPaintEvent *paintEvent)
 	{
 		QPainter painter(this);
-		painter.fillRect(this->bounds(), QColor(30, 30, 30));
+		painter.fillRect(this->bounds(), colorPanelBackground);
 
-		painter.setPen(QColor(230, 230, 230));
+		painter.setPen(colorOver);
 		painter.drawLine(0, 0, width(), 0);
 		painter.drawLine(0, height() - 1, width(), height() - 1);
 	}

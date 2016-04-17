@@ -14,7 +14,7 @@ namespace Jui
 	public:
 		Console(QWidget *parent);
 		~Console();
-
+		
 	public slots:
 		void addText(QString text, QColor color, bool newLine);
 		void fitGeometry();

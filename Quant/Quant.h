@@ -7,7 +7,7 @@
 #include <QDebug>
 
 #include "ScBridge.h"
-
+#include "Customize.h"
 #include "Canvan.h"
 #include "Panel.h"
 #include "Edges.h"
@@ -31,6 +31,9 @@ namespace QuantIDE
 		~Quant();
 
 	signals:
+		void bootInterpretAct();
+		void evaulateAct(QString);
+		void actConfigData(QMap<QString, QVariant*> config);
 		void print(QString, QColor);
 		void println(QString, QColor);
 
@@ -54,6 +57,7 @@ namespace QuantIDE
 		void onServerKillDone();
 
 		void fitGeometry();
+		void onConfigData(QMap<QString, QVariant*> config);
 		
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -63,10 +67,13 @@ namespace QuantIDE
 		void initControl();
 
 		ScBridge *bridge;
+		Customize *customize;
 		Canvan *canvan;
 		NodePanel *nodePanel;
 
-		Button *buttLang, *buttServer;
+		QColor colorAppBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+
+		Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
 		CodeEditor *globalCode;
 	};
 }
