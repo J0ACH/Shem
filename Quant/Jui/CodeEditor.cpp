@@ -12,7 +12,7 @@ namespace Jui
 		QFont font = QFont("Monaco", 7, QFont::Normal);
                 font.setStyleStrategy(QFont::NoAntialias);
 //                font.setStretch(QFont::Condensed);
-//		qDebug() << " font.stretch : "<<font.stretch();
+		qDebug() << " font.stretch : "<<font.stretch();
                 setFont(font);
 		setFrameStyle(QFrame::NoFrame);
                 //font.setHintingPreference(QFont::PreferDefault);
