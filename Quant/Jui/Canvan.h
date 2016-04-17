@@ -78,10 +78,10 @@ namespace Jui
 		QMap<QString, QVariant*> config;
 
 		QImage logo;
-		QLabel *version;
+		QString version;
 		//QLabel *title;
 
-		QColor colorText, colorActive, colorAppHeaderBackground, colorPanelBackground;
+		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
 
 		QPoint *mCursorGlobal;
 		QPoint *mCursorLocal;

@@ -25,7 +25,8 @@ namespace Jui
 		void initControl();
 
 		void setTitle(QString);
-		void setBackground(QColor);
+		void setColorBackground(QColor);
+		void setColorTitle(QColor);
 
 		void setEdgeControler(EdgeControler::Direction, bool);
 
@@ -40,7 +41,7 @@ namespace Jui
 
 	private:
 		QString title;
-		QColor backColor;
+		QColor colorPanelBackground, colorText;
 				
 		Button *closeButton;
 

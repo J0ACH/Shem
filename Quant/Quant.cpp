@@ -126,8 +126,10 @@ namespace QuantIDE
 		colorNormal = config.value("shem_colorNormal")->value<QColor>();
 		colorOver = config.value("shem_colorOver")->value<QColor>();
 		colorActive = config.value("shem_colorActive")->value<QColor>();
+		colorText = config.value("shem_colorText")->value<QColor>();
 
-		nodePanel->setBackground(colorPanelBackground);
+		nodePanel->setColorBackground(colorPanelBackground);
+		nodePanel->setColorTitle(colorText);
 
 		buttLang->setColorNormal(colorNormal);
 		buttServer->setColorNormal(colorNormal);

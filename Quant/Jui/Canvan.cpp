@@ -57,9 +57,9 @@ namespace Jui
 		minimizeButton = new Button(header);
 		minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
 
-		version = new QLabel(tail);
-		version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		version->setFont(QFont("Univers Condensed", 10));
+	//	version = new QLabel(tail);
+	//	version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//	version->setFont(QFont("Univers Condensed", 10));
 
 		mConsole = new Console(this);
 		mConsole->setTitle("Console");
@@ -77,10 +77,25 @@ namespace Jui
 	{
 		colorAppHeaderBackground = config.value("shem_colorAppHeaderBackground")->value<QColor>();
 		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
+		colorNormal = config.value("shem_colorNormal")->value<QColor>();
+		colorOver = config.value("shem_colorOver")->value<QColor>();
 		colorActive = config.value("shem_colorActive")->value<QColor>();
 		colorText = config.value("shem_colorText")->value<QColor>();
-		
-		mConsole->setBackground(colorPanelBackground);
+
+		mConsole->setColorBackground(colorPanelBackground);
+		mConsole->setColorTitle(colorText);
+
+		closeButton->setColorNormal(colorNormal);
+		maximizeButton->setColorNormal(colorNormal);
+		minimizeButton->setColorNormal(colorNormal);
+
+		closeButton->setColorOver(colorOver);
+		maximizeButton->setColorOver(colorOver);
+		minimizeButton->setColorOver(colorOver);
+
+		closeButton->setColorActive(colorActive);
+		maximizeButton->setColorActive(colorActive);
+		minimizeButton->setColorActive(colorActive);
 
 		// STYLESHEET SETUP
 		QString txt;
@@ -167,7 +182,7 @@ namespace Jui
 		this->fitScreen();
 		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
 
-		version->setGeometry(tail->width() - 180, 0, 170, tail->height() - 5);
+		//version->setGeometry(tail->width() - 180, 0, 170, tail->height() - 5);
 
 		mConsole->setGeometry(
 			this->width() - mConsole->width(),
@@ -195,13 +210,13 @@ namespace Jui
 	void Canvan::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
-		//painter.setRenderHint(QPainter::SmoothPixmapTransform);
+		painter.setFont(QFont("Univers Condensed", 10, QFont::Normal));
 
 		painter.setPen(Qt::NoPen);
 		painter.fillRect(header->geometry(), colorAppHeaderBackground);
 		painter.fillRect(tail->geometry(), colorAppHeaderBackground);
 
-		painter.setPen(QPen(colorText, 1));
+		painter.setPen(QPen(colorNormal, 1));
 		painter.setBrush(Qt::NoBrush);
 		painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 
@@ -216,17 +231,16 @@ namespace Jui
 		QRectF source(0, 0, logo.width(), logo.height());
 
 		QImage renderedIcon(logo);
-		renderedIcon.fill(colorText);
-
+		renderedIcon.fill(colorNormal);
 		renderedIcon.setAlphaChannel(logo);
 		painter.drawImage(target, renderedIcon, source);
 
-		//painter.drawRect(target);
-
-		//qDebug("Canvan::paintEvent");
-		//msgConsole("Canvan draw...");
+		painter.setPen(QPen(colorText, 1));
+		QTextOption opt;
+		opt.setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		painter.drawText(tail->geometry().adjusted(tail->width()-100, 5, -10 , -5), version, opt);
 	}
-	
+
 	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)
 	{
 		isPressed = true;
@@ -276,8 +290,8 @@ namespace Jui
 		QString strMinor = QString::number(minor);
 		QString strPatch = QString::number(patch);
 		if (patch < 10) { strPatch.prepend(QString::number(0)); }
-		QString text = tr("v%1.%2%3").arg(strMajor, strMinor, strPatch);
-		version->setText(text);
+		version = tr("v%1.%2%3").arg(strMajor, strMinor, strPatch);
+		//version->setText(text);
 	}
 
 	void Canvan::closeCanvan() {
