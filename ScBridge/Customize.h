@@ -4,6 +4,8 @@
 #include "ScBridge.h"
 
 #include <QWidget>
+#include <QDir>
+#include <QFile>
 #include <QMap>
 #include <QDebug>
 
@@ -34,13 +36,15 @@ namespace SupercolliderBridge
 		ScBridge *mBridge;
 		QString objectPattern;
 		QMap<QString, QVariant*> dictNode;
+		QFile *configFile;
 
 		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
-
-		QString configDir;
-
+		void initConfigFile(QString systemExtensionDir);
+		
+		void readConfigFile();
+		void writeConfigFile();
 	};
 }
 
-#endif // QUANT
+#endif // CUSTOMIZE
 
