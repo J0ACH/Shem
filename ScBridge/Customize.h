@@ -15,6 +15,8 @@ namespace SupercolliderBridge
 	{
 		Q_OBJECT
 
+		enum QuestionType { appExtensionDir };
+
 	public:
 		Customize(QObject *parent = 0);
 		~Customize();
@@ -23,12 +25,20 @@ namespace SupercolliderBridge
 
 	public slots:
 		void onInterpretStart();
+		void onBridgeAnswer(QString, int, QStringList);
 
-		
+	signals:
+		void actBridgeQuestion(QString, int, QString, bool);
+
 	private:
 		ScBridge *mBridge;
+		QString objectPattern;
 		QMap<QString, QVariant*> dictNode;
-		
+
+		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
+
+		QString configDir;
+
 	};
 }
 
