@@ -24,7 +24,13 @@ namespace Jui
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
 	}
 
-	void Console::setFont(QFont font) { text->setFont(font); update(); }
+	void Console::setFont(QFont font) 
+	{ 
+		text->setFont(font);
+		text->verticalScrollBar()->setValue(text->verticalScrollBar()->maximum());
+
+		update();
+	}
 
 	void Console::addText(QString newText, QColor color, bool newLine)
 	{		
@@ -37,11 +43,8 @@ namespace Jui
 		}
 		else
 		{
-			//QString old = text->toPlainText();
-			//text->setText(old.operator+=(newText.toLatin1()));
-			//	text->setPlainText(old.operator+=(newText));
-			//text->append(newText);
 			text->insertPlainText(newText); // problem s udrzeni pohledu na konci konzole
+			text->verticalScrollBar()->setValue(text->verticalScrollBar()->maximum());
 		}
 
 		format.setForeground(QBrush(QColor(230, 230, 230), Qt::SolidPattern));

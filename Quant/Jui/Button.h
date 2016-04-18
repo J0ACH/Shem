@@ -30,6 +30,7 @@ namespace Jui
 		void setStateKeeping(StateKeeping);
 		void setIcon(QImage, int);
 		void setText(QString name);
+		void setFont(QFont);
 		void setColorNormal(QColor);
 		void setColorOver(QColor);
 		void setColorActive(QColor);
@@ -53,6 +54,7 @@ namespace Jui
 		bool isPressed, isOver;
 
 		QString name;
+		QFont fontText;
 		QImage icon;
 		QColor normalColor, overColor, activeColor;
 		QColor blendColor(QColor, QColor, qreal);

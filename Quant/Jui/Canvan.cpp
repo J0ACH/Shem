@@ -57,10 +57,6 @@ namespace Jui
 		minimizeButton = new Button(header);
 		minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
 
-		//	version = new QLabel(tail);
-		//	version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		//	version->setFont(QFont("Univers Condensed", 10));
-
 		mConsole = new Console(this);
 		mConsole->setTitle("Console");
 
@@ -86,6 +82,7 @@ namespace Jui
 		colorActive = config.value("shem_colorActive")->value<QColor>();
 		colorText = config.value("shem_colorText")->value<QColor>();
 		fontTextSmall = config.value("shem_fontTextSmall")->value<QFont>();
+		fontCode = config.value("shem_fontCode")->value<QFont>();
 
 		mConsole->setFont(fontTextSmall);
 
@@ -187,8 +184,6 @@ namespace Jui
 		header->setGeometry(0, 0, this->width(), headerSize);
 		this->fitScreen();
 		tail->setGeometry(0, this->height() - tailSize, this->width(), tailSize);
-
-		//version->setGeometry(tail->width() - 180, 0, 170, tail->height() - 5);
 
 		mConsole->setGeometry(
 			this->width() - mConsole->width(),
@@ -297,7 +292,6 @@ namespace Jui
 		QString strPatch = QString::number(patch);
 		if (patch < 10) { strPatch.prepend(QString::number(0)); }
 		version = tr("v%1.%2%3").arg(strMajor, strMinor, strPatch);
-		//version->setText(text);
 	}
 
 	void Canvan::closeCanvan() {

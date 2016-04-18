@@ -77,7 +77,7 @@ namespace QuantIDE
 		connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
 
 		emit bootInterpretAct();
-		onMsgStatus("Quant init...");
+		onMsgStatus("Quant init...\r\n");
 	}
 
 	void Quant::initControl()
@@ -130,6 +130,8 @@ namespace QuantIDE
 		colorOver = config.value("shem_colorOver")->value<QColor>();
 		colorActive = config.value("shem_colorActive")->value<QColor>();
 		colorText = config.value("shem_colorText")->value<QColor>();
+		fontTextSmall = config.value("shem_fontTextSmall")->value<QFont>();
+		fontTextCode = config.value("shem_fontCode")->value<QFont>();
 
 		buttLang->setColorNormal(colorNormal);
 		buttServer->setColorNormal(colorNormal);
@@ -148,7 +150,15 @@ namespace QuantIDE
 		buttConsol->setColorActive(colorActive);
 		buttNodes->setColorActive(colorActive);
 		buttCustomize->setColorActive(colorActive);
+		
+		buttLang->setFont(fontTextSmall);
+		buttServer->setFont(fontTextSmall);
+		buttConsol->setFont(fontTextSmall);
+		buttNodes->setFont(fontTextSmall);
+		buttCustomize->setFont(fontTextSmall);
 
+		globalCode->setFontCode(fontTextCode);
+		
 		emit actConfigData(config);
 		onMsgStatus("Cutomization done...");
 
@@ -170,7 +180,7 @@ namespace QuantIDE
 	}
 
 	// MSG
-	void Quant::onMsgNormal(QString msg) { emit println(msg, QColor(120, 120, 120)); }
+	void Quant::onMsgNormal(QString msg) { emit print(msg, QColor(120, 120, 120)); }
 	void Quant::onMsgStatus(QString msg) { emit println(msg, QColor(230, 230, 230)); }
 	void Quant::onMsgEvaluate(QString msg) { emit println(msg, QColor(30, 130, 230)); }
 	void Quant::onMsgResult(QString msg) { emit println(msg, QColor(30, 230, 30)); }

@@ -4,6 +4,7 @@
 #include "Panel.h"
 #include <QWidget>
 #include <QTextEdit>
+#include <QScrollBar>
 
 namespace Jui
 {

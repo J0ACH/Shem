@@ -72,6 +72,7 @@ namespace QuantIDE
 		NodePanel *nodePanel;
 
 		QColor colorAppBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+		QFont fontTextSmall, fontTextCode;
 
 		Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
 		CodeEditor *globalCode;

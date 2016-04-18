@@ -47,12 +47,14 @@ namespace QuantIDE
 		colorNormal = config.value("shem_colorNormal")->value<QColor>();
 		colorOver = config.value("shem_colorOver")->value<QColor>();
 		colorActive = config.value("shem_colorActive")->value<QColor>();
+		fontTextSmall = config.value("shem_fontTextSmall")->value<QFont>();
 		
 		Panel::onConfigData(config);
 
 		buttAddNode->setColorNormal(colorNormal);
 		buttAddNode->setColorOver(colorOver);
 		buttAddNode->setColorActive(colorActive);
+		buttAddNode->setFont(fontTextSmall);
 
 		configData = config;
 		emit actConfigData(config);

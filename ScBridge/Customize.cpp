@@ -84,13 +84,13 @@ namespace SupercolliderBridge
 		out << "shem_colorAppBackground = " << 20 << "," << 20 << "," << 20 << "\n";
 		out << "shem_colorAppHeaderBackground = " << 40 << "," << 40 << "," << 40 << "\n";
 		out << "shem_colorPanelBackground = " << 30 << "," << 30 << "," << 30 << "\n";
-		//out << "shem_colorPanelHeaderBackground = " << 130 << "," << 30 << "," << 30 << "\n";
 		out << "shem_colorNormal = " << 120 << "," << 120 << "," << 120 << "\n";
 		out << "shem_colorFrozen = " << 70 << "," << 70 << "," << 70 << "\n";
 		out << "shem_colorOver = " << 255 << "," << 255 << "," << 255 << "\n";
 		out << "shem_colorActive = " << 70 << "," << 140 << "," << 210 << "\n";
 		out << "shem_colorText = " << 230 << "," << 230 << "," << 230 << "\n";
-		out << "shem_fontTextBig = " << "Univers Condensed" << ", " << 12 << "\n";
+		
+		out << "shem_fontTextBig = " << "Univers Condensed" << ", " << 13 << "\n";
 		out << "shem_fontTextSmall =  " << "Univers Condensed" << ", " << 10 << "\n";
 		out << "shem_fontCode = " << "Univers 57 Condensed" << ", " << 9 << "\n";
 

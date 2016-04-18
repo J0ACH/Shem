@@ -21,6 +21,7 @@ namespace Jui
 		~CodeEditor();
 
 		void setBackground(const QColor &);
+		void setFontCode(QFont);
 
 	public slots:
 		void fitTextFormat();

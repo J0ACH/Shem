@@ -10,13 +10,14 @@ namespace Jui
 
 		//QFont font = QFont("Consolas", 8);
 		//QFont font = QFont("Monaco", 7, QFont::Normal);
-		QFont font = QFont("Univers 57 Condensed", 9, QFont::Normal);
+		//QFont font = QFont("Univers 57 Condensed", 9, QFont::Normal);
 		//font.setStyleStrategy(QFont::NoAntialias);
 		//		qDebug() << " font.stretch : "<<font.stretch();
-		font.setStretch(QFont::Unstretched);
-		setFont(font);
-        	setFrameStyle(QFrame::NoFrame);
+		//font.setStretch(QFont::Unstretched);
+		//setFont(font);
 		//font.setHintingPreference(QFont::PreferDefault);
+        	
+		setFrameStyle(QFrame::NoFrame);
 
 		normalColor = QColor(120, 120, 120);
 		overColor = QColor(230, 230, 230);
@@ -32,6 +33,8 @@ namespace Jui
 		connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
 		connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
 	}
+
+	void CodeEditor::setFontCode(QFont font) { this->setFont(font); update(); }
 
 	void CodeEditor::fitTextFormat()
 	{

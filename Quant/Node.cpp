@@ -50,6 +50,9 @@ namespace QuantIDE
 		colorActive = config.value("shem_colorActive")->value<QColor>();
 		fontTextBig = config.value("shem_fontTextBig")->value<QFont>();
 		fontTextSmall = config.value("shem_fontTextSmall")->value<QFont>();
+		fontTextCode = config.value("shem_fontCode")->value<QFont>();
+		
+		sourceCode->setFontCode(fontTextCode);
 
 		closeButton->setColorNormal(colorNormal);
 		closeButton->setColorOver(colorOver);
@@ -58,6 +61,7 @@ namespace QuantIDE
 		playButton->setColorNormal(colorNormal);
 		playButton->setColorOver(colorOver);
 		playButton->setColorActive(colorActive);
+		playButton->setFont(fontTextSmall);
 
 		nameLabel->setFont(fontTextBig);
 		labelNodeID->setFont(fontTextSmall);
@@ -205,6 +209,7 @@ namespace QuantIDE
 	void Node::addControl(QString controlName)
 	{
 		CodeEditor *controlEditor = new CodeEditor(this);
+		controlEditor->setFontCode(fontTextCode);
 		controlEditor->show();
 
 		QLabel *controlLabel = new QLabel(this);

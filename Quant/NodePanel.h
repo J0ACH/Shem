@@ -48,6 +48,7 @@ namespace QuantIDE
 		void initControl();
 		QMap<QString, QVariant*> configData;
 		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+		QFont fontTextSmall;
 		Button *buttAddNode;
 		QScrollArea *scrollArea;
 		QWidget *scrollWidget;

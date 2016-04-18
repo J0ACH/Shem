@@ -14,12 +14,7 @@ namespace Jui
 		name = "button";
 		isPressed = false;
 		isOver = false;
-
-		//QColor normalColor = Qt::gray;
-		//QColor overColor = Qt::white;
-		//QColor activeColor = Qt::red;
-		//penColor = normalColor;
-
+		
 		iconOffset = 0;
 
 		ratio = 0;
@@ -34,6 +29,7 @@ namespace Jui
 	}
 
 	void Button::setText(QString buttonName) { name = buttonName; }
+	void Button::setFont(QFont font) { fontText = font;	update(); }
 	void Button::setIcon(QImage img, int offset = 0) { icon = img; iconOffset = offset; }
 	void Button::setColorNormal(QColor color){ normalColor = color; penColor = normalColor; update(); }
 	void Button::setColorOver(QColor color){ overColor = color; update(); }
@@ -79,9 +75,7 @@ namespace Jui
 	void Button::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
-		QFont font = QFont("Univers Condensed", 10, QFont::Normal);
-		font.setStretch(QFont::Unstretched);
-		painter.setFont(font);		
+		painter.setFont(fontText);
 
 		penColor = blendColor(normalColor, overColor, ratio);
 		painter.setPen(QPen(penColor, 1));

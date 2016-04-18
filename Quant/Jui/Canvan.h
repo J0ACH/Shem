@@ -6,7 +6,6 @@
 #include <QLabel>
 #include <QFontDatabase>
 #include <QMap>
-//#include "ui_canvan.h"
 
 #include "Console.h"
 #include "Button.h"
@@ -84,7 +83,7 @@ namespace Jui
 		QString version;
 
 		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-		QFont fontTextSmall;
+		QFont fontTextSmall, fontCode;
 
 		QPoint *mCursorGlobal;
 		QPoint *mCursorLocal;
