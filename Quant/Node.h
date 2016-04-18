@@ -70,7 +70,7 @@ namespace QuantIDE
 		QString objectPattern;
 		QMap<QString, QVariant*> configData;
 		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-
+		QFont fontTextBig, fontTextSmall;
 		ScBridge *mBridge;
 
 		QLabel *nameLabel;

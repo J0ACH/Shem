@@ -16,15 +16,15 @@ namespace Jui
 		text->setReadOnly(true);
 		text->setOverwriteMode(false);
 		text->setTabStopWidth(30);
-		//text->setFont(QFont("Consolas", 8));
-		//text->setFont(QFont("Univers Condensed", 10, QFont::Normal));
-		text->setFont(font);
+		
 		text->setFrameStyle(QFrame::NoFrame);
 
 		text->append(tr("Console init..."));
 
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
 	}
+
+	void Console::setFont(QFont font) { text->setFont(font); update(); }
 
 	void Console::addText(QString newText, QColor color, bool newLine)
 	{		

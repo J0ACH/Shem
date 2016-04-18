@@ -44,7 +44,8 @@ namespace Jui
 		QString title;
 
 		QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-				
+		QFont fontTextBig;
+
 		Button *closeButton;
 		Edges *edges;
 

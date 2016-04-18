@@ -14,6 +14,8 @@ namespace Jui
 	public:
 		Console(QWidget *parent);
 		~Console();
+
+		void setFont(QFont);
 		
 	public slots:
 		void addText(QString text, QColor color, bool newLine);

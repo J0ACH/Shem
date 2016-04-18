@@ -90,7 +90,8 @@ namespace SupercolliderBridge
 		out << "shem_colorOver = " << 255 << "," << 255 << "," << 255 << "\n";
 		out << "shem_colorActive = " << 70 << "," << 140 << "," << 210 << "\n";
 		out << "shem_colorText = " << 230 << "," << 230 << "," << 230 << "\n";
-		out << "shem_fontText = " << "Univers Condensed" << ", " << 12 << "\n";
+		out << "shem_fontTextBig = " << "Univers Condensed" << ", " << 12 << "\n";
+		out << "shem_fontTextSmall =  " << "Univers Condensed" << ", " << 10 << "\n";
 		out << "shem_fontCode = " << "Univers 57 Condensed" << ", " << 9 << "\n";
 
 		configFile->close();
@@ -112,9 +113,11 @@ namespace SupercolliderBridge
 			QStringList lineParts = line.remove("\n").split("=");
 
 			qDebug() << "Customize::readConfigFile line: " << line;
+			qDebug() << "Customize::key: " << lineParts[0];
+			qDebug() << "Customize::args: " << lineParts[1];
 
 			QString key = lineParts[0].remove(" ");
-			QStringList args = lineParts[1].remove(" ").split(",");
+			QStringList args = lineParts[1].split(",");
 			QVariant *value;
 
 			if (args.size() == 3)
@@ -124,6 +127,7 @@ namespace SupercolliderBridge
 				for (int i = 0; i < 3; i++)
 				{
 					bool isNumber;
+					args[i] = args[i].remove(" ");
 					rgb[i] = args[i].toInt(&isNumber, 10);
 					if (!isNumber) { isColor = false; break; }
 				}
@@ -140,23 +144,47 @@ namespace SupercolliderBridge
 			}
 			else if (args.size() == 2)
 			{
-				qDebug() << "mohl by by font";
+				qDebug() << "mohl by by font";				
+
+				bool isFont = true;
+				bool isNumber;
+				int size = args[1].remove(" ").toInt(&isNumber, 10);
+				if (!isNumber) { isFont = false; break; }
+				qDebug() << "name:" << args[0];
+				qDebug() << "size:" << size;
+				if (isFont) 
+				{
+					QFont font(args[0], size);
+					font.setStretch(QFont::Unstretched);
+					value = new QVariant(font);
+					configData.insert(key, value);
+					continue;
+				}
+				else
+				{
+					qDebug() << "neni to font";
+				}
+
 			}
+			
 			else
 			{
-
+				qDebug() << "je to neco jineho";
+				/*
 				foreach(QString oneArg, args)
 				{
 					bool isNumber;
 					int dec = oneArg.toInt(&isNumber, 10);
 					qDebug() << "isNumber: " << isNumber;
 				}
+				*/
 			}
 
 			qDebug() << "key: " << key;
 			qDebug() << "value: " << args.join(" || ");
 
-			configData.insert(key, value);
+			//configData.insert(key, value);
+			
 		}
 
 		foreach(QString key, configData.keys())

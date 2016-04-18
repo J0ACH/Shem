@@ -26,13 +26,13 @@ namespace Jui
 		screen = new QWidget(this);
 		tail = new QWidget(this);
 
+		QFontDatabase::addApplicationFont(":/fontText.ttf");
+		QFontDatabase::addApplicationFont(":/fontCode.ttf");
+
 		headerSize = 100;
 		tailSize = 50;
 		isPressed = false;
 		showScreen = false;
-
-		QFontDatabase::addApplicationFont(":/fontText.ttf");
-		QFontDatabase::addApplicationFont(":/fontCode.ttf");
 
 		this->initControl();
 
@@ -57,9 +57,9 @@ namespace Jui
 		minimizeButton = new Button(header);
 		minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
 
-	//	version = new QLabel(tail);
-	//	version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	//	version->setFont(QFont("Univers Condensed", 10));
+		//	version = new QLabel(tail);
+		//	version->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		//	version->setFont(QFont("Univers Condensed", 10));
 
 		mConsole = new Console(this);
 		mConsole->setTitle("Console");
@@ -85,9 +85,9 @@ namespace Jui
 		colorOver = config.value("shem_colorOver")->value<QColor>();
 		colorActive = config.value("shem_colorActive")->value<QColor>();
 		colorText = config.value("shem_colorText")->value<QColor>();
+		fontTextSmall = config.value("shem_fontTextSmall")->value<QFont>();
 
-		//mConsole->setColorBackground(colorPanelBackground);
-		//mConsole->setColorTitle(colorText);
+		mConsole->setFont(fontTextSmall);
 
 		closeButton->setColorNormal(colorNormal);
 		maximizeButton->setColorNormal(colorNormal);
@@ -244,7 +244,7 @@ namespace Jui
 		painter.setPen(QPen(colorText, 1));
 		QTextOption opt;
 		opt.setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		painter.drawText(tail->geometry().adjusted(tail->width()-100, 5, -10 , -5), version, opt);
+		painter.drawText(tail->geometry().adjusted(tail->width() - 100, 5, -10, -5), version, opt);
 	}
 
 	void Canvan::mousePressEvent(QMouseEvent *mouseEvent)

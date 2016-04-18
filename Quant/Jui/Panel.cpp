@@ -36,6 +36,9 @@ namespace Jui
 		colorActive = config.value("shem_colorActive")->value<QColor>();
 		colorText = config.value("shem_colorText")->value<QColor>();
 
+		fontTextBig = config.value("shem_fontTextBig")->value<QFont>();
+		//qDebug() << "Panel::onConfigData:fontTextBig: " << fontTextBig;
+
 		this->setColorBackground(colorPanelBackground);
 		this->setColorTitle(colorText);
 
@@ -87,7 +90,8 @@ namespace Jui
 	void Panel::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
-		painter.setFont(QFont("Univers Condensed", 12, QFont::Normal));
+		painter.setFont(fontTextBig);
+		
 		painter.fillRect(bounds(), colorPanelBackground);
 
 		painter.setPen(QPen(colorText, 1));

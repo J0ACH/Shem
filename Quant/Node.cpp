@@ -26,12 +26,7 @@ namespace QuantIDE
 	{
 		nameLabel = new QLabel(this);
 		nameLabel->setText("node1");
-		//QFont font = QFont("Swis721 LtCn BT", 14, QFont::Normal);
-		QFont font = QFont("Univers Condensed", 14, QFont::Normal);
-		QFont fontSmall = QFont("Univers Condensed", 10, QFont::Normal);
-		//QFont font = QFont("Teuton Normal", 18, QFont::Normal);
-		nameLabel->setFont(font);
-
+		
 		closeButton = new Button(this);
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
@@ -43,10 +38,8 @@ namespace QuantIDE
 
 		sourceCode = new CodeEditor(this);
 
-		labelNodeID = new QLabel(this);
-		labelNodeID->setFont(fontSmall);
-		labelNamedControls = new QLabel(this);
-		labelNamedControls->setFont(fontSmall);
+		labelNodeID = new QLabel(this);		
+		labelNamedControls = new QLabel(this);		
 	}
 
 	void Node::onConfigData(QMap<QString, QVariant*> config)
@@ -55,6 +48,8 @@ namespace QuantIDE
 		colorNormal = config.value("shem_colorNormal")->value<QColor>();
 		colorOver = config.value("shem_colorOver")->value<QColor>();
 		colorActive = config.value("shem_colorActive")->value<QColor>();
+		fontTextBig = config.value("shem_fontTextBig")->value<QFont>();
+		fontTextSmall = config.value("shem_fontTextSmall")->value<QFont>();
 
 		closeButton->setColorNormal(colorNormal);
 		closeButton->setColorOver(colorOver);
@@ -63,6 +58,10 @@ namespace QuantIDE
 		playButton->setColorNormal(colorNormal);
 		playButton->setColorOver(colorOver);
 		playButton->setColorActive(colorActive);
+
+		nameLabel->setFont(fontTextBig);
+		labelNodeID->setFont(fontTextSmall);
+		labelNamedControls->setFont(fontTextSmall);
 
 		configData = config;
 		//emit actConfigData(config);
@@ -210,7 +209,7 @@ namespace QuantIDE
 
 		QLabel *controlLabel = new QLabel(this);
 		controlLabel->setText(controlName);
-		controlLabel->setFont(QFont("Univers Condensed", 12, QFont::Normal));
+		controlLabel->setFont(fontTextSmall);
 		controlLabel->show();
 
 		conteinerControls.insert(controlName, controlEditor);

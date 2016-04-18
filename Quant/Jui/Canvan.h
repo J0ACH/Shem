@@ -84,6 +84,7 @@ namespace Jui
 		QString version;
 
 		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+		QFont fontTextSmall;
 
 		QPoint *mCursorGlobal;
 		QPoint *mCursorLocal;
