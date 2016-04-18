@@ -65,13 +65,17 @@ namespace QuantIDE
 
 	private:
 		void initControl();
+		void initProcessDialog();
+		void closeProcessDialog();
 
+		QWidget *initDialog;
 		ScBridge *bridge;
 		Customize *customize;
 		Canvan *canvan;
 		NodePanel *nodePanel;
 
 		QColor colorAppBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+		QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgResult, colorMsgError, colorMsgWarning, colorMsgBundle;
 		QFont fontTextSmall, fontTextCode;
 
 		Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;

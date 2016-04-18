@@ -39,7 +39,6 @@ namespace Jui
 	void CodeEditor::fitTextFormat()
 	{
 		QTextCharFormat formatCommonText;
-		formatCommonText.setFontWeight(QFont::Normal);
 		formatCommonText.setForeground(QBrush(QColor(120, 120, 120)));
 		this->highlightText(0, this->toPlainText().size(), formatCommonText);
 

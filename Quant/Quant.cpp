@@ -22,11 +22,12 @@ namespace QuantIDE
 
 	Quant::Quant(QWidget *parent) : QWidget(parent)
 	{
-
+		
 		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
 		customize = new Customize(this);
-
+		
+		
 		customize->setTargetBridge(bridge);
 
 		canvan->setHeaderHeight(42);
@@ -35,6 +36,8 @@ namespace QuantIDE
 		canvan->setTitle("Quant");
 		canvan->setVersion(Quant_VERSION_MAJOR, Quant_VERSION_MINOR, Quant_VERSION_PATCH);
 
+		
+		//this->initProcessDialog();
 		this->initControl();
 		this->fitGeometry();
 		//this->setMouseTracking(true);
@@ -79,7 +82,26 @@ namespace QuantIDE
 		emit bootInterpretAct();
 		onMsgStatus("Quant init...\r\n");
 	}
+	void Quant::initProcessDialog()
+	{
+		initDialog = new QWidget(0);
+		initDialog->setGeometry(5, 5, 300, 300);
+		initDialog->setWindowFlags(Qt::FramelessWindowHint);
+		initDialog->show();
 
+		//canvan->setVisible(false);
+		this->hide();
+		canvan->hide();
+
+	}
+	void Quant::closeProcessDialog()
+	{
+
+		canvan->show();
+		this->show();
+		initDialog->close();
+	}
+	
 	void Quant::initControl()
 	{
 		nodePanel = new NodePanel(canvan->screen);
@@ -130,6 +152,15 @@ namespace QuantIDE
 		colorOver = config.value("shem_colorOver")->value<QColor>();
 		colorActive = config.value("shem_colorActive")->value<QColor>();
 		colorText = config.value("shem_colorText")->value<QColor>();
+
+		colorMsgNormal = config.value("shem_colorMsgNormal")->value<QColor>();
+		colorMsgStatus = config.value("shem_colorMsgStatus")->value<QColor>();
+		colorMsgEvaluate = config.value("shem_colorMsgEvaluate")->value<QColor>();
+		colorMsgResult = config.value("shem_colorMsgResult")->value<QColor>();
+		colorMsgError = config.value("shem_colorMsgError")->value<QColor>();
+		colorMsgWarning = config.value("shem_colorMsgWarning")->value<QColor>();
+		colorMsgBundle = config.value("shem_colorMsgBundle")->value<QColor>();
+		
 		fontTextSmall = config.value("shem_fontTextSmall")->value<QFont>();
 		fontTextCode = config.value("shem_fontCode")->value<QFont>();
 
@@ -163,7 +194,7 @@ namespace QuantIDE
 		onMsgStatus("Cutomization done...");
 
 		update();
-	}
+					}
 
 	void Quant::fitGeometry()
 	{
@@ -180,13 +211,13 @@ namespace QuantIDE
 	}
 
 	// MSG
-	void Quant::onMsgNormal(QString msg) { emit print(msg, QColor(120, 120, 120)); }
-	void Quant::onMsgStatus(QString msg) { emit println(msg, QColor(230, 230, 230)); }
-	void Quant::onMsgEvaluate(QString msg) { emit println(msg, QColor(30, 130, 230)); }
-	void Quant::onMsgResult(QString msg) { emit println(msg, QColor(30, 230, 30)); }
-	void Quant::onMsgError(QString msg) { emit println(msg, QColor(230, 30, 30)); }
-	void Quant::onMsgWarning(QString msg) { emit println(msg, QColor(230, 130, 30)); }
-	void Quant::onMsgBundle(QString msg) { emit println(msg, QColor(170, 160, 20)); }
+	void Quant::onMsgNormal(QString msg) { emit print(msg, colorMsgNormal); }
+	void Quant::onMsgStatus(QString msg) { emit println(msg, colorMsgStatus); }
+	void Quant::onMsgEvaluate(QString msg) { emit println(msg, colorMsgEvaluate); }
+	void Quant::onMsgResult(QString msg) { emit println(msg, colorMsgResult); }
+	void Quant::onMsgError(QString msg) { emit println(msg, colorMsgError); }
+	void Quant::onMsgWarning(QString msg) { emit println(msg, colorMsgWarning); }
+	void Quant::onMsgBundle(QString msg) { emit println(msg, colorMsgBundle); }
 
 	// INTERPRET
 
@@ -199,6 +230,8 @@ namespace QuantIDE
 		onMsgStatus("Interpret boot done...");
 		buttLang->setState(Jui::Button::State::ON);
 		buttServer->setStateKeeping(Button::StateKeeping::HOLD);
+		
+		//this->closeProcessDialog();
 	}
 	void Quant::onInterpretKillInit()
 	{

@@ -20,7 +20,7 @@ namespace SupercolliderBridge
 
 	void Customize::onInterpretStart()
 	{
-		qDebug() << "Customize start";
+		//qDebug() << "Customize start";
 		this->onBridgeQuestion(QuestionType::appExtensionDir);
 	}
 
@@ -42,7 +42,7 @@ namespace SupercolliderBridge
 
 	void Customize::onBridgeAnswer(QString pattern, int selectorNum, QStringList answer)
 	{
-		qDebug() << "Customize::onBridgeAnswer: " << pattern << answer;
+		//qDebug() << "Customize::onBridgeAnswer: " << pattern << answer;
 		if (pattern == objectPattern)
 		{
 			QuestionType selector = static_cast<QuestionType>(selectorNum);
@@ -61,12 +61,12 @@ namespace SupercolliderBridge
 	}
 	void Customize::initConfigFile(QString systemExtensionDir)
 	{
-		qDebug() << "Customize::initConfigFile: " << systemExtensionDir;
+	//	qDebug() << "Customize::initConfigFile: " << systemExtensionDir;
 		QDir configDir;
 		configDir.setPath(systemExtensionDir);
 		configDir.mkdir("Shem");
 		configDir.setPath(QDir::fromNativeSeparators(tr("%1/Shem").arg(systemExtensionDir)));
-		qDebug() << "Customize::path: " << configDir.path();
+	//	qDebug() << "Customize::path: " << configDir.path();
 
 		configFile = new QFile(tr("%1/ShemConfig.txt").arg(configDir.path()));
 
@@ -76,7 +76,7 @@ namespace SupercolliderBridge
 
 	void Customize::writeConfigFile()
 	{
-		qDebug() << "Customize::writeConfigFile " << configFile->fileName();
+	//	qDebug() << "Customize::writeConfigFile " << configFile->fileName();
 
 		configFile->open(QIODevice::WriteOnly | QIODevice::Text);
 
@@ -89,7 +89,15 @@ namespace SupercolliderBridge
 		out << "shem_colorOver = " << 255 << "," << 255 << "," << 255 << "\n";
 		out << "shem_colorActive = " << 70 << "," << 140 << "," << 210 << "\n";
 		out << "shem_colorText = " << 230 << "," << 230 << "," << 230 << "\n";
-		
+
+		out << "shem_colorMsgNormal = " << 70 << "," << 70 << "," << 70 << "\n";
+		out << "shem_colorMsgStatus = " << 230 << "," << 230 << "," << 230 << "\n";
+		out << "shem_colorMsgEvaluate = " << 170 << "," << 230 << "," << 230 << "\n";
+		out << "shem_colorMsgResult = " << 170 << "," << 200 << "," << 160 << "\n";
+		out << "shem_colorMsgError = " << 230 << "," << 30 << "," << 30 << "\n";
+		out << "shem_colorMsgWarning = " << 230 << "," << 130 << "," << 30 << "\n";
+		out << "shem_colorMsgBundle = " << 170 << "," << 160 << "," << 20 << "\n";
+
 		out << "shem_fontTextBig = " << "Univers Condensed" << ", " << 13 << "\n";
 		out << "shem_fontTextSmall =  " << "Univers Condensed" << ", " << 10 << "\n";
 		out << "shem_fontCode = " << "Univers 57 Condensed" << ", " << 9 << "\n";
@@ -101,7 +109,7 @@ namespace SupercolliderBridge
 
 	void Customize::readConfigFile()
 	{
-		qDebug() << "Customize::readConfigFile " << configFile->fileName();
+		//qDebug() << "Customize::readConfigFile " << configFile->fileName();
 
 		QMap<QString, QVariant*> configData;
 
@@ -112,15 +120,15 @@ namespace SupercolliderBridge
 			QString line = in.readLine();
 			QStringList lineParts = line.remove("\n").split("=");
 
-			qDebug() << "Customize::readConfigFile line: " << line;
-			qDebug() << "Customize::key: " << lineParts[0];
-			qDebug() << "Customize::args: " << lineParts[1];
+			//qDebug() << "Customize::readConfigFile line: " << line;
+			//qDebug() << "Customize::key: " << lineParts[0];
+			//qDebug() << "Customize::args: " << lineParts[1];
 
 			QString key = lineParts[0].remove(" ");
 			QStringList args = lineParts[1].split(",");
 			QVariant *value;
 
-			if (args.size() == 3)
+			if (args.size() == 3) // COLOR
 			{
 				bool isColor = true;
 				int rgb[3];
@@ -132,27 +140,19 @@ namespace SupercolliderBridge
 					if (!isNumber) { isColor = false; break; }
 				}
 
-				if (isColor) { 
-					value = new QVariant(QColor(rgb[0], rgb[1], rgb[2])); 
+				if (isColor) {
+					value = new QVariant(QColor(rgb[0], rgb[1], rgb[2]));
 					configData.insert(key, value);
-					continue; 
-				}
-				else
-				{
-					qDebug() << "neni to barva";
+					continue;
 				}
 			}
-			else if (args.size() == 2)
+			else if (args.size() == 2) // FONT
 			{
-				qDebug() << "mohl by by font";				
-
 				bool isFont = true;
 				bool isNumber;
 				int size = args[1].remove(" ").toInt(&isNumber, 10);
 				if (!isNumber) { isFont = false; break; }
-				qDebug() << "name:" << args[0];
-				qDebug() << "size:" << size;
-				if (isFont) 
+				if (isFont)
 				{
 					QFont font(args[0], size);
 					font.setStretch(QFont::Unstretched);
@@ -160,31 +160,15 @@ namespace SupercolliderBridge
 					configData.insert(key, value);
 					continue;
 				}
-				else
-				{
-					qDebug() << "neni to font";
-				}
-
 			}
-			
 			else
 			{
-				qDebug() << "je to neco jineho";
-				/*
-				foreach(QString oneArg, args)
-				{
-					bool isNumber;
-					int dec = oneArg.toInt(&isNumber, 10);
-					qDebug() << "isNumber: " << isNumber;
-				}
-				*/
+				qWarning() << "COnfigData: nespecifikovany typ";
+				qDebug() << "key: " << key;
+				qDebug() << "value: " << args.join(" || ");
+
+				//configData.insert(key, value);
 			}
-
-			qDebug() << "key: " << key;
-			qDebug() << "value: " << args.join(" || ");
-
-			//configData.insert(key, value);
-			
 		}
 
 		foreach(QString key, configData.keys())
@@ -193,6 +177,7 @@ namespace SupercolliderBridge
 		}
 
 		emit actConfigData(configData);
+		mBridge->msgNormalAct(tr("\ncustomization config file: %1\r").arg(configFile->fileName()));
 		configFile->close();
 	}
 

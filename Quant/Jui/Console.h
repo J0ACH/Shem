@@ -17,9 +17,10 @@ namespace Jui
 		~Console();
 
 		void setFont(QFont);
+		void setColorText(QColor);
 		
 	public slots:
-		void addText(QString text, QColor color, bool newLine);
+		void addText(QString text, QColor color, bool newLine );
 		void fitGeometry();
 
 	private:

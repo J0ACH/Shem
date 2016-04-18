@@ -59,6 +59,7 @@ namespace Jui
 
 		mConsole = new Console(this);
 		mConsole->setTitle("Console");
+		//mConsole->setColorText(QColor(70, 70, 70)); // default text color 
 
 		mConsole->setGeometry(0, 0, 550, 150);
 
