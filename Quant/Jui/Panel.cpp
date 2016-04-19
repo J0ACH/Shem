@@ -30,14 +30,14 @@ namespace Jui
 
 	void Panel::onConfigData(QMap<QString, QVariant*> config)
 	{
-		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
-		colorNormal = config.value("shem_colorNormal")->value<QColor>();
-		colorOver = config.value("shem_colorOver")->value<QColor>();
-		colorActive = config.value("shem_colorActive")->value<QColor>();
-		colorText = config.value("shem_colorText")->value<QColor>();
-
-		fontTextBig = config.value("shem_fontTextBig")->value<QFont>();
-		//qDebug() << "Panel::onConfigData:fontTextBig: " << fontTextBig;
+		
+		colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
+		colorNormal = config.value("color_shem_Normal")->value<QColor>();
+		colorOver = config.value("color_shem_Over")->value<QColor>();
+		colorActive = config.value("color_shem_Active")->value<QColor>();
+		colorText = config.value("color_shem_Text")->value<QColor>();
+		fontTextBig = config.value("font_shem_TextBig")->value<QFont>();
+				
 
 		this->setColorBackground(colorPanelBackground);
 		this->setColorTitle(colorText);

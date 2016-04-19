@@ -44,10 +44,12 @@ namespace QuantIDE
 
 	void NodePanel::onConfigData(QMap<QString, QVariant*> config)
 	{
-		colorNormal = config.value("shem_colorNormal")->value<QColor>();
-		colorOver = config.value("shem_colorOver")->value<QColor>();
-		colorActive = config.value("shem_colorActive")->value<QColor>();
-		fontTextSmall = config.value("shem_fontTextSmall")->value<QFont>();
+		
+		colorNormal = config.value("color_shem_Normal")->value<QColor>();
+		colorOver = config.value("color_shem_Over")->value<QColor>();
+		colorActive = config.value("color_shem_Active")->value<QColor>();
+		fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
+		
 		
 		Panel::onConfigData(config);
 

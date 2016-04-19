@@ -36,14 +36,18 @@ namespace SupercolliderBridge
 	private:
 		ScBridge *mBridge;
 		QString objectPattern;
-		QMap<QString, QVariant*> dictNode;
 		QFile *configFile;
 
 		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
 		void initConfigFile(QString systemExtensionDir);
+		void mergeConfigData();
+
+		QMap<QString, QVariant*> readConfigFile();
+		QMap<QString, QVariant*> defaultConfig();
+		QMap<QString, QVariant*> processingConfigData(QMap<QString, QVariant*>);
+
+		void writeConfigFile(QMap<QString, QVariant*>);
 		
-		void readConfigFile();
-		void writeConfigFile();
 	};
 }
 

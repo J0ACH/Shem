@@ -146,23 +146,23 @@ namespace QuantIDE
 		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
 			nodePanel, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
-		colorAppBackground = QColor(config.value("shem_colorAppBackground")->value<QColor>());
-		colorPanelBackground = config.value("shem_colorPanelBackground")->value<QColor>();
-		colorNormal = config.value("shem_colorNormal")->value<QColor>();
-		colorOver = config.value("shem_colorOver")->value<QColor>();
-		colorActive = config.value("shem_colorActive")->value<QColor>();
-		colorText = config.value("shem_colorText")->value<QColor>();
+		colorAppBackground = QColor(config.value("color_shem_AppBackground")->value<QColor>());
+		colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
+		colorNormal = config.value("color_shem_Normal")->value<QColor>();
+		colorOver = config.value("color_shem_Over")->value<QColor>();
+		colorActive = config.value("color_shem_Active")->value<QColor>();
+		colorText = config.value("color_shem_Text")->value<QColor>();
 
-		colorMsgNormal = config.value("shem_colorMsgNormal")->value<QColor>();
-		colorMsgStatus = config.value("shem_colorMsgStatus")->value<QColor>();
-		colorMsgEvaluate = config.value("shem_colorMsgEvaluate")->value<QColor>();
-		colorMsgResult = config.value("shem_colorMsgResult")->value<QColor>();
-		colorMsgError = config.value("shem_colorMsgError")->value<QColor>();
-		colorMsgWarning = config.value("shem_colorMsgWarning")->value<QColor>();
-		colorMsgBundle = config.value("shem_colorMsgBundle")->value<QColor>();
+		colorMsgNormal = config.value("color_shem_MsgNormal")->value<QColor>();
+		colorMsgStatus = config.value("color_shem_MsgStatus")->value<QColor>();
+		colorMsgEvaluate = config.value("color_shem_MsgEvaluate")->value<QColor>();
+		colorMsgResult = config.value("color_shem_MsgResult")->value<QColor>();
+		colorMsgError = config.value("color_shem_MsgError")->value<QColor>();
+		colorMsgWarning = config.value("color_shem_MsgWarning")->value<QColor>();
+		colorMsgBundle = config.value("color_shem_MsgBundle")->value<QColor>();
 		
-		fontTextSmall = config.value("shem_fontTextSmall")->value<QFont>();
-		fontTextCode = config.value("shem_fontCode")->value<QFont>();
+		fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
+		fontTextCode = config.value("font_shem_TextCode")->value<QFont>();
 
 		buttLang->setColorNormal(colorNormal);
 		buttServer->setColorNormal(colorNormal);
