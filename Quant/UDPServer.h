@@ -13,6 +13,8 @@
 #include <QWidget>
 
 #include <QtNetwork/QUdpSocket>
+#include <QHostInfo>
+#include <QNetworkInterface>
 
 using namespace Jui;
 using namespace SupercolliderBridge;
@@ -26,7 +28,8 @@ namespace QuantIDE {
     public:
       UDPServer(QWidget *parent = 0);
       ~UDPServer();
-      public slots:
+    
+    public slots:
         void readPendingDatagrams();
 
     private:
@@ -34,6 +37,7 @@ namespace QuantIDE {
       void pendingDatagramSize();
       int port;
       QUdpSocket *socket;
+      QHostInfo *host;
       QString objectPattern;
   };
 }

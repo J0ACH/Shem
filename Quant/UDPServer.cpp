@@ -4,19 +4,37 @@ namespace QuantIDE {
 
   UDPServer::UDPServer(QWidget *parent) : QWidget(parent)
   {
-    // setObjectName("UDPServer");
+    setObjectName("UDPServer");
     objectPattern = QString::null;
 
-    initSocket();
+    this->initSocket();
     //QUdpSocket socket;
     //int port;
   }
   void UDPServer::initSocket()
   {
     port = 10000;
-    printf("UDP Server starting...\n");
+
+    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+      if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
+        qDebug() << "UDP: local IP address: " << address.toString();
+    }    
+
+    qDebug() << "UDP: Server starting, listening at port: " << port;
+
     socket = new QUdpSocket(this);
+    host = new QHostInfo();
     socket->bind(QHostAddress::LocalHost, port);
+
+
+
+    if(socket->state()==4){
+      qDebug() << "UDP: Server is ON!";
+    }else{
+      qDebug() << "UDP: There is a problem starting the server on port " << port;
+
+    }
+
     connect(socket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
   }
 
