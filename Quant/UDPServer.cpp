@@ -38,8 +38,10 @@ namespace QuantIDE {
             result = true;
         }
 
+#ifdef DEBUG
         if(!result)
           qDebug() << "UDP: interface seems to have no address";
+#endif
       }
 
     }
@@ -98,7 +100,7 @@ namespace QuantIDE {
     host = new QHostInfo();
     socket->bind(QHostAddress::Any, port);
 
-#ifdef DEBUD
+#ifdef DEBUG
     if(socket->state()==4){
       qDebug() << "UDP: Server is ON!";
     }else{
@@ -132,11 +134,13 @@ namespace QuantIDE {
 
       socket->readDatagram(datagram.data(), datagram.size(), &sender,
           &senderPort);
+
 #ifdef DEBUG
       qDebug() << "UDP: Got some data chef!";
       qDebug() << "UDP: sender: " << sender;
       qDebug() << "UDP: data: " << datagram.data();
 #endif
+
       // processDatagram(datagram);
     } // end while
   }   // end void
