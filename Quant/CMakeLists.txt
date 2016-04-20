@@ -34,13 +34,13 @@ SET(Quant_hdr
   Quant.h
   NodePanel.h
   Node.h
-  Networking.h
+  UDPServer.h
 )
 SET(Quant_src
   Quant.cpp
   NodePanel.cpp
   Node.cpp
-  Networking.cpp
+  UDPServer.cpp
 )
 SET(Quant_res
 	Quant.qrc
