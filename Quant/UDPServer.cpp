@@ -1,6 +1,7 @@
 #include "UDPServer.h"
 
 #define DEBUG 1
+#define PORT 10000
 
 namespace QuantIDE {
 
@@ -8,10 +9,7 @@ namespace QuantIDE {
   {
     setObjectName("UDPServer");
     objectPattern = QString::null;
-
     this->initSocket();
-    //QUdpSocket socket;
-    //int port;
   }
 
   bool UDPServer::isConnectedToNet(){
@@ -51,7 +49,7 @@ namespace QuantIDE {
 
   void UDPServer::initSocket()
   {
-    port = 10000;
+    port = PORT;
 
 #ifdef DEBUG
     qDebug() << "///////////// UDP Server //////////////////////////////////////////";
@@ -136,6 +134,8 @@ namespace QuantIDE {
           &senderPort);
 #ifdef DEBUG
       qDebug() << "UDP: Got some data chef!";
+      qDebug() << "UDP: sender: " << sender;
+      qDebug() << "UDP: data: " << datagram.data();
 #endif
       // processDatagram(datagram);
     } // end while
