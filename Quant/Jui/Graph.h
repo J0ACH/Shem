@@ -34,7 +34,8 @@ namespace Jui
 		void leaveEvent(QEvent *event);
 
 		int ID;
-
+		//int posX, posY;
+		//float valueX, valueY;
 	};
 
 	class Graph : public QWidget
@@ -46,6 +47,7 @@ namespace Jui
 		~Graph();
 
 		QRect bounds();
+		void setDomainX(int min, int max);
 		
 	public slots:
 		void onDeletePoint(int ID);
@@ -58,9 +60,12 @@ namespace Jui
 		void mousePressEvent(QMouseEvent *mouseEvent);
 		void mouseReleaseEvent(QMouseEvent *mouseEvent);
 
+		int minDomainX, maxDomainX, minDomainY, maxDomainY;
 		QPoint cursorPos;
-
 		QMap<int, GraphPoint*> collectionPts;
+
+		double getValueX(int displayX);
+		double getValueY(int displayY);
 		
 	};
 

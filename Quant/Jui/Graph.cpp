@@ -4,8 +4,8 @@ namespace Jui
 {
 
 	// GRAPH POINT	
-	GraphPoint::GraphPoint(QWidget *parent, int pointID) : 
-		QWidget(parent), 
+	GraphPoint::GraphPoint(QWidget *parent, int pointID) :
+		QWidget(parent),
 		ID(pointID)
 	{
 		isOver = false;
@@ -84,15 +84,41 @@ namespace Jui
 	Graph::Graph(QWidget *parent) : QWidget(parent)
 	{
 		this->setMouseTracking(true);
+		minDomainX = 0;
+		maxDomainX = 1;
+		minDomainY = 0;
+		maxDomainY = 1;
 		cursorPos = QPoint();
 		collectionPts = QMap<int, GraphPoint*>();
 	}
 
 	QRect Graph::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
 
+	QPointF Graph::valuePoint(QPoint displayPoint)
+	{
+		qDebug() << "Graph::Point: " << displayPoint;
+		QPoint valuePt;
+		
+		double scaleX = (double)displayPoint.x() / width() * (maxDomainX - minDomainX);
+		double scaleY = (double)displayPoint.y() / height() * (maxDomainY - minDomainY);
+		valuePt.setX(scaleX);
+		valuePt.setY(scaleY);
+		qDebug() << "Graph::valuePoint: " << QString::number(scaleX) << " || " << QString::number(scaleY);
+		return valuePt;
+	}
+
+	double Graph::getValueX(int displayX)
+	{
+		return (double)displayX / width() * (maxDomainX - minDomainX);
+	}
+	double Graph::getValueY(int displayY)
+	{
+		return (double)displayY / height() * (maxDomainY - minDomainY);
+	}
+
 	void Graph::onDeletePoint(int ID)
 	{
-		qDebug() << "Graph::onDeletePoint: "<< QString::number(ID);
+		qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
 		collectionPts.remove(ID);
 		update();
 	}
@@ -105,14 +131,24 @@ namespace Jui
 
 		painter.setPen(QPen(Qt::white, 1));
 
-		QString pos = tr("%1 ; %2").arg(
+		QString posPixel = tr("%1 ; %2").arg(
 			QString::number(cursorPos.x()),
 			QString::number(cursorPos.y())
 			);
 
+		QPointF valPt = this->valuePoint(cursorPos);
+		double dValX = this->getValueX(cursorPos.x());
+		double dValY = this->getValueY(cursorPos.y());
+		//qDebug() << "Graph::valuePoint: " << QString::number(dValX) << " || " << QString::number(dValY);
+		QString posValue = tr("%1 ; %2").arg(
+			QString::number(dValX, 'f', 2),
+			QString::number(dValY, 'f', 2)
+			);
+
 		QTextOption option;
 		option.setAlignment(Qt::AlignCenter);
-		painter.drawText(QRect(cursorPos.x(), cursorPos.y(), 50, 30), pos, option);
+		painter.drawText(QRect(cursorPos.x(), cursorPos.y() - 30, 80, 30), posPixel, option);
+		painter.drawText(QRect(cursorPos.x(), cursorPos.y() - 20, 80, 30), posValue, option);
 		painter.drawRect(bounds());
 
 		painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(collectionPts.size()), option);
