@@ -38,6 +38,3 @@ namespace QuantIDE {
 }
 
 #endif // end UDPServer
-}
-
-#endif // end UDPServer
