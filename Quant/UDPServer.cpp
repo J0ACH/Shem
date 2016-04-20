@@ -9,13 +9,15 @@ namespace QuantIDE {
   {
     setObjectName("UDPServer");
     objectPattern = QString::null;
+
     if(this->initSocket()==0){
-      this->println("UDP Server booted");
+      //print to graphical console?
+      //this->println("UDP Server booted");
     }
   }
 
   void println(const char *input){
-      emit println(input);
+    emit println(input);
   }
 
   bool UDPServer::isConnectedToNet(){
