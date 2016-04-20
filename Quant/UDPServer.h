@@ -38,9 +38,10 @@ namespace QuantIDE {
       void pendingDatagramSize();
       bool isConnectedToNet();
       int port;
-      int hasBroadcast;
+      int addressSelector;
+      bool hasBroadcast;
 
-
+      QNetworkInterface *interface;
       QHostAddress *broadcastAddress;
       QHostAddress *myAddress;
       QUdpSocket *socket;

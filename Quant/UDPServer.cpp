@@ -30,12 +30,21 @@ namespace QuantIDE {
         for (int j=0; j<iface.addressEntries().count(); j++)
         {
 #ifdef DEBUG
+          QString _broadcast = iface.addressEntries().at(j).broadcast().toString();
           qDebug() << "UDP: addr.:" << iface.addressEntries().at(j).ip().toString();
           qDebug() << "UDP: netmask:" << iface.addressEntries().at(j).netmask().toString();
+          qDebug() << "UDP: broadcast:" << _broadcast;
 #endif
 
-          if (result == false)
+          if (result == false){
             result = true;
+            interface = new QNetworkInterface(iface);
+          }
+
+          if(_broadcast.size()>0){
+            hasBroadcast=true;
+            addressSelector = j;
+          }
         }
 
 #ifdef DEBUG
@@ -75,37 +84,40 @@ namespace QuantIDE {
 #ifdef DEBUG
           qDebug() << "UDP: local IP address: " << address.toString();
 #endif
-          //broadcastAddress = new QHostAddress("239.20.4.1");		
-          broadcastAddress = new QHostAddress("172.20.4.255");		
         }else{
 #ifdef DEBUG
           qDebug() << "UDP WARN: multiple network addresses detected, picking first one";
+      
 #endif
         }
       }    
     }    
 
-    hasBroadcast = QHostAddress::Broadcast;
-#ifdef DEBUD
-    qDebug() << "UDP: Server starting, listening at port: " << port;
-    if(hasBroadcast==1){
-      qDebug() << "UDP: OK network seems to have broadcast support!";
+#ifdef DEBUG
+    if(hasBroadcast){
+          QString _baddress = interface->addressEntries().at(addressSelector).broadcast().toString();
+          broadcastAddress = new QHostAddress(_baddress);		
+      qDebug() << "UDP: OK broadcast addr.:" << _baddress;
     }else{
-      qDebug() << "UDP: NO network don't have broadcast support!";
+      qDebug() << "UDP: WARNING: network seems to have no Broadcast support, setting default one.";
+          broadcastAddress = new QHostAddress("239.1.1.250");		
 
     }
+    qDebug() << "UDP: Server starting, listening at port: " << port;
 #endif
 
     socket = new QUdpSocket(this);
     host = new QHostInfo();
     socket->bind(QHostAddress::Any, port);
 
+    
+
 #ifdef DEBUG
     if(socket->state()==4){
       qDebug() << "UDP: Server is ON!";
     }else{
       qDebug() << "UDP: There is a problem starting the server on port " << port;
-
+      return;
     }
 
     qDebug() << "///////////////////////////////////////////////////////////////////";
