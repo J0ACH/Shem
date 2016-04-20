@@ -28,14 +28,21 @@ namespace QuantIDE {
     public:
       UDPServer(QWidget *parent = 0);
       ~UDPServer();
-    
-    public slots:
-        void readPendingDatagrams();
+
+      public slots:
+	void readPendingDatagrams();
+      void sendHello();
 
     private:
       void initSocket();
       void pendingDatagramSize();
+      bool isConnectedToNet();
       int port;
+      int hasBroadcast;
+
+
+      QHostAddress *broadcastAddress;
+      QHostAddress *myAddress;
       QUdpSocket *socket;
       QHostInfo *host;
       QString objectPattern;
