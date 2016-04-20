@@ -19,22 +19,23 @@ using namespace SupercolliderBridge;
 
 namespace QuantIDE {
 
-	class UDPServer : public QWidget
-	{
-		Q_OBJECT
+  class UDPServer : public QWidget
+  {
+    Q_OBJECT
 
-	public:
-		UDPServer(QWidget *parent = 0);
-		~UDPServer();
+    public:
+      UDPServer(QWidget *parent = 0);
+      ~UDPServer();
+      public slots:
+        void readPendingDatagrams();
 
-	private:
-		void initSocket();
-		void readPendinDatagrams();
-		void pendingDatagramSize();
-		int port;
-		QUdpSocket *socket;
-		QString objectPattern;
-	};
+    private:
+      void initSocket();
+      void pendingDatagramSize();
+      int port;
+      QUdpSocket *socket;
+      QString objectPattern;
+  };
 }
 
 #endif // end UDPServer
