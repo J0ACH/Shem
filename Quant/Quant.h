@@ -12,6 +12,7 @@
 #include "Panel.h"
 #include "Edges.h"
 #include "CodeEditor.h"
+#include "Graph.h"
 
 #include "NodePanel.h"
 #include "Node.h"
@@ -80,6 +81,8 @@ namespace QuantIDE
 
 		Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
 		CodeEditor *globalCode;
+
+		Graph *testGraph;
 	};
 }
 #endif // QUANT
