@@ -20,27 +20,29 @@ FIND_PACKAGE(Qt5Core)
 FIND_PACKAGE(Qt5Widgets)
 FIND_PACKAGE(Qt5Gui)
 
-SET(QT_LIBRARIES 
+SET(QT_LIBRARIES
   Qt5::Core
-  Qt5::Gui 
+  Qt5::Gui
   Qt5::Widgets
   )
-  
-ADD_SUBDIRECTORY(Jui)  
+
+ADD_SUBDIRECTORY(Jui)
 
 # SOURCES ##################################################
 
-SET(Quant_hdr 
+SET(Quant_hdr
   Quant.h
   NodePanel.h
   Node.h
+  Networking.h
 )
-SET(Quant_src 
+SET(Quant_src
   Quant.cpp
   NodePanel.cpp
   Node.cpp
+  Networking.cpp
 )
-SET(Quant_res 
+SET(Quant_res
 	Quant.qrc
 	Jui/Jui.qrc
 )
@@ -61,7 +63,7 @@ endif(WIN32)
 # EXE ##################################################
 
 ADD_EXECUTABLE(Quant ${Quant_src} ${Quant_hdr} ${Quant_QT_Sources} ${Quant_ico})
-IF(WIN32) 
+IF(WIN32)
 	SET_TARGET_PROPERTIES( Quant PROPERTIES WIN32_EXECUTABLE TRUE )
 ENDIF()
 
@@ -78,7 +80,3 @@ TARGET_LINK_LIBRARIES(Quant
 # INSTALL ########################################################
 
 INSTALL(TARGETS Quant DESTINATION ${SC_INSTALL_DIR})
-
-
-
-
