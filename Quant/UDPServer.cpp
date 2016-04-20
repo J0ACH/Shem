@@ -113,11 +113,12 @@ namespace QuantIDE {
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
 
-    this->sendHello();
+    this->send("Hello there! -- test message");
   }
 
-  void UDPServer::sendHello(){
-    QByteArray datagram("Hello there!");
+  void UDPServer::send(const char *input){
+
+    QByteArray datagram(input);
     socket->writeDatagram(datagram.data(), datagram.size(), 
         *broadcastAddress , port);
   }

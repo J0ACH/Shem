@@ -30,8 +30,8 @@ namespace QuantIDE {
       ~UDPServer();
 
       public slots:
-	void readPendingDatagrams();
-      void sendHello();
+      void readPendingDatagrams();
+      void send(const char *input);
 
     private:
       void initSocket();
