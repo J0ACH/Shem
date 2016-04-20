@@ -94,19 +94,6 @@ namespace Jui
 
 	QRect Graph::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
 
-	QPointF Graph::valuePoint(QPoint displayPoint)
-	{
-		qDebug() << "Graph::Point: " << displayPoint;
-		QPoint valuePt;
-		
-		double scaleX = (double)displayPoint.x() / width() * (maxDomainX - minDomainX);
-		double scaleY = (double)displayPoint.y() / height() * (maxDomainY - minDomainY);
-		valuePt.setX(scaleX);
-		valuePt.setY(scaleY);
-		qDebug() << "Graph::valuePoint: " << QString::number(scaleX) << " || " << QString::number(scaleY);
-		return valuePt;
-	}
-
 	double Graph::getValueX(int displayX)
 	{
 		return (double)displayX / width() * (maxDomainX - minDomainX);
