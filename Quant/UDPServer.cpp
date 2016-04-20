@@ -9,26 +9,29 @@ namespace QuantIDE {
   {
     setObjectName("UDPServer");
     objectPattern = QString::null;
-    this->initSocket();
+    if(this->initSocket()==0){
+      this->println("UDP Server booted");
+    }
+  }
+
+  void println(const char *input){
+      emit println(input);
   }
 
   bool UDPServer::isConnectedToNet(){
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
     bool result = false;
 
-    for (int i = 0; i < ifaces.count(); i++)
-    {
+    for (int i = 0; i < ifaces.count(); i++){
       QNetworkInterface iface = ifaces.at(i);
       if ( iface.flags().testFlag(QNetworkInterface::IsUp)
-          && !iface.flags().testFlag(QNetworkInterface::IsLoopBack) )
-      {
+          && !iface.flags().testFlag(QNetworkInterface::IsLoopBack) ){
 
 #ifdef DEBUG
         qDebug() << "UDP: got interface:" << iface.name() << "with mac:" << iface.hardwareAddress();
 #endif
 
-        for (int j=0; j<iface.addressEntries().count(); j++)
-        {
+        for (int j=0; j<iface.addressEntries().count(); j++){
 #ifdef DEBUG
           QString _broadcast = iface.addressEntries().at(j).broadcast().toString();
           qDebug() << "UDP: addr.:" << iface.addressEntries().at(j).ip().toString();
@@ -58,8 +61,7 @@ namespace QuantIDE {
     return result;
   }
 
-  void UDPServer::initSocket()
-  {
+  int UDPServer::initSocket(){
     port = PORT;
 
 #ifdef DEBUG
@@ -74,7 +76,7 @@ namespace QuantIDE {
 #ifdef DEBUG
       qDebug() << "UDP: ERROR! you are not connected to any network.";
 #endif
-      return;      
+      return 1;      
     }
 
     int count = 0;
@@ -87,7 +89,7 @@ namespace QuantIDE {
         }else{
 #ifdef DEBUG
           qDebug() << "UDP WARN: multiple network addresses detected, picking first one";
-      
+
 #endif
         }
       }    
@@ -95,13 +97,12 @@ namespace QuantIDE {
 
 #ifdef DEBUG
     if(hasBroadcast){
-          QString _baddress = interface->addressEntries().at(addressSelector).broadcast().toString();
-          broadcastAddress = new QHostAddress(_baddress);		
+      QString _baddress = interface->addressEntries().at(addressSelector).broadcast().toString();
+      broadcastAddress = new QHostAddress(_baddress);		
       qDebug() << "UDP: OK broadcast addr.:" << _baddress;
     }else{
       qDebug() << "UDP: WARNING: network seems to have no Broadcast support, setting default one.";
-          broadcastAddress = new QHostAddress("239.1.1.250");		
-
+      broadcastAddress = new QHostAddress("239.1.1.250");		
     }
     qDebug() << "UDP: Server starting, listening at port: " << port;
 #endif
@@ -110,14 +111,14 @@ namespace QuantIDE {
     host = new QHostInfo();
     socket->bind(QHostAddress::Any, port);
 
-    
+
 
 #ifdef DEBUG
     if(socket->state()==4){
       qDebug() << "UDP: Server is ON!";
     }else{
       qDebug() << "UDP: There is a problem starting the server on port " << port;
-      return;
+      return 1;
     }
 
     qDebug() << "///////////////////////////////////////////////////////////////////";
@@ -126,6 +127,7 @@ namespace QuantIDE {
     connect(socket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
 
     this->send("Hello there! -- test message");
+    return 0;
   }
 
   void UDPServer::send(const char *input){
@@ -135,8 +137,8 @@ namespace QuantIDE {
         *broadcastAddress , port);
   }
 
-  void UDPServer::readPendingDatagrams()
-  {
+  void UDPServer::readPendingDatagrams(){
+
     while (socket->hasPendingDatagrams()) {
 
       QByteArray datagram;
@@ -154,9 +156,12 @@ namespace QuantIDE {
       qDebug() << "UDP: data: " << datagram.data();
 #endif
 
-      // processDatagram(datagram);
+      processDatagram(datagram);
     } // end while
   }   // end void
+
+  void UDPServer::processDatagram(QByteArray datagram){
+  }
 
   UDPServer::~UDPServer() {};
   // end class
