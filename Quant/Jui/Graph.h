@@ -16,19 +16,24 @@ namespace Jui
 		Q_OBJECT
 
 	public:
-		GraphPoint(QWidget *parent);
+		GraphPoint(QWidget *parent, int ptID); // !!! cesta jak udelat konstruktor neodvozeny od materske tridy
 		~GraphPoint();
-
 
 		bool isOver;
 		QRect bounds();
 
+	signals:
+		void actDelete(int ID);
+
 	protected:
 		void paintEvent(QPaintEvent *);
+		virtual bool eventFilter(QObject * watched, QEvent * event);
 
 	private:
 		void enterEvent(QEvent *event);
 		void leaveEvent(QEvent *event);
+
+		int ID;
 
 	};
 
@@ -41,12 +46,9 @@ namespace Jui
 		~Graph();
 
 		QRect bounds();
-
-	signals:
-		void pressAct();
-
-		public slots:
-
+		
+	public slots:
+		void onDeletePoint(int ID);
 
 	protected:
 		void paintEvent(QPaintEvent *);
@@ -58,7 +60,8 @@ namespace Jui
 
 		QPoint cursorPos;
 
-		QList<GraphPoint*> collectionPts;
+		QMap<int, GraphPoint*> collectionPts;
+		
 	};
 
 }

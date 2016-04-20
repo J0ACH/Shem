@@ -3,10 +3,14 @@
 namespace Jui
 {
 
-	// GRAPH POINT
-	GraphPoint::GraphPoint(QWidget *parent) : QWidget(parent)
+	// GRAPH POINT	
+	GraphPoint::GraphPoint(QWidget *parent, int pointID) : 
+		QWidget(parent), 
+		ID(pointID)
 	{
 		isOver = false;
+		//this->installEventFilter(this);
+		this->grabKeyboard();
 	}
 
 	QRect GraphPoint::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
@@ -23,6 +27,7 @@ namespace Jui
 
 	void GraphPoint::enterEvent(QEvent *event)
 	{
+		qDebug() << "ID: " << ID;
 		isOver = true;
 		update();
 	}
@@ -33,8 +38,45 @@ namespace Jui
 		update();
 	}
 
+	bool GraphPoint::eventFilter(QObject* target, QEvent* event)
+	{
+		if (isOver) {
+			if (event->type() == QEvent::KeyPress)
+			{
+				QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
+				quint32 modifers = eventKey->nativeModifiers();
+
+				switch (eventKey->key())
+				{
+				case Qt::Key::Key_Delete:
+					qDebug() << "event: DELTE PRESSED";
+
+					emit actDelete(ID);
+					this->close();
+					event->accept();
+
+					break;
+
+				case Qt::Key::Key_Escape:
+					qDebug() << "KeyEvent: Escape PRESSED";
+					event->accept();
+					return true;
+					break;
+				}
+			}
+
+			if (event->type() == QEvent::KeyRelease)
+			{
+				//highlightText(this->toPlainText(), Qt::red);
+				//fitTextFormat();
+			}
+		}
+
+		return QWidget::eventFilter(target, event);
+	}
+
 	GraphPoint::~GraphPoint(){}
-	
+
 	// GRAPH POINT END
 	///////////////////////////////////////////////////////////
 	// GRAPH 
@@ -43,10 +85,17 @@ namespace Jui
 	{
 		this->setMouseTracking(true);
 		cursorPos = QPoint();
-		collectionPts = QList<GraphPoint*>();
+		collectionPts = QMap<int, GraphPoint*>();
 	}
 
 	QRect Graph::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
+
+	void Graph::onDeletePoint(int ID)
+	{
+		qDebug() << "Graph::onDeletePoint: "<< QString::number(ID);
+		collectionPts.remove(ID);
+		update();
+	}
 
 	void Graph::paintEvent(QPaintEvent *event)
 	{
@@ -78,11 +127,14 @@ namespace Jui
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		GraphPoint *pt = new GraphPoint(this);
-		pt->setGeometry(cursorPos.x() - 5, cursorPos.y() - 5, 10, 10);
+		GraphPoint *pt = new GraphPoint(this, collectionPts.size());
+		pt->setGeometry(cursorPos.x() - 10, cursorPos.y() - 10, 20, 20);
 		pt->show();
 
-		collectionPts.append(pt);
+		this->installEventFilter(pt);
+		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
+
+		collectionPts.insert(collectionPts.size(), pt);
 
 		update();
 		mouseEvent->accept();
