@@ -22,23 +22,26 @@ namespace QuantIDE {
     {
       QNetworkInterface iface = ifaces.at(i);
       if ( iface.flags().testFlag(QNetworkInterface::IsUp)
-	  && !iface.flags().testFlag(QNetworkInterface::IsLoopBack) )
+          && !iface.flags().testFlag(QNetworkInterface::IsLoopBack) )
       {
 
 #ifdef DEBUG
-	qDebug() << "UDP: got interface:" << iface.name() << "with mac:" << iface.hardwareAddress();
+        qDebug() << "UDP: got interface:" << iface.name() << "with mac:" << iface.hardwareAddress();
 #endif
 
-	for (int j=0; j<iface.addressEntries().count(); j++)
-	{
+        for (int j=0; j<iface.addressEntries().count(); j++)
+        {
 #ifdef DEBUG
-	  qDebug() << "UDP: " << iface.addressEntries().at(j).ip().toString()
-	    << " | " << iface.addressEntries().at(j).netmask().toString();
+          qDebug() << "UDP: addr.:" << iface.addressEntries().at(j).ip().toString();
+          qDebug() << "UDP: netmask:" << iface.addressEntries().at(j).netmask().toString();
 #endif
 
-	  if (result == false)
-	    result = true;
-	}
+          if (result == false)
+            result = true;
+        }
+
+        if(!result)
+          qDebug() << "UDP: interface seems to have no address";
       }
 
     }
@@ -50,33 +53,40 @@ namespace QuantIDE {
   {
     port = 10000;
 
+#ifdef DEBUG
     qDebug() << "///////////// UDP Server //////////////////////////////////////////";
-
     qDebug() << "UDP: Checking network setup...";
+#endif
     if(isConnectedToNet()){
-      qDebug() << "UDP: Are we connected?";
-      qDebug() << "UDP: Link ESTABLISHED";
+#ifdef DEBUG
+      qDebug() << "UDP: Network link is ESTABLISHED";
+#endif
     }else{
-      qDebug() << "UDP: Are we connected?";
+#ifdef DEBUG
       qDebug() << "UDP: ERROR! you are not connected to any network.";
+#endif
       return;      
     }
 
     int count = 0;
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
       if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost)){
-	if(count==0){
-	  qDebug() << "UDP: local IP address: " << address.toString();
-	  //broadcastAddress = new QHostAddress("239.20.4.1");		
-	  broadcastAddress = new QHostAddress("172.20.4.255");		
-	}else{
-	  qDebug() << "UDP WARN: multiple network addresses detected, picking first one";
-	}
+        if(count==0){
+#ifdef DEBUG
+          qDebug() << "UDP: local IP address: " << address.toString();
+#endif
+          //broadcastAddress = new QHostAddress("239.20.4.1");		
+          broadcastAddress = new QHostAddress("172.20.4.255");		
+        }else{
+#ifdef DEBUG
+          qDebug() << "UDP WARN: multiple network addresses detected, picking first one";
+#endif
+        }
       }    
     }    
 
     hasBroadcast = QHostAddress::Broadcast;
-
+#ifdef DEBUD
     qDebug() << "UDP: Server starting, listening at port: " << port;
     if(hasBroadcast==1){
       qDebug() << "UDP: OK network seems to have broadcast support!";
@@ -84,12 +94,13 @@ namespace QuantIDE {
       qDebug() << "UDP: NO network don't have broadcast support!";
 
     }
+#endif
 
     socket = new QUdpSocket(this);
     host = new QHostInfo();
     socket->bind(QHostAddress::Any, port);
 
-
+#ifdef DEBUD
     if(socket->state()==4){
       qDebug() << "UDP: Server is ON!";
     }else{
@@ -98,6 +109,7 @@ namespace QuantIDE {
     }
 
     qDebug() << "///////////////////////////////////////////////////////////////////";
+#endif
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
 
@@ -107,12 +119,11 @@ namespace QuantIDE {
   void UDPServer::sendHello(){
     QByteArray datagram("Hello there!");
     socket->writeDatagram(datagram.data(), datagram.size(), 
-	*broadcastAddress , port);
+        *broadcastAddress , port);
   }
 
   void UDPServer::readPendingDatagrams()
   {
-    printf("UDPServer::readPendinDatagrams ran!\n");	
     while (socket->hasPendingDatagrams()) {
 
       QByteArray datagram;
@@ -122,8 +133,10 @@ namespace QuantIDE {
       quint16 senderPort;
 
       socket->readDatagram(datagram.data(), datagram.size(), &sender,
-	  &senderPort);
-      qDebug() << "got some data!";
+          &senderPort);
+#ifdef DEBUG
+      qDebug() << "UDP: Got some data chef!";
+#endif
       // processDatagram(datagram);
     } // end while
   }   // end void
