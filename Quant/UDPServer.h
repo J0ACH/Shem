@@ -23,13 +23,17 @@ class UDPServer : public QWidget {
   Q_OBJECT
 
 public:
-  UDPServer();
+  UDPServer(QWidget *parent = 0);
   ~UDPServer();
+  int port;
+  
 
 private:
   void initSocket();
   void pendingDatagramSize();
-  QUdpSocket socket;
+  void readPendingDatagrams();
+  void processDatagram();
+  QUdpSocket *socket;
   QString objectPattern;
 };
 }
