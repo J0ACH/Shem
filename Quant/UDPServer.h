@@ -1,5 +1,5 @@
-#ifndef UDPServer_H
-#define UDPServer_H
+#ifndef UDPSERVER_H
+#define UDPSERVER_H
 
 #include "CodeEditor.h"
 #include "ScBridge.h"
@@ -12,19 +12,26 @@
 #include <QTextEdit>
 #include <QWidget>
 
+#include <QtNetwork/QUdpSocket>
+
 using namespace Jui;
 using namespace SupercolliderBridge;
 
 namespace QuantIDE {
+
 class UDPServer : public QWidget {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-UDPServer(QWidget *parent = 0);
-~UDPServer();
-}
+  UDPServer();
+  ~UDPServer();
 
-private: QUdpSocket socket;
+private:
+  void initSocket();
+  void pendingDatagramSize();
+  QUdpSocket socket;
+  QString objectPattern;
+};
 }
 
 #endif // end UDPServer
