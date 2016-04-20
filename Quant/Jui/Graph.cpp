@@ -123,7 +123,6 @@ namespace Jui
 			QString::number(cursorPos.y())
 			);
 
-		QPointF valPt = this->valuePoint(cursorPos);
 		double dValX = this->getValueX(cursorPos.x());
 		double dValY = this->getValueY(cursorPos.y());
 		//qDebug() << "Graph::valuePoint: " << QString::number(dValX) << " || " << QString::number(dValY);
