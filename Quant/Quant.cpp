@@ -194,6 +194,8 @@ namespace QuantIDE
     onMsgStatus("Cutomization done...");
 
     update();
+
+	emit actConfigDone();
   }
 
   void Quant::fitGeometry()
@@ -211,7 +213,7 @@ namespace QuantIDE
   }
 
   // MSG
-  void Quant::onMsgNormal(QString msg) { emit print(msg, colorMsgNormal); }
+  void Quant::onMsgNormal(QString msg) { emit println(msg, colorMsgNormal); }
   void Quant::onMsgStatus(QString msg) { emit println(msg, colorMsgStatus); }
   void Quant::onMsgEvaluate(QString msg) { emit println(msg, colorMsgEvaluate); }
   void Quant::onMsgResult(QString msg) { emit println(msg, colorMsgResult); }

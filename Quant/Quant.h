@@ -37,6 +37,7 @@ namespace QuantIDE
 		void actConfigData(QMap<QString, QVariant*> config);
 		void print(QString, QColor);
 		void println(QString, QColor);
+		void actConfigDone();
 
 	public slots :
 		void onMsgNormal(QString);

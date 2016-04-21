@@ -30,15 +30,19 @@ namespace QuantIDE {
       ~UDPServer();
 
       public slots:
+	   int initSocket();
         void readPendingDatagrams();
       void send(const char *input);
 
+
 signals: 
-      void println(const char *input);
+     // void println(const char *input);
+	  void actPrintStatus(QString);
+	  void actPrintMsg(QString);
 
 
     private:
-      int initSocket();
+ //     int initSocket();
       void pendingDatagramSize();
       bool isConnectedToNet();
       int port;
