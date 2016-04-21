@@ -79,6 +79,18 @@ namespace Jui
 
 	// GRAPH POINT END
 	///////////////////////////////////////////////////////////
+	// GRAPH CURVE
+
+	GraphCurve::GraphCurve(QWidget *parent, GraphPoint *from, GraphPoint *to) :
+		QWidget(parent),
+		GraphPoint(from),
+		GraphPoint(to)
+	{
+		isOver = false;
+	}
+
+	// GRAPH CURVE END
+	///////////////////////////////////////////////////////////
 	// GRAPH 
 
 	Graph::Graph(QWidget *parent) : QWidget(parent)

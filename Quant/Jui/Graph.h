@@ -38,6 +38,20 @@ namespace Jui
 		//float valueX, valueY;
 	};
 
+	class GraphCurve : public QWidget
+	{
+		Q_OBJECT
+
+	public:
+		GraphCurve(QWidget *parent, GraphPoint *from, GraphPoint *to);
+		~GraphCurve();
+
+	private:
+		GraphPoint *from, *to;
+		bool isOver;
+	};
+
+
 	class Graph : public QWidget
 	{
 		Q_OBJECT
