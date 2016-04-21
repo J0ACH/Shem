@@ -47,7 +47,7 @@ namespace Jui
 		~GraphCurve();
 
 	private:
-		GraphPoint *from, *to;
+		GraphPoint *startPoint, *endPoint;
 		bool isOver;
 	};
 
@@ -61,6 +61,7 @@ namespace Jui
 		~Graph();
 
 		QRect bounds();
+		QRect boundsGraph();
 		void setDomainX(int min, int max);
 		
 	public slots:
@@ -74,6 +75,7 @@ namespace Jui
 		void mousePressEvent(QMouseEvent *mouseEvent);
 		void mouseReleaseEvent(QMouseEvent *mouseEvent);
 
+		int frameOffset;
 		int minDomainX, maxDomainX, minDomainY, maxDomainY;
 		QPoint cursorPos;
 		QMap<int, GraphPoint*> collectionPts;

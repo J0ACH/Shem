@@ -83,12 +83,12 @@ namespace Jui
 
 	GraphCurve::GraphCurve(QWidget *parent, GraphPoint *from, GraphPoint *to) :
 		QWidget(parent),
-		GraphPoint(from),
-		GraphPoint(to)
+		startPoint(from),
+		endPoint(to)
 	{
 		isOver = false;
 	}
-
+	GraphCurve::~GraphCurve(){}
 	// GRAPH CURVE END
 	///////////////////////////////////////////////////////////
 	// GRAPH 
@@ -96,8 +96,9 @@ namespace Jui
 	Graph::Graph(QWidget *parent) : QWidget(parent)
 	{
 		this->setMouseTracking(true);
-		minDomainX = 0;
-		maxDomainX = 1;
+		frameOffset = 20;
+		minDomainX = 10;
+		maxDomainX = 20;
 		minDomainY = 0;
 		maxDomainY = 1;
 		cursorPos = QPoint();
@@ -105,14 +106,20 @@ namespace Jui
 	}
 
 	QRect Graph::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
+	QRect Graph::boundsGraph()
+	{
+		return bounds().adjusted(frameOffset, frameOffset, -frameOffset, -frameOffset);
+	}
 
 	double Graph::getValueX(int displayX)
 	{
-		return (double)displayX / width() * (maxDomainX - minDomainX);
+		double perc = (displayX - boundsGraph().left()) / (double)boundsGraph().width();
+		return perc * (maxDomainX - minDomainX) + minDomainX;
 	}
 	double Graph::getValueY(int displayY)
 	{
-		return (double)displayY / height() * (maxDomainY - minDomainY);
+		double perc = 1 - (displayY - boundsGraph().top()) / (double)boundsGraph().height();
+		return perc * (maxDomainY - minDomainY) + minDomainY;
 	}
 
 	void Graph::onDeletePoint(int ID)
@@ -126,7 +133,7 @@ namespace Jui
 	{
 		QPainter painter(this);
 
-		painter.fillRect(bounds(), QColor(120, 30, 30));
+		painter.fillRect(this->boundsGraph(), QColor(120, 30, 30));
 
 		painter.setPen(QPen(Qt::white, 1));
 
