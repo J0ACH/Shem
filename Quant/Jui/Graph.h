@@ -16,28 +16,28 @@ namespace Jui
 		Q_OBJECT
 
 	public:
-		GraphPoint(QWidget *parent, int ptID); // !!! cesta jak udelat konstruktor neodvozeny od materske tridy
+		GraphPoint(QWidget *parent, int ptID, int pX, int pY, double valX, double valY); // !!! cesta jak udelat konstruktor neodvozeny od materske tridy
 		~GraphPoint();
 
 		bool isOver;
 		QRect bounds();
+		QRegion region;
 
 	signals:
 		void actDelete(int ID);
 
 	protected:
 		void paintEvent(QPaintEvent *);
+		void mouseMoveEvent(QMouseEvent *);
 		virtual bool eventFilter(QObject * watched, QEvent * event);
 
 	private:
-		void enterEvent(QEvent *event);
-		void leaveEvent(QEvent *event);
-
 		int ID;
-		//int posX, posY;
-		//float valueX, valueY;
+		int pixelX, pixelY;
+		double valueX, valueY;
+		int pointSize;
 	};
-
+	/*
 	class GraphCurve : public QWidget
 	{
 		Q_OBJECT
@@ -50,7 +50,7 @@ namespace Jui
 		GraphPoint *startPoint, *endPoint;
 		bool isOver;
 	};
-
+	*/
 
 	class Graph : public QWidget
 	{
@@ -63,6 +63,9 @@ namespace Jui
 		QRect bounds();
 		QRect boundsGraph();
 		void setDomainX(int min, int max);
+
+		void addPoint(int pixelX, int pixelY);
+		//GraphCurve addCurve(GraphPoint *from, GraphPoint *to);
 		
 	public slots:
 		void onDeletePoint(int ID);
@@ -79,7 +82,7 @@ namespace Jui
 		int minDomainX, maxDomainX, minDomainY, maxDomainY;
 		QPoint cursorPos;
 		QMap<int, GraphPoint*> collectionPts;
-
+		int newPointID;
 		double getValueX(int displayX);
 		double getValueY(int displayY);
 		

@@ -4,13 +4,27 @@ namespace Jui
 {
 
 	// GRAPH POINT	
-	GraphPoint::GraphPoint(QWidget *parent, int pointID) :
+	GraphPoint::GraphPoint(QWidget *parent, int pointID, int pX, int pY, double valX, double valY) :
 		QWidget(parent),
-		ID(pointID)
+		ID(pointID),
+		pixelX(pX),
+		pixelY(pY),
+		valueX(valX),
+		valueY(valY)
 	{
 		isOver = false;
-		//this->installEventFilter(this);
+		parent->installEventFilter(this);
 		this->grabKeyboard();
+		pointSize = 10;
+		this->setGeometry(pixelX - 50, pixelY - 25, 100, 35);
+		region = QRegion(
+			50 - pointSize / 2,
+			25 - pointSize / 2,
+			pointSize,
+			pointSize,
+			QRegion::RegionType::Ellipse
+			);
+		setMouseTracking(true);
 	}
 
 	QRect GraphPoint::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
@@ -19,22 +33,37 @@ namespace Jui
 	{
 		QPainter painter(this);
 
-		if (isOver) { painter.fillRect(bounds(), Qt::red); }
-
 		painter.setPen(QPen(Qt::white, 1));
-		painter.drawRect(bounds());
+		if (isOver) {
+			QPainterPath path;
+			path.addRegion(region);
+			painter.fillPath(path, Qt::red);
+
+			QString text = tr("%1 || %2").arg(QString::number(valueX, 'f', 2), QString::number(valueY, 'f', 2));
+			QTextOption option;
+			option.setAlignment(Qt::AlignCenter);
+			painter.drawText(QRect(0, 0, 100, 25), text, option);
+			
+			painter.drawRect(bounds());
+		}
+		painter.drawEllipse(QPoint(50, 25), pointSize / 2, pointSize / 2);
+
 	}
 
-	void GraphPoint::enterEvent(QEvent *event)
+	void GraphPoint::mouseMoveEvent(QMouseEvent * mouseEvent)
 	{
-		qDebug() << "ID: " << ID;
-		isOver = true;
-		update();
-	}
+		/*
+		qDebug() << tr("%1 ; %2").arg(
+		QString::number(mouseEvent->pos().x()),
+		QString::number(mouseEvent->pos().y())
+		);
+		*/
 
-	void GraphPoint::leaveEvent(QEvent *event)
-	{
-		isOver = false;
+		if (region.contains(mouseEvent->pos())) { isOver = true; }
+		else { 
+			isOver = false; 
+			
+		};
 		update();
 	}
 
@@ -71,7 +100,12 @@ namespace Jui
 				//fitTextFormat();
 			}
 		}
+		else
+		{
+			//event->ignore();
 
+		}
+	
 		return QWidget::eventFilter(target, event);
 	}
 
@@ -80,15 +114,17 @@ namespace Jui
 	// GRAPH POINT END
 	///////////////////////////////////////////////////////////
 	// GRAPH CURVE
-
+	/*
 	GraphCurve::GraphCurve(QWidget *parent, GraphPoint *from, GraphPoint *to) :
-		QWidget(parent),
-		startPoint(from),
-		endPoint(to)
+	QWidget(parent),
+	startPoint(from),
+	endPoint(to)
 	{
-		isOver = false;
+	isOver = false;
 	}
-	GraphCurve::~GraphCurve(){}
+	GraphCurve::~GraphCurve() { }
+	*/
+
 	// GRAPH CURVE END
 	///////////////////////////////////////////////////////////
 	// GRAPH 
@@ -99,10 +135,11 @@ namespace Jui
 		frameOffset = 50;
 		minDomainX = 10;
 		maxDomainX = 20;
-		minDomainY = 0;
-		maxDomainY = 1;
+		minDomainY = 1;
+		maxDomainY = 2;
 		cursorPos = QPoint();
 		collectionPts = QMap<int, GraphPoint*>();
+		newPointID = 0;
 	}
 
 	QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
@@ -122,6 +159,34 @@ namespace Jui
 		return perc * (maxDomainY - minDomainY) + minDomainY;
 	}
 
+	void Graph::addPoint(int pixelX, int pixelY)
+	{
+		GraphPoint *pt = new GraphPoint(
+			this,
+			newPointID,
+			pixelX,
+			pixelY,
+			getValueX(pixelX),
+			getValueY(pixelY)
+			);
+		pt->show();
+
+
+		//		this->installEventFilter(pt);
+		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
+
+		collectionPts.insert(collectionPts.size(), pt);
+
+		newPointID++;
+		//return *pt;
+	}
+	/*
+	GraphCurve Graph::addCurve(GraphPoint *from, GraphPoint *to)
+	{
+	GraphCurve *curve = new GraphCurve(this, from, to);
+	return *curve;
+	}
+	*/
 	void Graph::onDeletePoint(int ID)
 	{
 		qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
@@ -133,7 +198,7 @@ namespace Jui
 	{
 		QPainter painter(this);
 
-		painter.fillRect(bounds(), QColor(60, 20, 20));
+		painter.fillRect(bounds(), QColor(10, 10, 10));
 		painter.drawRect(this->boundsGraph());
 
 		painter.setPen(QPen(Qt::white, 1));
@@ -143,11 +208,9 @@ namespace Jui
 			QString::number(cursorPos.y())
 			);
 
-		
-
 		double dValX = this->getValueX(cursorPos.x());
 		double dValY = this->getValueY(cursorPos.y());
-		
+
 		QString posValue = tr("%1 ; %2").arg(
 			QString::number(dValX, 'f', 2),
 			QString::number(dValY, 'f', 2)
@@ -160,6 +223,8 @@ namespace Jui
 
 		painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(collectionPts.size()), option);
 
+		painter.setPen(QPen(QColor(70, 70, 70), 1));
+
 		// verticals
 		int cntSegX = 5;
 		for (int i = 0; i <= cntSegX; i++)
@@ -167,7 +232,7 @@ namespace Jui
 			int pixelX = boundsGraph().width() / cntSegX * i + boundsGraph().left();
 			double valX = getValueX(pixelX);
 			painter.drawText(
-				QRect(pixelX-25, boundsGraph().bottom() + 5, 50, 20),
+				QRect(pixelX - 25, boundsGraph().bottom() + 5, 50, 20),
 				QString::number(valX, 'f', 2),
 				option
 				);
@@ -198,14 +263,11 @@ namespace Jui
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		GraphPoint *pt = new GraphPoint(this, collectionPts.size());
-		pt->setGeometry(cursorPos.x() - 10, cursorPos.y() - 10, 20, 20);
-		pt->show();
-
-		this->installEventFilter(pt);
-		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
-
-		collectionPts.insert(collectionPts.size(), pt);
+		this->addPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
+		if (collectionPts.size() > 0)
+		{
+			//this->addCurve();
+		}
 
 		update();
 		mouseEvent->accept();
