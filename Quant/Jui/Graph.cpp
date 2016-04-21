@@ -96,7 +96,7 @@ namespace Jui
 	Graph::Graph(QWidget *parent) : QWidget(parent)
 	{
 		this->setMouseTracking(true);
-		frameOffset = 20;
+		frameOffset = 50;
 		minDomainX = 10;
 		maxDomainX = 20;
 		minDomainY = 0;
@@ -105,7 +105,7 @@ namespace Jui
 		collectionPts = QMap<int, GraphPoint*>();
 	}
 
-	QRect Graph::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
+	QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
 	QRect Graph::boundsGraph()
 	{
 		return bounds().adjusted(frameOffset, frameOffset, -frameOffset, -frameOffset);
@@ -133,7 +133,8 @@ namespace Jui
 	{
 		QPainter painter(this);
 
-		painter.fillRect(this->boundsGraph(), QColor(120, 30, 30));
+		painter.fillRect(bounds(), QColor(60, 20, 20));
+		painter.drawRect(this->boundsGraph());
 
 		painter.setPen(QPen(Qt::white, 1));
 
@@ -142,9 +143,11 @@ namespace Jui
 			QString::number(cursorPos.y())
 			);
 
+		
+
 		double dValX = this->getValueX(cursorPos.x());
 		double dValY = this->getValueY(cursorPos.y());
-		//qDebug() << "Graph::valuePoint: " << QString::number(dValX) << " || " << QString::number(dValY);
+		
 		QString posValue = tr("%1 ; %2").arg(
 			QString::number(dValX, 'f', 2),
 			QString::number(dValY, 'f', 2)
@@ -154,9 +157,36 @@ namespace Jui
 		option.setAlignment(Qt::AlignCenter);
 		painter.drawText(QRect(cursorPos.x(), cursorPos.y() - 30, 80, 30), posPixel, option);
 		painter.drawText(QRect(cursorPos.x(), cursorPos.y() - 20, 80, 30), posValue, option);
-		painter.drawRect(bounds());
 
 		painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(collectionPts.size()), option);
+
+		// verticals
+		int cntSegX = 5;
+		for (int i = 0; i <= cntSegX; i++)
+		{
+			int pixelX = boundsGraph().width() / cntSegX * i + boundsGraph().left();
+			double valX = getValueX(pixelX);
+			painter.drawText(
+				QRect(pixelX-25, boundsGraph().bottom() + 5, 50, 20),
+				QString::number(valX, 'f', 2),
+				option
+				);
+			painter.drawLine(pixelX, boundsGraph().top(), pixelX, boundsGraph().height() + boundsGraph().top());
+		};
+
+		// horizontals
+		int cntSegY = 5;
+		for (int i = 0; i <= cntSegY; i++)
+		{
+			int pixelY = boundsGraph().height() / cntSegY * i + boundsGraph().top();
+			double valY = getValueY(pixelY);
+			painter.drawText(
+				QRect(5, pixelY - 10, 40, 20),
+				QString::number(valY, 'f', 2),
+				option
+				);
+			painter.drawLine(boundsGraph().left(), pixelY, boundsGraph().right(), pixelY);
+		};
 
 	}
 
