@@ -99,7 +99,7 @@ namespace QuantIDE {
 		}
 		else{
 			emit actPrintMsg("UDP: WARNING: network seems to have no Broadcast support, setting default one.");
-			broadcastAddress = new QHostAddress("239.1.1.250");
+			broadcastAddress = new QHostAddress("239.0.0.1");
 		}
 
 		emit actPrintMsg(tr("UDP: Server starting, listening at port: %1").arg(QString::number(port)));
