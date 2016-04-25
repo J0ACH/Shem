@@ -103,7 +103,7 @@ namespace QuantIDE
 		{
 			Node *oneNode = dictNode.value(e);
 			//	fout << e << "," << dictNode->value(e) << '\n';
-			oneNode->setGeometry(0, nextNodeOriginY, scrollArea->width() - 5, 200);
+			oneNode->setGeometry(0, nextNodeOriginY, scrollArea->width() - 5, 300);
 			nextNodeOriginY = dictNode.value(e)->geometry().top() + dictNode.value(e)->height();
 
 			scrollArea->widget()->setGeometry(0, 0, scrollArea->width(), nextNodeOriginY);

@@ -137,9 +137,10 @@ namespace QuantIDE
 
 		globalCode = new CodeEditor(nodePanel);
 		globalCode->setText("s.sendMsg('/g_dumpTree', 0, 1)");
-
+		/*
 		testGraph = new Graph(canvan->screen);
-		testGraph->setGeometry(100, 100, 500, 300);
+		testGraph->setGeometry(100, 270, 500, 250);
+		*/
 	}
 
 	void Quant::onConfigData(QMap<QString, QVariant*> config)

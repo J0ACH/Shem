@@ -2,6 +2,7 @@
 #define NODE_H
 
 #include "CodeEditor.h"
+#include "Graph.h"
 #include "ScBridge.h"
 
 #include <QWidget>
@@ -80,6 +81,7 @@ namespace QuantIDE
 
 		QMap<QString, CodeEditor*> conteinerControls;
 		QMap<QString, QLabel*> conteinerControlsLabel;
+		QMap<QString, Graph*> conteinerControlsGraph;
 		
 	};
 }

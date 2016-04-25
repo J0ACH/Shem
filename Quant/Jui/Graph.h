@@ -63,8 +63,10 @@ namespace Jui
 		QRect bounds();
 		QRect boundsGraph();
 		void setDomainX(int min, int max);
+		void setDomainY(int min, int max);
 
-		void addPoint(int pixelX, int pixelY);
+		void addPixelPoint(int pixelX, int pixelY);
+		void addValuePoint(double valueX, double valueY);
 		//GraphCurve addCurve(GraphPoint *from, GraphPoint *to);
 		
 	public slots:
@@ -85,6 +87,8 @@ namespace Jui
 		int newPointID;
 		double getValueX(int displayX);
 		double getValueY(int displayY);
+		double getDisplayX(double valueX);
+		double getDisplayY(double valueY);
 		
 	};
 

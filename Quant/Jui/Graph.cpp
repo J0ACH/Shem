@@ -43,7 +43,7 @@ namespace Jui
 			QTextOption option;
 			option.setAlignment(Qt::AlignCenter);
 			painter.drawText(QRect(0, 0, 100, 25), text, option);
-			
+
 			painter.drawRect(bounds());
 		}
 		painter.drawEllipse(QPoint(50, 25), pointSize / 2, pointSize / 2);
@@ -60,9 +60,9 @@ namespace Jui
 		*/
 
 		if (region.contains(mouseEvent->pos())) { isOver = true; }
-		else { 
-			isOver = false; 
-			
+		else {
+			isOver = false;
+
 		};
 		update();
 	}
@@ -105,7 +105,7 @@ namespace Jui
 			//event->ignore();
 
 		}
-	
+
 		return QWidget::eventFilter(target, event);
 	}
 
@@ -145,7 +145,21 @@ namespace Jui
 	QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
 	QRect Graph::boundsGraph()
 	{
-		return bounds().adjusted(frameOffset, frameOffset, -frameOffset, -frameOffset);
+		return bounds().adjusted(frameOffset, 15, -15, -frameOffset);
+	}
+
+	void Graph::setDomainX(int min, int max)
+	{
+		minDomainX = min;
+		maxDomainX = max;
+		update();
+	}
+
+	void Graph::setDomainY(int min, int max)
+	{
+		minDomainY = min;
+		maxDomainY = max;
+		update();
 	}
 
 	double Graph::getValueX(int displayX)
@@ -158,8 +172,23 @@ namespace Jui
 		double perc = 1 - (displayY - boundsGraph().top()) / (double)boundsGraph().height();
 		return perc * (maxDomainY - minDomainY) + minDomainY;
 	}
+	double Graph::getDisplayX(double valueX)
+	{
+		//qDebug() << "point valueX: " << valueX;
+		double perc = (valueX - minDomainX) / (double)(maxDomainX - minDomainX);
+		//qDebug() << "point percX: " << perc;
+		return perc * boundsGraph().width() + boundsGraph().left();
+	}
+	double Graph::getDisplayY(double valueY)
+	{
+		qDebug() << "point valueY: " << valueY;
+		double perc = (valueY - minDomainY )/ (double)(maxDomainY - minDomainY);
+		//double perc = valueY  / (double)maxDomainY;
+		qDebug() << "point percY: " << perc;
+		return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
+	}
 
-	void Graph::addPoint(int pixelX, int pixelY)
+	void Graph::addPixelPoint(int pixelX, int pixelY)
 	{
 		GraphPoint *pt = new GraphPoint(
 			this,
@@ -179,6 +208,18 @@ namespace Jui
 
 		newPointID++;
 		//return *pt;
+	}
+	void Graph::addValuePoint(double valueX, double valueY)
+	{
+		GraphPoint *pt = new GraphPoint(
+			this,
+			newPointID,
+			getDisplayX(valueX),
+			getDisplayY(valueY),
+			valueX,
+			valueY
+			);
+		pt->show();
 	}
 	/*
 	GraphCurve Graph::addCurve(GraphPoint *from, GraphPoint *to)
@@ -226,7 +267,7 @@ namespace Jui
 		painter.setPen(QPen(QColor(70, 70, 70), 1));
 
 		// verticals
-		int cntSegX = 5;
+		int cntSegX = 4;
 		for (int i = 0; i <= cntSegX; i++)
 		{
 			int pixelX = boundsGraph().width() / cntSegX * i + boundsGraph().left();
@@ -240,7 +281,7 @@ namespace Jui
 		};
 
 		// horizontals
-		int cntSegY = 5;
+		int cntSegY = 4;
 		for (int i = 0; i <= cntSegY; i++)
 		{
 			int pixelY = boundsGraph().height() / cntSegY * i + boundsGraph().top();
@@ -263,7 +304,7 @@ namespace Jui
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		this->addPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
+		this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
 		if (collectionPts.size() > 0)
 		{
 			//this->addCurve();

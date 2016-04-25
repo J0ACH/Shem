@@ -183,11 +183,24 @@ namespace QuantIDE
 			case namedValues:
 				qDebug() << "Node::onBridgeAnswer::namedValues: " << answer[1];
 				conteinerControls[answer[0]]->setText(answer[1]);
+
+				conteinerControlsGraph[answer[0]]->setDomainX(0, 1);
+				//conteinerControlsGraph[answer[0]]->setDomainY(85, 105);
+				conteinerControlsGraph[answer[0]]->setDomainY(0, answer[1].toInt()*2);
+
+				double pointFromX = 0;
+				double pointFromY = answer[1].toDouble();
+				double pointToX = 1;
+				double pointToY = answer[1].toDouble();
+				conteinerControlsGraph[answer[0]]->addValuePoint(pointFromX, pointFromY);
+				conteinerControlsGraph[answer[0]]->addValuePoint(pointToX, pointToY);
 				break;
 
+				/*
 			default:
 				qDebug() << "Node::onBridgeAnswer::DEFAULT";
 				break;
+				*/
 			}
 		}
 	}
@@ -212,6 +225,10 @@ namespace QuantIDE
 		controlEditor->setFontCode(fontTextCode);
 		controlEditor->show();
 
+		Graph *envGraph = new Graph(this);
+		//envGraph->setDomainX(0, 1);
+		envGraph->show();
+
 		QLabel *controlLabel = new QLabel(this);
 		controlLabel->setText(controlName);
 		controlLabel->setFont(fontTextSmall);
@@ -219,6 +236,7 @@ namespace QuantIDE
 
 		conteinerControls.insert(controlName, controlEditor);
 		conteinerControlsLabel.insert(controlName, controlLabel);
+		conteinerControlsGraph.insert(controlName, envGraph);
 
 		connect(controlEditor, SIGNAL(evaluateAct()), this, SLOT(onEvaluateNode()));
 
@@ -269,14 +287,14 @@ namespace QuantIDE
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		playButton->setGeometry(90, 10, 40, 20);
 		sourceCode->setGeometry(10, 45, width() - 20, 60);
-
+		
 		labelNodeID->setGeometry(this->width() - 200, this->height() - 45, 180, 20);
 		labelNamedControls->setGeometry(this->width() - 200, this->height() - 25, 180, 20);
 
 		int controlID = 0;
 		foreach(CodeEditor *oneControler, conteinerControls)
 		{
-			oneControler->setGeometry(60, 80 + 35 * (controlID + 1), 200, 25);
+			oneControler->setGeometry(60, 80 + 35 * (controlID + 1), 100, 25);
 			controlID++;
 		}
 		controlID = 0;
@@ -285,6 +303,13 @@ namespace QuantIDE
 			oneLabel->setGeometry(15, 80 + 35 * (controlID + 1), 40, 25);
 			controlID++;
 		}
+		controlID = 0;
+		foreach(Graph *oneGraph, conteinerControlsGraph)
+		{
+			oneGraph->setGeometry(180, 80 + 35 * (controlID + 1), 400, 150);
+			controlID++;
+		}
+		
 	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)
