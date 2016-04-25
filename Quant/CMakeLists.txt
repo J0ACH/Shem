@@ -14,7 +14,9 @@ if(GIT_REVISION_DESCRIPTION)
     string(REPLACE "v" "" GIT_REVISION_DESCRIPTION "${GIT_REVISION_DESCRIPTION}")
     string(REGEX REPLACE "\-(.*)" "" GIT_REVISION_DESCRIPTION "${GIT_REVISION_DESCRIPTION}")
     set(PROJECT_VERSION "${GIT_REVISION_DESCRIPTION}")
-    set(PROJECT_VERSION_MAJOR "${GIT_REVISION_DESCRIPTION}")
+    
+    # to by bylo, verze je na svete ale nevim jak z toho dostat ty tri udaje... hm
+
     message(STATUS "Git reports version ${PROJECT_VERSION}")
 else()
     message(STATUS "Could not get revision information from Git! Calling this just version ${PROJECT_VERSION}!")
