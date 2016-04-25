@@ -33,6 +33,8 @@ namespace QuantIDE
 
 	signals:
 		void bootInterpretAct();
+		void bootServerAct();
+		void actConfigDone();
 		void evaulateAct(QString);
 		void actConfigData(QMap<QString, QVariant*> config);
 		void print(QString, QColor);
@@ -57,6 +59,8 @@ namespace QuantIDE
 		void onServerKillInit();
 		void onServerKillDone();
 
+		void onConfigDataDone();
+
 		void fitGeometry();
 		void onConfigData(QMap<QString, QVariant*> config);
 		
@@ -66,10 +70,7 @@ namespace QuantIDE
 
 	private:
 		void initControl();
-		void initProcessDialog();
-		void closeProcessDialog();
-
-		QWidget *initDialog;
+		
 		ScBridge *bridge;
 		Customize *customize;
 		Canvan *canvan;

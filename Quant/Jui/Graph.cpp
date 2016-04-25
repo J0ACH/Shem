@@ -93,12 +93,14 @@ namespace Jui
 					break;
 				}
 			}
-
+			/*
 			if (event->type() == QEvent::KeyRelease)
 			{
+				//event->ignore();
 				//highlightText(this->toPlainText(), Qt::red);
 				//fitTextFormat();
 			}
+			*/
 		}
 		else
 		{
@@ -145,7 +147,7 @@ namespace Jui
 	QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
 	QRect Graph::boundsGraph()
 	{
-		return bounds().adjusted(frameOffset, 15, -15, -frameOffset);
+		return bounds().adjusted(frameOffset, 14, -14, -frameOffset);
 	}
 
 	void Graph::setDomainX(int min, int max)
@@ -181,10 +183,10 @@ namespace Jui
 	}
 	double Graph::getDisplayY(double valueY)
 	{
-		qDebug() << "point valueY: " << valueY;
+		//qDebug() << "point valueY: " << valueY;
 		double perc = (valueY - minDomainY )/ (double)(maxDomainY - minDomainY);
 		//double perc = valueY  / (double)maxDomainY;
-		qDebug() << "point percY: " << perc;
+		//qDebug() << "point percY: " << perc;
 		return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
 	}
 
@@ -220,6 +222,9 @@ namespace Jui
 			valueY
 			);
 		pt->show();
+		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
+		collectionPts.insert(collectionPts.size(), pt);
+		newPointID++;
 	}
 	/*
 	GraphCurve Graph::addCurve(GraphPoint *from, GraphPoint *to)
@@ -285,6 +290,7 @@ namespace Jui
 		for (int i = 0; i <= cntSegY; i++)
 		{
 			int pixelY = boundsGraph().height() / cntSegY * i + boundsGraph().top();
+			//int pixelY = boundsGraph().height() / cntSegY * i + 14;
 			double valY = getValueY(pixelY);
 			painter.drawText(
 				QRect(5, pixelY - 10, 40, 20),

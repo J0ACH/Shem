@@ -7,21 +7,6 @@ INCLUDE("QuantVersion.txt" ${QT_USE_FILE})
 SET(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH}")
 MESSAGE(STATUS "\nQuant init...")
 
-# git version detecton ################################################ 
-include(GetGitRevisionDescription)
-git_describe(GIT_REVISION_DESCRIPTION --tags --match v*)
-if(GIT_REVISION_DESCRIPTION)
-    string(REPLACE "v" "" GIT_REVISION_DESCRIPTION "${GIT_REVISION_DESCRIPTION}")
-    string(REGEX REPLACE "\-(.*)" "" GIT_REVISION_DESCRIPTION "${GIT_REVISION_DESCRIPTION}")
-    set(PROJECT_VERSION "${GIT_REVISION_DESCRIPTION}")
-    
-    # to by bylo, verze je na svete ale nevim jak z toho dostat ty tri udaje... hm
-
-    message(STATUS "Git reports version ${PROJECT_VERSION}")
-else()
-    message(STATUS "Could not get revision information from Git! Calling this just version ${PROJECT_VERSION}!")
-endif()
-
 CONFIGURE_FILE (
   ${CMAKE_CURRENT_SOURCE_DIR}/QuantConfig.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/QuantConfig.h

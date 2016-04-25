@@ -186,7 +186,7 @@ namespace QuantIDE
 
 				conteinerControlsGraph[answer[0]]->setDomainX(0, 1);
 				//conteinerControlsGraph[answer[0]]->setDomainY(85, 105);
-				conteinerControlsGraph[answer[0]]->setDomainY(0, answer[1].toInt()*2);
+				conteinerControlsGraph[answer[0]]->setDomainY(0, answer[1].toInt()*1.5);
 
 				double pointFromX = 0;
 				double pointFromY = answer[1].toDouble();
