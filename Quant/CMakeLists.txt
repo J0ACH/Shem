@@ -11,10 +11,10 @@ MESSAGE(STATUS "\nQuant init...")
 include(GetGitRevisionDescription)
 git_describe(GIT_REVISION_DESCRIPTION --tags --match v*)
 if(GIT_REVISION_DESCRIPTION)
-    string(REPLACE "v" ""
-        GIT_REVISION_DESCRIPTION
-        "${GIT_REVISION_DESCRIPTION}")
+    string(REPLACE "v" "" GIT_REVISION_DESCRIPTION "${GIT_REVISION_DESCRIPTION}")
+    string(REGEX REPLACE "\-(.*)" "" GIT_REVISION_DESCRIPTION "${GIT_REVISION_DESCRIPTION}")
     set(PROJECT_VERSION "${GIT_REVISION_DESCRIPTION}")
+    set(PROJECT_VERSION_MINOR "${GIT_REVISION_DESCRIPTION}")
     message(STATUS "Git reports version ${PROJECT_VERSION}")
 else()
     message(STATUS "Could not get revision information from Git! Calling this just version ${PROJECT_VERSION}!")
