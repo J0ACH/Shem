@@ -8,11 +8,14 @@ namespace QuantIDE
 	{
 		setObjectName("Node");
 		objectPattern = QString::null;
+		objectID = QUuid::createUuid();
 
 		this->initControl();
 		this->fitGeometry();
 
 		stateNodePlay = StateNodePlay::FREE;
+
+		//conteinerControlsGraph = new QMap<QString, ControlEnvelope*>();
 
 		connect(playButton, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
 		connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
@@ -26,7 +29,7 @@ namespace QuantIDE
 	{
 		nameLabel = new QLabel(this);
 		nameLabel->setText("node1");
-		
+
 		closeButton = new Button(this);
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
@@ -38,8 +41,8 @@ namespace QuantIDE
 
 		sourceCode = new CodeEditor(this);
 
-		labelNodeID = new QLabel(this);		
-		labelNamedControls = new QLabel(this);		
+		labelNodeID = new QLabel(this);
+		labelNamedControls = new QLabel(this);
 	}
 
 	void Node::onConfigData(QMap<QString, QVariant*> config)
@@ -51,7 +54,7 @@ namespace QuantIDE
 		fontTextBig = config.value("font_shem_TextBig")->value<QFont>();
 		fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
 		fontTextCode = config.value("font_shem_TextCode")->value<QFont>();
-		
+
 		sourceCode->setFontCode(fontTextCode);
 
 		closeButton->setColorNormal(colorNormal);
@@ -98,6 +101,8 @@ namespace QuantIDE
 		nameLabel->setText(name);
 		objectPattern = tr("%1/%2").arg(this->objectName(), name);
 	}
+	QString Node::getName() { return nameLabel->text();	}
+
 	QString Node::name() { return nameLabel->text(); }
 
 	void Node::setSourceCode(QString code) { sourceCode->setText(code); }
@@ -184,23 +189,18 @@ namespace QuantIDE
 				qDebug() << "Node::onBridgeAnswer::namedValues: " << answer[1];
 				conteinerControls[answer[0]]->setText(answer[1]);
 
-				conteinerControlsGraph[answer[0]]->setDomainX(0, 1);
-				//conteinerControlsGraph[answer[0]]->setDomainY(85, 105);
-				conteinerControlsGraph[answer[0]]->setDomainY(0, answer[1].toInt()*1.5);
+				//conteinerControlsGraph[answer[0]]->setDomainX(0, 1);
+				//conteinerControlsGraph[answer[0]]->setDomainY(0, answer[1].toInt()*1.5);
 
 				double pointFromX = 0;
 				double pointFromY = answer[1].toDouble();
 				double pointToX = 1;
 				double pointToY = answer[1].toDouble();
-				conteinerControlsGraph[answer[0]]->addValuePoint(pointFromX, pointFromY);
-				conteinerControlsGraph[answer[0]]->addValuePoint(pointToX, pointToY);
+				//conteinerControlsGraph[answer[0]]->addValuePoint(pointFromX, pointFromY);
+				//conteinerControlsGraph[answer[0]]->addValuePoint(pointToX, pointToY);
 				break;
 
-				/*
-			default:
-				qDebug() << "Node::onBridgeAnswer::DEFAULT";
-				break;
-				*/
+
 			}
 		}
 	}
@@ -225,8 +225,7 @@ namespace QuantIDE
 		controlEditor->setFontCode(fontTextCode);
 		controlEditor->show();
 
-		Graph *envGraph = new Graph(this);
-		//envGraph->setDomainX(0, 1);
+		ControlEnvelope *envGraph = new ControlEnvelope(this, mBridge, controlName);
 		envGraph->show();
 
 		QLabel *controlLabel = new QLabel(this);
@@ -287,7 +286,7 @@ namespace QuantIDE
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		playButton->setGeometry(90, 10, 40, 20);
 		sourceCode->setGeometry(10, 45, width() - 20, 60);
-		
+
 		labelNodeID->setGeometry(this->width() - 200, this->height() - 45, 180, 20);
 		labelNamedControls->setGeometry(this->width() - 200, this->height() - 25, 180, 20);
 
@@ -303,13 +302,16 @@ namespace QuantIDE
 			oneLabel->setGeometry(15, 80 + 35 * (controlID + 1), 40, 25);
 			controlID++;
 		}
+		
 		controlID = 0;
-		foreach(Graph *oneGraph, conteinerControlsGraph)
+		foreach(ControlEnvelope *oneGraph, conteinerControlsGraph)
 		{
 			oneGraph->setGeometry(180, 80 + 35 * (controlID + 1), 400, 150);
 			controlID++;
 		}
 		
+
+
 	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)

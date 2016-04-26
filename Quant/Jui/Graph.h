@@ -3,10 +3,7 @@
 
 #include <QWidget>
 #include <QPainter>
-#include <QFrame>
-#include <QTimer>
 #include <QDebug>
-
 #include <QMouseEvent>
 
 namespace Jui

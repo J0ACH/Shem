@@ -2,7 +2,7 @@
 
 namespace Jui
 {
-
+	
 	// GRAPH POINT	
 	GraphPoint::GraphPoint(QWidget *parent, int pointID, int pX, int pY, double valX, double valY) :
 		QWidget(parent),
