@@ -14,7 +14,6 @@ namespace Jui
 	{
 		isOver = false;
 		parent->installEventFilter(this);
-		this->grabKeyboard();
 		pointSize = 10;
 		this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize, pointSize);
 		
@@ -217,22 +216,6 @@ namespace Jui
 		update();
 	}
 
-	/*
-	void Graph::focusInEvent(QFocusEvent * event)
-	{
-	qDebug() << "Graph::focusInEvent";
-	//this->parent()->installEventFilter(this);
-	//update();
-	}
-
-	void Graph::focusOutEvent(QFocusEvent * event)
-	{
-	qDebug() << "Graph::focusOutEvent";
-	//this->parent()->removeEventFilter(this);
-	//update();
-	}
-	*/
-
 	void Graph::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
@@ -299,12 +282,6 @@ namespace Jui
 			painter.drawLine(boundsGraph().left(), pixelY, boundsGraph().right(), pixelY);
 		};
 
-	}
-
-	void Graph::mouseMoveEvent(QMouseEvent * mouseEvent)
-	{
-		//cursorPos = mouseEvent->pos();
-		//update();
 	}
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)

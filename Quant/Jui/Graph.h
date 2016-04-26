@@ -74,10 +74,7 @@ namespace Jui
 
 	protected:
 		void paintEvent(QPaintEvent *);
-		void mouseMoveEvent(QMouseEvent *);
-		//void focusInEvent(QFocusEvent * event);
-		//void focusOutEvent(QFocusEvent * event);
-				
+								
 	private:
 		void mousePressEvent(QMouseEvent *mouseEvent);
 		void mouseReleaseEvent(QMouseEvent *mouseEvent);

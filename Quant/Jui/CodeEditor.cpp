@@ -114,7 +114,7 @@ namespace Jui
 
 	bool CodeEditor::eventFilter(QObject* target, QEvent* event)
 	{
-		qDebug() << "EventType " << event->type();
+		//qDebug() << "EventType " << event->type();
 		if (hasFocus())
 		{
 			if (event->type() == QEvent::KeyPress)
@@ -152,7 +152,8 @@ namespace Jui
 					break;
 				}
 			}
-
+			/*
+			
 
 			if (event->type() == QEvent::ShortcutOverride)
 			{
@@ -172,6 +173,7 @@ namespace Jui
 
 
 			}
+			*/
 
 		};
 
