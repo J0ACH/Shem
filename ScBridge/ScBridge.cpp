@@ -100,8 +100,7 @@ namespace SupercolliderBridge
 	}
 	void ScBridge::question(QUuid id, int selector, QString commandString, bool printAnswer)
 	{
-		//QString command = QStringLiteral("[ \"%1\", %2, %3 ]").arg(pattern, commandString, QString::number(printAnswer));
-		QString command = QStringLiteral("[\"ANSWER_MARKER\",\"%1\",%2,%3,%4]").arg(
+			QString command = QStringLiteral("[\"ANSWER_MARKER\",\"%1\",%2,%3,%4]").arg(
 			id.toString(),
 			QString::number(selector),
 			commandString,

@@ -79,6 +79,8 @@ namespace QuantIDE
 		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
 			newNode, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
+		connect(newNode, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
+
 		dictNode.insert(newNode->name(), newNode);
 
 
@@ -95,6 +97,7 @@ namespace QuantIDE
 
 	void NodePanel::fitGeometry()
 	{
+		qDebug() << "NodePanel::fitGeometry";
 		int nextNodeOriginY = 0;
 		buttAddNode->setGeometry(200, 10, 50, 20);
 		scrollArea->setGeometry(5, 50, width() - 10, height() - 100);
@@ -103,12 +106,13 @@ namespace QuantIDE
 		{
 			Node *oneNode = dictNode.value(e);
 			//	fout << e << "," << dictNode->value(e) << '\n';
-			oneNode->setGeometry(0, nextNodeOriginY, scrollArea->width() - 5, 300);
+			oneNode->setGeometry(0, nextNodeOriginY, scrollArea->width() - 5, oneNode->height());
 			nextNodeOriginY = dictNode.value(e)->geometry().top() + dictNode.value(e)->height();
 
 			scrollArea->widget()->setGeometry(0, 0, scrollArea->width(), nextNodeOriginY);
 			nextNodeOriginY += 10;
 		}
+		//emit resizeAct();
 	}
 
 	NodePanel::~NodePanel()

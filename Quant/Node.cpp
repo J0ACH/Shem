@@ -98,7 +98,7 @@ namespace QuantIDE
 	}
 
 	void Node::setName(QString name) { nameLabel->setText(name); }
-	
+
 	QString Node::name() { return nameLabel->text(); }
 
 	void Node::setSourceCode(QString code) { sourceCode->setText(code); }
@@ -186,11 +186,12 @@ namespace QuantIDE
 
 				//conteinerControlsGraph[answer[0]]->setDomainX(0, 1);
 				//conteinerControlsGraph[answer[0]]->setDomainY(0, answer[1].toInt()*1.5);
-
+				/*
 				double pointFromX = 0;
 				double pointFromY = answer[1].toDouble();
 				double pointToX = 1;
 				double pointToY = answer[1].toDouble();
+				*/
 				//conteinerControlsGraph[answer[0]]->addValuePoint(pointFromX, pointFromY);
 				//conteinerControlsGraph[answer[0]]->addValuePoint(pointToX, pointToY);
 				break;
@@ -282,28 +283,23 @@ namespace QuantIDE
 		playButton->setGeometry(90, 10, 40, 20);
 		sourceCode->setGeometry(10, 45, width() - 20, 60);
 
-		labelNodeID->setGeometry(this->width() - 200, this->height() - 45, 180, 20);
-		labelNamedControls->setGeometry(this->width() - 200, this->height() - 25, 180, 20);
+		labelNodeID->setGeometry(this->width() - 200, 20, 180, 20);
+		labelNamedControls->setGeometry(this->width() - 200, 5, 180, 20);
 
-		int controlID = 0;
-		foreach(CodeEditor *oneControler, conteinerControls)
+		int originY = 110;
+		for (int i = 0; i < conteinerControlsLabel.size(); i++)
 		{
-			oneControler->setGeometry(60, 80 + 35 * (controlID + 1), 100, 25);
-			controlID++;
+			qDebug() << i << " : " << originY;
+			QString namedControl = conteinerControlsLabel.keys()[i];
+			conteinerControlsLabel.value(namedControl)->setGeometry(15, originY, 40, 25);
+			conteinerControls.value(namedControl)->setGeometry(60, originY, 100, 25);
+			conteinerControlsGraph.value(namedControl)->setGeometry(180, originY, width()-200, 200);
+			originY += conteinerControlsGraph.value(namedControl)->bounds().height() + 10;
 		}
-		controlID = 0;
-		foreach(QLabel *oneLabel, conteinerControlsLabel)
-		{
-			oneLabel->setGeometry(15, 80 + 35 * (controlID + 1), 40, 25);
-			controlID++;
-		}		
-		controlID = 0;
-		foreach(ControlEnvelope *oneGraph, conteinerControlsGraph)
-		{
-			oneGraph->setGeometry(180, 80 + 35 * (controlID + 1), 400, 170);
-			controlID++;
-		}
-		}
+		QRect newRect = this->geometry();
+		newRect.setBottom(originY + 10);
+		this->setGeometry(newRect);
+			}
 
 	bool Node::eventFilter(QObject* target, QEvent* event)
 	{
@@ -322,10 +318,13 @@ namespace QuantIDE
 		}
 	}
 
+	void Node::resizeEvent(QResizeEvent *resizeEvent) { emit resizeAct(); }
+
 	void Node::paintEvent(QPaintEvent *paintEvent)
 	{
 		QPainter painter(this);
 		painter.fillRect(this->bounds(), colorPanelBackground);
+		//painter.fillRect(this->bounds(), QColor(120, 30, 30));
 
 		if (this->hasFocus()) { painter.setPen(colorActive); }
 		else { painter.setPen(colorNormal); }

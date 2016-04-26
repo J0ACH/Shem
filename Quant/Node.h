@@ -39,10 +39,9 @@ namespace QuantIDE
 		void setSourceCode(QString);
 
 		QString name();
-
 		QRect bounds();
 
-		public slots:
+	public slots:
 		void fitGeometry();
 		void onConfigData(QMap<QString, QVariant*> config);
 
@@ -57,10 +56,12 @@ namespace QuantIDE
 		void evaluateAct(QString, bool silent = false, bool print = false);
 		void killAct(QString);
 		void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
+		void resizeAct();
 
 	protected:
 		void closeEvent(QCloseEvent *event);
 		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent *event);
 		virtual bool eventFilter(QObject * watched, QEvent * event);
 
 	private:
@@ -81,8 +82,8 @@ namespace QuantIDE
 		CodeEditor *sourceCode;
 		Button *closeButton, *playButton;
 
-		 QMap<QString, CodeEditor*> conteinerControls;
-		 QMap<QString, QLabel*> conteinerControlsLabel;
+		QMap<QString, CodeEditor*> conteinerControls;
+		QMap<QString, QLabel*> conteinerControlsLabel;
 		QMap<QString, ControlEnvelope*> conteinerControlsGraph;
 
 	};

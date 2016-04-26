@@ -16,7 +16,7 @@ namespace Jui
 		parent->installEventFilter(this);
 		pointSize = 10;
 		this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize, pointSize);
-		
+
 		setFocusPolicy(Qt::StrongFocus);
 	}
 
@@ -68,7 +68,7 @@ namespace Jui
 				}
 			}
 		}
-		
+
 		return QObject::eventFilter(target, event);
 	}
 
@@ -81,37 +81,24 @@ namespace Jui
 		if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
 		else { painter.setPen(QColor(60, 60, 60)); }
 		painter.drawRect(bounds());
-
 	}
 
 	GraphPoint::~GraphPoint(){}
 
-	// GRAPH POINT END
-	///////////////////////////////////////////////////////////
-	// GRAPH CURVE
-	/*
-	GraphCurve::GraphCurve(QWidget *parent, GraphPoint *from, GraphPoint *to) :
-	QWidget(parent),
-	startPoint(from),
-	endPoint(to)
-	{
-	isOver = false;
-	}
-	GraphCurve::~GraphCurve() { }
-	*/
 
-	// GRAPH CURVE END
-	///////////////////////////////////////////////////////////
+	// GRAPH POINT END
+	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// GRAPH 
+
 
 	Graph::Graph(QWidget *parent) : QWidget(parent)
 	{
 		this->setMouseTracking(true);
-		frameOffset = 50;
-		minDomainX = 10;
-		maxDomainX = 20;
-		minDomainY = 1;
-		maxDomainY = 2;
+		frameOffset = 25;
+		minDomainX = 0;
+		maxDomainX = 1;
+		minDomainY = 0;
+		maxDomainY = 1;
 		cursorPos = QPoint();
 		collectionPts = QMap<int, GraphPoint*>();
 		newPointID = 0;
@@ -123,7 +110,7 @@ namespace Jui
 	QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
 	QRect Graph::boundsGraph()
 	{
-		return bounds().adjusted(frameOffset, 14, -14, -frameOffset);
+		return bounds().adjusted(frameOffset * 2, 14, -14, -frameOffset);
 	}
 
 	void Graph::setDomainX(int min, int max)
@@ -217,13 +204,21 @@ namespace Jui
 		collectionPts.insert(collectionPts.size(), pt);
 		newPointID++;
 	}
-	/*
-	GraphCurve Graph::addCurve(GraphPoint *from, GraphPoint *to)
+
+	void Graph::addLine(double valueX1, double valueY1, double valueX2, double valueY2)
 	{
-	GraphCurve *curve = new GraphCurve(this, from, to);
-	return *curve;
+		QPoint pt1 = QPoint(getDisplayX(valueX1), getDisplayY(valueY1));
+		QPoint pt2 = QPoint(getDisplayX(valueX2), getDisplayY(valueY2));
+		
+		collectionLines.append(new QLine(pt1, pt2));
+		update();
 	}
-	*/
+	void Graph::deleteGraph()
+	{
+		collectionLines = QList<QLine*>();
+		update();
+	}
+
 	void Graph::onDeletePoint(int ID)
 	{
 		qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
@@ -297,6 +292,12 @@ namespace Jui
 			painter.drawLine(boundsGraph().left(), pixelY, boundsGraph().right(), pixelY);
 		};
 
+		//graph
+		painter.setPen(QColor(240, 70, 70));
+		foreach (QLine *oneLine, collectionLines)
+		{
+			painter.drawLine(*oneLine);
+		}
 	}
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
@@ -314,13 +315,7 @@ namespace Jui
 		{
 			this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
 		}
-		/*
-		if (collectionPts.size() > 0)
-		{
-		//this->addCurve();
-		}
-		*/
-
+		
 		update();
 		//mouseEvent->accept();
 	}

@@ -152,29 +152,7 @@ namespace Jui
 					break;
 				}
 			}
-			/*
 			
-
-			if (event->type() == QEvent::ShortcutOverride)
-			{
-				qDebug() << "CodeEditor::QEvent::KeyRelease" << event;
-				QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
-				
-				//	this->viewport()->setFocus();
-				//this->viewport()->event(event);
-				//event->accept();
-				//QTextEdit::eventFilter(target, event);
-				insertPlainText(eventKey->text());
-				//QTextEdit::eventFilter(target, event);
-				//self.textEdit.append(event.text())
-				return true;
-				//this->viewport()->update();
-				//return true;
-
-
-			}
-			*/
-
 		};
 
 		event->ignore();

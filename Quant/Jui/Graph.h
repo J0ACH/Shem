@@ -37,20 +37,12 @@ namespace Jui
 
 		QPoint mousePressCoor;
 	};
-	/*
-	class GraphCurve : public QWidget
-	{
-		Q_OBJECT
+	
 
-	public:
-		GraphCurve(QWidget *parent, GraphPoint *from, GraphPoint *to);
-		~GraphCurve();
-
-	private:
-		GraphPoint *startPoint, *endPoint;
-		bool isOver;
-	};
-	*/
+	// GRAPH POINT END
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// GRAPH 
+	
 
 	class Graph : public QWidget
 	{
@@ -69,7 +61,8 @@ namespace Jui
 
 		void addPixelPoint(int pixelX, int pixelY);
 		void addValuePoint(double valueX, double valueY);
-		//GraphCurve addCurve(GraphPoint *from, GraphPoint *to);
+		void addLine(double valueX1, double valueY1, double valueX2, double valueY2);
+		void deleteGraph();
 		
 	public slots:
 		void onDeletePoint(int ID);
@@ -85,6 +78,8 @@ namespace Jui
 		int minDomainX, maxDomainX, minDomainY, maxDomainY;
 		QPoint cursorPos;
 		QMap<int, GraphPoint*> collectionPts;
+		QList<QLine*> collectionLines;
+
 		int newPointID;
 		double getValueX(int displayX);
 		double getValueY(int displayY);

@@ -30,21 +30,19 @@ namespace QuantIDE
 		envelopeCode->setText("Env([0,1,0], [0.15,0.85], ['lin', 'sin'])");
 
 		envGraph = new Graph(this);
-		envGraph->setGeometry(5, 35, 300, 120);
+		envGraph->setGeometry(5, 35, 600, 160);
 		envGraph->setDomainX(0, 1);
 		envGraph->setDomainY(0, 1);
 
-		int noSeg = 30;
+		int noSeg = envGraph->boundsGraph().width();
 		double min = envGraph->getDomainX()[0];
 		double max = envGraph->getDomainX()[1];
 		for (int i = 0; i <= noSeg; i++)
 		{
-			QPointF *point = new QPointF();
-			point->setX((max - min) / noSeg*i + min);
-			point->setY(0);
-			graphCurve.append(point);
+			graphCurveX.append((max - min) / noSeg*i + min);
 		}
 
+		
 	}
 
 	void ControlEnvelope::onEnvelopeCodeEvaluate()
@@ -53,12 +51,11 @@ namespace QuantIDE
 		this->onBridgeQuestion(QuestionType::envTimes);
 		this->onBridgeQuestion(QuestionType::envCurves);
 
-		QStringList txtPointAt;
-		foreach(QPointF *onePoint, graphCurve) { txtPointAt.append(QString::number(onePoint->x())); }
-		QString txt = txtPointAt.join(",");
-		txt = tr("[%1]").arg(txt);
-		qDebug() << "graphCurve " << txt;
-		this->onBridgeQuestion(QuestionType::envAt, txt);
+		graphCurveY = QList<double>();
+		envGraph->deleteGraph();
+		foreach(double oneX, graphCurveX) {
+			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));
+		}
 	}
 
 	void ControlEnvelope::onBridgeQuestion(QuestionType selector, QString args)
@@ -116,17 +113,20 @@ namespace QuantIDE
 				break;
 
 			case envAt:
-				QList<double> answ;
-				int cnt = 0;
-				foreach(QString oneAnsw, answer)
+				graphCurveY.append(answer[0].toDouble());
+
+				int prepareSize = graphCurveY.size() - 1;
+
+				if (prepareSize > 1)
 				{
-					answ.append(oneAnsw.toDouble());
-					graphCurve[cnt]->setY(oneAnsw.toDouble());
-					//qDebug() << "graphPoint " << cnt << " : " << graphCurve[cnt]->x() << " || " << graphCurve[cnt]->y();
-					envGraph->addValuePoint(graphCurve[cnt]->x(),  graphCurve[cnt]->y());
-					cnt++;
+					envGraph->addLine(
+						graphCurveX[prepareSize - 1],
+						graphCurveY[prepareSize - 1],
+						graphCurveX[prepareSize],
+						graphCurveY[prepareSize]
+						);
 				}
-				//qDebug() << "ControlEnvelope::envCurves: " << answ;
+
 				break;
 			}
 		}
