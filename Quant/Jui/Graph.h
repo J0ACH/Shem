@@ -64,6 +64,8 @@ namespace Jui
 		QRect boundsGraph();
 		void setDomainX(int min, int max);
 		void setDomainY(int min, int max);
+		QList<double> getDomainX();
+		QList<double> getDomainY();
 
 		void addPixelPoint(int pixelX, int pixelY);
 		void addValuePoint(double valueX, double valueY);

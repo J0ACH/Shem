@@ -55,6 +55,8 @@ namespace QuantIDE
 		QList<double> levels;
 		QList<double> times;
 		QList<QString> curves;
+		
+		QList<QPointF*> graphCurve;
 
 		CodeEditor *envelopeCode;
 		Graph *envGraph;

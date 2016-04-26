@@ -32,7 +32,19 @@ namespace QuantIDE
 		envGraph = new Graph(this);
 		envGraph->setGeometry(5, 35, 300, 120);
 		envGraph->setDomainX(0, 1);
-		envGraph->setDomainY(0, 100);
+		envGraph->setDomainY(0, 1);
+
+		int noSeg = 30;
+		double min = envGraph->getDomainX()[0];
+		double max = envGraph->getDomainX()[1];
+		for (int i = 0; i <= noSeg; i++)
+		{
+			QPointF *point = new QPointF();
+			point->setX((max - min) / noSeg*i + min);
+			point->setY(0);
+			graphCurve.append(point);
+		}
+
 	}
 
 	void ControlEnvelope::onEnvelopeCodeEvaluate()
@@ -40,7 +52,13 @@ namespace QuantIDE
 		this->onBridgeQuestion(QuestionType::envLevels);
 		this->onBridgeQuestion(QuestionType::envTimes);
 		this->onBridgeQuestion(QuestionType::envCurves);
-		this->onBridgeQuestion(QuestionType::envAt, tr("[0,0.25,0.5,0.75,1]"));
+
+		QStringList txtPointAt;
+		foreach(QPointF *onePoint, graphCurve) { txtPointAt.append(QString::number(onePoint->x())); }
+		QString txt = txtPointAt.join(",");
+		txt = tr("[%1]").arg(txt);
+		qDebug() << "graphCurve " << txt;
+		this->onBridgeQuestion(QuestionType::envAt, txt);
 	}
 
 	void ControlEnvelope::onBridgeQuestion(QuestionType selector, QString args)
@@ -68,7 +86,7 @@ namespace QuantIDE
 		case envAt:
 			selectorNum = QuestionType::envAt;
 			questionCode = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), args);
-			emit bridgeQuestionAct(objectID, selectorNum, questionCode, true);
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
 		}
 	}
@@ -99,8 +117,16 @@ namespace QuantIDE
 
 			case envAt:
 				QList<double> answ;
-				foreach(QString oneAnsw, answer) { answ.append(oneAnsw.toDouble()); }
-				qDebug() << "ControlEnvelope::envCurves: " << answ;
+				int cnt = 0;
+				foreach(QString oneAnsw, answer)
+				{
+					answ.append(oneAnsw.toDouble());
+					graphCurve[cnt]->setY(oneAnsw.toDouble());
+					//qDebug() << "graphPoint " << cnt << " : " << graphCurve[cnt]->x() << " || " << graphCurve[cnt]->y();
+					envGraph->addValuePoint(graphCurve[cnt]->x(),  graphCurve[cnt]->y());
+					cnt++;
+				}
+				//qDebug() << "ControlEnvelope::envCurves: " << answ;
 				break;
 			}
 		}

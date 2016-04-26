@@ -7,8 +7,6 @@ INCLUDE("QuantVersion.txt" ${QT_USE_FILE})
 SET(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH}")
 MESSAGE(STATUS "\nQuant init...")
 
-<<<<<<< HEAD
-=======
 # git version detecton ################################################ 
 include(GetGitRevisionDescription)
 git_describe(GIT_REVISION_DESCRIPTION --tags --match v*)
@@ -24,7 +22,6 @@ else()
   message(STATUS "Could not get revision information from Git! Calling this just version ${PROJECT_VERSION}!")
 endif()
 
->>>>>>> refs/remotes/origin/master
 CONFIGURE_FILE (
   ${CMAKE_CURRENT_SOURCE_DIR}/QuantConfig.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/QuantConfig.h
@@ -52,22 +49,16 @@ SET(Quant_hdr
   Quant.h
   NodePanel.h
   Node.h
-<<<<<<< HEAD
   ControlEnvelope.h
 )
-=======
-  )
->>>>>>> refs/remotes/origin/master
+
 SET(Quant_src 
   Quant.cpp
   NodePanel.cpp
   Node.cpp
-<<<<<<< HEAD
   ControlEnvelope.cpp
 )
-=======
-  )
->>>>>>> refs/remotes/origin/master
+
 SET(Quant_res 
   Quant.qrc
   Jui/Jui.qrc

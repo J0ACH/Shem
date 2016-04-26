@@ -140,6 +140,21 @@ namespace Jui
 		update();
 	}
 
+	QList<double> Graph::getDomainX()
+	{
+		QList<double> range;
+		range.append(minDomainX);
+		range.append(maxDomainX);
+		return range;
+	}
+	QList<double> Graph::getDomainY()
+	{
+		QList<double> range;
+		range.append(minDomainY);
+		range.append(maxDomainY);
+		return range;
+	}
+
 	double Graph::getValueX(int displayX)
 	{
 		double perc = (displayX - boundsGraph().left()) / (double)boundsGraph().width();

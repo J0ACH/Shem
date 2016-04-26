@@ -105,8 +105,9 @@ namespace SupercolliderBridge
 			id.toString(),
 			QString::number(selector),
 			commandString,
-			QString::number(printAnswer));
-		qDebug() << "ScBridge::question: " << command;
+			QString::number(printAnswer)
+			);
+		if (printAnswer) { qDebug() << "ScBridge::question: " << command; };
 		evaluateCode(command, false);
 	}
 
@@ -211,7 +212,7 @@ namespace SupercolliderBridge
 		{
 			if (msg.contains("ANSWER_MARKER"))
 			{
-				qDebug() << "msg [ANSWER_MARKER]: " << msg;
+				//qDebug() << "msg [ANSWER_MARKER]: " << msg;
 
 				QStringList incomingMSG = msg.split("->");
 				foreach(QString oneMSG, incomingMSG)
@@ -244,13 +245,15 @@ namespace SupercolliderBridge
 
 						}
 
-						qDebug() << "msgAnswer: "
-							//<< " pattern " << id
-							<< " pattern " << QString::number(selector)
-							<< " answer " << answer;
-							//<< " print " << printAnswer;
+						
 
 						if (printAnswer) {
+							qDebug() << "msgAnswer: "
+								//<< " pattern " << id
+								<< " pattern " << QString::number(selector)
+								<< " answer " << answer;
+							//<< " print " << printAnswer;
+
 							QString txt;
 							foreach(QString oneAnsw, answer)
 							{
