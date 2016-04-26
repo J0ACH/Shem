@@ -34,7 +34,7 @@ namespace QuantIDE
 		canvan->setTailHeight(34);
 		canvan->setLogo(QImage(":/logo32.png"));
 		canvan->setTitle("Quant");
-		canvan->setVersion(tr("%1").arg(Quant_VERSION));
+		canvan->setVersion(tr("v%1").arg(Quant_VERSION));
 
 		
 		//this->initProcessDialog();
