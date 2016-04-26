@@ -32,8 +32,15 @@ namespace QuantIDE
 		canvan->setTailHeight(34);
 		canvan->setLogo(QImage(":/logo32.png"));
 		canvan->setTitle("Quant");
+<<<<<<< HEAD
 		canvan->setVersion(Quant_VERSION_MAJOR, Quant_VERSION_MINOR, Quant_VERSION_PATCH);
 				
+=======
+		canvan->setVersion(tr("v%1").arg(Quant_VERSION));
+
+		
+		//this->initProcessDialog();
+>>>>>>> refs/remotes/origin/master
 		this->initControl();
 		this->fitGeometry();
 		
