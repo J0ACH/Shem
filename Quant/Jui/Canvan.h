@@ -39,7 +39,7 @@ namespace Jui
 		void setTailHeight(int);
 		void setTitle(QString titleName);
 		void setLogo(QImage);
-		void setVersion(int major, int minor, int patch);
+		void setVersion(QString);
 
 	signals:
 		void resizeAct();

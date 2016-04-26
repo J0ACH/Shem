@@ -286,13 +286,15 @@ namespace Jui
 	void Canvan::setTailHeight(int height) { tailSize = height; }
 	void Canvan::setLogo(QImage img) { logo = img; }
 	void Canvan::setTitle(QString name)	{ win->setWindowTitle(name); }
-	void Canvan::setVersion(int major = 0, int minor = 0, int patch = 0)
+	void Canvan::setVersion(QString _version)
 	{
+          /*
 		QString strMajor = QString::number(major);
 		QString strMinor = QString::number(minor);
 		QString strPatch = QString::number(patch);
 		if (patch < 10) { strPatch.prepend(QString::number(0)); }
-		version = tr("v%1.%2%3").arg(strMajor, strMinor, strPatch);
+	*/
+                version = _version;
 	}
 
 	void Canvan::closeCanvan() {
