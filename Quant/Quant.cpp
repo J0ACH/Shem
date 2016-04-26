@@ -22,7 +22,6 @@ namespace QuantIDE
 
 	Quant::Quant(QWidget *parent) : QWidget(parent)
 	{
-
 		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
 		customize = new Customize(this);

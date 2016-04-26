@@ -245,10 +245,10 @@ namespace SupercolliderBridge
 						}
 
 						qDebug() << "msgAnswer: "
-							<< " pattern " << id
+							//<< " pattern " << id
 							<< " pattern " << QString::number(selector)
-							<< " answer " << answer
-							<< " print " << printAnswer;
+							<< " answer " << answer;
+							//<< " print " << printAnswer;
 
 						if (printAnswer) {
 							QString txt;

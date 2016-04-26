@@ -2,8 +2,8 @@
 #define CONTROLGRAPH_H
 
 #include "ScBridge.h"
-//#include "Node.h"
 #include "CodeEditor.h"
+#include "Graph.h"
 
 #include <QWidget>
 #include <QLabel>
@@ -25,20 +25,26 @@ namespace QuantIDE
 		ControlEnvelope(QWidget *parent, ScBridge *bridge, QString controlName);
 		~ControlEnvelope();
 
-		enum QuestionType { envLevels, envTimes, envCurves };
+		enum QuestionType {
+			envLevels,
+			envTimes,
+			envCurves,
+			envAt
+		};
 
 		QRect bounds();
-				
+
 	public slots:
 		void onEnvelopeCodeEvaluate();
 		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
 		void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
-		
+
 	signals:
 		void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
 
 	protected:
 		void paintEvent(QPaintEvent *event);
+		//virtual bool eventFilter(QObject * watched, QEvent * event);
 
 
 	private:
@@ -46,8 +52,14 @@ namespace QuantIDE
 		QUuid objectID;
 		QString name;
 
+		QList<double> levels;
+		QList<double> times;
+		QList<QString> curves;
+
 		CodeEditor *envelopeCode;
+		Graph *envGraph;
 		//QLabel *envelopeLabel;
+
 
 		void initControl();
 	};

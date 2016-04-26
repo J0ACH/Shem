@@ -9,6 +9,8 @@ namespace QuantIDE
 		setObjectName("Node");
 		objectID = QUuid::createUuid();
 
+		setFocusPolicy(Qt::StrongFocus);
+
 		this->initControl();
 		this->fitGeometry();
 
@@ -294,17 +296,30 @@ namespace QuantIDE
 		{
 			oneLabel->setGeometry(15, 80 + 35 * (controlID + 1), 40, 25);
 			controlID++;
-		}
-		
+		}		
 		controlID = 0;
 		foreach(ControlEnvelope *oneGraph, conteinerControlsGraph)
 		{
-			oneGraph->setGeometry(180, 80 + 35 * (controlID + 1), 400, 150);
+			oneGraph->setGeometry(180, 80 + 35 * (controlID + 1), 400, 170);
 			controlID++;
 		}
-		
+		}
 
-
+	bool Node::eventFilter(QObject* target, QEvent* event)
+	{
+		if (event->type() == QEvent::FocusIn)
+		{
+			qDebug() << "QEvent::FocusIn";
+			installEventFilter(this);
+			update();
+			return true;
+		}
+		if (event->type() == QEvent::FocusOut)
+		{
+			qDebug() << "QEvent::FocusOut";
+			update();
+			return true;
+		}
 	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)
@@ -312,7 +327,10 @@ namespace QuantIDE
 		QPainter painter(this);
 		painter.fillRect(this->bounds(), colorPanelBackground);
 
-		painter.setPen(colorOver);
+		if (this->hasFocus()) { painter.setPen(colorActive); }
+		else { painter.setPen(colorNormal); }
+
+		//painter.setPen(colorOver);
 		painter.drawLine(0, 0, width(), 0);
 		painter.drawLine(0, height() - 1, width(), height() - 1);
 	}

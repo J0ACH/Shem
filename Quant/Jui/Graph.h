@@ -18,21 +18,24 @@ namespace Jui
 
 		bool isOver;
 		QRect bounds();
-		QRegion region;
+		//QRegion region;
 
 	signals:
 		void actDelete(int ID);
 
 	protected:
 		void paintEvent(QPaintEvent *);
+		void mousePressEvent(QMouseEvent *);
 		void mouseMoveEvent(QMouseEvent *);
 		virtual bool eventFilter(QObject * watched, QEvent * event);
-
+		
 	private:
 		int ID;
 		int pixelX, pixelY;
 		double valueX, valueY;
 		int pointSize;
+
+		QPoint mousePressCoor;
 	};
 	/*
 	class GraphCurve : public QWidget
@@ -72,7 +75,9 @@ namespace Jui
 	protected:
 		void paintEvent(QPaintEvent *);
 		void mouseMoveEvent(QMouseEvent *);
-
+		//void focusInEvent(QFocusEvent * event);
+		//void focusOutEvent(QFocusEvent * event);
+				
 	private:
 		void mousePressEvent(QMouseEvent *mouseEvent);
 		void mouseReleaseEvent(QMouseEvent *mouseEvent);

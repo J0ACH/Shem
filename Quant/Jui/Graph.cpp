@@ -2,7 +2,7 @@
 
 namespace Jui
 {
-	
+
 	// GRAPH POINT	
 	GraphPoint::GraphPoint(QWidget *parent, int pointID, int pX, int pY, double valX, double valY) :
 		QWidget(parent),
@@ -16,60 +16,35 @@ namespace Jui
 		parent->installEventFilter(this);
 		this->grabKeyboard();
 		pointSize = 10;
-		this->setGeometry(pixelX - 50, pixelY - 25, 100, 35);
-		region = QRegion(
-			50 - pointSize / 2,
-			25 - pointSize / 2,
-			pointSize,
-			pointSize,
-			QRegion::RegionType::Ellipse
-			);
-		setMouseTracking(true);
+		this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize, pointSize);
+		
+		setFocusPolicy(Qt::StrongFocus);
 	}
 
-	QRect GraphPoint::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
+	QRect GraphPoint::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 
-	void GraphPoint::paintEvent(QPaintEvent *event)
+
+	void GraphPoint::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		QPainter painter(this);
-
-		painter.setPen(QPen(Qt::white, 1));
-		if (isOver) {
-			QPainterPath path;
-			path.addRegion(region);
-			painter.fillPath(path, Qt::red);
-
-			QString text = tr("%1 || %2").arg(QString::number(valueX, 'f', 2), QString::number(valueY, 'f', 2));
-			QTextOption option;
-			option.setAlignment(Qt::AlignCenter);
-			painter.drawText(QRect(0, 0, 100, 25), text, option);
-
-			painter.drawRect(bounds());
-		}
-		painter.drawEllipse(QPoint(50, 25), pointSize / 2, pointSize / 2);
-
+		mousePressCoor = mouseEvent->pos();
 	}
-
 	void GraphPoint::mouseMoveEvent(QMouseEvent * mouseEvent)
 	{
-		/*
-		qDebug() << tr("%1 ; %2").arg(
-		QString::number(mouseEvent->pos().x()),
-		QString::number(mouseEvent->pos().y())
-		);
-		*/
-
-		if (region.contains(mouseEvent->pos())) { isOver = true; }
-		else {
-			isOver = false;
-
-		};
-		update();
+		QRect rect = this->geometry();
+		rect.moveCenter(QPoint(
+			mouseEvent->pos().x(),
+			mouseEvent->pos().y()
+			//mousePressCoor.x() - mouseEvent->pos().x(),
+			//mousePressCoor.y() - mouseEvent->pos().y()
+			));
+		//this->bounds().moveCenter(mouseEvent->pos());
+		this->setGeometry(rect);
 	}
 
 	bool GraphPoint::eventFilter(QObject* target, QEvent* event)
 	{
-		if (isOver) {
+		if (hasFocus())
+		{
 			if (event->type() == QEvent::KeyPress)
 			{
 				QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
@@ -83,7 +58,7 @@ namespace Jui
 					emit actDelete(ID);
 					this->close();
 					event->accept();
-
+					return true;
 					break;
 
 				case Qt::Key::Key_Escape:
@@ -93,22 +68,21 @@ namespace Jui
 					break;
 				}
 			}
-			/*
-			if (event->type() == QEvent::KeyRelease)
-			{
-				//event->ignore();
-				//highlightText(this->toPlainText(), Qt::red);
-				//fitTextFormat();
-			}
-			*/
 		}
-		else
-		{
-			//event->ignore();
+		
+		return QObject::eventFilter(target, event);
+	}
 
-		}
+	void GraphPoint::paintEvent(QPaintEvent *event)
+	{
+		QPainter painter(this);
 
-		return QWidget::eventFilter(target, event);
+		painter.fillRect(bounds(), QColor(60, 60, 160));
+
+		if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
+		else { painter.setPen(QColor(60, 60, 60)); }
+		painter.drawRect(bounds());
+
 	}
 
 	GraphPoint::~GraphPoint(){}
@@ -142,6 +116,9 @@ namespace Jui
 		cursorPos = QPoint();
 		collectionPts = QMap<int, GraphPoint*>();
 		newPointID = 0;
+
+		setFocusPolicy(Qt::StrongFocus);
+
 	}
 
 	QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
@@ -184,7 +161,7 @@ namespace Jui
 	double Graph::getDisplayY(double valueY)
 	{
 		//qDebug() << "point valueY: " << valueY;
-		double perc = (valueY - minDomainY )/ (double)(maxDomainY - minDomainY);
+		double perc = (valueY - minDomainY) / (double)(maxDomainY - minDomainY);
 		//double perc = valueY  / (double)maxDomainY;
 		//qDebug() << "point percY: " << perc;
 		return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
@@ -240,14 +217,36 @@ namespace Jui
 		update();
 	}
 
+	/*
+	void Graph::focusInEvent(QFocusEvent * event)
+	{
+	qDebug() << "Graph::focusInEvent";
+	//this->parent()->installEventFilter(this);
+	//update();
+	}
+
+	void Graph::focusOutEvent(QFocusEvent * event)
+	{
+	qDebug() << "Graph::focusOutEvent";
+	//this->parent()->removeEventFilter(this);
+	//update();
+	}
+	*/
+
 	void Graph::paintEvent(QPaintEvent *event)
 	{
 		QPainter painter(this);
 
-		painter.fillRect(bounds(), QColor(10, 10, 10));
-		painter.drawRect(this->boundsGraph());
+		//painter.fillRect(bounds(), QColor(10, 10, 10));
+		if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
+		else { painter.setPen(QColor(60, 60, 60)); }
+		painter.drawLine(0, 0, width(), 0);
+		painter.drawLine(0, height() - 1, width(), height() - 1);
 
 		painter.setPen(QPen(Qt::white, 1));
+
+		painter.drawRect(this->boundsGraph());
+
 
 		QString posPixel = tr("%1 ; %2").arg(
 			QString::number(cursorPos.x()),
@@ -304,26 +303,40 @@ namespace Jui
 
 	void Graph::mouseMoveEvent(QMouseEvent * mouseEvent)
 	{
-		cursorPos = mouseEvent->pos();
-		update();
+		//cursorPos = mouseEvent->pos();
+		//update();
 	}
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
+		bool selectPoint = false;
+		foreach(GraphPoint *onePoint, collectionPts)
+		{
+			if (onePoint->hasFocus())
+			{
+				selectPoint = true;
+				break;
+			}
+		}
+		if (!selectPoint)
+		{
+			this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
+		}
+		/*
 		if (collectionPts.size() > 0)
 		{
-			//this->addCurve();
+		//this->addCurve();
 		}
+		*/
 
 		update();
-		mouseEvent->accept();
+		//mouseEvent->accept();
 	}
 
 	void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)
 	{
 		update();
-		mouseEvent->accept();
+		//mouseEvent->accept();
 	}
 
 	Graph::~Graph() { }
