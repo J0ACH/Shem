@@ -36,7 +36,6 @@ namespace QuantIDE
 
 		void connectBridge(ScBridge*);
 		void setName(QString);
-		QString getName();
 		void setSourceCode(QString);
 
 		QString name();
@@ -50,14 +49,14 @@ namespace QuantIDE
 		void onEvaluateNode();
 		void onReciveText(QString);
 		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
-		void onBridgeAnswer(QString pattern, int selectorNum, QStringList answer);
+		void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
 
 		void changeNodePlay();
 
 	signals:
-		void evaluateAct(QString);
+		void evaluateAct(QString, bool silent = false, bool print = false);
 		void killAct(QString);
-		void bridgeQuestionAct(QString pattern, int selectorNum, QString question, bool print);
+		void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
 
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -70,7 +69,6 @@ namespace QuantIDE
 		void addControl(QString name);
 		void removeControl(QString name);
 
-		QString objectPattern;
 		QUuid objectID;
 		QMap<QString, QVariant*> configData;
 		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;

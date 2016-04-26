@@ -7,7 +7,6 @@ namespace QuantIDE
 		mBridge(NULL)
 	{
 		setObjectName("Node");
-		objectPattern = QString::null;
 		objectID = QUuid::createUuid();
 
 		this->initControl();
@@ -79,9 +78,9 @@ namespace QuantIDE
 	void Node::connectBridge(ScBridge *bridge)
 	{
 		mBridge = bridge;
-		connect(this, SIGNAL(evaluateAct(QString)), mBridge, SLOT(evaluateCode(QString)));
-		connect(this, SIGNAL(bridgeQuestionAct(QString, int, QString, bool)), mBridge, SLOT(question(QString, int, QString, bool)));
-		connect(mBridge, SIGNAL(answerAct(QString, int, QStringList)), this, SLOT(onBridgeAnswer(QString, int, QStringList)));
+		connect(this, SIGNAL(evaluateAct(QString, bool, bool)), mBridge, SLOT(evaluateCode(QString, bool, bool)));
+		connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
+		connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
 
 		stateNodePlay = StateNodePlay::STOP;
 		QString code;
@@ -96,13 +95,8 @@ namespace QuantIDE
 
 	}
 
-	void Node::setName(QString name)
-	{
-		nameLabel->setText(name);
-		objectPattern = tr("%1/%2").arg(this->objectName(), name);
-	}
-	QString Node::getName() { return nameLabel->text();	}
-
+	void Node::setName(QString name) { nameLabel->setText(name); }
+	
 	QString Node::name() { return nameLabel->text(); }
 
 	void Node::setSourceCode(QString code) { sourceCode->setText(code); }
@@ -114,7 +108,7 @@ namespace QuantIDE
 		emit evaluateAct(code);
 
 		code = tr("~%1[0] = {%2}").arg(name(), text);
-		emit evaluateAct(code);
+		emit evaluateAct(code, true, true);
 
 		onBridgeQuestion(QuestionType::namedControls);
 	}
@@ -145,25 +139,24 @@ namespace QuantIDE
 		case nodeID:
 			selectorNum = QuestionType::nodeID;
 			questionCode = tr("~%1.nodeID").arg(name());
-			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
 		case namedControls:
 			selectorNum = QuestionType::namedControls;
 			questionCode = tr("~%1.controlKeys").arg(name());
-			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
 		case namedValues:
 			selectorNum = QuestionType::namedValues;
 			questionCode = tr("~%1.controlKeysValues (['%2'])").arg(name(), args);
-			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
 		}
 	}
 
-	void Node::onBridgeAnswer(QString pattern, int selectorNum, QStringList answer)
+	void Node::onBridgeAnswer(QUuid id, int selectorNum, QStringList answer)
 	{
-		qDebug() << "Node::onBridgeAnswer: " << pattern << answer;
-		if (pattern == objectPattern)
+		if (id == objectID)
 		{
 			QuestionType selector = static_cast<QuestionType>(selectorNum);
 			QString txt = "";

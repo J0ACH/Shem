@@ -80,7 +80,7 @@ namespace SupercolliderBridge
 		}
 	}
 
-	void ScBridge::evaluateCode(QString const & commandString, bool silent)
+	void ScBridge::evaluateCode(QString const & commandString, bool silent, bool printAnswer)
 	{
 		if (state() != QProcess::Running) {
 			emit msgStatusAct(tr("Interpreter is not running!"));
@@ -95,14 +95,14 @@ namespace SupercolliderBridge
 		}
 
 		char commandChar = silent ? '\x1b' : '\x0c';
-		emit msgEvaluateAct(tr("EVALUATE: %1").arg(commandString));
+		if (printAnswer) { emit msgEvaluateAct(tr("EVALUATE: %1").arg(commandString)); }
 		write(&commandChar, 1);
 	}
-	void ScBridge::question(QString pattern, int selector, QString commandString, bool printAnswer)
+	void ScBridge::question(QUuid id, int selector, QString commandString, bool printAnswer)
 	{
 		//QString command = QStringLiteral("[ \"%1\", %2, %3 ]").arg(pattern, commandString, QString::number(printAnswer));
 		QString command = QStringLiteral("[\"ANSWER_MARKER\",\"%1\",%2,%3,%4]").arg(
-			pattern,
+			id.toString(),
 			QString::number(selector),
 			commandString,
 			QString::number(printAnswer));
@@ -224,7 +224,7 @@ namespace SupercolliderBridge
 						QStringList msgParts = oneMSG.split(",");
 						//qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
 
-						QString pattern;
+						QUuid id;
 						QStringList answer;
 						int selector, printAnswer;
 
@@ -237,7 +237,7 @@ namespace SupercolliderBridge
 
 							//qDebug() << "i: " << i;
 							if (i == 0) { /* skiping marker */ }
-							else if (i == 1) { pattern = onePart; }
+							else if (i == 1) { id = QUuid(onePart); }
 							else if (i == 2) { selector = onePart.toInt(); }
 							else if (i != msgParts.size() - 1) { answer.append(onePart); }
 							else if (i == msgParts.size() - 1) { printAnswer = onePart.toInt(); }
@@ -245,10 +245,11 @@ namespace SupercolliderBridge
 						}
 
 						qDebug() << "msgAnswer: "
-							<< " pattern " << pattern
+							<< " pattern " << id
 							<< " pattern " << QString::number(selector)
 							<< " answer " << answer
-							<< " print " << pattern;
+							<< " print " << printAnswer;
+
 						if (printAnswer) {
 							QString txt;
 							foreach(QString oneAnsw, answer)
@@ -257,7 +258,7 @@ namespace SupercolliderBridge
 							}
 							emit msgResultAct(txt);
 						}
-						emit answerAct(pattern, selector, answer);
+						emit answerAct(id, selector, answer);
 					}
 
 				}

@@ -8,20 +8,15 @@ namespace QuantIDE
 		name(controlName)
 	{
 		this->setObjectName("ControlEnvelope");
-		objectPattern = QUuid::createUuid().toString();
 		objectID = QUuid::createUuid();
 
-		qDebug() << "objectPattern: " << objectPattern;
-
-		
-		
 		this->initControl();
 		//this->fitGeometry();
 		
 		connect(envelopeCode, SIGNAL(evaluateAct()), this, SLOT(onEnvelopeCodeEvaluate()));
 		
-		connect(this, SIGNAL(bridgeQuestionAct(QString, int, QString, bool)), mBridge, SLOT(question(QString, int, QString, bool)));
-		connect(mBridge, SIGNAL(answerAct(QString, int, QStringList)), this, SLOT(onBridgeAnswer(QString, int, QStringList)));
+		connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
+		connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
 	}
 
 	QRect ControlEnvelope::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
@@ -52,27 +47,27 @@ namespace QuantIDE
 			selectorNum = QuestionType::envLevels;
 			questionCode = tr("%1.levels").arg(envelopeCode->toPlainText());
 			//qDebug() << "Question levels" << questionCode;
-			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
 			
 		case envTimes:
 			selectorNum = QuestionType::envTimes;
 			questionCode = tr("%1.times").arg(envelopeCode->toPlainText());
-			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
 		case envCurves:
 			selectorNum = QuestionType::envCurves;
 			questionCode = tr("%1.curves").arg(envelopeCode->toPlainText());
-			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
 			
 		}
 	}
 
-	void ControlEnvelope::onBridgeAnswer(QString pattern, int selectorNum, QStringList answer)
+	void ControlEnvelope::onBridgeAnswer(QUuid id, int selectorNum, QStringList answer)
 	{
-		qDebug() << "Node::onBridgeAnswer: " << pattern << answer;
-		if (pattern == objectPattern)
+		
+		if (id == objectID)
 		{
 			QuestionType selector = static_cast<QuestionType>(selectorNum);
 			QString txt = "";

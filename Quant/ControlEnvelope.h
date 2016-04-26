@@ -32,10 +32,10 @@ namespace QuantIDE
 	public slots:
 		void onEnvelopeCodeEvaluate();
 		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
-		void onBridgeAnswer(QString pattern, int selectorNum, QStringList answer);
+		void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
 		
 	signals:
-		void bridgeQuestionAct(QString pattern, int selectorNum, QString question, bool print);
+		void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
 
 	protected:
 		void paintEvent(QPaintEvent *event);
@@ -43,9 +43,8 @@ namespace QuantIDE
 
 	private:
 		ScBridge *mBridge;
-		QString name;
-		QString objectPattern;
 		QUuid objectID;
+		QString name;
 
 		CodeEditor *envelopeCode;
 		//QLabel *envelopeLabel;
