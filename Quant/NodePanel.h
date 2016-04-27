@@ -43,7 +43,7 @@ namespace QuantIDE
 
 	signals:
 		void actConfigData(QMap<QString, QVariant*> config);
-
+		
 	private:
 		void initControl();
 		QMap<QString, QVariant*> configData;

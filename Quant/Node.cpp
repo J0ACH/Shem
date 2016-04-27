@@ -278,6 +278,8 @@ namespace QuantIDE
 
 	void Node::fitGeometry()
 	{
+		qDebug() << "Node::fitGeometry";
+
 		nameLabel->setGeometry(10, 5, 80, 30);
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		playButton->setGeometry(90, 10, 40, 20);
@@ -293,13 +295,13 @@ namespace QuantIDE
 			QString namedControl = conteinerControlsLabel.keys()[i];
 			conteinerControlsLabel.value(namedControl)->setGeometry(15, originY, 40, 25);
 			conteinerControls.value(namedControl)->setGeometry(60, originY, 100, 25);
-			conteinerControlsGraph.value(namedControl)->setGeometry(180, originY, width()-200, 200);
+			conteinerControlsGraph.value(namedControl)->setGeometry(180, originY, width() - 200, 200);
 			originY += conteinerControlsGraph.value(namedControl)->bounds().height() + 10;
 		}
 		QRect newRect = this->geometry();
 		newRect.setBottom(originY + 10);
 		this->setGeometry(newRect);
-			}
+	}
 
 	bool Node::eventFilter(QObject* target, QEvent* event)
 	{
@@ -318,7 +320,7 @@ namespace QuantIDE
 		}
 	}
 
-	void Node::resizeEvent(QResizeEvent *resizeEvent) { emit resizeAct(); }
+	//void Node::resizeEvent(QResizeEvent *resizeEvent) { /*emit resizeAct();*/ }
 
 	void Node::paintEvent(QPaintEvent *paintEvent)
 	{

@@ -61,7 +61,7 @@ namespace QuantIDE
 	protected:
 		void closeEvent(QCloseEvent *event);
 		void paintEvent(QPaintEvent *event);
-		void resizeEvent(QResizeEvent *event);
+	//	void resizeEvent(QResizeEvent *event);
 		virtual bool eventFilter(QObject * watched, QEvent * event);
 
 	private:

@@ -21,7 +21,7 @@ namespace Jui
 	void Panel::initControl()
 	{
 		closeButton = new Button(this);
-		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
+		//closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
 		closeButton->setText("X");
 
@@ -96,6 +96,14 @@ namespace Jui
 
 		painter.setPen(QPen(colorText, 1));
 		painter.drawText(15, 25, title);
+
+		bool showScreen = true;
+		if (showScreen)
+		{
+			painter.setPen(QColor(30, 30, 130));
+			painter.drawLine(this->geometry().topLeft(), this->geometry().bottomRight());
+			painter.drawLine(this->geometry().bottomLeft(), this->geometry().topRight());
+		}
 	}
 
 	void Panel::resizeEvent(QResizeEvent *resizeEvent)
