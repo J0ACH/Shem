@@ -61,14 +61,20 @@ namespace Jui
 
 		void addPixelPoint(int pixelX, int pixelY);
 		void addValuePoint(double valueX, double valueY);
+		void addGraphPoint(int pixelX, double valueY);
 		void addLine(double valueX1, double valueY1, double valueX2, double valueY2);
 		void deleteGraph();
 		
 	public slots:
 		void onDeletePoint(int ID);
 
+	signals:
+		void actResized();
+		void actPointAdded(double valueX, double valueY);
+
 	protected:
 		void paintEvent(QPaintEvent *);
+		void resizeEvent(QResizeEvent *event);
 								
 	private:
 		void mousePressEvent(QMouseEvent *mouseEvent);
@@ -79,6 +85,8 @@ namespace Jui
 		QPoint cursorPos;
 		QMap<int, GraphPoint*> collectionPts;
 		QList<QLine*> collectionLines;
+
+		QList<double> graphValues;
 
 		int newPointID;
 		double getValueX(int displayX);

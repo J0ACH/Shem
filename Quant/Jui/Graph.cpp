@@ -119,7 +119,6 @@ namespace Jui
 		maxDomainX = max;
 		update();
 	}
-
 	void Graph::setDomainY(int min, int max)
 	{
 		minDomainY = min;
@@ -205,6 +204,11 @@ namespace Jui
 		newPointID++;
 	}
 
+	void Graph::addGraphPoint(int pixelX, double valueY)
+	{
+
+	}
+
 	void Graph::addLine(double valueX1, double valueY1, double valueX2, double valueY2)
 	{
 		QPoint pt1 = QPoint(getDisplayX(valueX1), getDisplayY(valueY1));
@@ -213,8 +217,10 @@ namespace Jui
 		collectionLines.append(new QLine(pt1, pt2));
 		update();
 	}
+
 	void Graph::deleteGraph()
 	{
+		graphValues = QList<double>();
 		collectionLines = QList<QLine*>();
 		update();
 	}
@@ -224,6 +230,16 @@ namespace Jui
 		qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
 		collectionPts.remove(ID);
 		update();
+	}
+
+	void Graph::resizeEvent(QResizeEvent *resizeEvent) 
+	{ 
+		qDebug() << "Graph::resizeEvent";
+		
+		graphValues = QList<double>();
+		collectionLines = QList<QLine*>();
+
+		emit actResized();
 	}
 
 	void Graph::paintEvent(QPaintEvent *event)
@@ -314,6 +330,8 @@ namespace Jui
 		if (!selectPoint)
 		{
 			this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
+			
+			void actPointAdded(double valueX, double valueY);
 		}
 		
 		update();
