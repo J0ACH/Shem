@@ -74,7 +74,7 @@ namespace QuantIDE
 		newNode->setSourceCode("SinOsc.ar(\\freq.kr(90)!2, mul: Saw.kr(2, 0.5, 0.5))");
 		newNode->connectBridge(mBridge);
 		newNode->setFixedWidth(scrollArea->width() - 10);
-		//newNode->setFixedHeight(150);
+		newNode->setFixedHeight(150);
 		newNode->show();
 
 		//connect(this, SIGNAL(resizeAct()), newNode, SLOT(fitGeometry()));
@@ -111,7 +111,7 @@ namespace QuantIDE
 			qDebug() << "NodePanel::NEW LOOP";
 			oneNode->setGeometry(5, nextNodeOriginY, oneNode->width(), oneNode->height());
 			qDebug() << "NodePanel::fitNodesPosition - moveY: " << nextNodeOriginY;
-			nextNodeOriginY += nextNodeOriginY + oneNode->height() + 10;
+			nextNodeOriginY += oneNode->height() + 10;
 			qDebug() << "NodePanel::fitNodesPosition - endLoopY: " << nextNodeOriginY;
 			qDebug() << "NodePanel::fitNodesPosition - origin: " << oneNode->geometry().topLeft();
 		}

@@ -45,8 +45,6 @@ namespace QuantIDE
 
 		labelNodeID = new QLabel(this);
 		labelNamedControls = new QLabel(this);
-
-		//this->setFixedHeight(150);
 	}
 
 	void Node::onConfigData(QMap<QString, QVariant*> config)
