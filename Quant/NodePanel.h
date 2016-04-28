@@ -34,8 +34,9 @@ namespace QuantIDE
 
 		void setTargetBridge(ScBridge*);
 
-	public slots:
-		void fitGeometry();
+		public slots:
+		//void fitGeometry();
+		void fitNodesPosition();
 		void onConfigData(QMap<QString, QVariant*> config);
 
 		void addNode();
@@ -47,7 +48,7 @@ namespace QuantIDE
 	protected:
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
-		
+
 	private:
 		void initControl();
 		QMap<QString, QVariant*> configData;
@@ -58,7 +59,7 @@ namespace QuantIDE
 		QWidget *scrollWidget;
 		QMap<QString, Node*> dictNode;
 		ScBridge *mBridge;
-		
+
 	};
 }
 

@@ -12,7 +12,7 @@ namespace QuantIDE
 		setFocusPolicy(Qt::StrongFocus);
 
 		this->initControl();
-		this->fitGeometry();
+		//this->fitGeometry();
 
 		stateNodePlay = StateNodePlay::FREE;
 
@@ -30,20 +30,23 @@ namespace QuantIDE
 	{
 		nameLabel = new QLabel(this);
 		nameLabel->setText("node1");
+		nameLabel->setGeometry(10, 5, 80, 30);
 
 		closeButton = new Button(this);
-		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
 		closeButton->setText("X");
 
 		playButton = new Button(this);
 		playButton->setText("play");
 		playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
+		playButton->setGeometry(90, 10, 40, 20);
 
 		sourceCode = new CodeEditor(this);
 
 		labelNodeID = new QLabel(this);
 		labelNamedControls = new QLabel(this);
+
+		//this->setFixedHeight(150);
 	}
 
 	void Node::onConfigData(QMap<QString, QVariant*> config)
@@ -280,13 +283,9 @@ namespace QuantIDE
 	{
 		//qDebug() << "Node::fitGeometry";
 
-		nameLabel->setGeometry(10, 5, 80, 30);
-		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
-		playButton->setGeometry(90, 10, 40, 20);
-		sourceCode->setGeometry(10, 45, width() - 20, 60);
+		
 
-		labelNodeID->setGeometry(this->width() - 200, 20, 180, 20);
-		labelNamedControls->setGeometry(this->width() - 200, 5, 180, 20);
+		
 
 		int originY = 110;
 		for (int i = 0; i < conteinerControlsLabel.size(); i++)
@@ -298,6 +297,7 @@ namespace QuantIDE
 			conteinerControlsGraph.value(namedControl)->setGeometry(180, originY, width() - 200, 200);
 			originY += conteinerControlsGraph.value(namedControl)->bounds().height() + 10;
 		}
+
 		QRect newRect = this->geometry();
 		newRect.setBottom(originY + 10);
 		this->setGeometry(newRect);
@@ -320,8 +320,14 @@ namespace QuantIDE
 		}
 	}
 
-	void Node::resizeEvent(QResizeEvent *resizeEvent) { 
-		/*emit resizeAct();*/
+	void Node::resizeEvent(QResizeEvent *resizeEvent) 
+	{ 
+		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
+		sourceCode->setGeometry(10, 45, width() - 20, 60);
+		labelNodeID->setGeometry(this->width() - 200, 20, 180, 20);
+		labelNamedControls->setGeometry(this->width() - 200, 5, 180, 20);
+
+		emit actChangedHeight();
 		qDebug("Node::resizeEvent");
 	}
 

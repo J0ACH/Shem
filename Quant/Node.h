@@ -40,7 +40,7 @@ namespace QuantIDE
 
 		QString name();
 		QRect bounds();
-
+		
 	public slots:
 		void fitGeometry();
 		void onConfigData(QMap<QString, QVariant*> config);
@@ -57,6 +57,7 @@ namespace QuantIDE
 		void killAct(QString);
 		void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
 		void resizeAct();
+		void actChangedHeight();
 
 	protected:
 		void closeEvent(QCloseEvent *event);

@@ -9,7 +9,7 @@ namespace QuantIDE
 		setObjectName("NodePanel");
 
 		this->initControl();
-		this->fitGeometry();
+		//this->fitGeometry();
 
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
 		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
@@ -23,21 +23,23 @@ namespace QuantIDE
 	{
 		buttAddNode = new Button(this);
 		buttAddNode->setText("AddNode");
+		buttAddNode->setGeometry(200, 10, 50, 20);
 
 		scrollArea = new QScrollArea(this);
 		//scrollArea->setFrameStyle(QFrame::NoFrame);
+		scrollArea->move(5, 50);
 		scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 		scrollArea->setStyleSheet("background-color: rgba(0,0,0,0)");
 		//scrollArea->setStyleSheet("background-color: rgba(120,120,120,255)");
 		//scrollArea->setWidgetResizable(true);
 
-		scrollWidget = new QWidget();
+		scrollWidget = new QWidget(this);
 		scrollWidget->setAutoFillBackground(true);
 		//scrollWidget->setStyleSheet("background-color: rgba(0,0,0,0)");
-		scrollWidget->setStyleSheet("background-color: rgba(120,30,30,255)");
-		scrollArea->setWidget(scrollWidget);
+		scrollWidget->setStyleSheet("background-color: rgba(30,30,130,150)");
+		scrollWidget->setGeometry(0, 0, 300, 100);
 
-		scrollWidget->show();
+		scrollArea->setWidget(scrollWidget);
 	}
 
 	void NodePanel::onConfigData(QMap<QString, QVariant*> config)
@@ -66,78 +68,70 @@ namespace QuantIDE
 	{
 		qDebug("NodePanel::addNode()");
 
+		//Node *newNode = new Node(scrollWidget);
 		Node *newNode = new Node(scrollWidget);
 		newNode->setName(tr("test%1").arg(QString::number(dictNode.values().size())));
 		newNode->setSourceCode("SinOsc.ar(\\freq.kr(90)!2, mul: Saw.kr(2, 0.5, 0.5))");
 		newNode->connectBridge(mBridge);
+		newNode->setFixedWidth(scrollArea->width() - 10);
+		//newNode->setFixedHeight(150);
 		newNode->show();
 
-		connect(this, SIGNAL(resizeAct()), newNode, SLOT(fitGeometry()));
+		//connect(this, SIGNAL(resizeAct()), newNode, SLOT(fitGeometry()));
 		connect(newNode, SIGNAL(killAct(QString)), this, SLOT(deleteNode(QString)));
 		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
 			newNode, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
-		//connect(newNode, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
+		connect(newNode, SIGNAL(actChangedHeight()), this, SLOT(fitNodesPosition()));
 
 		dictNode.insert(newNode->name(), newNode);
 
-		this->fitGeometry();
-		//emit resizeAct();
+		this->fitNodesPosition();
+
+
 		emit actConfigData(configData);
 
-		scrollArea->ensureWidgetVisible(newNode, 50, 50);
+		//scrollArea->ensureWidgetVisible(newNode, 50, 50);
 
-		
+
 	}
 
 	void NodePanel::deleteNode(QString nodeName)
 	{
 		dictNode.remove(nodeName);
 		//emit resizeAct();
-		this->fitGeometry();
+		this->fitNodesPosition();
 	}
 
-	void NodePanel::fitGeometry()
+	void NodePanel::fitNodesPosition()
 	{
-
-		//buttAddNode->setGeometry(200, 10, 50, 20);
-		//scrollArea->setGeometry(5, 50, width() - 10, height() - 100);
-
 		int nextNodeOriginY = 0;
 		for each (Node *oneNode in dictNode.values())
 		{
-			oneNode->setGeometry(5, nextNodeOriginY, scrollArea->width() - 10, 300);
-			oneNode->update();
-
-			nextNodeOriginY += oneNode->height() + 10;
-
-			//qDebug() << "NodePanel::fitGeometry - nextNodeOrigin: " << oneNode->geometry();
-			//scrollArea->setGeometry(5, 50, width() - 10, height() - 100);
-
-			//qDebug() << "NodePanel::fitGeometry - widget.height: " << scrollArea->widget()->height();
-			//qDebug() << "NodePanel::fitGeometry - viewport.height: " << scrollArea->viewport()->height();
-			//update();
+			qDebug() << "NodePanel::NEW LOOP";
+			oneNode->setGeometry(5, nextNodeOriginY, oneNode->width(), oneNode->height());
+			qDebug() << "NodePanel::fitNodesPosition - moveY: " << nextNodeOriginY;
+			nextNodeOriginY += nextNodeOriginY + oneNode->height() + 10;
+			qDebug() << "NodePanel::fitNodesPosition - endLoopY: " << nextNodeOriginY;
+			qDebug() << "NodePanel::fitNodesPosition - origin: " << oneNode->geometry().topLeft();
 		}
-	
-		qDebug() << "NodePanel::fitGeometry - nextNodeOrigin: " << nextNodeOriginY;
-
-		//scrollWidget = scrollArea->takeWidget();
-		//QWidget *newScrollWidget = new QWidget();
-		//newScrollWidget->setGeometry(0, 0, scrollArea->width(), nextNodeOriginY);
-		//scrollArea->setWidget(newScrollWidget);
-
-		//update();
-		//emit resizeAct();
-
+		scrollWidget->setFixedHeight(nextNodeOriginY);
+		qDebug() << "NodePanel::fitNodesPosition - nextNodeOriginY: " << nextNodeOriginY;
 	}
 
 	void NodePanel::resizeEvent(QResizeEvent *event)
 	{
 		Panel::resizeEvent(event); // send event to superclass
-		buttAddNode->setGeometry(200, 10, 50, 20);
-		scrollArea->setGeometry(5, 50, width() - 10, height() - 100);
 		
-		qDebug("NodePanel::resizeEvent");
+		scrollArea->resize(width() - 10, height() - 100);
+		scrollWidget->setFixedWidth(scrollArea->width());
+
+		for each (Node *oneNode in dictNode.values())
+		{
+			oneNode->setFixedWidth(scrollArea->width() - 10);
+		}
+
+		//qDebug("NodePanel::resizeEvent");
 
 	}
 	void NodePanel::paintEvent(QPaintEvent *event)
@@ -145,8 +139,9 @@ namespace QuantIDE
 		Panel::paintEvent(event); // send event to superclass
 
 		QPainter painter(this);
-		painter.fillRect(bounds(), QColor(120,30,30,30));
-		
+
+		//painter.fillRect(scrollWidget->geometry(), QColor(120, 30, 30, 60));
+
 	}
 
 	NodePanel::~NodePanel()
