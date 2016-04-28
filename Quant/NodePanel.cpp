@@ -100,8 +100,8 @@ namespace QuantIDE
 	void NodePanel::fitGeometry()
 	{
 
-		buttAddNode->setGeometry(200, 10, 50, 20);
-		scrollArea->setGeometry(5, 50, width() - 10, height() - 100);
+		//buttAddNode->setGeometry(200, 10, 50, 20);
+		//scrollArea->setGeometry(5, 50, width() - 10, height() - 100);
 
 		int nextNodeOriginY = 0;
 		for each (Node *oneNode in dictNode.values())
@@ -131,16 +131,18 @@ namespace QuantIDE
 
 	}
 
-	void NodePanel::resizeEvent(QResizeEvent *e)
+	void NodePanel::resizeEvent(QResizeEvent *event)
 	{
-		Panel::resizeEvent(e);
+		Panel::resizeEvent(event); // send event to superclass
+		buttAddNode->setGeometry(200, 10, 50, 20);
+		scrollArea->setGeometry(5, 50, width() - 10, height() - 100);
 		
 		qDebug("NodePanel::resizeEvent");
 
 	}
 	void NodePanel::paintEvent(QPaintEvent *event)
 	{
-		Panel::paintEvent(event);
+		Panel::paintEvent(event); // send event to superclass
 
 		QPainter painter(this);
 		painter.fillRect(bounds(), QColor(120,30,30,30));

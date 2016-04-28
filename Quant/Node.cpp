@@ -320,7 +320,10 @@ namespace QuantIDE
 		}
 	}
 
-	//void Node::resizeEvent(QResizeEvent *resizeEvent) { /*emit resizeAct();*/ }
+	void Node::resizeEvent(QResizeEvent *resizeEvent) { 
+		/*emit resizeAct();*/
+		qDebug("Node::resizeEvent");
+	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)
 	{
