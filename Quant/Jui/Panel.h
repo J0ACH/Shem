@@ -29,12 +29,12 @@ namespace Jui
 
 		void setEdgeControler(EdgeControler::Direction, bool);
 
-	public slots:
+		public slots:
 		void onConfigData(QMap<QString, QVariant*> config);
-		
+
 	signals:
 		void resizeAct();
-	
+
 	protected:
 		void mousePressEvent(QMouseEvent *mouseEvent);
 		void paintEvent(QPaintEvent *event);
@@ -49,7 +49,7 @@ namespace Jui
 		Button *closeButton;
 		Edges *edges;
 
-		
+
 	};
 
 

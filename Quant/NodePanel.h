@@ -43,6 +43,10 @@ namespace QuantIDE
 
 	signals:
 		void actConfigData(QMap<QString, QVariant*> config);
+
+	protected:
+		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent *event);
 		
 	private:
 		void initControl();
@@ -54,7 +58,7 @@ namespace QuantIDE
 		QWidget *scrollWidget;
 		QMap<QString, Node*> dictNode;
 		ScBridge *mBridge;
-		int testID;
+		
 	};
 }
 

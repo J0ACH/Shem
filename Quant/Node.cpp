@@ -278,7 +278,7 @@ namespace QuantIDE
 
 	void Node::fitGeometry()
 	{
-		qDebug() << "Node::fitGeometry";
+		//qDebug() << "Node::fitGeometry";
 
 		nameLabel->setGeometry(10, 5, 80, 30);
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
@@ -291,7 +291,7 @@ namespace QuantIDE
 		int originY = 110;
 		for (int i = 0; i < conteinerControlsLabel.size(); i++)
 		{
-			qDebug() << i << " : " << originY;
+			//qDebug() << i << " : " << originY;
 			QString namedControl = conteinerControlsLabel.keys()[i];
 			conteinerControlsLabel.value(namedControl)->setGeometry(15, originY, 40, 25);
 			conteinerControls.value(namedControl)->setGeometry(60, originY, 100, 25);
