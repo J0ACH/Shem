@@ -66,40 +66,32 @@ namespace QuantIDE
 
 	void NodePanel::addNode()
 	{
-		qDebug("NodePanel::addNode()");
+		//qDebug("NodePanel::addNode()");
 
-		//Node *newNode = new Node(scrollWidget);
 		Node *newNode = new Node(scrollWidget);
 		newNode->setName(tr("test%1").arg(QString::number(dictNode.values().size())));
 		newNode->setSourceCode("SinOsc.ar(\\freq.kr(90)!2, mul: Saw.kr(2, 0.5, 0.5))");
 		newNode->connectBridge(mBridge);
 		newNode->setFixedWidth(scrollArea->width() - 10);
-		newNode->setFixedHeight(150);
 		newNode->show();
 
-		//connect(this, SIGNAL(resizeAct()), newNode, SLOT(fitGeometry()));
 		connect(newNode, SIGNAL(killAct(QString)), this, SLOT(deleteNode(QString)));
+		connect(newNode, SIGNAL(actChangedHeight()), this, SLOT(fitNodesPosition()));
 		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
 			newNode, SLOT(onConfigData(QMap<QString, QVariant*>)));
-
-		connect(newNode, SIGNAL(actChangedHeight()), this, SLOT(fitNodesPosition()));
-
+		
 		dictNode.insert(newNode->name(), newNode);
 
 		this->fitNodesPosition();
 
-
 		emit actConfigData(configData);
 
-		//scrollArea->ensureWidgetVisible(newNode, 50, 50);
-
-
+		scrollArea->ensureWidgetVisible(newNode, 0, newNode->height());
 	}
 
 	void NodePanel::deleteNode(QString nodeName)
 	{
 		dictNode.remove(nodeName);
-		//emit resizeAct();
 		this->fitNodesPosition();
 	}
 
@@ -108,15 +100,15 @@ namespace QuantIDE
 		int nextNodeOriginY = 0;
 		for each (Node *oneNode in dictNode.values())
 		{
-			qDebug() << "NodePanel::NEW LOOP";
+			//qDebug() << "NodePanel::NEW LOOP";
 			oneNode->setGeometry(5, nextNodeOriginY, oneNode->width(), oneNode->height());
-			qDebug() << "NodePanel::fitNodesPosition - moveY: " << nextNodeOriginY;
+			//qDebug() << "NodePanel::fitNodesPosition - moveY: " << nextNodeOriginY;
 			nextNodeOriginY += oneNode->height() + 10;
-			qDebug() << "NodePanel::fitNodesPosition - endLoopY: " << nextNodeOriginY;
-			qDebug() << "NodePanel::fitNodesPosition - origin: " << oneNode->geometry().topLeft();
+			//qDebug() << "NodePanel::fitNodesPosition - endLoopY: " << nextNodeOriginY;
+			//qDebug() << "NodePanel::fitNodesPosition - origin: " << oneNode->geometry().topLeft();
 		}
 		scrollWidget->setFixedHeight(nextNodeOriginY);
-		qDebug() << "NodePanel::fitNodesPosition - nextNodeOriginY: " << nextNodeOriginY;
+		//qDebug() << "NodePanel::fitNodesPosition - nextNodeOriginY: " << nextNodeOriginY;
 	}
 
 	void NodePanel::resizeEvent(QResizeEvent *event)

@@ -40,9 +40,9 @@ namespace QuantIDE
 
 		QString name();
 		QRect bounds();
-		
+
 	public slots:
-		void fitGeometry();
+		void fitControlsPosition();
 		void onConfigData(QMap<QString, QVariant*> config);
 
 		void onEvaluateNode();
@@ -56,7 +56,7 @@ namespace QuantIDE
 		void evaluateAct(QString, bool silent = false, bool print = false);
 		void killAct(QString);
 		void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
-		void resizeAct();
+		//void resizeAct();
 		void actChangedHeight();
 
 	protected:
