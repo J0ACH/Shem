@@ -9,8 +9,7 @@ namespace QuantIDE
 		setObjectName("NodePanel");
 
 		this->initControl();
-		//this->fitGeometry();
-
+		
 		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
 		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
 	}
@@ -26,17 +25,14 @@ namespace QuantIDE
 		buttAddNode->setGeometry(200, 10, 50, 20);
 
 		scrollArea = new QScrollArea(this);
-		//scrollArea->setFrameStyle(QFrame::NoFrame);
+		scrollArea->setFrameStyle(QFrame::NoFrame);
 		scrollArea->move(5, 50);
 		scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 		scrollArea->setStyleSheet("background-color: rgba(0,0,0,0)");
-		//scrollArea->setStyleSheet("background-color: rgba(120,120,120,255)");
-		//scrollArea->setWidgetResizable(true);
-
+		
 		scrollWidget = new QWidget(this);
 		scrollWidget->setAutoFillBackground(true);
-		//scrollWidget->setStyleSheet("background-color: rgba(0,0,0,0)");
-		scrollWidget->setStyleSheet("background-color: rgba(30,30,130,150)");
+		scrollWidget->setStyleSheet("background-color: rgba(0,0,0,0)");
 		scrollWidget->setGeometry(0, 0, 300, 100);
 
 		scrollArea->setWidget(scrollWidget);
@@ -49,8 +45,7 @@ namespace QuantIDE
 		colorOver = config.value("color_shem_Over")->value<QColor>();
 		colorActive = config.value("color_shem_Active")->value<QColor>();
 		fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
-
-
+		
 		Panel::onConfigData(config);
 
 		buttAddNode->setColorNormal(colorNormal);

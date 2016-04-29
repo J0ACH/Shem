@@ -96,7 +96,7 @@ namespace Jui
 		painter.setPen(QPen(colorText, 1));
 		painter.drawText(15, 25, title);
 
-		bool showScreen = true;
+		bool showScreen = false;
 		if (showScreen)
 		{
 			painter.setPen(QColor(30, 30, 130));

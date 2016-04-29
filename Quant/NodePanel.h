@@ -35,7 +35,6 @@ namespace QuantIDE
 		void setTargetBridge(ScBridge*);
 
 		public slots:
-		//void fitGeometry();
 		void fitNodesPosition();
 		void onConfigData(QMap<QString, QVariant*> config);
 
