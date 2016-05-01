@@ -25,6 +25,9 @@ namespace QuantIDE
 
 	void ControlEnvelope::initControl()
 	{
+		QLabel *controlLabel = new QLabel(this);
+		controlLabel->setText(name);
+
 		envelopeCode = new CodeEditor(this);
 		envelopeCode->setGeometry(5, 5, 300, 25);
 		envelopeCode->setText("Env([0,1,0], [0.15,0.85], ['lin', 'sin'])");
@@ -87,7 +90,6 @@ namespace QuantIDE
 			break;
 		}
 	}
-
 	void ControlEnvelope::onBridgeAnswer(QUuid id, int selectorNum, QStringList answer)
 	{
 
@@ -130,6 +132,11 @@ namespace QuantIDE
 				break;
 			}
 		}
+	}
+
+	void ControlEnvelope::resizeEvent(QResizeEvent *event)
+	{
+
 	}
 
 	void ControlEnvelope::paintEvent(QPaintEvent *event)

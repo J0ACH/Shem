@@ -2,21 +2,18 @@
 
 namespace QuantIDE
 {
-	NodePanel::NodePanel(QWidget *parent) :
+	NodePanel::NodePanel(QWidget *parent, ScBridge *bridge) :
 		Panel(parent),
-		mBridge(NULL)
+		mBridge(bridge)
 	{
 		setObjectName("NodePanel");
 
 		this->initControl();
 		
-		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
 		connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
 	}
 
 	QRect NodePanel::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
-
-	void NodePanel::setTargetBridge(ScBridge *target) { mBridge = target; }
 
 	void NodePanel::initControl()
 	{
@@ -63,10 +60,9 @@ namespace QuantIDE
 	{
 		//qDebug("NodePanel::addNode()");
 
-		Node *newNode = new Node(scrollWidget);
+		Node *newNode = new Node(scrollWidget, mBridge);
 		newNode->setName(tr("test%1").arg(QString::number(dictNode.values().size())));
 		newNode->setSourceCode("SinOsc.ar(\\freq.kr(90)!2, mul: Saw.kr(2, 0.5, 0.5))");
-		newNode->connectBridge(mBridge);
 		newNode->setFixedWidth(scrollArea->width() - 10);
 		newNode->show();
 
@@ -78,7 +74,6 @@ namespace QuantIDE
 		dictNode.insert(newNode->name(), newNode);
 
 		this->fitNodesPosition();
-
 		emit actConfigData(configData);
 
 		scrollArea->ensureWidgetVisible(newNode, 0, newNode->height());

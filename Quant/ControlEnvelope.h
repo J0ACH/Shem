@@ -44,6 +44,7 @@ namespace QuantIDE
 
 	protected:
 		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent *event);
 		//virtual bool eventFilter(QObject * watched, QEvent * event);
 
 
@@ -51,7 +52,7 @@ namespace QuantIDE
 		ScBridge *mBridge;
 		QUuid objectID;
 		QString name;
-
+		
 		QList<double> levels;
 		QList<double> times;
 		QList<QString> curves;

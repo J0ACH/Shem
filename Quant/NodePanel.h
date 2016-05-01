@@ -27,14 +27,12 @@ namespace QuantIDE
 		Q_OBJECT
 
 	public:
-		NodePanel(QWidget *parent = 0);
+		NodePanel(QWidget *parent, ScBridge *bridge);
 		~NodePanel();
 
 		QRect bounds();
 
-		void setTargetBridge(ScBridge*);
-
-		public slots:
+	public slots:
 		void fitNodesPosition();
 		void onConfigData(QMap<QString, QVariant*> config);
 

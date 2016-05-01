@@ -76,10 +76,9 @@ namespace QuantIDE
 	
 	void Quant::initControl()
 	{
-		nodePanel = new NodePanel(canvan->screen);
+		nodePanel = new NodePanel(canvan->screen, bridge);
 		nodePanel->setTitle("NodePanel");
-		nodePanel->setTargetBridge(bridge);
-
+		
 		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
 		buttLang->setStateKeeping(Button::StateKeeping::HOLD);
