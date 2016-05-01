@@ -279,20 +279,6 @@ namespace QuantIDE
 			oneEnv->setGeometry(10, nextControlOriginY, oneEnv->width(), oneEnv->height());
 			nextControlOriginY += oneEnv->bounds().height() + 10;
 		}
-		/*
-		for (int i = 0; i < conteinerControlsLabel.size(); i++)
-		{
-			//qDebug() << i << " : " << originY;
-			QString namedControl = conteinerControlsLabel.keys()[i];
-
-			conteinerControlsLabel.value(namedControl)->setGeometry(15, nextControlOriginY, 40, 25);
-			conteinerControls.value(namedControl)->setGeometry(60, nextControlOriginY, 100, 25);
-			conteinerControlsGraph.value(namedControl)->setGeometry(180, nextControlOriginY, width() - 200, 200);
-
-			nextControlOriginY += conteinerControlsGraph.value(namedControl)->bounds().height() + 10;
-		}
-		*/
-
 		this->setFixedHeight(nextControlOriginY);
 	}
 
@@ -330,7 +316,7 @@ namespace QuantIDE
 		
 
 		emit actChangedHeight();
-		qDebug("Node::resizeEvent");
+		//qDebug("Node::resizeEvent");
 	}
 
 	void Node::paintEvent(QPaintEvent *paintEvent)

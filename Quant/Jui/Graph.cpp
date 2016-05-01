@@ -15,30 +15,33 @@ namespace Jui
 		isOver = false;
 		parent->installEventFilter(this);
 		pointSize = 10;
-		this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize, pointSize);
+		this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
+
+		mCursorLocal = new QPoint(0, 0);
 
 		setFocusPolicy(Qt::StrongFocus);
 	}
 
 	QRect GraphPoint::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 
-
 	void GraphPoint::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		mousePressCoor = mouseEvent->pos();
+		isPressed = true;
+		*mCursorLocal = mouseEvent->pos();
+
 	}
-	void GraphPoint::mouseMoveEvent(QMouseEvent * mouseEvent)
+
+	void GraphPoint::mouseMoveEvent(QMouseEvent *mouseEvent)
 	{
-		QRect rect = this->geometry();
-		rect.moveCenter(QPoint(
-			mouseEvent->pos().x(),
-			mouseEvent->pos().y()
-			//mousePressCoor.x() - mouseEvent->pos().x(),
-			//mousePressCoor.y() - mouseEvent->pos().y()
-			));
-		//this->bounds().moveCenter(mouseEvent->pos());
-		this->setGeometry(rect);
+		if (isPressed)
+		{
+			QPoint pos = this->parentWidget()->mapFromGlobal(mouseEvent->globalPos());
+			this->setGeometry(pos.x() - mCursorLocal->x(), pos.y() - mCursorLocal->y(), this->width(), this->height());
+		}
 	}
+
+	void GraphPoint::mouseReleaseEvent(QMouseEvent *mouseEvent) { isPressed = false; }
+
 
 	bool GraphPoint::eventFilter(QObject* target, QEvent* event)
 	{
@@ -76,11 +79,12 @@ namespace Jui
 	{
 		QPainter painter(this);
 
-		painter.fillRect(bounds(), QColor(60, 60, 160));
-
-		if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
-		else { painter.setPen(QColor(60, 60, 60)); }
-		painter.drawRect(bounds());
+		if (this->hasFocus()) {
+			//painter.fillPat Rect(bounds(), QColor(60, 60, 160));
+			painter.setPen(QColor(120, 20, 20));
+		}
+		else { painter.setPen(QColor(Qt::white)); }
+		painter.drawEllipse(bounds());
 	}
 
 	GraphPoint::~GraphPoint(){}
@@ -99,7 +103,7 @@ namespace Jui
 		maxDomainX = 1;
 		minDomainY = 0;
 		maxDomainY = 1;
-		cursorPos = QPoint();
+		//cursorPos = QPoint();
 		collectionPts = QMap<int, GraphPoint*>();
 		newPointID = 0;
 
@@ -151,19 +155,14 @@ namespace Jui
 		double perc = 1 - (displayY - boundsGraph().top()) / (double)boundsGraph().height();
 		return perc * (maxDomainY - minDomainY) + minDomainY;
 	}
-	double Graph::getDisplayX(double valueX)
+	double Graph::getPixelX(double valueX)
 	{
-		//qDebug() << "point valueX: " << valueX;
 		double perc = (valueX - minDomainX) / (double)(maxDomainX - minDomainX);
-		//qDebug() << "point percX: " << perc;
 		return perc * boundsGraph().width() + boundsGraph().left();
 	}
-	double Graph::getDisplayY(double valueY)
+	double Graph::getPixelY(double valueY)
 	{
-		//qDebug() << "point valueY: " << valueY;
 		double perc = (valueY - minDomainY) / (double)(maxDomainY - minDomainY);
-		//double perc = valueY  / (double)maxDomainY;
-		//qDebug() << "point percY: " << perc;
 		return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
 	}
 
@@ -193,8 +192,8 @@ namespace Jui
 		GraphPoint *pt = new GraphPoint(
 			this,
 			newPointID,
-			getDisplayX(valueX),
-			getDisplayY(valueY),
+			getPixelX(valueX),
+			getPixelY(valueY),
 			valueX,
 			valueY
 			);
@@ -204,24 +203,35 @@ namespace Jui
 		newPointID++;
 	}
 
-	void Graph::addGraphPoint(int pixelX, double valueY)
+	void Graph::drawPoint(double valueX, double valueY)
 	{
-
+		//collDrawPoints.append(new QPointF(valueX, valueY));
+		this->addValuePoint(valueX, valueY);
+		update();
 	}
 
-	void Graph::addLine(double valueX1, double valueY1, double valueX2, double valueY2)
+	void Graph::drawLine(double valueX1, double valueY1, double valueX2, double valueY2)
 	{
-		QPoint pt1 = QPoint(getDisplayX(valueX1), getDisplayY(valueY1));
-		QPoint pt2 = QPoint(getDisplayX(valueX2), getDisplayY(valueY2));
-		
-		collectionLines.append(new QLine(pt1, pt2));
+		collDrawLines.append(new QLineF(valueX1, valueY1, valueX2, valueY2));
+		update();
+	}
+
+	void Graph::drawPolyline(QVector<QPointF> collPoints)
+	{
+		graphPolylines = new QPolygonF(collPoints);
+		//graphPolylines.append(polygon);
 		update();
 	}
 
 	void Graph::deleteGraph()
 	{
+		for each(GraphPoint *onePoint in collectionPts.values()) { onePoint->close(); }
+		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
-		collectionLines = QList<QLine*>();
+
+		//collDrawPoints = QList<QPointF*>();
+		//collDrawLines = QList<QLineF*>();
+
 		update();
 	}
 
@@ -232,14 +242,18 @@ namespace Jui
 		update();
 	}
 
-	void Graph::resizeEvent(QResizeEvent *resizeEvent) 
-	{ 
-		qDebug() << "Graph::resizeEvent";
-		
-		graphValues = QList<double>();
-		collectionLines = QList<QLine*>();
+	void Graph::resizeEvent(QResizeEvent *resizeEvent)
+	{
+		//qDebug() << "Graph::resizeEvent";
 
-		emit actResized();
+		graphValues = QList<double>();
+
+		/*
+		for each(QPointF *onePoint in collDrawPoints)
+		{
+		//painter.drawEllipse(getPixelX(onePoint->x()) - 5, getPixelY(onePoint->y()) - 5, 10, 10);
+		};
+		*/
 	}
 
 	void Graph::paintEvent(QPaintEvent *event)
@@ -256,24 +270,25 @@ namespace Jui
 
 		painter.drawRect(this->boundsGraph());
 
-
+		/*
 		QString posPixel = tr("%1 ; %2").arg(
-			QString::number(cursorPos.x()),
-			QString::number(cursorPos.y())
-			);
+		QString::number(cursorPos.x()),
+		QString::number(cursorPos.y())
+		);
 
 		double dValX = this->getValueX(cursorPos.x());
 		double dValY = this->getValueY(cursorPos.y());
 
 		QString posValue = tr("%1 ; %2").arg(
-			QString::number(dValX, 'f', 2),
-			QString::number(dValY, 'f', 2)
-			);
+		QString::number(dValX, 'f', 2),
+		QString::number(dValY, 'f', 2)
+		);
 
-		QTextOption option;
-		option.setAlignment(Qt::AlignCenter);
 		painter.drawText(QRect(cursorPos.x(), cursorPos.y() - 30, 80, 30), posPixel, option);
 		painter.drawText(QRect(cursorPos.x(), cursorPos.y() - 20, 80, 30), posValue, option);
+		*/
+		QTextOption option;
+		option.setAlignment(Qt::AlignCenter);
 
 		painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(collectionPts.size()), option);
 
@@ -308,12 +323,35 @@ namespace Jui
 			painter.drawLine(boundsGraph().left(), pixelY, boundsGraph().right(), pixelY);
 		};
 
-		//graph
-		painter.setPen(QColor(240, 70, 70));
-		foreach (QLine *oneLine, collectionLines)
+		//collDrawPoints
+		painter.setPen(QColor(70, 70, 170));
+		for each(QPointF *onePoint in collDrawPoints)
 		{
-			painter.drawLine(*oneLine);
+			painter.drawEllipse(getPixelX(onePoint->x()) - 5, getPixelY(onePoint->y()) - 5, 10, 10);
+		};
+
+		// collDrawLines
+		painter.setPen(QColor(70, 170, 70));
+		for each(QLineF *oneLine in collDrawLines)
+		{
+			QPointF pt1 = QPoint(getPixelX(oneLine->p1().x()), getPixelY(oneLine->p1().y()));
+			QPointF pt2 = QPoint(getPixelX(oneLine->p2().x()), getPixelY(oneLine->p2().y()));
+			painter.drawLine(pt1, pt2);
+		};
+
+		//collPolygons
+		painter.setPen(QColor(240, 70, 70));
+		QPolygonF poly;
+		for each(QPointF onePt in graphPolylines->toList())
+		{
+			onePt.setX(getPixelX(onePt.x()));
+			onePt.setY(getPixelY(onePt.y()));
+			//qDebug() << "DrawonePt " << onePt;
+			poly.append(onePt);
 		}
+		painter.drawPolyline(poly);
+
+
 	}
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
@@ -330,10 +368,10 @@ namespace Jui
 		if (!selectPoint)
 		{
 			this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
-			
+
 			void actPointAdded(double valueX, double valueY);
 		}
-		
+
 		update();
 		//mouseEvent->accept();
 	}

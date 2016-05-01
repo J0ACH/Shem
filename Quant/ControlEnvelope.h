@@ -29,7 +29,9 @@ namespace QuantIDE
 			envLevels,
 			envTimes,
 			envCurves,
-			envAt
+			redrawEnvPoints,
+			envAt,
+			redrawEnvGraph
 		};
 
 		QRect bounds();
@@ -57,13 +59,17 @@ namespace QuantIDE
 		QList<double> times;
 		QList<QString> curves;
 		
-		//QList<QPointF*> graphCurve;
+		QVector<QPointF> graphPolyline;
 		QList<double> graphCurveX;
 		QList<double> graphCurveY;
-
+		
+		QLabel *nameLabel;
+		QLabel *levelLabel, *timeLabel, *curveLabel;
 		CodeEditor *envelopeCode;
 		Graph *envGraph;
-		//QLabel *envelopeLabel;
+
+		//QList<QPoint*> graphCurve;
+		
 
 
 		void initControl();

@@ -13,31 +13,37 @@ namespace QuantIDE
 		setFocusPolicy(Qt::StrongFocus);
 
 		this->initControl();
-		//this->fitGeometry();
 
 		connect(envelopeCode, SIGNAL(evaluateAct()), this, SLOT(onEnvelopeCodeEvaluate()));
-
 		connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
 		connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
+
+		this->onEnvelopeCodeEvaluate();
 	}
 
 	QRect ControlEnvelope::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 
 	void ControlEnvelope::initControl()
 	{
-		QLabel *controlLabel = new QLabel(this);
-		controlLabel->setText(name);
+		nameLabel = new QLabel(this);
+		nameLabel->setText(name);
+
+		levelLabel = new QLabel(this);
+		timeLabel = new QLabel(this);
+		curveLabel = new QLabel(this);
 
 		envelopeCode = new CodeEditor(this);
-		envelopeCode->setGeometry(5, 5, 300, 25);
 		envelopeCode->setText("Env([0,1,0], [0.15,0.85], ['lin', 'sin'])");
 
 		envGraph = new Graph(this);
-		envGraph->setGeometry(5, 35, 600, 160);
 		envGraph->setDomainX(0, 1);
 		envGraph->setDomainY(0, 1);
+		envGraph->drawLine(0.25, 0.25, 0.5, 0.5);
+		envGraph->drawLine(0.75, 0.25, 0.5, 0.5);
 
-		int noSeg = envGraph->boundsGraph().width();
+		graphCurveX = QList<double>();
+		//int noSeg = envGraph->boundsGraph().width();
+		int noSeg = 200;
 		double min = envGraph->getDomainX()[0];
 		double max = envGraph->getDomainX()[1];
 		for (int i = 0; i <= noSeg; i++)
@@ -45,20 +51,27 @@ namespace QuantIDE
 			graphCurveX.append((max - min) / noSeg*i + min);
 		}
 
-		
 	}
 
 	void ControlEnvelope::onEnvelopeCodeEvaluate()
 	{
+		envGraph->deleteGraph();
+
+		levels = QList<double>();
+		times = QList<double>();
+		curves = QList<QString>();
+		graphCurveY = QList<double>();
+		graphPolyline = QVector<QPointF>();
+
 		this->onBridgeQuestion(QuestionType::envLevels);
 		this->onBridgeQuestion(QuestionType::envTimes);
 		this->onBridgeQuestion(QuestionType::envCurves);
+		this->onBridgeQuestion(QuestionType::redrawEnvPoints);
 
-		graphCurveY = QList<double>();
-		envGraph->deleteGraph();
 		foreach(double oneX, graphCurveX) {
 			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));
 		}
+		this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 	}
 
 	void ControlEnvelope::onBridgeQuestion(QuestionType selector, QString args)
@@ -83,9 +96,19 @@ namespace QuantIDE
 			questionCode = tr("%1.curves").arg(envelopeCode->toPlainText());
 			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
+		case redrawEnvPoints:
+			selectorNum = QuestionType::redrawEnvPoints;
+			questionCode = tr("\" \"").arg(envelopeCode->toPlainText());
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
+			break;
 		case envAt:
 			selectorNum = QuestionType::envAt;
 			questionCode = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), args);
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
+			break;
+		case redrawEnvGraph:
+			selectorNum = QuestionType::redrawEnvGraph;
+			questionCode = tr("\" \"").arg(envelopeCode->toPlainText());
 			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
 		}
@@ -97,6 +120,8 @@ namespace QuantIDE
 		{
 			QuestionType selector = static_cast<QuestionType>(selectorNum);
 
+			double currentPointTime;
+			
 			switch (selector)
 			{
 			case envLevels:
@@ -114,21 +139,38 @@ namespace QuantIDE
 				qDebug() << "ControlEnvelope::envCurves: " << curves;
 				break;
 
+			case redrawEnvPoints:
+				qDebug() << "ControlEnvelope::refreshEnv NOW";
+				currentPointTime = 0;
+				for (int i = 0; i < levels.size(); i++)
+				{
+					envGraph->drawPoint(currentPointTime, levels[i]);
+					if (i != levels.size() - 1) { currentPointTime += times[i]; }
+				}
+				break;
+
 			case envAt:
+				//qDebug() << "polyline size: " << graphPolyline.size();
+				//qDebug() << "ControlEnvelope::envAt " << answer[0];
+				//currentGraphPtID = graphPolyline.size();
 				graphCurveY.append(answer[0].toDouble());
 
-				int prepareSize = graphCurveY.size() - 1;
+				break;
 
-				if (prepareSize > 1)
+			case redrawEnvGraph:
+				qDebug() << "ControlEnvelope::refreshGraph NOW";
+				qDebug() << "ControlEnvelope::graphCurveX " << graphCurveX.size();
+				qDebug() << "ControlEnvelope::graphCurveY " << graphCurveY.size();
+				//qDebug() << "ControlEnvelope::graphPolyline " << graphPolyline.size();
+
+				if (graphCurveX.size() == graphCurveY.size())
 				{
-					envGraph->addLine(
-						graphCurveX[prepareSize - 1],
-						graphCurveY[prepareSize - 1],
-						graphCurveX[prepareSize],
-						graphCurveY[prepareSize]
-						);
+					for (int i = 0; i < graphCurveX.size(); i++)
+					{
+						graphPolyline.append(QPointF(graphCurveX[i], graphCurveY[i]));
+					}
+					envGraph->drawPolyline(graphPolyline);
 				}
-
 				break;
 			}
 		}
@@ -136,7 +178,24 @@ namespace QuantIDE
 
 	void ControlEnvelope::resizeEvent(QResizeEvent *event)
 	{
+		nameLabel->setGeometry(5, 5, 95, 25);
+		envelopeCode->setGeometry(5, 30, width() - 10, 25);
+		envGraph->setGeometry(5, 60, width() - 10, height() - 65);
+		/*
+		graphCurveX = QList<double>();
+		int noSeg = envGraph->boundsGraph().width();
+		double min = envGraph->getDomainX()[0];
+		double max = envGraph->getDomainX()[1];
+		for (int i = 0; i <= noSeg; i++)
+		{
+			graphCurveX.append((max - min) / noSeg*i + min);
+		}
+		*/
 
+		foreach(double oneX, graphCurveX) {
+			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));
+		}
+		//this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 	}
 
 	void ControlEnvelope::paintEvent(QPaintEvent *event)
