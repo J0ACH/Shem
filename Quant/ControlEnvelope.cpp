@@ -100,6 +100,7 @@ namespace QuantIDE
 			);
 
 		envelopeCode->setText(codeEnv);
+		envGraph->deleteGraph();
 		envelopeCode->evaluateAct();
 
 		qDebug() << "ENV: " << codeEnv;

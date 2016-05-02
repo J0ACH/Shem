@@ -234,8 +234,9 @@ namespace Jui
 
 	void Graph::deleteGraph()
 	{
-		//for each(GraphPoint *onePoint in collectionPts.values()) { onePoint->close(); }
-		//collectionPts = QMap<int, GraphPoint*>();
+		newPointID = 0;
+		for each(GraphPoint *onePoint in collectionPts.values()) { onePoint->close(); }
+		collectionPts = QMap<int, GraphPoint*>();
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
 
