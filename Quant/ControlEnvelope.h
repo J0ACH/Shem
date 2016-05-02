@@ -38,7 +38,7 @@ namespace QuantIDE
 
 	public slots:
 		void onEnvelopeCodeEvaluate();
-		void onControlPointsChange(QVector<QPointF>);
+		void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
 		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
 		void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
 

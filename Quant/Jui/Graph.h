@@ -76,7 +76,8 @@ namespace Jui
 
 	signals:
 		void actPointAdded(double valueX, double valueY);
-		void actControlPointsChange(QVector<QPointF>);
+		//void actControlPointsChange(QVector<QPointF>);
+		void actGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
 
 	protected:
 		void paintEvent(QPaintEvent *);
@@ -85,6 +86,8 @@ namespace Jui
 	private:
 		void mousePressEvent(QMouseEvent *mouseEvent);
 		void mouseReleaseEvent(QMouseEvent *mouseEvent);
+
+		void makeEnv();
 
 		int frameOffset;
 		int minDomainX, maxDomainX, minDomainY, maxDomainY;

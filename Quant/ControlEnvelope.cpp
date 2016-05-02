@@ -18,8 +18,8 @@ namespace QuantIDE
 		connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
 		connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
 		connect(
-			envGraph, SIGNAL(actControlPointsChange(QVector<QPointF>)),
-			this, SLOT(onControlPointsChange(QVector<QPointF>))
+			envGraph, SIGNAL(actGraphEnv(QList<double>, QList<double>, QList<double>)),
+			this, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
 			);
 
 		this->onEnvelopeCodeEvaluate();
@@ -78,9 +78,31 @@ namespace QuantIDE
 		this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 	}
 
-	void ControlEnvelope::onControlPointsChange(QVector<QPointF> collPts)
+	void ControlEnvelope::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
 	{
-		qDebug() << "ControlEnvelope::onControlPointsChange" << collPts;
+		qDebug() << "ControlEnvelope::onControlPointsChange";
+		qDebug() << "levels: " << envLevels;
+		qDebug() << "times: " << envTimes;
+		qDebug() << "curves: " << envCurves;
+
+		QStringList txtLevels;
+		QStringList txtTime;
+		QStringList txtCurves;
+
+		for each (double oneLevel in envLevels) { txtLevels.append(QString::number(oneLevel, 'f', 2)); }
+		for each (double oneTime in envTimes) { txtTime.append(QString::number(oneTime, 'f', 2)); }
+		for each (double oneCurve in envCurves) { txtCurves.append(QString::number(oneCurve, 'f', 2)); }
+
+		QString codeEnv = tr("Env([%1], [%2], [%3])").arg(
+			txtLevels.join(", "),
+			txtTime.join(", "),
+			txtCurves.join(", ")
+			);
+
+		envelopeCode->setText(codeEnv);
+		envelopeCode->evaluateAct();
+
+		qDebug() << "ENV: " << codeEnv;
 	}
 
 	void ControlEnvelope::onBridgeQuestion(QuestionType selector, QString args)
@@ -130,7 +152,7 @@ namespace QuantIDE
 			QuestionType selector = static_cast<QuestionType>(selectorNum);
 
 			double currentPointTime;
-			
+
 			switch (selector)
 			{
 			case envLevels:
@@ -197,7 +219,7 @@ namespace QuantIDE
 		double max = envGraph->getDomainX()[1];
 		for (int i = 0; i <= noSeg; i++)
 		{
-			graphCurveX.append((max - min) / noSeg*i + min);
+		graphCurveX.append((max - min) / noSeg*i + min);
 		}
 		*/
 

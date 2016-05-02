@@ -114,6 +114,9 @@ namespace Jui
 		maxDomainY = 1;
 		//cursorPos = QPoint();
 		collectionPts = QMap<int, GraphPoint*>();
+		graphPolylines = new QPolygonF();
+		graphValues = QList<double>();
+
 		newPointID = 0;
 
 		setFocusPolicy(Qt::StrongFocus);
@@ -231,7 +234,8 @@ namespace Jui
 
 	void Graph::deleteGraph()
 	{
-		for each(GraphPoint *onePoint in collectionPts.values()) { onePoint->close(); }
+		//for each(GraphPoint *onePoint in collectionPts.values()) { onePoint->close(); }
+		//collectionPts = QMap<int, GraphPoint*>();
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
 
@@ -253,12 +257,33 @@ namespace Jui
 		collectionPts.value(ID)->valueX = getValueX(pixelX);
 		collectionPts.value(ID)->valueY = getValueY(pixelY);
 
-		QVector<QPointF> collPts;
-		for each (GraphPoint *onePt in collectionPts.values())
+		this->makeEnv();
+	}
+
+	void Graph::makeEnv()
+	{
+		QList<double> levels;
+		QList<double> times;
+		QList<double> curves;
+
+		double currentTime = 0;
+		for (int i = 0; i < collectionPts.values().size(); i++)
 		{
-			collPts.append(QPointF(onePt->valueX, onePt->valueY));
+			levels.append(collectionPts.values()[i]->valueY);
+
+			if (i != 0)
+			{
+				//qDebug() << "collectionPts.values()[i]->valueX" << collectionPts.values()[i]->valueX;
+				//qDebug() << "collectionPts.values()[i]->valueX - currentTime" << collectionPts.values()[i]->valueX - currentTime;
+				times.append(collectionPts.values()[i]->valueX - currentTime);
+				curves.append(-2);
+			}
+
+			currentTime += collectionPts.values()[i]->valueX;
 		}
-		emit actControlPointsChange(collPts);
+
+		//qDebug() << "Graph::actGraphEnv";
+		emit actGraphEnv(levels, times, curves);
 	}
 
 	void Graph::resizeEvent(QResizeEvent *resizeEvent)
