@@ -38,11 +38,13 @@ namespace QuantIDE
 
 	public slots:
 		void onEnvelopeCodeEvaluate();
+		void onControlPointsChange(QVector<QPointF>);
 		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
 		void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
 
 	signals:
 		void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
+		void actChangeEnvCode(QString txt);
 
 	protected:
 		void paintEvent(QPaintEvent *event);

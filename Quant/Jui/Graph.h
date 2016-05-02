@@ -16,12 +16,13 @@ namespace Jui
 		GraphPoint(QWidget *parent, int ptID, int pX, int pY, double valX, double valY); // !!! cesta jak udelat konstruktor neodvozeny od materske tridy
 		~GraphPoint();
 
-		bool isOver;
 		QRect bounds();
-		//QRegion region;
+		int pixelX, pixelY;
+		double valueX, valueY;
 
 	signals:
 		void actDelete(int ID);
+		void actMoved(int ID, int pixelX, int pixelY);
 
 	protected:
 		void paintEvent(QPaintEvent *);
@@ -33,13 +34,10 @@ namespace Jui
 
 	private:
 		int ID;
-		int pixelX, pixelY;
-		double valueX, valueY;
-		int pointSize;
+				int pointSize;
 
-		//QPoint mousePressCoor;
-		bool isPressed;
-		QPoint *mCursorLocal;
+		QPoint mousePressCoor;
+		QPoint mouseGlobalCoor;
 	};
 
 
@@ -72,11 +70,13 @@ namespace Jui
 
 		void deleteGraph();
 
-		public slots:
+	public slots:
 		void onDeletePoint(int ID);
+		void onMovePoint(int ID, int pixelX, int pixelY);
 
 	signals:
 		void actPointAdded(double valueX, double valueY);
+		void actControlPointsChange(QVector<QPointF>);
 
 	protected:
 		void paintEvent(QPaintEvent *);
@@ -88,7 +88,7 @@ namespace Jui
 
 		int frameOffset;
 		int minDomainX, maxDomainX, minDomainY, maxDomainY;
-		//QPoint cursorPos;
+		
 		QMap<int, GraphPoint*> collectionPts;
 
 		QList<QPointF*> collDrawPoints;

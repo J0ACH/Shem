@@ -12,12 +12,11 @@ namespace Jui
 		valueX(valX),
 		valueY(valY)
 	{
-		isOver = false;
 		parent->installEventFilter(this);
 		pointSize = 10;
 		this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
 
-		mCursorLocal = new QPoint(0, 0);
+		mousePressCoor = QPoint(0, 0);
 
 		setFocusPolicy(Qt::StrongFocus);
 	}
@@ -26,21 +25,31 @@ namespace Jui
 
 	void GraphPoint::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		isPressed = true;
-		*mCursorLocal = mouseEvent->pos();
-
+		mousePressCoor = mouseEvent->pos();
+		mouseGlobalCoor = mouseEvent->globalPos();
 	}
 
 	void GraphPoint::mouseMoveEvent(QMouseEvent *mouseEvent)
 	{
-		if (isPressed)
-		{
-			QPoint pos = this->parentWidget()->mapFromGlobal(mouseEvent->globalPos());
-			this->setGeometry(pos.x() - mCursorLocal->x(), pos.y() - mCursorLocal->y(), this->width(), this->height());
-		}
+		QPoint pos = this->parentWidget()->mapFromGlobal(mouseEvent->globalPos());
+
+		this->setGeometry(
+			pos.x() - mousePressCoor.x(),
+			pos.y() - mousePressCoor.y(),
+			this->width(),
+			this->height()
+			);
 	}
 
-	void GraphPoint::mouseReleaseEvent(QMouseEvent *mouseEvent) { isPressed = false; }
+	void GraphPoint::mouseReleaseEvent(QMouseEvent *mouseEvent)
+	{
+		int deltaX = mouseEvent->globalPos().x() - mouseGlobalCoor.x();
+		int deltaY = mouseEvent->globalPos().y() - mouseGlobalCoor.y();
+		qDebug() << "point ID: " << ID << "dX: " << deltaX << "dY: " << -deltaY;
+		pixelX += deltaX;
+		pixelY += deltaY;
+		emit actMoved(ID, pixelX, pixelY);
+	}
 
 
 	bool GraphPoint::eventFilter(QObject* target, QEvent* event)
@@ -178,14 +187,11 @@ namespace Jui
 			);
 		pt->show();
 
-
-		//		this->installEventFilter(pt);
 		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
+		this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
 
 		collectionPts.insert(collectionPts.size(), pt);
-
 		newPointID++;
-		//return *pt;
 	}
 	void Graph::addValuePoint(double valueX, double valueY)
 	{
@@ -199,6 +205,8 @@ namespace Jui
 			);
 		pt->show();
 		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
+		this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
+
 		collectionPts.insert(collectionPts.size(), pt);
 		newPointID++;
 	}
@@ -209,13 +217,11 @@ namespace Jui
 		this->addValuePoint(valueX, valueY);
 		update();
 	}
-
 	void Graph::drawLine(double valueX1, double valueY1, double valueX2, double valueY2)
 	{
 		collDrawLines.append(new QLineF(valueX1, valueY1, valueX2, valueY2));
 		update();
 	}
-
 	void Graph::drawPolyline(QVector<QPointF> collPoints)
 	{
 		graphPolylines = new QPolygonF(collPoints);
@@ -240,6 +246,19 @@ namespace Jui
 		qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
 		collectionPts.remove(ID);
 		update();
+	}
+	void Graph::onMovePoint(int ID, int pixelX, int pixelY)
+	{
+		qDebug() << "Graph::onMovePoint: " << QString::number(ID);
+		collectionPts.value(ID)->valueX = getValueX(pixelX);
+		collectionPts.value(ID)->valueY = getValueY(pixelY);
+
+		QVector<QPointF> collPts;
+		for each (GraphPoint *onePt in collectionPts.values())
+		{
+			collPts.append(QPointF(onePt->valueX, onePt->valueY));
+		}
+		emit actControlPointsChange(collPts);
 	}
 
 	void Graph::resizeEvent(QResizeEvent *resizeEvent)

@@ -17,6 +17,10 @@ namespace QuantIDE
 		connect(envelopeCode, SIGNAL(evaluateAct()), this, SLOT(onEnvelopeCodeEvaluate()));
 		connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
 		connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
+		connect(
+			envGraph, SIGNAL(actControlPointsChange(QVector<QPointF>)),
+			this, SLOT(onControlPointsChange(QVector<QPointF>))
+			);
 
 		this->onEnvelopeCodeEvaluate();
 	}
@@ -72,6 +76,11 @@ namespace QuantIDE
 			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));
 		}
 		this->onBridgeQuestion(QuestionType::redrawEnvGraph);
+	}
+
+	void ControlEnvelope::onControlPointsChange(QVector<QPointF> collPts)
+	{
+		qDebug() << "ControlEnvelope::onControlPointsChange" << collPts;
 	}
 
 	void ControlEnvelope::onBridgeQuestion(QuestionType selector, QString args)
