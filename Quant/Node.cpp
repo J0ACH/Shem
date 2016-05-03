@@ -103,7 +103,7 @@ namespace QuantIDE
 	}
 	void Node::sendSourceCode(QString txt)
 	{
-		QString code = tr("~%1[0] = {%2}").arg(name(), txt);
+		QString code = tr("~%1[0] = {Out.ar(0,%2)}").arg(name(), txt);
 		emit actCodeEvaluated(code);
 
 		onBridgeQuestion(QuestionType::namedControls);

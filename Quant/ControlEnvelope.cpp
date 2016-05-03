@@ -78,31 +78,23 @@ namespace QuantIDE
 
 		QString code;
 		code += "(\n";
-		code += tr("var bus = Bus.new('control', %1, 1, s);\n").arg(2);
+		code += tr("var bus = Bus.new('control', %1, 1, s);\n").arg(QString::number(busIndex));
 		code += "var cNode = NodeProxy.for (bus);\n";
 		code += "var pattern = Pseq([0, 0], inf);\n";
 		code += tr("var envs = Pswitch([%1], pattern);\n").arg(envelopeCode->toPlainText());
-
-		code += "~test0[10] = Task({\n";
+		code += "cNode.quant_(1);\n";
+		code += tr("~test0[%1] = Task({\n").arg(QString::number(busIndex+1));
 		code += "\tvar cntLoops = envs.which.list.size * envs.which.repeats;\n";
 		code += "\tcntLoops.do({ | noLoop |\n";
 		code += "\t\tvar currentNum = envs.which.list[noLoop % envs.which.list.size];\n";
 		code += "\t\tvar currentEnv = envs.list[currentNum];\n";
-		/*
-		code += tr("~test0.set('%1',").arg(name);
-		code += "cNode.source_({ EnvGen.kr(currentEnv,";
-		code += "timeScale: currentEnvironment['tempo'].clock.tempo.reciprocal,";
-		code += "doneAction : 2 )})) ;" ;
-		*/
-		code += "\tnoLoop.postln;\n";
+		code += tr("\t\t~test0.set('%1', cNode.source_({EnvGen.kr(currentEnv,doneAction:2)}));\n").arg(name);
 		code += "\t\tcurrentEnv.totalDuration.wait;\n";
-		code += "})\n";
-		//code += "1;\n";
+		code += "\t})\n";
 		code += "});\n";
 		code += ")";
 		emit actCodeEvaluated(code,false, true);
 	}
-
 
 	void ControlEnvelope::onEnvelopeCodeEvaluate()
 	{
