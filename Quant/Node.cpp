@@ -210,28 +210,11 @@ namespace QuantIDE
 
 	void Node::addControl(QString controlName)
 	{
-		/*
-		CodeEditor *envEditor = new CodeEditor(this);
-		envEditor->setFontCode(fontTextCode);
-		envEditor->show();
-		*/
-
 		ControlEnvelope *newGraph = new ControlEnvelope(this, mBridge, controlName);
 		newGraph->setFixedHeight(250);
 		newGraph->show();
 
-		/*
-		QLabel *controlLabel = new QLabel(this);
-		controlLabel->setText(controlName);
-		controlLabel->setFont(fontTextSmall);
-		controlLabel->show();
-		*/
-
-		//conteinerControls.insert(controlName, envEditor);
-		//conteinerControlsLabel.insert(controlName, controlLabel);
 		conteinerControlsGraph.insert(controlName, newGraph);
-
-		//	connect(envEditor, SIGNAL(sendT()), this, SLOT(sendSetNode(QString, QString)));
 
 		onBridgeQuestion(QuestionType::namedValues, controlName);
 
@@ -239,6 +222,7 @@ namespace QuantIDE
 	}
 	void Node::removeControl(QString controlName)
 	{
+		conteinerControlsGraph.value(controlName)->sendFreeBusIndex();
 		conteinerControlsGraph.value(controlName)->close();
 		conteinerControlsGraph.remove(controlName);
 

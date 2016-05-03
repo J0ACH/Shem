@@ -17,7 +17,8 @@ namespace QuantIDE
 		connect(envelopeCode, SIGNAL(evaluateAct()), this, SLOT(onEnvelopeCodeEvaluate()));
 		connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
 		connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
-		
+		connect(this, SIGNAL(actCodeEvaluated(QString, bool, bool)), mBridge, SLOT(evaluateCode(QString, bool, bool)));
+
 		connect(
 			this, SIGNAL(actGraphEnv(QList<double>, QList<double>, QList<double>)),
 			envGraph, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
@@ -27,6 +28,7 @@ namespace QuantIDE
 			this, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
 			);
 
+		this->onBridgeQuestion(QuestionType::initBusIndex);
 		this->onEnvelopeCodeEvaluate();
 	}
 
@@ -37,9 +39,11 @@ namespace QuantIDE
 		nameLabel = new QLabel(this);
 		nameLabel->setText(name);
 
-		levelLabel = new QLabel(this);
-		timeLabel = new QLabel(this);
-		curveLabel = new QLabel(this);
+		busLabel = new QLabel(this);
+
+		//levelLabel = new QLabel(this);
+		//timeLabel = new QLabel(this);
+		//curveLabel = new QLabel(this);
 
 		envelopeCode = new CodeEditor(this);
 		envelopeCode->setText("Env([0,1,0], [0.15,0.85], ['lin', 'sin'])");
@@ -59,8 +63,46 @@ namespace QuantIDE
 		{
 			graphCurveX.append((max - min) / noSeg*i + min);
 		}
-
 	}
+
+
+	void ControlEnvelope::sendFreeBusIndex()
+	{
+		qDebug() << "Bus FREE test";
+		QString code = tr("Bus.new(\control, %1, 1, s).free").arg(QString::number(busIndex)); // nefunguje
+		emit actCodeEvaluated(code);
+	}
+	void ControlEnvelope::sendTask()
+	{
+		qDebug() << "TASK TEST";
+
+		QString code;
+		code += "(\n";
+		code += tr("var bus = Bus.new('control', %1, 1, s);\n").arg(2);
+		code += "var cNode = NodeProxy.for (bus);\n";
+		code += "var pattern = Pseq([0, 0], inf);\n";
+		code += tr("var envs = Pswitch([%1], pattern);\n").arg(envelopeCode->toPlainText());
+
+		code += "~test0[10] = Task({\n";
+		code += "\tvar cntLoops = envs.which.list.size * envs.which.repeats;\n";
+		code += "\tcntLoops.do({ | noLoop |\n";
+		code += "\t\tvar currentNum = envs.which.list[noLoop % envs.which.list.size];\n";
+		code += "\t\tvar currentEnv = envs.list[currentNum];\n";
+		/*
+		code += tr("~test0.set('%1',").arg(name);
+		code += "cNode.source_({ EnvGen.kr(currentEnv,";
+		code += "timeScale: currentEnvironment['tempo'].clock.tempo.reciprocal,";
+		code += "doneAction : 2 )})) ;" ;
+		*/
+		code += "\tnoLoop.postln;\n";
+		code += "\t\tcurrentEnv.totalDuration.wait;\n";
+		code += "})\n";
+		//code += "1;\n";
+		code += "});\n";
+		code += ")";
+		emit actCodeEvaluated(code,false, true);
+	}
+
 
 	void ControlEnvelope::onEnvelopeCodeEvaluate()
 	{
@@ -75,6 +117,8 @@ namespace QuantIDE
 			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));
 		}
 		this->onBridgeQuestion(QuestionType::redrawEnvGraph);
+
+		this->sendTask();
 	}
 
 	void ControlEnvelope::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
@@ -129,6 +173,11 @@ namespace QuantIDE
 			questionCode = tr("\" \"").arg(envelopeCode->toPlainText());
 			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
+		case initBusIndex:
+			selectorNum = QuestionType::initBusIndex;
+			questionCode = "Bus.control(s,1).index";
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
+			break;
 		}
 	}
 	void ControlEnvelope::onBridgeAnswer(QUuid id, int selectorNum, QStringList answer)
@@ -150,7 +199,7 @@ namespace QuantIDE
 			case envArray:
 				foreach(QString oneAnsw, answer) { dblList.append(oneAnsw.toDouble()); }
 				//qDebug() << "ControlEnvelope::envArray: " << dblList;
-				
+
 				currentPointTime = 0 - answer[1].toDouble();
 				for (int i = 0; i < answer.size(); i += 4)
 				{
@@ -179,9 +228,9 @@ namespace QuantIDE
 				break;
 
 			case redrawEnvGraph:
-				qDebug() << "ControlEnvelope::refreshGraph NOW";
-				qDebug() << "ControlEnvelope::graphCurveX " << graphCurveX.size();
-				qDebug() << "ControlEnvelope::graphCurveY " << graphCurveY.size();
+				//qDebug() << "ControlEnvelope::refreshGraph NOW";
+				//qDebug() << "ControlEnvelope::graphCurveX " << graphCurveX.size();
+				//qDebug() << "ControlEnvelope::graphCurveY " << graphCurveY.size();
 				//qDebug() << "ControlEnvelope::graphPolyline " << graphPolyline.size();
 
 				if (graphCurveX.size() == graphCurveY.size())
@@ -193,6 +242,12 @@ namespace QuantIDE
 					envGraph->drawPolyline(graphPolyline);
 				}
 				break;
+
+			case initBusIndex:
+				busIndex = answer[0].toInt();
+				busLabel->setText(tr("busIndex : %1").arg(busIndex));
+				//qDebug() << "Control " << name << " busIndex : " << busIndex;
+				break;
 			}
 		}
 	}
@@ -200,6 +255,7 @@ namespace QuantIDE
 	void ControlEnvelope::resizeEvent(QResizeEvent *event)
 	{
 		nameLabel->setGeometry(5, 5, 95, 25);
+		busLabel->setGeometry(100, 5, 100, 25);
 		envelopeCode->setGeometry(5, 30, width() - 10, 25);
 		envGraph->setGeometry(5, 60, width() - 10, height() - 65);
 
@@ -225,5 +281,8 @@ namespace QuantIDE
 
 	}
 
-	ControlEnvelope::~ControlEnvelope() { }
+	ControlEnvelope::~ControlEnvelope()
+	{
+
+	}
 }

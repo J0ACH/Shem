@@ -362,21 +362,18 @@ namespace Jui
 	{
 		//qDebug() << "Graph::resizeEvent";
 		graphValues = QList<double>();
-		
+
 		for each(GraphPoint *onePt in controlPts)
 		{
 			int pointSize = onePt->pointSize;
 			onePt->pixelX = getPixelX(onePt->valueX);
-
 			onePt->setGeometry(
 				onePt->pixelX - pointSize / 2,
 				onePt->pixelY - pointSize / 2,
 				pointSize + 1,
 				pointSize + 1
 				);
-			//onePt->update();
 		}
-		//update();
 	}
 
 	void Graph::paintEvent(QPaintEvent *event)
