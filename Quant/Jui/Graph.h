@@ -20,6 +20,7 @@ namespace Jui
 		int ID;
 		int pixelX, pixelY;
 		double valueX, valueY;
+		int pointSize;
 
 	signals:
 		void actDelete(int ID);
@@ -34,9 +35,6 @@ namespace Jui
 		virtual bool eventFilter(QObject * watched, QEvent * event);
 
 	private:
-		
-		int pointSize;
-
 		QPoint mousePressCoor;
 		QPoint mouseGlobalCoor;
 	};

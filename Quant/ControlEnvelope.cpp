@@ -47,8 +47,8 @@ namespace QuantIDE
 		envGraph = new Graph(this);
 		envGraph->setDomainX(0, 1);
 		envGraph->setDomainY(0, 1);
-		envGraph->drawLine(0.25, 0.25, 0.5, 0.5);
-		envGraph->drawLine(0.75, 0.25, 0.5, 0.5);
+		//envGraph->drawLine(0.25, 0.25, 0.5, 0.5);
+		//envGraph->drawLine(0.75, 0.25, 0.5, 0.5);
 
 		graphCurveX = QList<double>();
 		//int noSeg = envGraph->boundsGraph().width();
@@ -70,10 +70,6 @@ namespace QuantIDE
 		graphPolyline = QVector<QPointF>();
 
 		this->onBridgeQuestion(QuestionType::envArray);
-		//this->onBridgeQuestion(QuestionType::envTimes);
-		//this->onBridgeQuestion(QuestionType::envLevels);
-		//this->onBridgeQuestion(QuestionType::envCurves);
-		//this->onBridgeQuestion(QuestionType::redrawEnvPoints);
 
 		foreach(double oneX, graphCurveX) {
 			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));

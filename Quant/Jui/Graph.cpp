@@ -85,7 +85,7 @@ namespace Jui
 		QPainter painter(this);
 
 		if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
-		else { painter.setPen(QColor(Qt::white));}
+		else { painter.setPen(QColor(Qt::white)); }
 
 		painter.drawEllipse(bounds());
 	}
@@ -312,10 +312,12 @@ namespace Jui
 
 	void Graph::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
 	{
+		/*
 		qDebug() << "Graph::onGraphEnv";
 		qDebug() << "levels: " << envLevels;
 		qDebug() << "times: " << envTimes;
 		qDebug() << "curves: " << envCurves;
+		*/
 
 		this->deleteGraph();
 		for (int i = 0; i < envLevels.size(); i++)
@@ -330,15 +332,6 @@ namespace Jui
 		QList<double> levels;
 		QList<double> times;
 		QList<double> curves;
-
-		/*
-		for (int i = 0; i < controlPts.size(); i++)
-		{
-		qDebug()
-		<< "ID: " << controlPts[i]->ID
-		<< " time: " << controlPts[i]->valueX;
-		}
-		*/
 
 		for (int i = 0; i < controlPts.size(); i++)
 		{
@@ -368,8 +361,22 @@ namespace Jui
 	void Graph::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		//qDebug() << "Graph::resizeEvent";
-
 		graphValues = QList<double>();
+		
+		for each(GraphPoint *onePt in controlPts)
+		{
+			int pointSize = onePt->pointSize;
+			onePt->pixelX = getPixelX(onePt->valueX);
+
+			onePt->setGeometry(
+				onePt->pixelX - pointSize / 2,
+				onePt->pixelY - pointSize / 2,
+				pointSize + 1,
+				pointSize + 1
+				);
+			//onePt->update();
+		}
+		//update();
 	}
 
 	void Graph::paintEvent(QPaintEvent *event)
@@ -453,29 +460,14 @@ namespace Jui
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		qDebug("Graph::mousePressEvent");
-		bool selectPoint = false;
-		foreach(GraphPoint *onePoint, controlPts)
-		{
-			if (onePoint->hasFocus())
-			{
-				qDebug("point selcted");
-				selectPoint = true;
-				break;
-			}
-		}
-		if (!selectPoint)
-		{
-			qDebug("point NOT selcted");
-			this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
-			this->makeEnv();
-		}
-		update();
+		this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
+		this->makeEnv();
+		//update();
 	}
 
 	void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)
 	{
-		update();
+		//update();
 		//mouseEvent->accept();
 	}
 
