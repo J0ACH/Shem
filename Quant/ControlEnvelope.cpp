@@ -83,10 +83,12 @@ namespace QuantIDE
 
 	void ControlEnvelope::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
 	{
+		/*
 		qDebug() << "ControlEnvelope::onControlPointsChange";
 		qDebug() << "levels: " << envLevels;
 		qDebug() << "times: " << envTimes;
 		qDebug() << "curves: " << envCurves;
+		*/
 
 		QStringList txtLevels;
 		QStringList txtTime;
@@ -151,7 +153,7 @@ namespace QuantIDE
 			{
 			case envArray:
 				foreach(QString oneAnsw, answer) { dblList.append(oneAnsw.toDouble()); }
-				qDebug() << "ControlEnvelope::envArray: " << dblList;
+				//qDebug() << "ControlEnvelope::envArray: " << dblList;
 				
 				currentPointTime = 0 - answer[1].toDouble();
 				for (int i = 0; i < answer.size(); i += 4)
@@ -161,12 +163,13 @@ namespace QuantIDE
 					levels.append(answer[i].toDouble());
 					times.append(currentPointTime);
 					curves.append(answer[i + 3].toDouble());
-
+					/*
 					qDebug() << "level: " << answer[i];
 					qDebug() << "time: " << answer[i + 1];
 					qDebug() << "type: " << answer[i + 2];
 					qDebug() << "curve: " << answer[i + 3];
 					qDebug() << "///////////////////\n";
+					*/
 				}
 				emit actGraphEnv(levels, times, curves);
 				break;

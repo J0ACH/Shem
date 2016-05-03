@@ -16,8 +16,6 @@ namespace Jui
 		pointSize = 10;
 		this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
 
-		mousePressCoor = QPoint(0, 0);
-
 		setFocusPolicy(Qt::StrongFocus);
 	}
 
@@ -45,12 +43,10 @@ namespace Jui
 	{
 		int deltaX = mouseEvent->globalPos().x() - mouseGlobalCoor.x();
 		int deltaY = mouseEvent->globalPos().y() - mouseGlobalCoor.y();
-		qDebug() << "point ID: " << ID << "dX: " << deltaX << "dY: " << -deltaY;
 		pixelX += deltaX;
 		pixelY += deltaY;
-		emit actMoved(ID, pixelX, pixelY);
+		if (deltaX != 0 || deltaY != 0) { emit actMoved(ID, pixelX, pixelY); }
 	}
-
 
 	bool GraphPoint::eventFilter(QObject* target, QEvent* event)
 	{
@@ -89,16 +85,7 @@ namespace Jui
 		QPainter painter(this);
 
 		if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
-		else
-		{
-			painter.setPen(QColor(Qt::white));
-			this->setGeometry(
-				pixelX - pointSize / 2,
-				pixelY - pointSize / 2,
-				pointSize + 1,
-				pointSize + 1
-				);
-		}
+		else { painter.setPen(QColor(Qt::white));}
 
 		painter.drawEllipse(bounds());
 	}
@@ -185,81 +172,6 @@ namespace Jui
 		return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
 	}
 
-	/*
-	void Graph::setLevels(QList<double> levels)
-	{
-	qDebug() << "Graph::setLevels: " << levels;
-	qDebug() << "Graph::controlPts.size: " << controlPts.size();
-
-	if (levels.size() != controlPts.values().size())
-	{
-	qDebug() << "Graph::setLevels NEW PTS";
-	this->deleteGraph();
-	for each (double oneVal in levels)	{ this->addValuePoint(0, oneVal); }
-	}
-
-	int cnt = 0;
-	for each (GraphPoint *onePt in controlPts.values())
-	{
-	this->disconnect(onePt, SIGNAL(actMoved(double, int, int)), this, SLOT(onMovePoint(double, int, int)));
-	onePt->valueY = levels[cnt];
-	onePt->pixelY = getPixelY(levels[cnt]);
-	qDebug() << "Graph::setLevels: " << onePt->valueX << " || " << onePt->valueY;
-	this->connect(onePt, SIGNAL(actMoved(double, int, int)), this, SLOT(onMovePoint(double, int, int)));
-	//onePt->update();
-	cnt++;
-	}
-	qDebug() << "Graph::controlPts.size: " << controlPts.size();
-	update();
-	}
-	QList<double> Graph::getLevels()
-	{
-	QList<double> answ;
-	for each (GraphPoint *onePt in controlPts.values()) { answ.append(onePt->valueY); }
-	return answ;
-	}
-	void Graph::setTimes(QList<double> times)
-	{
-	qDebug() << "Graph::setTimes: " << times;
-	qDebug() << "Graph::controlPts.size: " << controlPts.size();
-	int cnt = 0;
-	double currentTime = 0;
-	times.prepend(0);
-
-	if (times.size() != controlPts.values().size())
-	{
-	qDebug() << "Graph::setTimes NEW PTS";
-	this->deleteGraph();
-	//this->addValuePoint(this->getDomainX()[0], 0);
-	for each (double oneVal in times) { this->addValuePoint(oneVal, 0); }
-	}
-	qDebug() << "Graph::controlPts.size: " << controlPts.size();
-
-	for each (GraphPoint *onePt in controlPts.values())
-	{
-	this->disconnect(onePt, SIGNAL(actMoved(double, int, int)), this, SLOT(onMovePoint(double, int, int)));
-	currentTime += times[cnt];
-	//qDebug() << "Graph::currentTime: " << currentTime;
-	onePt->valueX = currentTime;
-	onePt->pixelX = getPixelX(times[cnt]);
-	qDebug() << "Graph::setTimes: " << onePt->valueX << " || " << onePt->valueY;
-	drawLine(currentTime, 0, currentTime, 1);
-	//onePt->update();
-	this->connect(onePt, SIGNAL(actMoved(double, int, int)), this, SLOT(onMovePoint(double, int, int)));
-	cnt++;
-	}
-	qDebug() << "Graph::controlPts.size: " << controlPts.size();
-	update();
-	}
-	QList<double> Graph::getTimes()
-	{
-	QList<double> answ;
-	for each (GraphPoint *onePt in controlPts.values()) { answ.append(onePt->valueX); }
-	return answ;
-	}
-	void Graph::setCurves(QList<double> levels) { }
-	*/
-
 	void Graph::addPixelPoint(int pixelX, int pixelY)
 	{
 		GraphPoint *pt = new GraphPoint(
@@ -344,7 +256,6 @@ namespace Jui
 
 	void Graph::deleteGraph()
 	{
-		//newPointID = 0;
 		for each(GraphPoint *onePoint in controlPts) { onePoint->close(); }
 		controlPts = QList<GraphPoint*>();
 		graphPolylines = new QPolygonF();
@@ -360,6 +271,7 @@ namespace Jui
 	{
 		qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
 		controlPts.removeAt(ID);
+		this->makeEnv();
 		update();
 	}
 	void Graph::onMovePoint(int ID, int pixelX, int pixelY)
@@ -374,19 +286,18 @@ namespace Jui
 				break;
 			}
 		}
-		this->sortByTime();
+		this->sortPointsByX();
 		this->makeEnv();
 	}
-	void Graph::sortByTime()
+
+	void Graph::sortPointsByX()
 	{
 		bool sorted = false;
-		//int num = 0;
 		if (controlPts.size() == 0) { sorted = true; }
+
 		while (!sorted)
 		{
 			sorted = true;
-			qDebug() << "sortLoop";
-
 			for (int i = 1; i < controlPts.size(); i++)
 			{
 				if (controlPts[i]->valueX < controlPts[i - 1]->valueX)
@@ -397,7 +308,6 @@ namespace Jui
 				}
 			}
 		}
-
 	}
 
 	void Graph::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
@@ -421,12 +331,14 @@ namespace Jui
 		QList<double> times;
 		QList<double> curves;
 
+		/*
 		for (int i = 0; i < controlPts.size(); i++)
 		{
-			qDebug()
-				<< "ID: " << controlPts[i]->ID
-				<< " time: " << controlPts[i]->valueX;
+		qDebug()
+		<< "ID: " << controlPts[i]->ID
+		<< " time: " << controlPts[i]->valueX;
 		}
+		*/
 
 		for (int i = 0; i < controlPts.size(); i++)
 		{
@@ -445,16 +357,11 @@ namespace Jui
 						}
 					}
 				}
-
-				//qDebug() << "previousTime:" << previousTime;
-				//qDebug() << "collectionPts.values()[i]->valueX - previousTime" << controlPts.values()[i]->valueX - previousTime;
 				times.append(controlPts[i]->valueX - previousTime);
 				curves.append(-2);
 			}
-			//currentTime += controlPts.values()[i]->valueX;
 		}
 
-		//qDebug() << "Graph::actGraphEnv";
 		emit actGraphEnv(levels, times, curves);
 	}
 
@@ -546,30 +453,29 @@ namespace Jui
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
 	{
+		qDebug("Graph::mousePressEvent");
 		bool selectPoint = false;
 		foreach(GraphPoint *onePoint, controlPts)
 		{
 			if (onePoint->hasFocus())
 			{
+				qDebug("point selcted");
 				selectPoint = true;
 				break;
 			}
 		}
 		if (!selectPoint)
 		{
+			qDebug("point NOT selcted");
 			this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
-
 			this->makeEnv();
-			//void actPointAdded(double valueX, double valueY);
 		}
-
 		update();
-		//mouseEvent->accept();
 	}
 
 	void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)
 	{
-		//update();
+		update();
 		//mouseEvent->accept();
 	}
 

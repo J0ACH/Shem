@@ -62,14 +62,6 @@ namespace Jui
 		QList<double> getDomainX();
 		QList<double> getDomainY();
 		
-		/*
-		void setLevels(QList<double> levels);
-		QList<double> getLevels();
-		void setTimes(QList<double> times);
-		QList<double> getTimes();
-		void setCurves(QList<double> curves);
-		*/
-
 		void addPixelPoint(int pixelX, int pixelY);
 		void addValuePoint(double valueX, double valueY);
 
@@ -86,7 +78,6 @@ namespace Jui
 
 	signals:
 		void actPointAdded(double valueX, double valueY);
-		//void actControlPointsChange(QVector<QPointF>);
 		void actGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
 
 	protected:
@@ -98,12 +89,11 @@ namespace Jui
 		void mouseReleaseEvent(QMouseEvent *mouseEvent);
 
 		void makeEnv();
-		void sortByTime();
+		void sortPointsByX();
 
 		int frameOffset;
 		int minDomainX, maxDomainX, minDomainY, maxDomainY;
 
-		//QMap<int, GraphPoint*> controlPts;
 		QList<GraphPoint*> controlPts;
 
 		QList<QPointF*> collDrawPoints;
@@ -112,7 +102,6 @@ namespace Jui
 
 		QList<double> graphValues;
 
-		//int newPointID;
 		double getValueX(int displayX);
 		double getValueY(int displayY);
 		double getPixelX(double valueX);
