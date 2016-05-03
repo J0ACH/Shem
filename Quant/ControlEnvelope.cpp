@@ -17,6 +17,11 @@ namespace QuantIDE
 		connect(envelopeCode, SIGNAL(evaluateAct()), this, SLOT(onEnvelopeCodeEvaluate()));
 		connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
 		connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
+		
+		connect(
+			this, SIGNAL(actGraphEnv(QList<double>, QList<double>, QList<double>)),
+			envGraph, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
+			);
 		connect(
 			envGraph, SIGNAL(actGraphEnv(QList<double>, QList<double>, QList<double>)),
 			this, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
@@ -61,16 +66,14 @@ namespace QuantIDE
 	{
 		envGraph->deleteGraph();
 
-		levels = QList<double>();
-		times = QList<double>();
-		curves = QList<QString>();
 		graphCurveY = QList<double>();
 		graphPolyline = QVector<QPointF>();
 
-		this->onBridgeQuestion(QuestionType::envLevels);
-		this->onBridgeQuestion(QuestionType::envTimes);
-		this->onBridgeQuestion(QuestionType::envCurves);
-		this->onBridgeQuestion(QuestionType::redrawEnvPoints);
+		this->onBridgeQuestion(QuestionType::envArray);
+		//this->onBridgeQuestion(QuestionType::envTimes);
+		//this->onBridgeQuestion(QuestionType::envLevels);
+		//this->onBridgeQuestion(QuestionType::envCurves);
+		//this->onBridgeQuestion(QuestionType::redrawEnvPoints);
 
 		foreach(double oneX, graphCurveX) {
 			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));
@@ -91,7 +94,7 @@ namespace QuantIDE
 
 		for each (double oneLevel in envLevels) { txtLevels.append(QString::number(oneLevel, 'f', 2)); }
 		for each (double oneTime in envTimes) { txtTime.append(QString::number(oneTime, 'f', 2)); }
-		for each (double oneCurve in envCurves) { txtCurves.append(QString::number(oneCurve, 'f', 2)); }
+		for each (double oneCurve in envCurves) { txtCurves.append(QString::number(oneCurve)); }
 
 		QString codeEnv = tr("Env([%1], [%2], [%3])").arg(
 			txtLevels.join(", "),
@@ -113,24 +116,9 @@ namespace QuantIDE
 
 		switch (selector)
 		{
-		case envLevels:
-			selectorNum = QuestionType::envLevels;
-			questionCode = tr("%1.levels").arg(envelopeCode->toPlainText());
-			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
-			break;
-		case envTimes:
-			selectorNum = QuestionType::envTimes;
-			questionCode = tr("%1.times").arg(envelopeCode->toPlainText());
-			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
-			break;
-		case envCurves:
-			selectorNum = QuestionType::envCurves;
-			questionCode = tr("%1.curves").arg(envelopeCode->toPlainText());
-			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
-			break;
-		case redrawEnvPoints:
-			selectorNum = QuestionType::redrawEnvPoints;
-			questionCode = tr("\" \"").arg(envelopeCode->toPlainText());
+		case envArray:
+			selectorNum = QuestionType::envArray;
+			questionCode = tr("%1.asArray").arg(envelopeCode->toPlainText());
 			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
 		case envAt:
@@ -153,32 +141,34 @@ namespace QuantIDE
 			QuestionType selector = static_cast<QuestionType>(selectorNum);
 
 			double currentPointTime;
+			QList<double> dblList;
+			QList<double> levels;
+			QList<double> times;
+			QList<double> type;
+			QList<double> curves;
 
 			switch (selector)
 			{
-			case envLevels:
-				foreach(QString oneAnsw, answer) { levels.append(oneAnsw.toDouble()); }
-				qDebug() << "ControlEnvelope::envLevels: " << levels;
-				break;
-
-			case envTimes:
-				foreach(QString oneAnsw, answer) { times.append(oneAnsw.toDouble()); }
-				qDebug() << "ControlEnvelope::envTimes: " << times;
-				break;
-
-			case envCurves:
-				foreach(QString oneAnsw, answer) { curves.append(oneAnsw); }
-				qDebug() << "ControlEnvelope::envCurves: " << curves;
-				break;
-
-			case redrawEnvPoints:
-				qDebug() << "ControlEnvelope::refreshEnv NOW";
-				currentPointTime = 0;
-				for (int i = 0; i < levels.size(); i++)
+			case envArray:
+				foreach(QString oneAnsw, answer) { dblList.append(oneAnsw.toDouble()); }
+				qDebug() << "ControlEnvelope::envArray: " << dblList;
+				
+				currentPointTime = 0 - answer[1].toDouble();
+				for (int i = 0; i < answer.size(); i += 4)
 				{
-					envGraph->drawPoint(currentPointTime, levels[i]);
-					if (i != levels.size() - 1) { currentPointTime += times[i]; }
+					currentPointTime += answer[i + 1].toDouble();
+
+					levels.append(answer[i].toDouble());
+					times.append(currentPointTime);
+					curves.append(answer[i + 3].toDouble());
+
+					qDebug() << "level: " << answer[i];
+					qDebug() << "time: " << answer[i + 1];
+					qDebug() << "type: " << answer[i + 2];
+					qDebug() << "curve: " << answer[i + 3];
+					qDebug() << "///////////////////\n";
 				}
+				emit actGraphEnv(levels, times, curves);
 				break;
 
 			case envAt:
@@ -213,16 +203,6 @@ namespace QuantIDE
 		nameLabel->setGeometry(5, 5, 95, 25);
 		envelopeCode->setGeometry(5, 30, width() - 10, 25);
 		envGraph->setGeometry(5, 60, width() - 10, height() - 65);
-		/*
-		graphCurveX = QList<double>();
-		int noSeg = envGraph->boundsGraph().width();
-		double min = envGraph->getDomainX()[0];
-		double max = envGraph->getDomainX()[1];
-		for (int i = 0; i <= noSeg; i++)
-		{
-		graphCurveX.append((max - min) / noSeg*i + min);
-		}
-		*/
 
 		foreach(double oneX, graphCurveX) {
 			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));

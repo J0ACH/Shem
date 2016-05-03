@@ -17,6 +17,7 @@ namespace Jui
 		~GraphPoint();
 
 		QRect bounds();
+		int ID;
 		int pixelX, pixelY;
 		double valueX, valueY;
 
@@ -33,8 +34,8 @@ namespace Jui
 		virtual bool eventFilter(QObject * watched, QEvent * event);
 
 	private:
-		int ID;
-				int pointSize;
+		
+		int pointSize;
 
 		QPoint mousePressCoor;
 		QPoint mouseGlobalCoor;
@@ -60,6 +61,14 @@ namespace Jui
 		void setDomainY(int min, int max);
 		QList<double> getDomainX();
 		QList<double> getDomainY();
+		
+		/*
+		void setLevels(QList<double> levels);
+		QList<double> getLevels();
+		void setTimes(QList<double> times);
+		QList<double> getTimes();
+		void setCurves(QList<double> curves);
+		*/
 
 		void addPixelPoint(int pixelX, int pixelY);
 		void addValuePoint(double valueX, double valueY);
@@ -73,6 +82,7 @@ namespace Jui
 	public slots:
 		void onDeletePoint(int ID);
 		void onMovePoint(int ID, int pixelX, int pixelY);
+		void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
 
 	signals:
 		void actPointAdded(double valueX, double valueY);
@@ -91,8 +101,8 @@ namespace Jui
 
 		int frameOffset;
 		int minDomainX, maxDomainX, minDomainY, maxDomainY;
-		
-		QMap<int, GraphPoint*> collectionPts;
+
+		QMap<int, GraphPoint*> controlPts;
 
 		QList<QPointF*> collDrawPoints;
 		QList<QLineF*> collDrawLines;
@@ -100,7 +110,7 @@ namespace Jui
 
 		QList<double> graphValues;
 
-		int newPointID;
+		//int newPointID;
 		double getValueX(int displayX);
 		double getValueY(int displayY);
 		double getPixelX(double valueX);

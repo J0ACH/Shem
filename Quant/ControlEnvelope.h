@@ -26,10 +26,7 @@ namespace QuantIDE
 		~ControlEnvelope();
 
 		enum QuestionType {
-			envLevels,
-			envTimes,
-			envCurves,
-			redrawEnvPoints,
+			envArray,
 			envAt,
 			redrawEnvGraph
 		};
@@ -44,6 +41,7 @@ namespace QuantIDE
 
 	signals:
 		void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
+		void actGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
 		void actChangeEnvCode(QString txt);
 
 	protected:
@@ -57,9 +55,9 @@ namespace QuantIDE
 		QUuid objectID;
 		QString name;
 		
-		QList<double> levels;
-		QList<double> times;
-		QList<QString> curves;
+		//QList<double> levels;
+		//QList<double> times;
+		//QList<QString> curves;
 		
 		QVector<QPointF> graphPolyline;
 		QList<double> graphCurveX;

@@ -88,11 +88,18 @@ namespace Jui
 	{
 		QPainter painter(this);
 
-		if (this->hasFocus()) {
-			//painter.fillPat Rect(bounds(), QColor(60, 60, 160));
-			painter.setPen(QColor(120, 20, 20));
+		if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
+		else
+		{
+			painter.setPen(QColor(Qt::white));
+			this->setGeometry(
+				pixelX - pointSize / 2,
+				pixelY - pointSize / 2,
+				pointSize + 1,
+				pointSize + 1
+				);
 		}
-		else { painter.setPen(QColor(Qt::white)); }
+
 		painter.drawEllipse(bounds());
 	}
 
@@ -113,11 +120,11 @@ namespace Jui
 		minDomainY = 0;
 		maxDomainY = 1;
 		//cursorPos = QPoint();
-		collectionPts = QMap<int, GraphPoint*>();
+		controlPts = QMap<int, GraphPoint*>();
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
 
-		newPointID = 0;
+		//newPointID = 0;
 
 		setFocusPolicy(Qt::StrongFocus);
 
@@ -178,11 +185,86 @@ namespace Jui
 		return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
 	}
 
+	/*
+	void Graph::setLevels(QList<double> levels)
+	{
+	qDebug() << "Graph::setLevels: " << levels;
+	qDebug() << "Graph::controlPts.size: " << controlPts.size();
+
+	if (levels.size() != controlPts.values().size())
+	{
+	qDebug() << "Graph::setLevels NEW PTS";
+	this->deleteGraph();
+	for each (double oneVal in levels)	{ this->addValuePoint(0, oneVal); }
+	}
+
+	int cnt = 0;
+	for each (GraphPoint *onePt in controlPts.values())
+	{
+	this->disconnect(onePt, SIGNAL(actMoved(double, int, int)), this, SLOT(onMovePoint(double, int, int)));
+	onePt->valueY = levels[cnt];
+	onePt->pixelY = getPixelY(levels[cnt]);
+	qDebug() << "Graph::setLevels: " << onePt->valueX << " || " << onePt->valueY;
+	this->connect(onePt, SIGNAL(actMoved(double, int, int)), this, SLOT(onMovePoint(double, int, int)));
+	//onePt->update();
+	cnt++;
+	}
+	qDebug() << "Graph::controlPts.size: " << controlPts.size();
+	update();
+	}
+	QList<double> Graph::getLevels()
+	{
+	QList<double> answ;
+	for each (GraphPoint *onePt in controlPts.values()) { answ.append(onePt->valueY); }
+	return answ;
+	}
+	void Graph::setTimes(QList<double> times)
+	{
+	qDebug() << "Graph::setTimes: " << times;
+	qDebug() << "Graph::controlPts.size: " << controlPts.size();
+	int cnt = 0;
+	double currentTime = 0;
+	times.prepend(0);
+
+	if (times.size() != controlPts.values().size())
+	{
+	qDebug() << "Graph::setTimes NEW PTS";
+	this->deleteGraph();
+	//this->addValuePoint(this->getDomainX()[0], 0);
+	for each (double oneVal in times) { this->addValuePoint(oneVal, 0); }
+	}
+	qDebug() << "Graph::controlPts.size: " << controlPts.size();
+
+	for each (GraphPoint *onePt in controlPts.values())
+	{
+	this->disconnect(onePt, SIGNAL(actMoved(double, int, int)), this, SLOT(onMovePoint(double, int, int)));
+	currentTime += times[cnt];
+	//qDebug() << "Graph::currentTime: " << currentTime;
+	onePt->valueX = currentTime;
+	onePt->pixelX = getPixelX(times[cnt]);
+	qDebug() << "Graph::setTimes: " << onePt->valueX << " || " << onePt->valueY;
+	drawLine(currentTime, 0, currentTime, 1);
+	//onePt->update();
+	this->connect(onePt, SIGNAL(actMoved(double, int, int)), this, SLOT(onMovePoint(double, int, int)));
+	cnt++;
+	}
+	qDebug() << "Graph::controlPts.size: " << controlPts.size();
+	update();
+	}
+	QList<double> Graph::getTimes()
+	{
+	QList<double> answ;
+	for each (GraphPoint *onePt in controlPts.values()) { answ.append(onePt->valueX); }
+	return answ;
+	}
+	void Graph::setCurves(QList<double> levels) { }
+	*/
+
 	void Graph::addPixelPoint(int pixelX, int pixelY)
 	{
 		GraphPoint *pt = new GraphPoint(
 			this,
-			newPointID,
+			controlPts.size(),
 			pixelX,
 			pixelY,
 			getValueX(pixelX),
@@ -190,17 +272,18 @@ namespace Jui
 			);
 		pt->show();
 
-		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
+		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(double)));
 		this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
 
-		collectionPts.insert(collectionPts.size(), pt);
-		newPointID++;
+		//controlPts.insert(getValueX(pixelX), pt);
+		controlPts.insert(controlPts.size(), pt);
+		//newPointID++;
 	}
 	void Graph::addValuePoint(double valueX, double valueY)
 	{
 		GraphPoint *pt = new GraphPoint(
 			this,
-			newPointID,
+			controlPts.size(),
 			getPixelX(valueX),
 			getPixelY(valueY),
 			valueX,
@@ -210,8 +293,9 @@ namespace Jui
 		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
 		this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
 
-		collectionPts.insert(collectionPts.size(), pt);
-		newPointID++;
+		//controlPts.insert(valueX, pt);
+		controlPts.insert(controlPts.size(), pt);
+		//newPointID++;
 	}
 
 	void Graph::drawPoint(double valueX, double valueY)
@@ -234,9 +318,9 @@ namespace Jui
 
 	void Graph::deleteGraph()
 	{
-		newPointID = 0;
-		for each(GraphPoint *onePoint in collectionPts.values()) { onePoint->close(); }
-		collectionPts = QMap<int, GraphPoint*>();
+		//newPointID = 0;
+		for each(GraphPoint *onePoint in controlPts.values()) { onePoint->close(); }
+		controlPts = QMap<int, GraphPoint*>();
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
 
@@ -249,38 +333,80 @@ namespace Jui
 	void Graph::onDeletePoint(int ID)
 	{
 		qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
-		collectionPts.remove(ID);
+		controlPts.remove(ID);
 		update();
 	}
 	void Graph::onMovePoint(int ID, int pixelX, int pixelY)
 	{
 		qDebug() << "Graph::onMovePoint: " << QString::number(ID);
-		collectionPts.value(ID)->valueX = getValueX(pixelX);
-		collectionPts.value(ID)->valueY = getValueY(pixelY);
+		controlPts.value(ID)->valueX = getValueX(pixelX);
+		controlPts.value(ID)->valueY = getValueY(pixelY);
+		/*
+		GraphPoint *tempPt = controlPts.value(ID);
+		tempPt->ID = getValueX(pixelX);
+		tempPt->valueX = getValueX(pixelX);
+		tempPt->valueY = getValueY(pixelY);
+		*/
+
+		//controlPts.remove(ID);
+		//controlPts.insert(getValueX(pixelX), tempPt);
 
 		this->makeEnv();
 	}
 
+	void Graph::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
+	{
+		qDebug() << "Graph::onGraphEnv";
+		qDebug() << "levels: " << envLevels;
+		qDebug() << "times: " << envTimes;
+		qDebug() << "curves: " << envCurves;
+
+		this->deleteGraph();
+		for (int i = 0; i < envLevels.size(); i++)
+		{
+			this->addValuePoint(envTimes[i], envLevels[i]);
+		}
+	}
+
+
 	void Graph::makeEnv()
 	{
+		qDebug() << "Graph::makeEnv";
 		QList<double> levels;
 		QList<double> times;
 		QList<double> curves;
 
-		double currentTime = 0;
-		for (int i = 0; i < collectionPts.values().size(); i++)
+		for (int i = 0; i < controlPts.values().size(); i++)
 		{
-			levels.append(collectionPts.values()[i]->valueY);
+			qDebug()
+				<< "ID: " << controlPts.values()[i]->ID
+				<< " time: " << controlPts.values()[i]->valueX;
+		}
+
+		for (int i = 0; i < controlPts.values().size(); i++)
+		{
+			levels.append(controlPts.values()[i]->valueY);
 
 			if (i != 0)
 			{
-				//qDebug() << "collectionPts.values()[i]->valueX" << collectionPts.values()[i]->valueX;
-				//qDebug() << "collectionPts.values()[i]->valueX - currentTime" << collectionPts.values()[i]->valueX - currentTime;
-				times.append(collectionPts.values()[i]->valueX - currentTime);
+				double previousTime = 0;
+				for each (GraphPoint *onePt in controlPts.values())
+				{
+					if (onePt->valueX < controlPts.values()[i]->valueX)
+					{
+						if (onePt->valueX > previousTime)
+						{
+							previousTime = onePt->valueX;
+						}
+					}
+				}
+
+				//qDebug() << "previousTime:" << previousTime;
+				//qDebug() << "collectionPts.values()[i]->valueX - previousTime" << controlPts.values()[i]->valueX - previousTime;
+				times.append(controlPts.values()[i]->valueX - previousTime);
 				curves.append(-2);
 			}
-
-			currentTime += collectionPts.values()[i]->valueX;
+			//currentTime += controlPts.values()[i]->valueX;
 		}
 
 		//qDebug() << "Graph::actGraphEnv";
@@ -292,13 +418,6 @@ namespace Jui
 		//qDebug() << "Graph::resizeEvent";
 
 		graphValues = QList<double>();
-
-		/*
-		for each(QPointF *onePoint in collDrawPoints)
-		{
-		//painter.drawEllipse(getPixelX(onePoint->x()) - 5, getPixelY(onePoint->y()) - 5, 10, 10);
-		};
-		*/
 	}
 
 	void Graph::paintEvent(QPaintEvent *event)
@@ -315,27 +434,10 @@ namespace Jui
 
 		painter.drawRect(this->boundsGraph());
 
-		/*
-		QString posPixel = tr("%1 ; %2").arg(
-		QString::number(cursorPos.x()),
-		QString::number(cursorPos.y())
-		);
-
-		double dValX = this->getValueX(cursorPos.x());
-		double dValY = this->getValueY(cursorPos.y());
-
-		QString posValue = tr("%1 ; %2").arg(
-		QString::number(dValX, 'f', 2),
-		QString::number(dValY, 'f', 2)
-		);
-
-		painter.drawText(QRect(cursorPos.x(), cursorPos.y() - 30, 80, 30), posPixel, option);
-		painter.drawText(QRect(cursorPos.x(), cursorPos.y() - 20, 80, 30), posValue, option);
-		*/
 		QTextOption option;
 		option.setAlignment(Qt::AlignCenter);
 
-		painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(collectionPts.size()), option);
+		painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(controlPts.size()), option);
 
 		painter.setPen(QPen(QColor(70, 70, 70), 1));
 
@@ -395,14 +497,12 @@ namespace Jui
 			poly.append(onePt);
 		}
 		painter.drawPolyline(poly);
-
-
 	}
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
 	{
 		bool selectPoint = false;
-		foreach(GraphPoint *onePoint, collectionPts)
+		foreach(GraphPoint *onePoint, controlPts)
 		{
 			if (onePoint->hasFocus())
 			{
@@ -414,7 +514,8 @@ namespace Jui
 		{
 			this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
 
-			void actPointAdded(double valueX, double valueY);
+			this->makeEnv();
+			//void actPointAdded(double valueX, double valueY);
 		}
 
 		update();
@@ -423,7 +524,7 @@ namespace Jui
 
 	void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)
 	{
-		update();
+		//update();
 		//mouseEvent->accept();
 	}
 
