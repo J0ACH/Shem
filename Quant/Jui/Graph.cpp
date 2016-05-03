@@ -120,7 +120,7 @@ namespace Jui
 		minDomainY = 0;
 		maxDomainY = 1;
 		//cursorPos = QPoint();
-		controlPts = QMap<int, GraphPoint*>();
+		controlPts = QList<GraphPoint*>();
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
 
@@ -272,12 +272,25 @@ namespace Jui
 			);
 		pt->show();
 
-		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(double)));
+		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
 		this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
 
-		//controlPts.insert(getValueX(pixelX), pt);
-		controlPts.insert(controlPts.size(), pt);
-		//newPointID++;
+		if (controlPts.size() == 0) { controlPts.append(pt); }
+		else
+		{
+			for (int i = 0; i <= controlPts.size(); i++)
+			{
+				if (i == controlPts.size()) {
+					controlPts.append(pt);
+					break;
+				}
+				if (controlPts[i]->valueX > pt->valueX)
+				{
+					controlPts.insert(i, pt);
+					break;
+				}
+			}
+		}
 	}
 	void Graph::addValuePoint(double valueX, double valueY)
 	{
@@ -293,9 +306,22 @@ namespace Jui
 		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
 		this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
 
-		//controlPts.insert(valueX, pt);
-		controlPts.insert(controlPts.size(), pt);
-		//newPointID++;
+		if (controlPts.size() == 0) { controlPts.append(pt); }
+		else
+		{
+			for (int i = 0; i <= controlPts.size(); i++)
+			{
+				if (i == controlPts.size()) {
+					controlPts.append(pt);
+					break;
+				}
+				if (controlPts[i]->valueX > pt->valueX)
+				{
+					controlPts.insert(i, pt);
+					break;
+				}
+			}
+		}
 	}
 
 	void Graph::drawPoint(double valueX, double valueY)
@@ -319,8 +345,8 @@ namespace Jui
 	void Graph::deleteGraph()
 	{
 		//newPointID = 0;
-		for each(GraphPoint *onePoint in controlPts.values()) { onePoint->close(); }
-		controlPts = QMap<int, GraphPoint*>();
+		for each(GraphPoint *onePoint in controlPts) { onePoint->close(); }
+		controlPts = QList<GraphPoint*>();
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
 
@@ -333,25 +359,45 @@ namespace Jui
 	void Graph::onDeletePoint(int ID)
 	{
 		qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
-		controlPts.remove(ID);
+		controlPts.removeAt(ID);
 		update();
 	}
 	void Graph::onMovePoint(int ID, int pixelX, int pixelY)
 	{
 		qDebug() << "Graph::onMovePoint: " << QString::number(ID);
-		controlPts.value(ID)->valueX = getValueX(pixelX);
-		controlPts.value(ID)->valueY = getValueY(pixelY);
-		/*
-		GraphPoint *tempPt = controlPts.value(ID);
-		tempPt->ID = getValueX(pixelX);
-		tempPt->valueX = getValueX(pixelX);
-		tempPt->valueY = getValueY(pixelY);
-		*/
-
-		//controlPts.remove(ID);
-		//controlPts.insert(getValueX(pixelX), tempPt);
-
+		for (int i = 0; i < controlPts.size(); i++)
+		{
+			if (controlPts[i]->ID == ID)
+			{
+				controlPts[i]->valueX = getValueX(pixelX);
+				controlPts[i]->valueY = getValueY(pixelY);
+				break;
+			}
+		}
+		this->sortByTime();
 		this->makeEnv();
+	}
+	void Graph::sortByTime()
+	{
+		bool sorted = false;
+		//int num = 0;
+		if (controlPts.size() == 0) { sorted = true; }
+		while (!sorted)
+		{
+			sorted = true;
+			qDebug() << "sortLoop";
+
+			for (int i = 1; i < controlPts.size(); i++)
+			{
+				if (controlPts[i]->valueX < controlPts[i - 1]->valueX)
+				{
+					sorted = false;
+					controlPts.swap(i, i - 1);
+					break;
+				}
+			}
+		}
+
 	}
 
 	void Graph::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
@@ -368,7 +414,6 @@ namespace Jui
 		}
 	}
 
-
 	void Graph::makeEnv()
 	{
 		qDebug() << "Graph::makeEnv";
@@ -376,23 +421,23 @@ namespace Jui
 		QList<double> times;
 		QList<double> curves;
 
-		for (int i = 0; i < controlPts.values().size(); i++)
+		for (int i = 0; i < controlPts.size(); i++)
 		{
 			qDebug()
-				<< "ID: " << controlPts.values()[i]->ID
-				<< " time: " << controlPts.values()[i]->valueX;
+				<< "ID: " << controlPts[i]->ID
+				<< " time: " << controlPts[i]->valueX;
 		}
 
-		for (int i = 0; i < controlPts.values().size(); i++)
+		for (int i = 0; i < controlPts.size(); i++)
 		{
-			levels.append(controlPts.values()[i]->valueY);
+			levels.append(controlPts[i]->valueY);
 
 			if (i != 0)
 			{
 				double previousTime = 0;
-				for each (GraphPoint *onePt in controlPts.values())
+				for each (GraphPoint *onePt in controlPts)
 				{
-					if (onePt->valueX < controlPts.values()[i]->valueX)
+					if (onePt->valueX < controlPts[i]->valueX)
 					{
 						if (onePt->valueX > previousTime)
 						{
@@ -403,7 +448,7 @@ namespace Jui
 
 				//qDebug() << "previousTime:" << previousTime;
 				//qDebug() << "collectionPts.values()[i]->valueX - previousTime" << controlPts.values()[i]->valueX - previousTime;
-				times.append(controlPts.values()[i]->valueX - previousTime);
+				times.append(controlPts[i]->valueX - previousTime);
 				curves.append(-2);
 			}
 			//currentTime += controlPts.values()[i]->valueX;

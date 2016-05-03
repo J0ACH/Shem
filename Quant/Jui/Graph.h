@@ -98,11 +98,13 @@ namespace Jui
 		void mouseReleaseEvent(QMouseEvent *mouseEvent);
 
 		void makeEnv();
+		void sortByTime();
 
 		int frameOffset;
 		int minDomainX, maxDomainX, minDomainY, maxDomainY;
 
-		QMap<int, GraphPoint*> controlPts;
+		//QMap<int, GraphPoint*> controlPts;
+		QList<GraphPoint*> controlPts;
 
 		QList<QPointF*> collDrawPoints;
 		QList<QLineF*> collDrawLines;
