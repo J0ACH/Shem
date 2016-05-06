@@ -19,7 +19,7 @@ namespace QuantIDE
 
 	class ControlEnvelope : public QWidget
 	{
-		Q_OBJECT
+		Q_OBJECT		
 
 	public:
 		ControlEnvelope(QWidget *parent, ScBridge *bridge, QString controlName);

@@ -258,7 +258,7 @@ namespace QuantIDE
 	void Node::fitControlsPosition()
 	{
 		int nextControlOriginY = 110;
-		for each(ControlEnvelope *oneEnv in conteinerControlsGraph.values())
+		foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
 		{
 			oneEnv->setGeometry(10, nextControlOriginY, oneEnv->width(), oneEnv->height());
 			nextControlOriginY += oneEnv->bounds().height() + 10;
@@ -293,7 +293,7 @@ namespace QuantIDE
 		labelNodeID->setGeometry(this->width() - 200, 20, 100, 20);
 		labelNamedControls->setGeometry(this->width() - 200, 5, 100, 20);
 		
-		for each(ControlEnvelope *oneEnv in conteinerControlsGraph.values())
+		foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
 		{
 			oneEnv->setFixedWidth(width() - 20);
 		}

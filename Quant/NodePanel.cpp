@@ -90,7 +90,7 @@ namespace QuantIDE
 	void NodePanel::fitNodesPosition()
 	{
 		int nextNodeOriginY = 0;
-		for each (Node *oneNode in dictNode.values())
+		foreach (Node *oneNode, dictNode.values())
 		{
 			//qDebug() << "NodePanel::NEW LOOP";
 			oneNode->setGeometry(5, nextNodeOriginY, oneNode->width(), oneNode->height());
@@ -110,7 +110,7 @@ namespace QuantIDE
 		scrollArea->resize(width() - 10, height() - 100);
 		scrollWidget->setFixedWidth(scrollArea->width());
 
-		for each (Node *oneNode in dictNode.values())
+		foreach (Node *oneNode, dictNode.values())
 		{
 			oneNode->setFixedWidth(scrollArea->width() - 10);
 		}

@@ -256,7 +256,7 @@ namespace Jui
 
 	void Graph::deleteGraph()
 	{
-		for each(GraphPoint *onePoint in controlPts) { onePoint->close(); }
+		foreach(GraphPoint *onePoint, controlPts) { onePoint->close(); }
 		controlPts = QList<GraphPoint*>();
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
@@ -340,7 +340,7 @@ namespace Jui
 			if (i != 0)
 			{
 				double previousTime = 0;
-				for each (GraphPoint *onePt in controlPts)
+				foreach (GraphPoint *onePt, controlPts)
 				{
 					if (onePt->valueX < controlPts[i]->valueX)
 					{
@@ -363,7 +363,7 @@ namespace Jui
 		//qDebug() << "Graph::resizeEvent";
 		graphValues = QList<double>();
 
-		for each(GraphPoint *onePt in controlPts)
+		foreach(GraphPoint *onePt, controlPts)
 		{
 			int pointSize = onePt->pointSize;
 			onePt->pixelX = getPixelX(onePt->valueX);
@@ -428,14 +428,14 @@ namespace Jui
 
 		//collDrawPoints
 		painter.setPen(QColor(70, 70, 170));
-		for each(QPointF *onePoint in collDrawPoints)
+		foreach(QPointF *onePoint, collDrawPoints)
 		{
 			painter.drawEllipse(getPixelX(onePoint->x()) - 5, getPixelY(onePoint->y()) - 5, 10, 10);
 		};
 
 		// collDrawLines
 		painter.setPen(QColor(70, 170, 70));
-		for each(QLineF *oneLine in collDrawLines)
+		foreach(QLineF *oneLine, collDrawLines)
 		{
 			QPointF pt1 = QPoint(getPixelX(oneLine->p1().x()), getPixelY(oneLine->p1().y()));
 			QPointF pt2 = QPoint(getPixelX(oneLine->p2().x()), getPixelY(oneLine->p2().y()));
@@ -445,7 +445,7 @@ namespace Jui
 		//collPolygons
 		painter.setPen(QColor(240, 70, 70));
 		QPolygonF poly;
-		for each(QPointF onePt in graphPolylines->toList())
+		foreach(QPointF onePt, graphPolylines->toList())
 		{
 			onePt.setX(getPixelX(onePt.x()));
 			onePt.setY(getPixelY(onePt.y()));

@@ -69,7 +69,7 @@ namespace QuantIDE
 	void ControlEnvelope::sendFreeBusIndex()
 	{
 		qDebug() << "Bus FREE test";
-		QString code = tr("Bus.new(\control, %1, 1, s).free").arg(QString::number(busIndex)); // nefunguje
+		QString code = tr("Bus.new('control', %1, 1, s).free").arg(QString::number(busIndex)); // nefunguje
 		emit actCodeEvaluated(code);
 	}
 	void ControlEnvelope::sendTask()
@@ -126,9 +126,9 @@ namespace QuantIDE
 		QStringList txtTime;
 		QStringList txtCurves;
 
-		for each (double oneLevel in envLevels) { txtLevels.append(QString::number(oneLevel, 'f', 2)); }
-		for each (double oneTime in envTimes) { txtTime.append(QString::number(oneTime, 'f', 2)); }
-		for each (double oneCurve in envCurves) { txtCurves.append(QString::number(oneCurve)); }
+		foreach (double oneLevel, envLevels) { txtLevels.append(QString::number(oneLevel, 'f', 2)); }
+		foreach (double oneTime, envTimes) { txtTime.append(QString::number(oneTime, 'f', 2)); }
+		foreach (double oneCurve, envCurves) { txtCurves.append(QString::number(oneCurve)); }
 
 		QString codeEnv = tr("Env([%1], [%2], [%3])").arg(
 			txtLevels.join(", "),
