@@ -22,7 +22,7 @@ namespace QuantIDE
 		Q_OBJECT		
 
 	public:
-		ControlEnvelope(QWidget *parent, ScBridge *bridge, QString controlName);
+		ControlEnvelope(QWidget *parent, ScBridge *bridge, QString nodeName, QString controlName, int cBus);
 		~ControlEnvelope();
 
 		enum QuestionType {
@@ -58,7 +58,7 @@ namespace QuantIDE
 	private:
 		ScBridge *mBridge;
 		QUuid objectID;
-		QString name;
+		QString name, parentName;
 		
 		//QList<double> levels;
 		//QList<double> times;

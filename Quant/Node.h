@@ -28,7 +28,7 @@ namespace QuantIDE
 
 
 	public:
-		Node(QWidget *parent, ScBridge *bridge);
+		Node(QWidget *parent, ScBridge *bridge, int nodeNum);
 		~Node();
 
 		StateNodePlay stateNodePlay;
@@ -76,6 +76,7 @@ namespace QuantIDE
 		void removeControl(QString name);
 
 		QUuid objectID;
+		int nodeNumber;
 		QMap<QString, QVariant*> configData;
 		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
 		QFont fontTextBig, fontTextSmall, fontTextCode;
@@ -86,8 +87,6 @@ namespace QuantIDE
 		CodeEditor *sourceCode;
 		Button *closeButton, *playButton;
 
-		//QMap<QString, CodeEditor*> conteinerControls;
-		//QMap<QString, QLabel*> conteinerControlsLabel;
 		QMap<QString, ControlEnvelope*> conteinerControlsGraph;
 
 	};

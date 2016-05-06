@@ -2,9 +2,10 @@
 
 namespace QuantIDE
 {
-	Node::Node(QWidget *parent, ScBridge *bridge) :
+	Node::Node(QWidget *parent, ScBridge *bridge, int nodeNum) :
 		QWidget(parent),
-		mBridge(bridge)
+		mBridge(bridge),
+		nodeNumber(nodeNum)
 	{
 		setObjectName("Node");
 		objectID = QUuid::createUuid();
@@ -85,15 +86,26 @@ namespace QuantIDE
 
 	void Node::sendInitNode()
 	{
-		QString code = tr("~%1 = NodeProxy.audio(s, 2)").arg(name());
-		emit actCodeEvaluated(code);
+		//QString code = tr("~%1 = NodeProxy.audio(s, 2);").arg(name());
+		//QString code = tr("~%1.play(vol: 0.5, fadeTime : 4).quant_(1);").arg(name());
+		//code += tr("~%1.play(out:0);").arg(name());
+
+		//code = tr("~%1.play.quant_(1);").arg(name());
+		//code += tr("~%1.fadeTime = 0.5;").arg(name());
+		//code += tr("~%1.monitor.fadeTime = 6;").arg(name());
+		
+		//emit actCodeEvaluated(tr("~%1.play(out:0);").arg(name()), false, true);
+
+		emit actCodeEvaluated(tr("~%1 = NodeProxy.audio(s, 2);").arg(name()));
+		emit actCodeEvaluated(tr("~%1.fadeTime = 4;").arg(name()));
+		emit actCodeEvaluated(tr("~%1.quant_(1);").arg(name()));
 
 		onBridgeQuestion(QuestionType::nodeID);
 	}
 	void Node::sendFreeNode()
 	{
 		QString code = tr("~%1.free").arg(name());
-		emit actCodeEvaluated(code);
+		emit actCodeEvaluated(code, false, true);
 	}
 
 	void Node::setSourceCode(QString txt) 
@@ -103,8 +115,9 @@ namespace QuantIDE
 	}
 	void Node::sendSourceCode(QString txt)
 	{
-		QString code = tr("~%1[0] = {Out.ar(0,%2)}").arg(name(), txt);
-		emit actCodeEvaluated(code);
+		//QString code = tr("~%1[0] = {Out.ar(0, %2)}").arg(name(), txt);
+		QString code = tr("(~%1[0] = { %2 })").arg(name(), txt);
+		emit actCodeEvaluated(code, false, true);
 
 		onBridgeQuestion(QuestionType::namedControls);
 	}
@@ -122,7 +135,7 @@ namespace QuantIDE
 		}
 		*/
 
-		emit actCodeEvaluated(code);
+		emit actCodeEvaluated(code, false, true);
 	}
 
 	void Node::onBridgeQuestion(QuestionType selector, QString args)
@@ -210,7 +223,8 @@ namespace QuantIDE
 
 	void Node::addControl(QString controlName)
 	{
-		ControlEnvelope *newGraph = new ControlEnvelope(this, mBridge, controlName);
+		int busIndex = nodeNumber*100 + conteinerControlsGraph.size();
+		ControlEnvelope *newGraph = new ControlEnvelope(this, mBridge, nameLabel->text(), controlName, busIndex);
 		newGraph->setFixedHeight(250);
 		newGraph->show();
 
@@ -237,17 +251,17 @@ namespace QuantIDE
 		case QuantIDE::StateNodePlay::PLAY:
 			code = tr("~%1.stop(4)").arg(name());
 			stateNodePlay = StateNodePlay::STOP;
-			//emit evaluateAct(code);
+			emit actCodeEvaluated(code, false, true);
 			break;
 		case QuantIDE::StateNodePlay::STOP:
 			code = tr("~%1.play(vol: 1, fadeTime: 4);").arg(name());
 			stateNodePlay = StateNodePlay::PLAY;
-			//emit evaluateAct(code);
+			emit actCodeEvaluated(code, false, true);
 			break;
 		case QuantIDE::StateNodePlay::FREE:
 			code = tr("~%1.play").arg(name());
 			stateNodePlay = StateNodePlay::PLAY;
-			//emit evaluateAct(code);
+			emit actCodeEvaluated(code, false, true);
 			break;
 		}
 

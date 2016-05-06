@@ -2,14 +2,16 @@
 
 namespace QuantIDE
 {
-	ControlEnvelope::ControlEnvelope(QWidget *parent, ScBridge *bridge, QString controlName) :
+	ControlEnvelope::ControlEnvelope(QWidget *parent, ScBridge *bridge, QString nodeName, QString controlName, int cBus) :
 		QWidget(parent),
 		mBridge(bridge),
-		name(controlName)
+		parentName(nodeName),
+		name(controlName),
+		busIndex(cBus)
 	{
 		this->setObjectName("ControlEnvelope");
 		objectID = QUuid::createUuid();
-
+		
 		setFocusPolicy(Qt::StrongFocus);
 
 		this->initControl();
@@ -28,7 +30,7 @@ namespace QuantIDE
 			this, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
 			);
 
-		this->onBridgeQuestion(QuestionType::initBusIndex);
+		//this->onBridgeQuestion(QuestionType::initBusIndex);
 		this->onEnvelopeCodeEvaluate();
 	}
 
@@ -40,11 +42,8 @@ namespace QuantIDE
 		nameLabel->setText(name);
 
 		busLabel = new QLabel(this);
-
-		//levelLabel = new QLabel(this);
-		//timeLabel = new QLabel(this);
-		//curveLabel = new QLabel(this);
-
+		busLabel->setText(tr("busIndex : %1").arg(busIndex));
+		
 		envelopeCode = new CodeEditor(this);
 		envelopeCode->setText("Env([0,1,0], [0.15,0.85], ['lin', 'sin'])");
 
@@ -78,22 +77,23 @@ namespace QuantIDE
 
 		QString code;
 		code += "(\n";
-		code += tr("var bus = Bus.new('control', %1, 1, s);\n").arg(QString::number(busIndex));
-		code += "var cNode = NodeProxy.for (bus);\n";
+		//code += tr("var bus = Bus.new('control', %1, 1, s);\n").arg(QString::number(busIndex));
+		//code += "var cNode = NodeProxy.for (bus);\n";
+		code += tr("var cNode = NodeProxy.for (%1);\n").arg(QString::number(busIndex));;
 		code += "var pattern = Pseq([0, 0], inf);\n";
 		code += tr("var envs = Pswitch([%1], pattern);\n").arg(envelopeCode->toPlainText());
 		code += "cNode.quant_(1);\n";
-		code += tr("~test0[%1] = Task({\n").arg(QString::number(busIndex+1));
+		code += tr("~%1[%2] = Task({\n").arg(parentName, QString::number(busIndex));
 		code += "\tvar cntLoops = envs.which.list.size * envs.which.repeats;\n";
 		code += "\tcntLoops.do({ | noLoop |\n";
 		code += "\t\tvar currentNum = envs.which.list[noLoop % envs.which.list.size];\n";
 		code += "\t\tvar currentEnv = envs.list[currentNum];\n";
-		code += tr("\t\t~test0.set('%1', cNode.source_({EnvGen.kr(currentEnv,doneAction:2)}));\n").arg(name);
+		code += tr("\t\t~%1.set('%2', cNode.source_({EnvGen.kr(currentEnv,doneAction:2)}));\n").arg(parentName,name);
 		code += "\t\tcurrentEnv.totalDuration.wait;\n";
 		code += "\t})\n";
 		code += "});\n";
 		code += ")";
-		emit actCodeEvaluated(code,false, true);
+		emit actCodeEvaluated(code,false, false);
 	}
 
 	void ControlEnvelope::onEnvelopeCodeEvaluate()

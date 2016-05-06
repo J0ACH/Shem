@@ -59,10 +59,13 @@ namespace QuantIDE
 	void NodePanel::addNode()
 	{
 		//qDebug("NodePanel::addNode()");
+		//QString sourceCode = "var sig = SinOsc.ar(140, mul:\\amp.kr());\n";
+		//sourceCode += "Pan2.ar(sig, 0);";
 
-		Node *newNode = new Node(scrollWidget, mBridge);
+		Node *newNode = new Node(scrollWidget, mBridge, dictNode.values().size()+1);
 		newNode->setName(tr("test%1").arg(QString::number(dictNode.values().size())));
 		newNode->setSourceCode("SinOsc.ar(140!2, mul:\\amp.kr())");
+		//newNode->setSourceCode(sourceCode);
 		//newNode->setSourceCode(QStringLiteral("SinOsc.ar(140!2, mul:\\amp.kr)"));
 		//newNode->setSourceCode("SinOsc.ar(\\freq.kr(90)!2, mul: Saw.kr(2, 0.5, 0.5))");
 		newNode->setFixedWidth(scrollArea->width() - 10);
