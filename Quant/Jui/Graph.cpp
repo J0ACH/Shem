@@ -17,9 +17,12 @@ namespace Jui
 		this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
 
 		setFocusPolicy(Qt::StrongFocus);
+		type = PointType::vertex;
 	}
 
 	QRect GraphPoint::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+
+	//void GraphPoint::setPointType(GraphPoint::PointType pointType)	{ type = pointType; }
 
 	void GraphPoint::mousePressEvent(QMouseEvent *mouseEvent)
 	{
@@ -31,21 +34,58 @@ namespace Jui
 	{
 		QPoint pos = this->parentWidget()->mapFromGlobal(mouseEvent->globalPos());
 
-		this->setGeometry(
-			pos.x() - mousePressCoor.x(),
-			pos.y() - mousePressCoor.y(),
-			this->width(),
-			this->height()
-			);
+		switch (type)
+		{
+		case vertex:
+			this->setGeometry(
+				pos.x() - mousePressCoor.x(),
+				pos.y() - mousePressCoor.y(),
+				this->width(),
+				this->height()
+				);
+			break;
+		case startPoint:
+		case endPoint:
+			this->setGeometry(
+				pixelX - pointSize / 2,
+				pos.y() - mousePressCoor.y(),
+				this->width(),
+				this->height()
+				);
+			break;
+
+		default:
+			break;
+		}
+
 	}
 
 	void GraphPoint::mouseReleaseEvent(QMouseEvent *mouseEvent)
 	{
-		int deltaX = mouseEvent->globalPos().x() - mouseGlobalCoor.x();
-		int deltaY = mouseEvent->globalPos().y() - mouseGlobalCoor.y();
-		pixelX += deltaX;
-		pixelY += deltaY;
-		if (deltaX != 0 || deltaY != 0) { emit actMoved(ID, pixelX, pixelY); }
+		int deltaX, deltaY;
+
+		switch (type)
+		{
+		case vertex:
+			deltaX = mouseEvent->globalPos().x() - mouseGlobalCoor.x();
+			deltaY = mouseEvent->globalPos().y() - mouseGlobalCoor.y();
+			pixelX += deltaX;
+			pixelY += deltaY;
+			if (deltaX != 0 || deltaY != 0) { emit actMoved(ID, pixelX, pixelY); }
+
+			break;
+
+		case startPoint:
+		case endPoint:
+			deltaY = mouseEvent->globalPos().y() - mouseGlobalCoor.y();
+			pixelY += deltaY;
+			if (deltaY != 0) { emit actMoved(ID, pixelX, pixelY); }
+
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	bool GraphPoint::eventFilter(QObject* target, QEvent* event)
@@ -60,12 +100,14 @@ namespace Jui
 				switch (eventKey->key())
 				{
 				case Qt::Key::Key_Delete:
-					qDebug() << "event: DELTE PRESSED";
-
-					emit actDelete(ID);
-					this->close();
-					event->accept();
-					return true;
+					//qDebug() << "event: DELTE PRESSED";
+					if (type == PointType::vertex)
+					{
+						emit actDelete(ID);
+						this->close();
+						event->accept();
+						return true;
+					}
 					break;
 
 				case Qt::Key::Key_Escape:
@@ -87,7 +129,22 @@ namespace Jui
 		if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
 		else { painter.setPen(QColor(Qt::white)); }
 
-		painter.drawEllipse(bounds());
+		switch (type)
+		{
+		case Jui::GraphPoint::vertex:
+			painter.drawEllipse(bounds());
+			break;
+		case Jui::GraphPoint::startPoint:
+			painter.drawRect(bounds());
+			break;
+		case Jui::GraphPoint::endPoint:
+			painter.drawRect(bounds());
+			break;
+		case Jui::GraphPoint::curvePoint:
+			painter.drawRect(bounds());
+			break;
+		}
+
 	}
 
 	GraphPoint::~GraphPoint(){}
@@ -238,7 +295,6 @@ namespace Jui
 
 	void Graph::drawPoint(double valueX, double valueY)
 	{
-		//collDrawPoints.append(new QPointF(valueX, valueY));
 		this->addValuePoint(valueX, valueY);
 		update();
 	}
@@ -261,9 +317,6 @@ namespace Jui
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
 
-		//collDrawPoints = QList<QPointF*>();
-		//collDrawLines = QList<QLineF*>();
-
 		update();
 	}
 
@@ -281,9 +334,18 @@ namespace Jui
 		{
 			if (controlPts[i]->ID == ID)
 			{
-				controlPts[i]->valueX = getValueX(pixelX);
-				controlPts[i]->valueY = getValueY(pixelY);
-				break;
+				switch (controlPts[i]->type)
+				{
+				case GraphPoint::PointType::vertex:
+					controlPts[i]->valueX = getValueX(pixelX);
+					controlPts[i]->valueY = getValueY(pixelY);
+					break;
+				case GraphPoint::PointType::startPoint:
+				case GraphPoint::PointType::endPoint:
+					//controlPts[i]->valueX = getValueX(pixelX);
+					controlPts[i]->valueY = getValueY(pixelY);
+					break;
+				}
 			}
 		}
 		this->sortPointsByX();
@@ -324,6 +386,12 @@ namespace Jui
 		{
 			this->addValuePoint(envTimes[i], envLevels[i]);
 		}
+
+		if (controlPts.size() >= 1)
+		{
+			controlPts[0]->type = GraphPoint::PointType::startPoint;
+			controlPts[controlPts.size() - 1]->type = GraphPoint::PointType::endPoint;
+		}
 	}
 
 	void Graph::makeEnv()
@@ -340,7 +408,7 @@ namespace Jui
 			if (i != 0)
 			{
 				double previousTime = 0;
-				foreach (GraphPoint *onePt, controlPts)
+				foreach(GraphPoint *onePt, controlPts)
 				{
 					if (onePt->valueX < controlPts[i]->valueX)
 					{

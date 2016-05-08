@@ -22,6 +22,10 @@ namespace Jui
 		double valueX, valueY;
 		int pointSize;
 
+		enum PointType {vertex, startPoint, endPoint, curvePoint};
+		//void setPointType(PointType type);
+		PointType type;
+
 	signals:
 		void actDelete(int ID);
 		void actMoved(int ID, int pixelX, int pixelY);
@@ -37,6 +41,8 @@ namespace Jui
 	private:
 		QPoint mousePressCoor;
 		QPoint mouseGlobalCoor;
+
+		
 	};
 
 
