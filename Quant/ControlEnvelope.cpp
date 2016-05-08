@@ -240,6 +240,9 @@ namespace QuantIDE
 
 				for (int i = 0; i < midCurvePointY.size(); i++)
 				{
+					//envGraph->drawPoint(midCurvePointX[i], midCurvePointY[i]);
+					envGraph->addCurvePoint(midCurvePointX[i], midCurvePointY[i], 0);
+
 				envGraph->drawLine(
 					midCurvePointX[i],
 					0,

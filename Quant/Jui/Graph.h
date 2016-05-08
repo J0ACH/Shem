@@ -14,7 +14,7 @@ namespace Jui
 		Q_OBJECT
 
 	public:
-		GraphPoint(QWidget *parent, int ptID, int pX, int pY, double valX, double valY); // !!! cesta jak udelat konstruktor neodvozeny od materske tridy
+		GraphPoint(QWidget *parent, int ptID, int pX, int pY, double valX, double valY);
 		~GraphPoint();
 
 		QRect bounds();
@@ -22,6 +22,7 @@ namespace Jui
 		int pixelX, pixelY;
 		double valueX, valueY;
 		int pointSize;
+		int curvature;
 
 		enum PointType {vertex, startPoint, endPoint, curvePoint};
 		PointType type;
@@ -70,8 +71,9 @@ namespace Jui
 		QList<double> getDomainX();
 		QList<double> getDomainY();
 		
-		void addPixelPoint(int pixelX, int pixelY);
-		void addValuePoint(double valueX, double valueY);
+		//void addPixelPoint(int pixelX, int pixelY);
+		GraphPoint *addValuePoint(double valueX, double valueY, GraphPoint::PointType type);
+		void addCurvePoint(double valueX, double valueY, int curveValue);
 
 		void drawPoint(double valueX, double valueY);
 		void drawLine(double valueX1, double valueY1, double valueX2, double valueY2);
@@ -103,6 +105,7 @@ namespace Jui
 		int minDomainX, maxDomainX, minDomainY, maxDomainY;
 
 		QList<GraphPoint*> controlPts;
+		QList<GraphPoint*> curvePts;
 
 		QList<QPointF*> collDrawPoints;
 		QList<QLineF*> collDrawLines;

@@ -14,6 +14,7 @@ namespace Jui
 	{
 		parent->installEventFilter(this);
 		pointSize = 10;
+		curvature = 0;
 		this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
 
 		setFocusPolicy(Qt::StrongFocus);
@@ -22,7 +23,7 @@ namespace Jui
 		labelID = new QLabel(parentWidget());
 		labelID->setAttribute(Qt::WA_NoMousePropagation);
 		labelID->setText(tr("ID: %1").arg(QString::number(ID)));
-		labelID->setGeometry(pixelX, pixelY, 80, 25);		
+		labelID->setGeometry(pixelX, pixelY, 80, 25);
 
 		labelTime = new QLabel(parentWidget());
 		labelTime->setAttribute(Qt::WA_NoMousePropagation);
@@ -32,8 +33,8 @@ namespace Jui
 		labelLevel = new QLabel(parentWidget());
 		labelLevel->setAttribute(Qt::WA_NoMousePropagation);
 		labelLevel->setText(tr("y: %1").arg(QString::number(valY)));
-		labelLevel->setGeometry(pixelX, pixelY+30, 80, 25);
-		
+		labelLevel->setGeometry(pixelX, pixelY + 30, 80, 25);
+
 	}
 
 	QRect GraphPoint::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
@@ -271,40 +272,41 @@ namespace Jui
 		double perc = (valueY - minDomainY) / (double)(maxDomainY - minDomainY);
 		return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
 	}
-
+	/*
 	void Graph::addPixelPoint(int pixelX, int pixelY)
 	{
-		GraphPoint *pt = new GraphPoint(
-			this,
-			controlPts.size(),
-			pixelX,
-			pixelY,
-			getValueX(pixelX),
-			getValueY(pixelY)
-			);
-		pt->show();
+	GraphPoint *pt = new GraphPoint(
+	this,
+	controlPts.size(),
+	pixelX,
+	pixelY,
+	getValueX(pixelX),
+	getValueY(pixelY)
+	);
+	pt->show();
 
-		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
-		this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
+	this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
+	this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
 
-		if (controlPts.size() == 0) { controlPts.append(pt); }
-		else
-		{
-			for (int i = 0; i <= controlPts.size(); i++)
-			{
-				if (i == controlPts.size()) {
-					controlPts.append(pt);
-					break;
-				}
-				if (controlPts[i]->valueX > pt->valueX)
-				{
-					controlPts.insert(i, pt);
-					break;
-				}
-			}
-		}
+	if (controlPts.size() == 0) { controlPts.append(pt); }
+	else
+	{
+	for (int i = 0; i <= controlPts.size(); i++)
+	{
+	if (i == controlPts.size()) {
+	controlPts.append(pt);
+	break;
 	}
-	void Graph::addValuePoint(double valueX, double valueY)
+	if (controlPts[i]->valueX > pt->valueX)
+	{
+	controlPts.insert(i, pt);
+	break;
+	}
+	}
+	}
+	}
+	*/
+	GraphPoint *Graph::addValuePoint(double valueX, double valueY, GraphPoint::PointType type = GraphPoint::PointType::vertex)
 	{
 		GraphPoint *pt = new GraphPoint(
 			this,
@@ -314,31 +316,47 @@ namespace Jui
 			valueX,
 			valueY
 			);
+		pt->type = type;
 		pt->show();
 		this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
 		this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
 
-		if (controlPts.size() == 0) { controlPts.append(pt); }
-		else
+		if (type == GraphPoint::PointType::vertex)
 		{
-			for (int i = 0; i <= controlPts.size(); i++)
+			if (controlPts.size() == 0) { controlPts.append(pt); }
+			else
 			{
-				if (i == controlPts.size()) {
-					controlPts.append(pt);
-					break;
-				}
-				if (controlPts[i]->valueX > pt->valueX)
+				for (int i = 0; i <= controlPts.size(); i++)
 				{
-					controlPts.insert(i, pt);
-					break;
+					if (i == controlPts.size()) {
+						controlPts.append(pt);
+						break;
+					}
+					if (controlPts[i]->valueX > pt->valueX)
+					{
+						controlPts.insert(i, pt);
+						break;
+					}
 				}
 			}
 		}
+		else if (type == GraphPoint::PointType::curvePoint)
+		{
+			curvePts.append(pt);
+		}
+
+		return pt;
+	}
+	void Graph::addCurvePoint(double valueX, double valueY, int curveNum)
+	{
+		GraphPoint *pt = this->addValuePoint(valueX, valueY, GraphPoint::PointType::curvePoint);
+		//pt->type = GraphPoint::PointType::curvePoint;
+		pt->curvature = curveNum;
 	}
 
 	void Graph::drawPoint(double valueX, double valueY)
 	{
-		this->addValuePoint(valueX, valueY);
+		collDrawPoints.append(new QPointF(valueX, valueY));
 		update();
 	}
 	void Graph::drawLine(double valueX1, double valueY1, double valueX2, double valueY2)
@@ -357,6 +375,9 @@ namespace Jui
 	{
 		foreach(GraphPoint *onePoint, controlPts) { onePoint->close(); }
 		controlPts = QList<GraphPoint*>();
+		foreach(GraphPoint *onePoint, curvePts) { onePoint->close(); }
+		curvePts = QList<GraphPoint*>();
+		collDrawPoints = QList<QPointF*>();
 		collDrawLines = QList<QLineF*>();
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
@@ -539,10 +560,10 @@ namespace Jui
 		};
 
 		//collDrawPoints
-		painter.setPen(QColor(70, 70, 170));
+		painter.setPen(QColor(150, 150, 150));
 		foreach(QPointF *onePoint, collDrawPoints)
 		{
-			painter.drawEllipse(getPixelX(onePoint->x()) - 5, getPixelY(onePoint->y()) - 5, 10, 10);
+			painter.drawEllipse(getPixelX(onePoint->x()) - 3, getPixelY(onePoint->y()) - 3, 6, 6);
 		};
 
 		// collDrawLines
@@ -569,7 +590,8 @@ namespace Jui
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
+		//this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
+		this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
 		this->makeEnv();
 		//update();
 	}
