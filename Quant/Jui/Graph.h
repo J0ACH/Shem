@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QMouseEvent>
+#include <QLabel>
 
 namespace Jui
 {
@@ -23,7 +24,6 @@ namespace Jui
 		int pointSize;
 
 		enum PointType {vertex, startPoint, endPoint, curvePoint};
-		//void setPointType(PointType type);
 		PointType type;
 
 	signals:
@@ -35,6 +35,9 @@ namespace Jui
 		void mousePressEvent(QMouseEvent *);
 		void mouseMoveEvent(QMouseEvent *);
 		void mouseReleaseEvent(QMouseEvent *mouseEvent);
+		void closeEvent(QCloseEvent *);
+		void focusInEvent(QFocusEvent* );
+		void focusOutEvent(QFocusEvent* );
 
 		virtual bool eventFilter(QObject * watched, QEvent * event);
 
@@ -42,7 +45,8 @@ namespace Jui
 		QPoint mousePressCoor;
 		QPoint mouseGlobalCoor;
 
-		
+		QLabel *labelID;
+		QLabel *labelLevel, *labelTime;
 	};
 
 

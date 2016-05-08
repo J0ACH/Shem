@@ -18,11 +18,25 @@ namespace Jui
 
 		setFocusPolicy(Qt::StrongFocus);
 		type = PointType::vertex;
+
+		labelID = new QLabel(parentWidget());
+		labelID->setAttribute(Qt::WA_NoMousePropagation);
+		labelID->setText(tr("ID: %1").arg(QString::number(ID)));
+		labelID->setGeometry(pixelX, pixelY, 80, 25);		
+
+		labelTime = new QLabel(parentWidget());
+		labelTime->setAttribute(Qt::WA_NoMousePropagation);
+		labelTime->setText(tr("x: %1").arg(QString::number(valX)));
+		labelTime->setGeometry(pixelX, pixelY + 15, 80, 25);
+
+		labelLevel = new QLabel(parentWidget());
+		labelLevel->setAttribute(Qt::WA_NoMousePropagation);
+		labelLevel->setText(tr("y: %1").arg(QString::number(valY)));
+		labelLevel->setGeometry(pixelX, pixelY+30, 80, 25);
+		
 	}
 
 	QRect GraphPoint::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
-
-	//void GraphPoint::setPointType(GraphPoint::PointType pointType)	{ type = pointType; }
 
 	void GraphPoint::mousePressEvent(QMouseEvent *mouseEvent)
 	{
@@ -63,6 +77,7 @@ namespace Jui
 	void GraphPoint::mouseReleaseEvent(QMouseEvent *mouseEvent)
 	{
 		int deltaX, deltaY;
+		bool moved = false;
 
 		switch (type)
 		{
@@ -71,7 +86,7 @@ namespace Jui
 			deltaY = mouseEvent->globalPos().y() - mouseGlobalCoor.y();
 			pixelX += deltaX;
 			pixelY += deltaY;
-			if (deltaX != 0 || deltaY != 0) { emit actMoved(ID, pixelX, pixelY); }
+			if (deltaX != 0 || deltaY != 0) { moved = true; }
 
 			break;
 
@@ -79,12 +94,16 @@ namespace Jui
 		case endPoint:
 			deltaY = mouseEvent->globalPos().y() - mouseGlobalCoor.y();
 			pixelY += deltaY;
-			if (deltaY != 0) { emit actMoved(ID, pixelX, pixelY); }
-
+			if (deltaY != 0) { moved = true; }
 			break;
+		}
 
-		default:
-			break;
+		if (moved)
+		{
+			labelID->setGeometry(pixelX, pixelY, 80, 25);
+			labelTime->setGeometry(pixelX, pixelY + 15, 80, 25);
+			labelLevel->setGeometry(pixelX, pixelY + 30, 80, 25);
+			emit actMoved(ID, pixelX, pixelY);
 		}
 	}
 
@@ -100,7 +119,7 @@ namespace Jui
 				switch (eventKey->key())
 				{
 				case Qt::Key::Key_Delete:
-					//qDebug() << "event: DELTE PRESSED";
+
 					if (type == PointType::vertex)
 					{
 						emit actDelete(ID);
@@ -135,16 +154,40 @@ namespace Jui
 			painter.drawEllipse(bounds());
 			break;
 		case Jui::GraphPoint::startPoint:
-			painter.drawRect(bounds());
+			//painter.drawRect(bounds());
+			painter.drawChord(bounds(), 16 * 270, 16 * 180);
 			break;
 		case Jui::GraphPoint::endPoint:
-			painter.drawRect(bounds());
+			//painter.drawRect(bounds());
+			painter.drawChord(bounds(), 16 * 90, 16 * 180);
 			break;
 		case Jui::GraphPoint::curvePoint:
 			painter.drawRect(bounds());
 			break;
 		}
 
+	}
+	void GraphPoint::closeEvent(QCloseEvent *event)
+	{
+		labelID->close();
+		labelTime->close();
+		labelLevel->close();
+	}
+
+	void GraphPoint::focusInEvent(QFocusEvent* event)
+	{
+		labelID->show();
+		labelTime->show();
+		labelLevel->show();
+		update();
+	}
+
+	void GraphPoint::focusOutEvent(QFocusEvent* event)
+	{
+		labelID->hide();
+		labelTime->hide();
+		labelLevel->hide();
+		update();
 	}
 
 	GraphPoint::~GraphPoint(){}
