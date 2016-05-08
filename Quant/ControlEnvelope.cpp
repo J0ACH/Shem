@@ -11,7 +11,7 @@ namespace QuantIDE
 	{
 		this->setObjectName("ControlEnvelope");
 		objectID = QUuid::createUuid();
-		
+
 		setFocusPolicy(Qt::StrongFocus);
 
 		this->initControl();
@@ -43,7 +43,7 @@ namespace QuantIDE
 
 		busLabel = new QLabel(this);
 		busLabel->setText(tr("busIndex : %1").arg(busIndex));
-		
+
 		envelopeCode = new CodeEditor(this);
 		envelopeCode->setText("Env([0,1,0], [0.15,0.85], ['lin', 'sin'])");
 
@@ -88,12 +88,12 @@ namespace QuantIDE
 		code += "\tcntLoops.do({ | noLoop |\n";
 		code += "\t\tvar currentNum = envs.which.list[noLoop % envs.which.list.size];\n";
 		code += "\t\tvar currentEnv = envs.list[currentNum];\n";
-		code += tr("\t\t~%1.set('%2', cNode.source_({EnvGen.kr(currentEnv,doneAction:2)}));\n").arg(parentName,name);
+		code += tr("\t\t~%1.set('%2', cNode.source_({EnvGen.kr(currentEnv,doneAction:2)}));\n").arg(parentName, name);
 		code += "\t\tcurrentEnv.totalDuration.wait;\n";
 		code += "\t})\n";
 		code += "});\n";
 		code += ")";
-		emit actCodeEvaluated(code,false, false);
+		emit actCodeEvaluated(code, false, false);
 	}
 
 	void ControlEnvelope::onEnvelopeCodeEvaluate()
@@ -106,7 +106,7 @@ namespace QuantIDE
 		this->onBridgeQuestion(QuestionType::envArray);
 
 		foreach(double oneX, graphCurveX) {
-			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));
+			this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
 		}
 		this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 
@@ -126,9 +126,9 @@ namespace QuantIDE
 		QStringList txtTime;
 		QStringList txtCurves;
 
-		foreach (double oneLevel, envLevels) { txtLevels.append(QString::number(oneLevel, 'f', 2)); }
-		foreach (double oneTime, envTimes) { txtTime.append(QString::number(oneTime, 'f', 2)); }
-		foreach (double oneCurve, envCurves) { txtCurves.append(QString::number(oneCurve)); }
+		foreach(double oneLevel, envLevels) { txtLevels.append(QString::number(oneLevel, 'f', 2)); }
+		foreach(double oneTime, envTimes) { txtTime.append(QString::number(oneTime, 'f', 2)); }
+		foreach(double oneCurve, envCurves) { txtCurves.append(QString::number(oneCurve)); }
 
 		QString codeEnv = tr("Env([%1], [%2], [%3])").arg(
 			txtLevels.join(", "),
@@ -157,6 +157,11 @@ namespace QuantIDE
 			break;
 		case envAt:
 			selectorNum = QuestionType::envAt;
+			questionCode = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), args);
+			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
+			break;
+		case graphAt:
+			selectorNum = QuestionType::graphAt;
 			questionCode = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), args);
 			emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
 			break;
@@ -208,15 +213,51 @@ namespace QuantIDE
 					qDebug() << "///////////////////\n";
 					*/
 				}
+
+				if (times.size() > 0)
+				{
+					midCurvePointX = QList<double>();
+					midCurvePointY = QList<double>();
+
+					for (int i = 1; i < times.size(); i++)
+					{
+						//qDebug() << "times[i] " << times[i];
+						//qDebug() << "times[i-1] " << times[i-1];
+						currentPointTime = ((times[i] - times[i-1]) / 2) + times[i-1];
+						midCurvePointX.append(currentPointTime);
+						//qDebug() << "currentTime " << currentPointTime;
+						this->onBridgeQuestion(QuestionType::envAt, QString::number(currentPointTime));
+						//currentPointTime += times[i];
+					}
+				}
+
 				emit actGraphEnv(levels, times, curves);
 				break;
 
 			case envAt:
+				qDebug() << "ControlEnvelope::envAt " << answer;
+				midCurvePointY.append(answer[0].toDouble());
+
+				for (int i = 0; i < midCurvePointY.size(); i++)
+				{
+				envGraph->drawLine(
+					midCurvePointX[i],
+					0,
+					midCurvePointX[i],
+					midCurvePointY[i]
+					);
+				}
+
+
+				break;
+
+			case graphAt:
 				//qDebug() << "polyline size: " << graphPolyline.size();
 				//qDebug() << "ControlEnvelope::envAt " << answer[0];
 				//currentGraphPtID = graphPolyline.size();
 				graphCurveY.append(answer[0].toDouble());
 
+				
 				break;
 
 			case redrawEnvGraph:
@@ -252,7 +293,7 @@ namespace QuantIDE
 		envGraph->setGeometry(5, 60, width() - 10, height() - 65);
 
 		foreach(double oneX, graphCurveX) {
-			this->onBridgeQuestion(QuestionType::envAt, QString::number(oneX));
+			this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
 		}
 		//this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 	}

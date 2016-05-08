@@ -28,6 +28,7 @@ namespace QuantIDE
 		enum QuestionType {
 			envArray,
 			envAt,
+			graphAt,
 			redrawEnvGraph,
 			initBusIndex
 		};
@@ -67,6 +68,8 @@ namespace QuantIDE
 		QVector<QPointF> graphPolyline;
 		QList<double> graphCurveX;
 		QList<double> graphCurveY;
+		QList<double> midCurvePointX;
+		QList<double> midCurvePointY;
 		
 		QLabel *nameLabel, *busLabel;
 

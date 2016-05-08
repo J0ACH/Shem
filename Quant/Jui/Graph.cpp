@@ -357,6 +357,7 @@ namespace Jui
 	{
 		foreach(GraphPoint *onePoint, controlPts) { onePoint->close(); }
 		controlPts = QList<GraphPoint*>();
+		collDrawLines = QList<QLineF*>();
 		graphPolylines = new QPolygonF();
 		graphValues = QList<double>();
 
