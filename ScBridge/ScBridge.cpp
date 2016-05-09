@@ -100,7 +100,7 @@ namespace SupercolliderBridge
 	}
 	void ScBridge::question(QUuid id, int selector, QString commandString, bool printAnswer)
 	{
-			QString command = QStringLiteral("[\"ANSWER_MARKER\",\"%1\",%2,%3,%4]").arg(
+		QString command = QStringLiteral("[\"ANSWER_MARKER\",\"%1\",%2,%3,%4]").arg(
 			id.toString(),
 			QString::number(selector),
 			commandString,
@@ -108,6 +108,98 @@ namespace SupercolliderBridge
 			);
 		if (printAnswer) { qDebug() << "ScBridge::question: " << command; };
 		evaluateCode(command, false);
+	}
+
+	QStringList ScBridge::questionNEW(QString code, QStringList args)
+	{
+		//QString quest = tr(code.toUtf8()).arg(args.toA);
+		//	QProcess::waitForStarted(30000);
+		questionList.enqueue(code);
+
+		QStringList list;
+		QUuid questionID = QUuid::createUuid();
+
+		//answers.insert(questionID, answer);
+
+		/*
+		if (!answers.contains(questionID))
+		{
+		list.append("Answer is NULL");
+		qDebug("Hodnota neni v odpovedich");
+		}
+		*/
+
+		connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+
+
+		QString command = QStringLiteral("[\"ANSWER_NEW\",\"%1\",%2]").arg(
+			questionID.toString(),
+			questionList.dequeue()
+			);
+		//evaluateCode(command, false, true);
+
+		{
+			QEventLoop loop;
+			loop.connect(this, SIGNAL(actAnswerNEW(QUuid, QStringList)), SLOT(quit()));
+			this->evaluateCode(command, false, true);
+			loop.exec();
+		}
+
+		list.append(tr("Question: %1").arg(code));
+		list.append(tr("Answer: %1").arg(answers.value(questionID).join(" || ")));
+
+		//QEventLoop loop;
+		/*
+		while (!questionList.isEmpty())
+		{
+		qDebug() << "questionList.size " << questionList.size();
+
+
+		QString command = QStringLiteral("[\"ANSWER_NEW\",\"%1\",%2]").arg(
+		questionID.toString(),
+		questionList.dequeue()
+		);
+		evaluateCode(command, false, true);
+
+		//qDebug("PRED CEKANIM");
+		//QProcess:: waitForReadyRead(30000);
+		//QThread::msleep(1000);
+		//this->thread()->msleep(1000);
+		//this->thread()->wait()
+
+		//QByteArray out = QProcess::readAll();
+		//QString postString = QString::fromUtf8(out);
+
+		//qDebug() << "opoved: " << answers;
+		//qDebug("PO CEKANIM");
+
+		}
+		*/
+
+		/*
+		QTimer timer;
+		timer.setInterval(500);
+		int cnt = 0;
+		//while (QEventLoop::processEvents())
+		while (answers.contains(questionID))
+		{
+			qDebug() << "answers.size " << answers.size();
+			//QThread::msleep(100);
+
+			//this->thread()->msleep(1000);
+			timer.start();
+			qDebug() << "whileLoop " << cnt;
+			cnt++;
+		}
+		timer.stop();
+		*/
+
+
+
+		//list.append(tr("Question: %1").arg(code));
+		//answer.append(tr("Answer: %1").arg(postString));
+		//answer.append(postString);
+		return list;
 	}
 
 	void ScBridge::startInterpretr()
@@ -163,9 +255,9 @@ namespace SupercolliderBridge
 			{
 				stateInterpret = StateInterpret::OFF;
 			}
-		}
-		mTerminationRequested = false;
 	}
+		mTerminationRequested = false;
+}
 
 	void ScBridge::onReadyRead()
 	{
@@ -244,7 +336,7 @@ namespace SupercolliderBridge
 
 						}
 
-						
+
 
 						if (printAnswer) {
 							qDebug() << "msgAnswer: "
@@ -264,6 +356,46 @@ namespace SupercolliderBridge
 					}
 
 				}
+			}
+			else if (msg.contains("ANSWER_NEW"))
+			{
+				//qDebug() << "msg [ANSWER_NEW]: " << msg;
+				QStringList incomingMSG = msg.split("->");
+				foreach(QString oneMSG, incomingMSG)
+				{
+					if (oneMSG.contains("ANSWER_NEW"))
+					{
+						oneMSG = oneMSG.replace("\r\n", "");
+						qDebug() << "oneMSG: " << oneMSG;
+
+						QStringList msgParts = oneMSG.split(",");
+						//qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
+
+						QUuid id;
+						QStringList answer;
+
+						for (int i = 0; i < msgParts.size(); i = i + 1)
+						{
+							QString onePart = msgParts.at(i);
+							onePart = onePart.replace(" ", "");
+							onePart = onePart.replace("[", "");
+							onePart = onePart.replace("]", "");
+
+							//qDebug() << "i: " << i;
+							if (i == 0) { /* skiping marker */ }
+							else if (i == 1) { id = QUuid(onePart); }
+							else { answer.append(onePart); }
+
+							//qDebug() << "id: " << id.toString();
+							//qDebug() << "answer: " << answer.join(" || ");
+							answers.insert(id, answer);
+							qDebug() << "opoved: " << answers;
+						}
+						emit actAnswerNEW(id, answer);
+					}
+				}
+
+
 			}
 			else { emit msgResultAct(msg); }
 		}
@@ -368,5 +500,5 @@ namespace SupercolliderBridge
 	}
 
 	ScBridge::~ScBridge() {	}
-}
+	}
 

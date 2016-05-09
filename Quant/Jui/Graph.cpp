@@ -590,10 +590,8 @@ namespace Jui
 
 	void Graph::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		//this->addPixelPoint(mouseEvent->pos().x(), mouseEvent->pos().y());
 		this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
 		this->makeEnv();
-		//update();
 	}
 
 	void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)

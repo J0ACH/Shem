@@ -53,6 +53,7 @@ namespace QuantIDE
 	protected:
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
+		void mousePressEvent(QMouseEvent *mouseEvent);
 		//virtual bool eventFilter(QObject * watched, QEvent * event);
 
 

@@ -223,7 +223,7 @@ namespace QuantIDE
 					{
 						//qDebug() << "times[i] " << times[i];
 						//qDebug() << "times[i-1] " << times[i-1];
-						currentPointTime = ((times[i] - times[i-1]) / 2) + times[i-1];
+						currentPointTime = ((times[i] - times[i - 1]) / 2) + times[i - 1];
 						midCurvePointX.append(currentPointTime);
 						//qDebug() << "currentTime " << currentPointTime;
 						this->onBridgeQuestion(QuestionType::envAt, QString::number(currentPointTime));
@@ -243,12 +243,12 @@ namespace QuantIDE
 					//envGraph->drawPoint(midCurvePointX[i], midCurvePointY[i]);
 					envGraph->addCurvePoint(midCurvePointX[i], midCurvePointY[i], 0);
 
-				envGraph->drawLine(
-					midCurvePointX[i],
-					0,
-					midCurvePointX[i],
-					midCurvePointY[i]
-					);
+					envGraph->drawLine(
+						midCurvePointX[i],
+						0,
+						midCurvePointX[i],
+						midCurvePointY[i]
+						);
 				}
 
 
@@ -260,7 +260,7 @@ namespace QuantIDE
 				//currentGraphPtID = graphPolyline.size();
 				graphCurveY.append(answer[0].toDouble());
 
-				
+
 				break;
 
 			case redrawEnvGraph:
@@ -286,6 +286,22 @@ namespace QuantIDE
 				break;
 			}
 		}
+	}
+
+	void ControlEnvelope::mousePressEvent(QMouseEvent *mouseEvent)
+	{
+		qDebug() << "ControlEnvelope::mousePressEvent";
+		QString code1 = tr("~%1.nodeID").arg(parentName);
+		QString code2 = tr("~%1.source.def.sourceCode").arg(parentName);
+		QString code3 = tr("~%1.isPlaying").arg(parentName);
+		QStringList args;
+		QStringList answer1, answer2, answer3;
+		answer1 = mBridge->questionNEW(code1, args);
+		answer2 = mBridge->questionNEW(code2, args);
+		answer3 = mBridge->questionNEW(code3, args);
+		mBridge->msgStatusAct(answer1.join(" || "));
+		mBridge->msgStatusAct(answer2.join(" || "));
+		mBridge->msgStatusAct(answer3.join(" || "));
 	}
 
 	void ControlEnvelope::resizeEvent(QResizeEvent *event)
