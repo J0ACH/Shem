@@ -6,17 +6,9 @@ namespace Jui
 	CodeEditor::CodeEditor(QWidget *parent) : QTextEdit(parent)
 	{
 		setObjectName("CodeEditor");
-		installEventFilter(this);
 
-		//QFont font = QFont("Consolas", 8);
-		//QFont font = QFont("Monaco", 7, QFont::Normal);
-		//QFont font = QFont("Univers 57 Condensed", 9, QFont::Normal);
-		//font.setStyleStrategy(QFont::NoAntialias);
-		//		qDebug() << " font.stretch : "<<font.stretch();
-		//font.setStretch(QFont::Unstretched);
-		//setFont(font);
-		//font.setHintingPreference(QFont::PreferDefault);
-        	
+		this->installEventFilter(this);
+		setFocusPolicy(Qt::StrongFocus);
 		setFrameStyle(QFrame::NoFrame);
 
 		normalColor = QColor(120, 120, 120);
@@ -122,48 +114,49 @@ namespace Jui
 
 	bool CodeEditor::eventFilter(QObject* target, QEvent* event)
 	{
-		if (event->type() == QEvent::KeyPress)
+		//qDebug() << "EventType " << event->type();
+		if (hasFocus())
 		{
-			QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
-			quint32 modifers = eventKey->nativeModifiers();
-
-			switch (eventKey->key())
+			if (event->type() == QEvent::KeyPress)
 			{
-			case Qt::Key::Key_Return:
+				QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
+				quint32 modifers = eventKey->nativeModifiers();
 
-				qDebug() << "event: ENTER PRESSED";
-
-				switch (eventKey->modifiers())
+				switch (eventKey->key())
 				{
-				case Qt::KeyboardModifier::ControlModifier:
-					backgroundAlpha = 255;
-					timer->stop();
-					timer->setInterval(fadeTimeOut / fps);
-					timer->start();
+				case Qt::Key::Key_Return:
 
-					emit evaluateAct();
-					emit sendText(this->toPlainText());
+					qDebug() << "event: ENTER PRESSED";
 
+					switch (eventKey->modifiers())
+					{
+					case Qt::KeyboardModifier::ControlModifier:
+						backgroundAlpha = 255;
+						timer->stop();
+						timer->setInterval(fadeTimeOut / fps);
+						timer->start();
 
-					qDebug() << "KeyEvent: Ctrl+ENTER PRESSED (modifer" << eventKey->modifiers() << ")";
+						emit evaluateAct();
+						emit sendText(this->toPlainText());
+
+						qDebug() << "KeyEvent: Ctrl+ENTER PRESSED (modifer" << eventKey->modifiers() << ")";
+						event->accept();
+						return true;
+						break;
+					}
+					break;
+				case Qt::Key::Key_Escape:
+					qDebug() << "KeyEvent: Escape PRESSED";
+					event->accept();
 					return true;
 					break;
 				}
-				break;
-			case Qt::Key::Key_Escape:
-				qDebug() << "KeyEvent: Escape PRESSED";
-				return true;
-				break;
 			}
-		}
+			
+		};
 
-		if (event->type() == QEvent::KeyRelease)
-		{
-			//highlightText(this->toPlainText(), Qt::red);
-			//fitTextFormat();
-		}
-
-		return QTextEdit::eventFilter(target, event);
+		event->ignore();
+		return QObject::eventFilter(target, event);
 	}
 
 
@@ -176,7 +169,9 @@ namespace Jui
 		fillColor.setAlpha(backgroundAlpha);
 		painter.fillRect(bounds, fillColor);
 
-		painter.setPen(QColor(120, 120, 120));
+		if (this->hasFocus()) { painter.setPen(activeColor); }
+		else { painter.setPen(QColor(120, 120, 120)); }
+
 		painter.drawLine(0, 0, width(), 0);
 		painter.drawLine(0, height() - 1, width(), height() - 1);
 

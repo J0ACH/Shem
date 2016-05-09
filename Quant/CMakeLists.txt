@@ -49,12 +49,16 @@ SET(Quant_hdr
   Quant.h
   NodePanel.h
   Node.h
-  )
+  ControlEnvelope.h
+)
+
 SET(Quant_src 
   Quant.cpp
   NodePanel.cpp
   Node.cpp
-  )
+  ControlEnvelope.cpp
+)
+
 SET(Quant_res 
   Quant.qrc
   Jui/Jui.qrc

@@ -21,7 +21,6 @@ namespace Jui
 	void Panel::initControl()
 	{
 		closeButton = new Button(this);
-		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
 		closeButton->setText("X");
 
@@ -30,21 +29,21 @@ namespace Jui
 
 	void Panel::onConfigData(QMap<QString, QVariant*> config)
 	{
-		
+
 		colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
 		colorNormal = config.value("color_shem_Normal")->value<QColor>();
 		colorOver = config.value("color_shem_Over")->value<QColor>();
 		colorActive = config.value("color_shem_Active")->value<QColor>();
 		colorText = config.value("color_shem_Text")->value<QColor>();
 		fontTextBig = config.value("font_shem_TextBig")->value<QFont>();
-				
+
 
 		this->setColorBackground(colorPanelBackground);
 		this->setColorTitle(colorText);
 
 		closeButton->setColorNormal(colorNormal);
 		closeButton->setColorOver(colorOver);
-		closeButton->setColorActive(colorActive);	
+		closeButton->setColorActive(colorActive);
 
 		update();
 	}
@@ -91,19 +90,25 @@ namespace Jui
 	{
 		QPainter painter(this);
 		painter.setFont(fontTextBig);
-		
+
 		painter.fillRect(bounds(), colorPanelBackground);
 
 		painter.setPen(QPen(colorText, 1));
 		painter.drawText(15, 25, title);
+
+		bool showScreen = false;
+		if (showScreen)
+		{
+			painter.setPen(QColor(30, 30, 130));
+			painter.drawLine(this->geometry().topLeft(), this->geometry().bottomRight());
+			painter.drawLine(this->geometry().bottomLeft(), this->geometry().topRight());
+		}
 	}
 
 	void Panel::resizeEvent(QResizeEvent *resizeEvent)
 	{
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
-		emit resizeAct();
-
-		//qDebug("Panel::resizeEvent");
+		emit resizeAct(); // zustava prozatim pouze pro Edges
 	}
 
 	Panel::~Panel()

@@ -22,7 +22,7 @@ namespace Jui
 		format.setForeground(QBrush(QColor(230, 30, 30)));
 		text->setCurrentCharFormat(format);
 
-		connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
+		//connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
 	}
 
 	void Console::setFont(QFont font)
@@ -58,8 +58,18 @@ namespace Jui
 		text->setCurrentCharFormat(format);
 
 	}
+	
+	/*
+	void Console::fitGeometry() { 
+		text->setGeometry(10, 35, this->width() - 20, this->height() - 45); 
+	}
+	*/
 
-	void Console::fitGeometry() { text->setGeometry(10, 35, this->width() - 20, this->height() - 45); }
+	void Console::resizeEvent(QResizeEvent *event)
+	{
+		Panel::resizeEvent(event); // send event to superclass
+		text->setGeometry(10, 35, this->width() - 20, this->height() - 45);
+	}
 
 	Console::~Console()	{ }
 

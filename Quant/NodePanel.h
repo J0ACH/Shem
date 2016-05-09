@@ -27,15 +27,13 @@ namespace QuantIDE
 		Q_OBJECT
 
 	public:
-		NodePanel(QWidget *parent = 0);
+		NodePanel(QWidget *parent, ScBridge *bridge);
 		~NodePanel();
 
 		QRect bounds();
 
-		void setTargetBridge(ScBridge*);
-
 	public slots:
-		void fitGeometry();
+		void fitNodesPosition();
 		void onConfigData(QMap<QString, QVariant*> config);
 
 		void addNode();
@@ -43,6 +41,10 @@ namespace QuantIDE
 
 	signals:
 		void actConfigData(QMap<QString, QVariant*> config);
+
+	protected:
+		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent *event);
 
 	private:
 		void initControl();
@@ -54,7 +56,7 @@ namespace QuantIDE
 		QWidget *scrollWidget;
 		QMap<QString, Node*> dictNode;
 		ScBridge *mBridge;
-		int testID;
+
 	};
 }
 

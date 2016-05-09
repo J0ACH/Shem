@@ -2,6 +2,8 @@
 #define NODE_H
 
 #include "CodeEditor.h"
+#include "ControlEnvelope.h"
+#include "Graph.h"
 #include "ScBridge.h"
 
 #include <QWidget>
@@ -19,46 +21,52 @@ using namespace SupercolliderBridge;
 namespace QuantIDE
 {
 	enum class StateNodePlay{ PLAY, STOP, FREE };
-	
+
 	class Node : public QWidget
 	{
 		Q_OBJECT
 
 
 	public:
-		Node(QWidget *parent = 0);
+		Node(QWidget *parent, ScBridge *bridge, int nodeNum);
 		~Node();
 
 		StateNodePlay stateNodePlay;
-		enum QuestionType {nodeID, namedControls, namedValues};
+		enum QuestionType { nodeID, namedControls, namedValues };
 
-		void connectBridge(ScBridge*);
 		void setName(QString);
 		void setSourceCode(QString);
 
 		QString name();
-
 		QRect bounds();
 
 	public slots:
-		void fitGeometry();
+		void fitControlsPosition();
 		void onConfigData(QMap<QString, QVariant*> config);
 
-		void onEvaluateNode();
-		void onReciveText(QString);
+		//void onEvaluateNode();
+		//void onReciveText(QString);
 		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
-		void onBridgeAnswer(QString pattern, int selectorNum, QStringList answer);
-		
+		void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
+
 		void changeNodePlay();
 
+		void sendInitNode();
+		void sendFreeNode();
+		void sendSourceCode(QString txt);
+		void sendSetNode(QString nameControl, QString txt);
+
 	signals:
-		void evaluateAct(QString);
+		void actCodeEvaluated(QString, bool silent = false, bool print = false);
 		void killAct(QString);
-		void bridgeQuestionAct(QString pattern, int selectorNum, QString question, bool print);
-		
+		void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
+		void actChangedHeight();
+
 	protected:
 		void closeEvent(QCloseEvent *event);
 		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent *event);
+		virtual bool eventFilter(QObject * watched, QEvent * event);
 
 	private:
 		void initControl();
@@ -67,7 +75,8 @@ namespace QuantIDE
 		void addControl(QString name);
 		void removeControl(QString name);
 
-		QString objectPattern;
+		QUuid objectID;
+		int nodeNumber;
 		QMap<QString, QVariant*> configData;
 		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
 		QFont fontTextBig, fontTextSmall, fontTextCode;
@@ -78,9 +87,8 @@ namespace QuantIDE
 		CodeEditor *sourceCode;
 		Button *closeButton, *playButton;
 
-		QMap<QString, CodeEditor*> conteinerControls;
-		QMap<QString, QLabel*> conteinerControlsLabel;
-		
+		QMap<QString, ControlEnvelope*> conteinerControlsGraph;
+
 	};
 }
 

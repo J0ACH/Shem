@@ -21,7 +21,10 @@ namespace Jui
 		
 	public slots:
 		void addText(QString text, QColor color, bool newLine );
-		void fitGeometry();
+		//void fitGeometry();
+
+	protected:
+		void resizeEvent(QResizeEvent *event);
 
 	private:
 		QTextEdit *text;

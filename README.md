@@ -1,7 +1,6 @@
 #Shem
 _Custom live-coding environment written in QT._
 
-
 ![alt tag](http://i.imgur.com/qE4dD9I.png)
 
 ##features and TODOs

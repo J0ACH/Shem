@@ -8,14 +8,15 @@ namespace SupercolliderBridge
 	{
 		setObjectName("Customize");
 		objectPattern = "ShemConfig";
+		objectID = QUuid::createUuid();
 	}
 
 	void Customize::setTargetBridge(ScBridge *target)
 	{
 		mBridge = target;
 		connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onInterpretStart()));
-		connect(this, SIGNAL(actBridgeQuestion(QString, int, QString, bool)), mBridge, SLOT(question(QString, int, QString, bool)));
-		connect(mBridge, SIGNAL(answerAct(QString, int, QStringList)), this, SLOT(onBridgeAnswer(QString, int, QStringList)));
+		connect(this, SIGNAL(actBridgeQuestion(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
+		connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
 	}
 
 	void Customize::onInterpretStart() { this->onBridgeQuestion(QuestionType::appExtensionDir); }
@@ -31,15 +32,14 @@ namespace SupercolliderBridge
 			selectorNum = QuestionType::appExtensionDir;
 			//questionCode = "Platform.userConfigDir";
 			questionCode = "Platform.systemExtensionDir";
-			emit actBridgeQuestion(objectPattern, selectorNum, questionCode, false);
+			emit actBridgeQuestion(objectID, selectorNum, questionCode, false);
 			break;
 		}
 	}
 
-	void Customize::onBridgeAnswer(QString pattern, int selectorNum, QStringList answer)
+	void Customize::onBridgeAnswer(QUuid id, int selectorNum, QStringList answer)
 	{
-		//qDebug() << "Customize::onBridgeAnswer: " << pattern << answer;
-		if (pattern == objectPattern)
+		if (id == objectID)
 		{
 			QuestionType selector = static_cast<QuestionType>(selectorNum);
 
@@ -98,7 +98,7 @@ namespace SupercolliderBridge
 		{
 			qDebug() << "configKey [" << key << "] ->" << mergeConfig[key]->toString();
 		};
-		
+
 		emit actConfigData(mergeConfig);
 	}
 
@@ -169,7 +169,7 @@ namespace SupercolliderBridge
 				bool boolean = mergeConfigData[key]->value<bool>();
 				if (boolean) { out << key << " = true\n"; }
 				else { out << key << " = false\n"; }
-				
+
 			}
 		}
 
@@ -257,7 +257,7 @@ namespace SupercolliderBridge
 				if (!isNumber) { isFont = false; break; }
 				if (isFont)
 				{
-					if (args[0].startsWith(" ")) { args[0].remove(0,1); }
+					if (args[0].startsWith(" ")) { args[0].remove(0, 1); }
 
 					QFont font;
 					font.setFamily(args[0]);

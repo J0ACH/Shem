@@ -12,6 +12,7 @@
 #include "Panel.h"
 #include "Edges.h"
 #include "CodeEditor.h"
+#include "Graph.h"
 
 #include "NodePanel.h"
 #include "Node.h"
@@ -32,6 +33,8 @@ namespace QuantIDE
 
 	signals:
 		void bootInterpretAct();
+		void bootServerAct();
+		void actConfigDone();
 		void evaulateAct(QString);
 		void actConfigData(QMap<QString, QVariant*> config);
 		void print(QString, QColor);
@@ -56,6 +59,8 @@ namespace QuantIDE
 		void onServerKillInit();
 		void onServerKillDone();
 
+		void onConfigDataDone();
+
 		void fitGeometry();
 		void onConfigData(QMap<QString, QVariant*> config);
 		
@@ -65,10 +70,7 @@ namespace QuantIDE
 
 	private:
 		void initControl();
-		void initProcessDialog();
-		void closeProcessDialog();
-
-		QWidget *initDialog;
+		
 		ScBridge *bridge;
 		Customize *customize;
 		Canvan *canvan;
@@ -80,6 +82,8 @@ namespace QuantIDE
 
 		Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
 		CodeEditor *globalCode;
+
+		Graph *testGraph;
 	};
 }
 #endif // QUANT

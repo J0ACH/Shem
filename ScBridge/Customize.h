@@ -27,14 +27,15 @@ namespace SupercolliderBridge
 
 	public slots:
 		void onInterpretStart();
-		void onBridgeAnswer(QString, int, QStringList);
+		void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
 
 	signals:
-		void actBridgeQuestion(QString, int, QString, bool);
+		void actBridgeQuestion(QUuid, int, QString, bool);
 		void actConfigData(QMap<QString, QVariant*> config);
 
 	private:
 		ScBridge *mBridge;
+		QUuid objectID;
 		QString objectPattern;
 		QFile *configFile;
 
