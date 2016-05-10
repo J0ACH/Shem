@@ -33,7 +33,7 @@ namespace SupercolliderBridge
 		StateInterpret stateInterpret;
 		StateServer stateServer;
 
-		QStringList questionNEW(QString code, QStringList args);
+		QString questionNEW(QString code);
 
 	private slots:
 		void onReadyRead(void);
@@ -68,7 +68,7 @@ namespace SupercolliderBridge
 		void msgBundleAct(QString const &);
 
 		void answerAct(QUuid id, int selector, QStringList answer);
-		void actAnswerNEW(QUuid id, QStringList answer);
+		void actAnswered();
 
 		void killBridgeDoneAct();
 
@@ -90,9 +90,8 @@ namespace SupercolliderBridge
 		void msgFilter(QString msg);
 
 		void onResponse(const QString & selector, const QString & data);
-
-		QQueue<QString> questionList;
-		QMap<QUuid, QStringList> answers;
+				
+		QStringList uniqeAnswer;
 	};
 
 }

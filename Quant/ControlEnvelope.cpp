@@ -294,14 +294,21 @@ namespace QuantIDE
 		QString code1 = tr("~%1.nodeID").arg(parentName);
 		QString code2 = tr("~%1.source.def.sourceCode").arg(parentName);
 		QString code3 = tr("~%1.isPlaying").arg(parentName);
-		QStringList args;
-		QStringList answer1, answer2, answer3;
-		answer1 = mBridge->questionNEW(code1, args);
-		answer2 = mBridge->questionNEW(code2, args);
-		answer3 = mBridge->questionNEW(code3, args);
-		mBridge->msgStatusAct(answer1.join(" || "));
-		mBridge->msgStatusAct(answer2.join(" || "));
-		mBridge->msgStatusAct(answer3.join(" || "));
+		QString answer1 = tr("QA: %1 = %2").arg(code1, mBridge->questionNEW(code1));
+		QString answer2 = tr("QA: %1 = %2").arg(code2, mBridge->questionNEW(code2));
+		QString answer3 = tr("QA: %1 = %2").arg(code3, mBridge->questionNEW(code3));
+		mBridge->msgStatusAct(answer1);
+		mBridge->msgStatusAct(answer2);
+		mBridge->msgStatusAct(answer3);
+
+		foreach(double oneX, graphCurveX) {
+			this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
+
+			code1 = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), QString::number(oneX));
+			answer1 = tr("QA: %1 = %2").arg(code1, mBridge->questionNEW(code1));
+			mBridge->msgStatusAct(answer1);
+		}
+
 	}
 
 	void ControlEnvelope::resizeEvent(QResizeEvent *event)
@@ -313,7 +320,12 @@ namespace QuantIDE
 
 		foreach(double oneX, graphCurveX) {
 			this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
+
+			//QString code1 = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), QString::number(oneX));
+			//QStringList answer1 = mBridge->questionNEW(code1);
+			//mBridge->msgStatusAct(answer1.join(" || "));
 		}
+		
 		//this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 	}
 
