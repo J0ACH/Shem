@@ -19,13 +19,12 @@ int main(int argc, char** argv){
 
 namespace QuantIDE
 {
-
 	Quant::Quant(QWidget *parent) : QWidget(parent)
 	{
 		canvan = new Canvan(this);
 		bridge = new ScBridge(this);
 		customize = new Customize(this);
-		
+
 		customize->setTargetBridge(bridge);
 
 		canvan->setHeaderHeight(42);
@@ -34,11 +33,11 @@ namespace QuantIDE
 		canvan->setTitle("Quant");
 		canvan->setVersion(tr("v%1").arg(Quant_VERSION));
 
-		
+
 		//this->initProcessDialog();
 		this->initControl();
 		this->fitGeometry();
-		
+
 		// CONTROLS
 		connect(this, SIGNAL(bootInterpretAct()), bridge, SLOT(changeInterpretState()));
 		connect(this, SIGNAL(evaulateAct(QString)), bridge, SLOT(evaluateCode(QString)));
@@ -55,7 +54,7 @@ namespace QuantIDE
 		// MSG actions
 		connect(this, SIGNAL(print(QString, QColor)), canvan, SLOT(print(QString, QColor)));
 		connect(this, SIGNAL(println(QString, QColor)), canvan, SLOT(println(QString, QColor)));
-		
+
 		// INTERPRET actions
 		connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(changeInterpretState()));
 		connect(bridge, SIGNAL(interpretBootInitAct()), this, SLOT(onInterpretBootInit()));
@@ -71,14 +70,14 @@ namespace QuantIDE
 		connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
 
 		emit bootInterpretAct();
-		onMsgStatus("Quant init...\r\n");
+		onMsgStatus("Quant init...");
 	}
-	
+
 	void Quant::initControl()
 	{
 		nodePanel = new NodePanel(canvan->screen, bridge);
 		nodePanel->setTitle("NodePanel");
-		
+
 		buttLang = new Button(canvan->tail);
 		buttLang->setText("Lang");
 		buttLang->setStateKeeping(Button::StateKeeping::HOLD);
@@ -108,10 +107,14 @@ namespace QuantIDE
 
 		globalCode = new CodeEditor(nodePanel);
 		globalCode->setText("s.sendMsg('/g_dumpTree', 0, 1)");
-		/*
-		testGraph = new Graph(canvan->screen);
-		testGraph->setGeometry(100, 270, 500, 250);
-		*/
+
+		labelServerMeter = new QLabel(canvan->tail);
+		labelServerMeter->setText("NaN");
+		labelServerMeter->setToolTip("CPU");
+
+		labelServerSynths = new QLabel(canvan->tail);
+		labelServerSynths->setText("0");
+		labelServerSynths->setToolTip("numSynths");
 	}
 
 	void Quant::fitGeometry()
@@ -126,6 +129,9 @@ namespace QuantIDE
 		buttCustomize->setGeometry(190, 5, 60, 24);
 
 		globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
+
+		labelServerMeter->setGeometry(canvan->tail->width() - 200, 5, 40, 25);
+		labelServerSynths->setGeometry(canvan->tail->width() - 155, 5, 30, 25);
 	}
 
 	// MSG
@@ -190,6 +196,9 @@ namespace QuantIDE
 
 		globalCode->setFontCode(fontTextCode);
 
+		labelServerMeter->setFont(fontTextSmall);
+		labelServerSynths->setFont(fontTextSmall);
+
 		emit actConfigData(config);
 		onMsgStatus("Cutomization done...");
 
@@ -210,6 +219,8 @@ namespace QuantIDE
 
 		connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
 
+		connect(&serverTask, SIGNAL(timeout()), this, SLOT(onServerTask()));
+
 		emit bootServerAct();
 	}
 
@@ -229,11 +240,11 @@ namespace QuantIDE
 	}
 	void Quant::onInterpretKillInit()
 	{
-		onMsgStatus("Interpret kill init...");
+		onMsgStatus("Interpret kill init...\r\n");
 	}
 	void Quant::onInterpretKillDone()
 	{
-		onMsgStatus("Interpret kill done...");
+		onMsgStatus("Interpret kill done...\r\n");
 		buttLang->setState(Jui::Button::State::OFF);
 		buttServer->setStateKeeping(Button::StateKeeping::TOUCH);
 	}
@@ -242,21 +253,25 @@ namespace QuantIDE
 
 	void Quant::onServerBootInit()
 	{
-		onMsgStatus("ScServer boot init...");
+		onMsgStatus("ScServer boot init...\r\n");
 	}
 	void Quant::onServerBootDone()
 	{
-		onMsgStatus("ScServer boot done...");
+		onMsgStatus("ScServer boot done...\r\n");
 		emit evaulateAct("p = ProxySpace.push(s)");
 		buttServer->setState(Jui::Button::State::ON);
+
+		serverTask.start(1000);
 	}
 	void Quant::onServerKillInit()
 	{
-		onMsgStatus("ScServer kill init...");
+		onMsgStatus("ScServer kill init...\r\n");
+		serverTask.stop();
+		labelServerMeter->setText("NaN");
 	}
 	void Quant::onServerKillDone()
 	{
-		onMsgStatus("ScServer kill done...");
+		onMsgStatus("ScServer kill done...\r\n");
 		buttServer->setState(Jui::Button::State::OFF);
 	}
 
@@ -266,6 +281,20 @@ namespace QuantIDE
 		painter.fillRect(QRect(0, 0, width() - 1, height() - 1), colorAppBackground);
 	}
 	void Quant::closeEvent(QCloseEvent *event)	{ canvan->close(); }
+
+	void Quant::onServerTask()
+	{
+		QString txtCPU = bridge->questionNEW("s.peakCPU");
+		if (txtCPU != "NaN")
+		{
+			double serverCPU = txtCPU.toDouble();
+			labelServerMeter->setText(tr("%1 %").arg(QString::number(serverCPU, 'f', 2)));
+		}
+
+		QString numSynths = bridge->questionNEW("s.numSynths");
+		if (numSynths != "NaN")	{ labelServerSynths->setText(numSynths); }
+		
+	}
 
 	Quant::~Quant() { }
 }

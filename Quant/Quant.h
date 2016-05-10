@@ -63,6 +63,7 @@ namespace QuantIDE
 
 		void fitGeometry();
 		void onConfigData(QMap<QString, QVariant*> config);
+		void onServerTask();
 		
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -84,6 +85,9 @@ namespace QuantIDE
 		CodeEditor *globalCode;
 
 		Graph *testGraph;
+
+		QLabel *labelServerMeter, *labelServerSynths;
+		QTimer serverTask;
 	};
 }
 #endif // QUANT

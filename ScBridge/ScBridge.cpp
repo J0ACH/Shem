@@ -81,19 +81,19 @@ namespace SupercolliderBridge
 	void ScBridge::evaluateCode(QString const & commandString, bool silent, bool printAnswer)
 	{
 		if (state() != QProcess::Running) {
-			emit msgStatusAct(tr("Interpreter is not running!"));
+			emit msgStatusAct(tr("Interpreter is not running!\r\n"));
 			return;
 		}
 
 		QByteArray bytesToWrite = commandString.toUtf8();
 		size_t writtenBytes = write(bytesToWrite);
 		if (writtenBytes != bytesToWrite.size()) {
-			emit msgStatusAct(tr("Error when passing data to interpreter!"));
+			emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
 			return;
 		}
 
 		char commandChar = silent ? '\x1b' : '\x0c';
-		if (printAnswer) { emit msgEvaluateAct(tr("EVALUATE: %1").arg(commandString)); }
+		if (printAnswer) { emit msgEvaluateAct(tr("EVALUATE: %1\r\n").arg(commandString)); }
 		write(&commandChar, 1);
 	}
 	void ScBridge::question(QUuid id, int selector, QString commandString, bool printAnswer)
@@ -108,22 +108,24 @@ namespace SupercolliderBridge
 		evaluateCode(command, false);
 	}
 
-	QString ScBridge::questionNEW(QString code)
+	QString ScBridge::questionNEW(QString code, bool print)
 	{
 		answer = QStringList();
 
 		QTimer time;
 		time.setSingleShot(true);
-		time.start(5);
-		answer.append("answerToLate");
+		time.start(10);
+		answer.append("NaN");
 		{
 			QEventLoop loop;
 			loop.connect(&time, SIGNAL(timeout()), SLOT(quit()));
 			loop.connect(this, SIGNAL(actAnswered()), SLOT(quit()));
 			QString command = QStringLiteral("[\"ANSWER_NEW\",%1]").arg(code);
-			this->evaluateCode(command, false, true);
+			this->evaluateCode(command, false, false);
 			loop.exec();
 		}
+
+		if (print) { emit msgNormalAct(tr("QA: %1 = %2\r\n").arg(code, answer.join(" || "))); }
 		return answer.join(" || ");
 	}
 
@@ -201,7 +203,7 @@ namespace SupercolliderBridge
 	void ScBridge::msgFilter(QString msg)
 	{
 		//	qDebug() << "msg: " << msg;
-
+		//bool typeFound = false;
 		if (msg.contains("ERROR"))
 		{
 			emit msgErrorAct(msg);
@@ -235,7 +237,8 @@ namespace SupercolliderBridge
 				{
 					if (oneMSG.contains("ANSWER_MARKER"))
 					{
-						oneMSG = oneMSG.replace("\r\n", "");
+						oneMSG = oneMSG.replace("\r", "");
+						oneMSG = oneMSG.replace("\n", "");
 						//qDebug() << "oneMSG: " << oneMSG;
 
 						QStringList msgParts = oneMSG.split(",");
@@ -258,10 +261,7 @@ namespace SupercolliderBridge
 							else if (i == 2) { selector = onePart.toInt(); }
 							else if (i != msgParts.size() - 1) { oneAnswer.append(onePart); }
 							else if (i == msgParts.size() - 1) { printAnswer = onePart.toInt(); }
-
 						}
-
-
 
 						if (printAnswer) {
 							qDebug() << "msgAnswer: "
@@ -275,11 +275,10 @@ namespace SupercolliderBridge
 							{
 								txt += tr("%1; ").arg(oneAnsw);
 							}
-							emit msgResultAct(txt);
+							//emit msgResultAct(txt);
 						}
 						emit answerAct(id, selector, oneAnswer);
 					}
-
 				}
 			}
 			else if (msg.contains("ANSWER_NEW"))
@@ -291,7 +290,8 @@ namespace SupercolliderBridge
 				{
 					if (oneMSG.contains("ANSWER_NEW"))
 					{
-						oneMSG = oneMSG.replace("\r\n", "");
+						oneMSG = oneMSG.replace("\r", "");
+						oneMSG = oneMSG.replace("\n", "");
 						//qDebug() << "oneMSG: " << oneMSG;
 
 						QStringList msgParts = oneMSG.split(",");
@@ -306,14 +306,17 @@ namespace SupercolliderBridge
 							if (i == 0) { /* skiping marker */ }
 							else { answer.append(onePart); }
 						}
-						emit actAnswered();
 					}
 				}
+				emit actAnswered();
 			}
-			else { emit msgResultAct(msg); }
 		}
 		else if (msg.contains("bundle")) { emit msgBundleAct(msg); }
-		else { emit msgNormalAct(msg); }
+		else {
+			//qDebug() << msg;
+			if (msg.startsWith("\r\n"))	{ msg = msg.replace("\r\n", ""); }
+			if (!msg.isEmpty())	{ emit msgNormalAct(msg); }
+		}
 	}
 
 	void ScBridge::onNewIpcConnection()
