@@ -109,18 +109,22 @@ namespace SupercolliderBridge
 	}
 
 	QString ScBridge::questionNEW(QString code)
-	{		
+	{
+		answer = QStringList();
+
+		QTimer time;
+		time.setSingleShot(true);
+		time.start(5);
+		answer.append("answerToLate");
 		{
 			QEventLoop loop;
+			loop.connect(&time, SIGNAL(timeout()), SLOT(quit()));
 			loop.connect(this, SIGNAL(actAnswered()), SLOT(quit()));
-
 			QString command = QStringLiteral("[\"ANSWER_NEW\",%1]").arg(code);
-			this->evaluateCode(command, false, false);
-
+			this->evaluateCode(command, false, true);
 			loop.exec();
-		}			
-		//return tr("QA: %1 = %2").arg(code, uniqeAnswer.join(" || "));
-		return uniqeAnswer.join(" || ");
+		}
+		return answer.join(" || ");
 	}
 
 	void ScBridge::startInterpretr()
@@ -238,7 +242,7 @@ namespace SupercolliderBridge
 						//qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
 
 						QUuid id;
-						QStringList answer;
+						QStringList oneAnswer;
 						int selector, printAnswer;
 
 						for (int i = 0; i < msgParts.size(); i = i + 1)
@@ -252,7 +256,7 @@ namespace SupercolliderBridge
 							if (i == 0) { /* skiping marker */ }
 							else if (i == 1) { id = QUuid(onePart); }
 							else if (i == 2) { selector = onePart.toInt(); }
-							else if (i != msgParts.size() - 1) { answer.append(onePart); }
+							else if (i != msgParts.size() - 1) { oneAnswer.append(onePart); }
 							else if (i == msgParts.size() - 1) { printAnswer = onePart.toInt(); }
 
 						}
@@ -263,24 +267,24 @@ namespace SupercolliderBridge
 							qDebug() << "msgAnswer: "
 								//<< " pattern " << id
 								<< " pattern " << QString::number(selector)
-								<< " answer " << answer;
+								<< " answer " << oneAnswer;
 							//<< " print " << printAnswer;
 
 							QString txt;
-							foreach(QString oneAnsw, answer)
+							foreach(QString oneAnsw, oneAnswer)
 							{
 								txt += tr("%1; ").arg(oneAnsw);
 							}
 							emit msgResultAct(txt);
 						}
-						emit answerAct(id, selector, answer);
+						emit answerAct(id, selector, oneAnswer);
 					}
 
 				}
 			}
 			else if (msg.contains("ANSWER_NEW"))
 			{
-				uniqeAnswer = QStringList();
+				answer = QStringList();
 				//qDebug() << "msg [ANSWER_NEW]: " << msg;
 				QStringList incomingMSG = msg.split("->");
 				foreach(QString oneMSG, incomingMSG)
@@ -291,7 +295,7 @@ namespace SupercolliderBridge
 						//qDebug() << "oneMSG: " << oneMSG;
 
 						QStringList msgParts = oneMSG.split(",");
-				
+
 						for (int i = 0; i < msgParts.size(); i = i + 1)
 						{
 							QString onePart = msgParts.at(i);
@@ -300,8 +304,7 @@ namespace SupercolliderBridge
 							onePart = onePart.replace("]", "");
 
 							if (i == 0) { /* skiping marker */ }
-							else { uniqeAnswer.append(onePart); }
-
+							else { answer.append(onePart); }
 						}
 						emit actAnswered();
 					}

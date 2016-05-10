@@ -290,7 +290,7 @@ namespace QuantIDE
 
 	void ControlEnvelope::mousePressEvent(QMouseEvent *mouseEvent)
 	{
-		qDebug() << "ControlEnvelope::mousePressEvent";
+		//qDebug() << "ControlEnvelope::mousePressEvent";
 		QString code1 = tr("~%1.nodeID").arg(parentName);
 		QString code2 = tr("~%1.source.def.sourceCode").arg(parentName);
 		QString code3 = tr("~%1.isPlaying").arg(parentName);
@@ -301,14 +301,15 @@ namespace QuantIDE
 		mBridge->msgStatusAct(answer2);
 		mBridge->msgStatusAct(answer3);
 
-		foreach(double oneX, graphCurveX) {
-			this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
+		for (int i = 0; i <= 10; i++)
+		{
+			double oneX = 1 / 10.0*i;
+			//this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
 
 			code1 = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), QString::number(oneX));
 			answer1 = tr("QA: %1 = %2").arg(code1, mBridge->questionNEW(code1));
 			mBridge->msgStatusAct(answer1);
 		}
-
 	}
 
 	void ControlEnvelope::resizeEvent(QResizeEvent *event)
@@ -320,12 +321,18 @@ namespace QuantIDE
 
 		foreach(double oneX, graphCurveX) {
 			this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
-
-			//QString code1 = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), QString::number(oneX));
-			//QStringList answer1 = mBridge->questionNEW(code1);
-			//mBridge->msgStatusAct(answer1.join(" || "));
 		}
-		
+
+		for (int i = 0; i <= 10; i++)
+		{
+			double oneX = 1 / 10.0*i;
+			//this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
+
+			QString code1 = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), QString::number(oneX));
+			QString answer1 = tr("resize QA: %1 = %2").arg(code1, mBridge->questionNEW(code1));
+			mBridge->msgStatusAct(answer1);
+		}
+
 		//this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 	}
 

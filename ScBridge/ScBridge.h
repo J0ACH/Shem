@@ -91,7 +91,7 @@ namespace SupercolliderBridge
 
 		void onResponse(const QString & selector, const QString & data);
 				
-		QStringList uniqeAnswer;
+		QStringList answer;
 	};
 
 }
