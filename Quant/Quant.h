@@ -12,7 +12,6 @@
 #include "Panel.h"
 #include "Edges.h"
 #include "CodeEditor.h"
-#include "Graph.h"
 
 #include "NodePanel.h"
 #include "Node.h"
@@ -35,7 +34,6 @@ namespace QuantIDE
 		void bootInterpretAct();
 		void bootServerAct();
 		void actConfigDone();
-		void evaulateAct(QString);
 		void actConfigData(QMap<QString, QVariant*> config);
 		void print(QString, QColor);
 		void println(QString, QColor);
@@ -64,6 +62,8 @@ namespace QuantIDE
 		void fitGeometry();
 		void onConfigData(QMap<QString, QVariant*> config);
 		void onServerTask();
+
+		void onRecivedGlobalCode(QString);
 		
 	protected:
 		void closeEvent(QCloseEvent *event);
@@ -83,8 +83,6 @@ namespace QuantIDE
 
 		Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
 		CodeEditor *globalCode;
-
-		Graph *testGraph;
 
 		QLabel *labelServerMeter, *labelServerSynths;
 		QTimer serverTask;

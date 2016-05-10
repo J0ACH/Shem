@@ -40,11 +40,11 @@ namespace QuantIDE
 
 		// CONTROLS
 		connect(this, SIGNAL(bootInterpretAct()), bridge, SLOT(changeInterpretState()));
-		connect(this, SIGNAL(evaulateAct(QString)), bridge, SLOT(evaluateCode(QString)));
+		//connect(this, SIGNAL(evaulateAct(QString)), bridge, SLOT(evaluateCode(QString)));
 		connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
 		connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
 		connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(close()));
-		connect(globalCode, SIGNAL(sendText(QString)), bridge, SLOT(evaluateCode(QString)));
+		connect(globalCode, SIGNAL(sendText(QString)), this, SLOT(onRecivedGlobalCode(QString)));
 
 		// CONFIG
 		connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
@@ -258,7 +258,17 @@ namespace QuantIDE
 	void Quant::onServerBootDone()
 	{
 		onMsgStatus("ScServer boot done...\r\n");
-		emit evaulateAct("p = ProxySpace.push(s)");
+		QString code = "p = ProxySpace.push(s);";
+		code += "s.sync;";
+		code += "p.makeTempoClock;";
+		code += "s.sync;";
+		code += "p.clock.tempo_(60/60);";
+		code += "s.sync;";
+		//bridge->evaluateNEW("p = ProxySpace.push(s);", true);
+		//bridge->evaluateNEW("p.makeTempoClock;", true);
+		//bridge->evaluateNEW("p.clock.tempo_(60/60);", true);
+		bridge->evaluateNEW(tr("s.makeBundle(0.3, {%1});").arg(code), true);
+
 		buttServer->setState(Jui::Button::State::ON);
 
 		serverTask.start(1000);
@@ -293,8 +303,12 @@ namespace QuantIDE
 
 		QString numSynths = bridge->questionNEW("s.numSynths");
 		if (numSynths != "NaN")	{ labelServerSynths->setText(numSynths); }
-		
+
 	}
+
+	// GLOBAL CODE
+
+	void Quant::onRecivedGlobalCode(QString code) { bridge->evaluateNEW(code, true); }
 
 	Quant::~Quant() { }
 }

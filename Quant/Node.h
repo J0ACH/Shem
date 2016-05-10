@@ -28,16 +28,19 @@ namespace QuantIDE
 
 
 	public:
-		Node(QWidget *parent, ScBridge *bridge, int nodeNum);
+		Node(QWidget *parent, ScBridge *bridge, QString name, int nodeNum);
 		~Node();
 
 		StateNodePlay stateNodePlay;
-		enum QuestionType { nodeID, namedControls, namedValues };
+		enum QuestionType { /*nodeID,*/ namedControls, namedValues };
 
 		void setName(QString);
 		void setSourceCode(QString);
 
-		QString name();
+		QString nodeName;
+		QString getNodeID();
+
+		//QString name();
 		QRect bounds();
 
 	public slots:
@@ -76,6 +79,7 @@ namespace QuantIDE
 		void removeControl(QString name);
 
 		QUuid objectID;
+		
 		int nodeNumber;
 		QMap<QString, QVariant*> configData;
 		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;

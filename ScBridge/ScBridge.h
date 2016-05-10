@@ -33,6 +33,7 @@ namespace SupercolliderBridge
 		StateInterpret stateInterpret;
 		StateServer stateServer;
 
+		void evaluateNEW(QString code, bool print = false);
 		QString questionNEW(QString code, bool print = false);
 
 	private slots:

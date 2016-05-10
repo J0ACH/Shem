@@ -58,12 +58,8 @@ namespace QuantIDE
 
 	void NodePanel::addNode()
 	{
-		//qDebug("NodePanel::addNode()");
-		//QString sourceCode = "var sig = SinOsc.ar(140, mul:\\amp.kr());\n";
-		//sourceCode += "Pan2.ar(sig, 0);";
-
-		Node *newNode = new Node(scrollWidget, mBridge, dictNode.values().size() + 1);
-		newNode->setName(tr("test%1").arg(QString::number(dictNode.values().size())));
+		QString newName = tr("test%1").arg(QString::number(dictNode.values().size() + 1)); // chyba, potreba dodelat
+		Node *newNode = new Node(scrollWidget, mBridge, newName, dictNode.values().size() + 1);
 		newNode->setSourceCode("SinOsc.ar(140!2, mul:\\amp.kr())");
 		//newNode->setSourceCode(sourceCode);
 		//newNode->setSourceCode(QStringLiteral("SinOsc.ar(140!2, mul:\\amp.kr)"));
@@ -76,7 +72,7 @@ namespace QuantIDE
 		connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
 			newNode, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
-		dictNode.insert(newNode->name(), newNode);
+		dictNode.insert(newNode->nodeName, newNode);
 
 		this->fitNodesPosition();
 		emit actConfigData(configData);

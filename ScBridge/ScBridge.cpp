@@ -69,15 +69,18 @@ namespace SupercolliderBridge
 			emit serverBootInitAct();
 			evaluateCode("Server.local = Server.default = s;");
 			// evaluateCode("s.dumpOSC;");
-			evaluateCode("s.boot;");
+			evaluateCode("s.boot;", true);
 			break;
 		case StateServer::RUNNING:
 			emit serverKillInitAct();
-			evaluateCode("s.quit;");
+			evaluateCode("s.quit;", true);
 			break;
 		}
 	}
 
+
+	//////////////////////////////////////////////
+	//////// bude odsraneno
 	void ScBridge::evaluateCode(QString const & commandString, bool silent, bool printAnswer)
 	{
 		if (state() != QProcess::Running) {
@@ -106,6 +109,29 @@ namespace SupercolliderBridge
 			);
 		if (printAnswer) { qDebug() << "ScBridge::question: " << command; };
 		evaluateCode(command, false);
+	}
+	//////// bude odsraneno
+	/////////////////////////////////////////////////////////
+
+	void ScBridge::evaluateNEW(QString code, bool print)
+	{
+		bool silent = false;
+		if (state() != QProcess::Running) {
+			emit msgStatusAct(tr("Interpreter is not running!\r\n"));
+			return;
+		}
+
+		QByteArray bytesToWrite = code.toUtf8();
+		size_t writtenBytes = write(bytesToWrite);
+
+		if (writtenBytes != bytesToWrite.size()) {
+			emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
+			return;
+		}
+
+		char commandChar = silent ? '\x1b' : '\x0c';
+		if (print) { emit msgEvaluateAct(tr("EVALUATE: %1\r\n").arg(code)); }
+		write(&commandChar, 1);
 	}
 
 	QString ScBridge::questionNEW(QString code, bool print)
@@ -202,8 +228,8 @@ namespace SupercolliderBridge
 
 	void ScBridge::msgFilter(QString msg)
 	{
-		//	qDebug() << "msg: " << msg;
-		//bool typeFound = false;
+			//qDebug() << "msg: " << msg;
+		
 		if (msg.contains("ERROR"))
 		{
 			emit msgErrorAct(msg);
@@ -309,6 +335,13 @@ namespace SupercolliderBridge
 					}
 				}
 				emit actAnswered();
+			}
+			else {
+				//qDebug() << msg;
+				//if (msg.startsWith("\r\n"))	{ msg = msg.replace("\r\n", ""); }
+				//if (!msg.isEmpty())	{ emit msgResultAct(msg); }
+				//emit msgResultAct(tr("%1\r\n").arg(msg));
+				emit msgResultAct(msg);
 			}
 		}
 		else if (msg.contains("bundle")) { emit msgBundleAct(msg); }
