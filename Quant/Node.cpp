@@ -98,8 +98,6 @@ namespace QuantIDE
 		mBridge->evaluateNEW(tr("~%1.quant_(1);").arg(nodeName), true);
 
 		labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
-				
-		//onBridgeQuestion(QuestionType::nodeID);
 	}
 	void Node::sendFreeNode()
 	{
@@ -118,7 +116,7 @@ namespace QuantIDE
 		/*
 		foreach(QString oneAnsw, answer)
 		{
-			txt += tr("%1; ").arg(oneAnsw);
+		txt += tr("%1; ").arg(oneAnsw);
 		}
 		*/
 		qDebug() << "Node::onBridgeAnswer::target: " << controlKeys;

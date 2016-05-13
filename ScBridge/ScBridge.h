@@ -82,6 +82,7 @@ namespace SupercolliderBridge
 		QString mIpcServerName;
 		QByteArray mIpcData;
 
+		int lateFlagBreakTime;
 		bool mTerminationRequested;
 		QDateTime mTerminationRequestTime;
 		bool mCompiled;

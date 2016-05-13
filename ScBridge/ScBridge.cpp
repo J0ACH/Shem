@@ -16,6 +16,8 @@ namespace SupercolliderBridge
 		stateInterpret = StateInterpret::OFF;
 		stateServer = StateServer::OFF;
 
+		lateFlagBreakTime = 200;
+
 		connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 		connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
 	}
@@ -84,7 +86,7 @@ namespace SupercolliderBridge
 	void ScBridge::evaluateCode(QString const & commandString, bool silent, bool printAnswer)
 	{
 		//emit msgWarningAct(tr("Called mathod ScBridge::evaluateCode() for code %1. Method deprecated, use ScBridge::evaluateNEW() instead").arg(commandString));
-		
+
 		if (state() != QProcess::Running) {
 			emit msgStatusAct(tr("Interpreter is not running!\r\n"));
 			return;
@@ -120,11 +122,15 @@ namespace SupercolliderBridge
 		bool synced = false;
 		bool silent = false;
 
+		qint64 evalTime = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
+		qint64 syncTime;
+		int durationTime;
+
 		QTimer time;
 		time.setSingleShot(true);
-		time.start(200);
+		time.start(lateFlagBreakTime);
 		//answer.append("NaN");
-		
+
 		if (state() != QProcess::Running) {
 			emit msgStatusAct(tr("Interpreter is not running!\r\n"));
 			return false;
@@ -139,7 +145,7 @@ namespace SupercolliderBridge
 
 			QByteArray bytesToWrite = command.toUtf8();
 			size_t writtenBytes = write(bytesToWrite);
-			
+
 			if (writtenBytes != bytesToWrite.size()) {
 				emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
 				return false;
@@ -150,9 +156,17 @@ namespace SupercolliderBridge
 			write(&commandChar, 1);
 
 			loop.exec();
-		}	
+		}
 
-		if (print) { emit msgNormalAct(tr("synced: %1\r\n").arg(code)); }
+		syncTime = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
+		durationTime = syncTime - evalTime;
+
+		if (print) {
+			emit msgNormalAct(tr("synced [%1 ms]: %2\r\n").arg(
+				QString::number(durationTime),
+				code)
+				);
+		}
 
 		return true;
 	}
@@ -161,9 +175,13 @@ namespace SupercolliderBridge
 	{
 		answer = QStringList();
 
+		qint64 evalTime = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
+		qint64 answerTime;
+		int durationTime;
+
 		QTimer time;
 		time.setSingleShot(true);
-		time.start(50);
+		time.start(lateFlagBreakTime);
 		answer.append("NaN");
 
 		{
@@ -171,7 +189,7 @@ namespace SupercolliderBridge
 			loop.connect(&time, SIGNAL(timeout()), SLOT(quit()));
 			loop.connect(this, SIGNAL(actAnswered()), SLOT(quit()));
 			QString command = QStringLiteral("[\"answerFlag\",%1]").arg(code);
-			
+
 			//this->evaluateCode(command, false, false);
 			if (state() != QProcess::Running) {
 				emit msgStatusAct(tr("Interpreter is not running!\r\n"));
@@ -179,7 +197,7 @@ namespace SupercolliderBridge
 			}
 			QByteArray bytesToWrite = command.toUtf8();
 			size_t writtenBytes = write(bytesToWrite);
-			
+
 			if (writtenBytes != bytesToWrite.size()) {
 				emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
 				return "";
@@ -191,7 +209,16 @@ namespace SupercolliderBridge
 			loop.exec();
 		}
 
-		if (print) { emit msgNormalAct(tr("QA: %1 = %2\r\n").arg(code, answer.join(" || "))); }
+		answerTime = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
+		durationTime = answerTime - evalTime;
+
+		if (print) {
+			emit msgNormalAct(tr("QA [%1 ms]: %2 = %3\r\n").arg(
+				QString::number(durationTime),
+				code,
+				answer.join(" || "))
+				);
+		}
 
 		return answer.join(" || ");
 	}
@@ -251,7 +278,7 @@ namespace SupercolliderBridge
 			}
 		}
 		mTerminationRequested = false;
-	}
+}
 
 	void ScBridge::onReadyRead()
 	{
@@ -269,8 +296,8 @@ namespace SupercolliderBridge
 
 	void ScBridge::msgFilter(QString msg)
 	{
-			//qDebug() << "msg: " << msg;
-		
+		//qDebug() << "msg: " << msg;
+
 		if (msg.contains("ERROR"))
 		{
 			emit msgErrorAct(msg);
@@ -352,7 +379,7 @@ namespace SupercolliderBridge
 			}
 			//////// bude odsraneno
 			//////////////////////////////////////////////
-			
+
 			else if (msg.contains("syncFlag"))
 			{
 				answer = QStringList();
