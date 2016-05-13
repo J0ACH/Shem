@@ -34,6 +34,8 @@ namespace QuantIDE
 		};
 
 		QRect bounds();
+		void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
+		QString getEnv();
 
 	public slots:
 		void sendFreeBusIndex();
@@ -62,9 +64,9 @@ namespace QuantIDE
 		QUuid objectID;
 		QString name, parentName;
 		
-		//QList<double> levels;
-		//QList<double> times;
-		//QList<QString> curves;
+		QList<double> levels;
+		QList<double> times;
+		QList<QString> curves;
 		
 		QVector<QPointF> graphPolyline;
 		QList<double> graphCurveX;

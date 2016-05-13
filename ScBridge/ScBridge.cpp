@@ -67,13 +67,13 @@ namespace SupercolliderBridge
 		{
 		case StateServer::OFF:
 			emit serverBootInitAct();
-			evaluateCode("Server.local = Server.default = s;");
+			evaluateNEW("Server.local = Server.default = s;");
 			// evaluateCode("s.dumpOSC;");
-			evaluateCode("s.boot;", true);
+			evaluateNEW("s.boot;");
 			break;
 		case StateServer::RUNNING:
 			emit serverKillInitAct();
-			evaluateCode("s.quit;", true);
+			evaluateNEW("s.quit;");
 			break;
 		}
 	}
@@ -83,6 +83,8 @@ namespace SupercolliderBridge
 	//////// bude odsraneno
 	void ScBridge::evaluateCode(QString const & commandString, bool silent, bool printAnswer)
 	{
+		//emit msgWarningAct(tr("Called mathod ScBridge::evaluateCode() for code %1. Method deprecated, use ScBridge::evaluateNEW() instead").arg(commandString));
+		
 		if (state() != QProcess::Running) {
 			emit msgStatusAct(tr("Interpreter is not running!\r\n"));
 			return;
@@ -113,25 +115,46 @@ namespace SupercolliderBridge
 	//////// bude odsraneno
 	/////////////////////////////////////////////////////////
 
-	void ScBridge::evaluateNEW(QString code, bool print)
+	bool ScBridge::evaluateNEW(QString code, bool print)
 	{
+		bool synced = false;
 		bool silent = false;
+
+		QTimer time;
+		time.setSingleShot(true);
+		time.start(200);
+		//answer.append("NaN");
+		
 		if (state() != QProcess::Running) {
 			emit msgStatusAct(tr("Interpreter is not running!\r\n"));
-			return;
+			return false;
 		}
 
-		QByteArray bytesToWrite = code.toUtf8();
-		size_t writtenBytes = write(bytesToWrite);
+		QString command;
+		{
+			QEventLoop loop;
+			loop.connect(&time, SIGNAL(timeout()), SLOT(quit()));
+			loop.connect(this, SIGNAL(actSynced()), SLOT(quit()));
+			command = QStringLiteral("[\"syncFlag\",%1]").arg(code);
 
-		if (writtenBytes != bytesToWrite.size()) {
-			emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
-			return;
-		}
+			QByteArray bytesToWrite = command.toUtf8();
+			size_t writtenBytes = write(bytesToWrite);
+			
+			if (writtenBytes != bytesToWrite.size()) {
+				emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
+				return false;
+			}
 
-		char commandChar = silent ? '\x1b' : '\x0c';
-		if (print) { emit msgEvaluateAct(tr("EVALUATE: %1\r\n").arg(code)); }
-		write(&commandChar, 1);
+			char commandChar = silent ? '\x1b' : '\x0c';
+			if (print) { emit msgEvaluateAct(tr("evalNew: %1\r\n").arg(code)); }
+			write(&commandChar, 1);
+
+			loop.exec();
+		}	
+
+		if (print) { emit msgNormalAct(tr("synced: %1\r\n").arg(code)); }
+
+		return true;
 	}
 
 	QString ScBridge::questionNEW(QString code, bool print)
@@ -140,18 +163,36 @@ namespace SupercolliderBridge
 
 		QTimer time;
 		time.setSingleShot(true);
-		time.start(10);
+		time.start(50);
 		answer.append("NaN");
+
 		{
 			QEventLoop loop;
 			loop.connect(&time, SIGNAL(timeout()), SLOT(quit()));
 			loop.connect(this, SIGNAL(actAnswered()), SLOT(quit()));
-			QString command = QStringLiteral("[\"ANSWER_NEW\",%1]").arg(code);
-			this->evaluateCode(command, false, false);
+			QString command = QStringLiteral("[\"answerFlag\",%1]").arg(code);
+			
+			//this->evaluateCode(command, false, false);
+			if (state() != QProcess::Running) {
+				emit msgStatusAct(tr("Interpreter is not running!\r\n"));
+				return "";
+			}
+			QByteArray bytesToWrite = command.toUtf8();
+			size_t writtenBytes = write(bytesToWrite);
+			
+			if (writtenBytes != bytesToWrite.size()) {
+				emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
+				return "";
+			}
+
+			char commandChar = '\x0c';
+			write(&commandChar, 1);
+
 			loop.exec();
 		}
 
 		if (print) { emit msgNormalAct(tr("QA: %1 = %2\r\n").arg(code, answer.join(" || "))); }
+
 		return answer.join(" || ");
 	}
 
@@ -254,6 +295,8 @@ namespace SupercolliderBridge
 		else if (msg.contains("***")) { emit msgStatusAct(msg); }
 		else if (msg.contains("->"))
 		{
+			//////////////////////////////////////////////
+			//////// bude odsraneno
 			if (msg.contains("ANSWER_MARKER"))
 			{
 				//qDebug() << "msg [ANSWER_MARKER]: " << msg;
@@ -307,14 +350,46 @@ namespace SupercolliderBridge
 					}
 				}
 			}
-			else if (msg.contains("ANSWER_NEW"))
+			//////// bude odsraneno
+			//////////////////////////////////////////////
+			
+			else if (msg.contains("syncFlag"))
 			{
 				answer = QStringList();
-				//qDebug() << "msg [ANSWER_NEW]: " << msg;
+				//qDebug() << "msg [syncFlag]: " << msg;
 				QStringList incomingMSG = msg.split("->");
 				foreach(QString oneMSG, incomingMSG)
 				{
-					if (oneMSG.contains("ANSWER_NEW"))
+					if (oneMSG.contains("syncFlag"))
+					{
+						oneMSG = oneMSG.replace("\r", "");
+						oneMSG = oneMSG.replace("\n", "");
+						//qDebug() << "oneMSG: " << oneMSG;
+
+						QStringList msgParts = oneMSG.split(",");
+
+						for (int i = 0; i < msgParts.size(); i = i + 1)
+						{
+							QString onePart = msgParts.at(i);
+							onePart = onePart.replace(" ", "");
+							onePart = onePart.replace("[", "");
+							onePart = onePart.replace("]", "");
+
+							if (i == 0) { /* skiping marker */ }
+							else { answer.append(onePart); }
+						}
+					}
+				}
+				emit actSynced();
+			}
+			else if (msg.contains("answerFlag"))
+			{
+				answer = QStringList();
+				//qDebug() << "msg [answerFlag]: " << msg;
+				QStringList incomingMSG = msg.split("->");
+				foreach(QString oneMSG, incomingMSG)
+				{
+					if (oneMSG.contains("answerFlag"))
 					{
 						oneMSG = oneMSG.replace("\r", "");
 						oneMSG = oneMSG.replace("\n", "");

@@ -92,36 +92,18 @@ namespace QuantIDE
 
 	void Node::sendInitNode()
 	{
-		QString code = tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName);
-		//QString code = tr("~%1.play(vol: 0.5, fadeTime : 4).quant_(1);").arg(name());
-		//code += "s.sync;";
-		code += tr("~%1.play(out:0);").arg(nodeName);
-		code += tr("~%1.fadeTime = 0.5;").arg(nodeName);
-		code += tr("~%1.quant_(1);").arg(nodeName);
-		//code += tr("~%1.monitor.fadeTime = 6;").arg(nodeName);
-		//code += "s.sync;";
-
-		mBridge->evaluateNEW(tr("s.makeBundle(0.3, {%1});").arg(code), true);
-
-		//emit actCodeEvaluated(tr("~%1.play(out:0);").arg(name()), false, true);
-		//mBridge->evaluateNEW(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-		//mBridge->evaluateNEW("s.sync;", true);
-		//mBridge->evaluateNEW(tr("~%1.play;").arg(nodeName), true);
-		//mBridge->evaluateNEW(tr("~%1.fadeTime = 4;").arg(nodeName), true);
-		//mBridge->evaluateNEW(tr("~%1.quant_(1);").arg(nodeName), true);
-		//emit actCodeEvaluated(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName));
-		//emit actCodeEvaluated(tr("~%1.fadeTime = 4;").arg(nodeName));
-		//emit actCodeEvaluated(tr("~%1.quant_(1);").arg(nodeName));
+		mBridge->evaluateNEW(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
+		mBridge->evaluateNEW(tr("~%1.play(out:0);").arg(nodeName), true);
+		mBridge->evaluateNEW(tr("~%1.fadeTime = 0.5;").arg(nodeName), true);
+		mBridge->evaluateNEW(tr("~%1.quant_(1);").arg(nodeName), true);
 
 		labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
-		//labelNodeID->setText(tr("nodeID: %1").arg(QString::number(this->getNodeID())));
-		
+				
 		//onBridgeQuestion(QuestionType::nodeID);
 	}
 	void Node::sendFreeNode()
 	{
-		QString code = tr("~%1.free").arg(nodeName);
-		emit actCodeEvaluated(code, false, true);
+		mBridge->evaluateNEW(tr("~%1.free").arg(nodeName), true);
 	}
 
 	void Node::setSourceCode(QString txt)
@@ -131,10 +113,25 @@ namespace QuantIDE
 	}
 	void Node::sendSourceCode(QString txt)
 	{
+		mBridge->evaluateNEW(tr("(~%1[0] = { %2 })").arg(nodeName, txt), true);
+		QString controlKeys = mBridge->questionNEW(tr("~%1.controlKeys").arg(nodeName), true);
+		/*
+		foreach(QString oneAnsw, answer)
+		{
+			txt += tr("%1; ").arg(oneAnsw);
+		}
+		*/
+		qDebug() << "Node::onBridgeAnswer::target: " << controlKeys;
+		labelNamedControls->setText(tr("controls: %1").arg(controlKeys));
+
+		//this->initControlsEditor(answer);
+
+		/*
 		//QString code = tr("~%1[0] = {Out.ar(0, %2)}").arg(name(), txt);
 		QString code = tr("(~%1[0] = { %2 })").arg(nodeName, txt);
 		emit actCodeEvaluated(code, false, true);
 
+		*/
 		onBridgeQuestion(QuestionType::namedControls);
 	}
 

@@ -258,16 +258,9 @@ namespace QuantIDE
 	void Quant::onServerBootDone()
 	{
 		onMsgStatus("ScServer boot done...\r\n");
-		QString code = "p = ProxySpace.push(s);";
-		code += "s.sync;";
-		code += "p.makeTempoClock;";
-		code += "s.sync;";
-		code += "p.clock.tempo_(60/60);";
-		code += "s.sync;";
-		//bridge->evaluateNEW("p = ProxySpace.push(s);", true);
-		//bridge->evaluateNEW("p.makeTempoClock;", true);
-		//bridge->evaluateNEW("p.clock.tempo_(60/60);", true);
-		bridge->evaluateNEW(tr("s.makeBundle(0.3, {%1});").arg(code), true);
+		bridge->evaluateNEW("p = ProxySpace.push(s);", true);
+		bridge->evaluateNEW("p.makeTempoClock;", true);
+		bridge->evaluateNEW("p.clock.tempo_(60/60);", true);
 
 		buttServer->setState(Jui::Button::State::ON);
 

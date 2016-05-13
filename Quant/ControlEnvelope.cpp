@@ -64,6 +64,31 @@ namespace QuantIDE
 		}
 	}
 
+	void ControlEnvelope::setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves)
+	{
+		levels = listLevels;
+		times = listTimes;
+		curves = listCurves;
+	}
+
+	QString ControlEnvelope::getEnv()
+	{
+		QStringList txtLevels;
+		QStringList txtTime;
+		QStringList txtCurves;
+
+		foreach(double oneLevel, levels) { txtLevels.append(QString::number(oneLevel, 'f', 2)); }
+		foreach(double oneTime, times) { txtTime.append(QString::number(oneTime, 'f', 2)); }
+		foreach(QString oneCurve, curves) { txtCurves.append(oneCurve); }
+
+		QString codeEnv = tr("Env([%1], [%2], [%3])").arg(
+			txtLevels.join(", "),
+			txtTime.join(", "),
+			txtCurves.join(", ")
+			);
+
+		return codeEnv;
+	}
 
 	void ControlEnvelope::sendFreeBusIndex()
 	{
@@ -105,13 +130,17 @@ namespace QuantIDE
 
 		this->onBridgeQuestion(QuestionType::envArray);
 
+
 		foreach(double oneX, graphCurveX) {
 			this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
+
 		}
 		this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 
 		this->sendTask();
 	}
+
+	
 
 	void ControlEnvelope::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
 	{
