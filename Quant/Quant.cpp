@@ -8,13 +8,13 @@ using namespace SupercolliderBridge;
 
 int main(int argc, char** argv){
 
-	QApplication app(argc, argv);
+  QApplication app(argc, argv);
 
-	QuantIDE::Quant *win = new QuantIDE::Quant();
-	win->setGeometry(50, 50, 1400, 700);
-	win->show();
+  QuantIDE::Quant *win = new QuantIDE::Quant();
+  win->setGeometry(50, 50, 1400, 700);
+  win->show();
 
-	return app.exec();
+  return app.exec();
 }
 
 namespace QuantIDE
@@ -72,6 +72,9 @@ namespace QuantIDE
 
 		emit bootInterpretAct();
 		onMsgStatus("Quant init...\r\n");
+                
+
+                udpServer = new UDPServer(this);		
 	}
 	
 	void Quant::initControl()

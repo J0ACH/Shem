@@ -16,6 +16,7 @@
 
 #include "NodePanel.h"
 #include "Node.h"
+#include "UDPServer.h"
 
 using namespace SupercolliderBridge;
 using namespace Jui;
@@ -84,6 +85,7 @@ namespace QuantIDE
 		CodeEditor *globalCode;
 
 		Graph *testGraph;
+                UDPServer *udpServer;
 	};
 }
 #endif // QUANT
