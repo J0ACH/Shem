@@ -18,17 +18,20 @@
 
 namespace SupercolliderBridge
 {
-  enum class StateInterpret{ OFF, RUNNING };
-  enum class StateServer{ OFF, RUNNING };
-  enum class MessageType{ ERROR, WARNING, STATUS, EVAULATE, RESULT, ANSWER };
+	enum class StateInterpret{ OFF, RUNNING };
+	enum class StateServer{ OFF, RUNNING };
+	enum class MessageType{ ERROR, WARNING, STATUS, EVAULATE, RESULT, ANSWER};
 
-  class ScBridge : public QProcess
-  {
-    Q_OBJECT
+	class ScBridge : public QProcess
+	{
+		Q_OBJECT
+		
+	public:
+		ScBridge(QObject *parent);
+		~ScBridge();
 
-  public:
-    ScBridge(QObject *parent);
-    ~ScBridge();
+		StateInterpret stateInterpret;
+		StateServer stateServer;
 
 		QString nextID();
 		bool evaluateNEW(QString code, bool print = false, bool silent = false);
@@ -40,60 +43,61 @@ namespace SupercolliderBridge
 		void finalizeConnection();
 		void onIpcData();
 
-    private slots:
-    void onReadyRead(void);
-    void onNewIpcConnection();
-    void finalizeConnection();
-    void onIpcData();
+		void killBridge();
+		void changeInterpretState();
+		void changeServerState();
 
-    void killBridge();
-    void changeInterpretState();
-    void changeServerState();
+		void evaluateCode(QString const & commandString, bool silent = false, bool printAnswer = false);
+		void question(QUuid id, int selector, QString commandString, bool printAnswer = false);
 
-    void evaluateCode(QString const & commandString, bool silent = false, bool printAnswer = false);
-    void question(QUuid id, int selector, QString commandString, bool printAnswer = false);
+	signals:
+		void interpretBootInitAct();
+		void interpretBootDoneAct();
+		void interpretKillInitAct();
+		void interpretKillDoneAct();
 
-  signals:
-    void interpretBootInitAct();
-    void interpretBootDoneAct();
-    void interpretKillInitAct();
-    void interpretKillDoneAct();
+		void serverBootInitAct();
+		void serverBootDoneAct();
+		void serverKillInitAct();
+		void serverKillDoneAct();
 
-    void serverBootInitAct();
-    void serverBootDoneAct();
-    void serverKillInitAct();
-    void serverKillDoneAct();
+		void msgErrorAct(QString const &);
+		void msgWarningAct(QString const &);
+		void msgNormalAct(QString const &);
+		void msgStatusAct(QString const &);
+		void msgEvaluateAct(QString const &);
+		void msgResultAct(QString const &);
+		void msgBundleAct(QString const &);
 
 		void answerAct(QUuid id, int selector, QStringList answer);
 		void actSynced();
 		void actAnswered();
 
-    void answerAct(QUuid id, int selector, QStringList answer);
+		void killBridgeDoneAct();
 
-    void killBridgeDoneAct();
+		//void response(const QString & selector, const QString & data);
 
-    //void response(const QString & selector, const QString & data);
+	private:
+		QLocalServer *mIpcServer;
+		QLocalSocket *mIpcSocket;
+		QString mIpcServerName;
+		QByteArray mIpcData;
 
 		int lateFlagBreakTime;
 		bool mTerminationRequested;
 		QDateTime mTerminationRequestTime;
 		bool mCompiled;
 
-    bool mTerminationRequested;
-    QDateTime mTerminationRequestTime;
-    bool mCompiled;
+		void startInterpretr();
+		void killInterpreter();
 
-    void startInterpretr();
-    void killInterpreter();
+		void msgFilter(QString msg);
 
 		void onResponse(const QString & selector, const QString & data);
 				
 		//QStringList answer;
 		QVariant answer;
 	};
-
-    void onResponse(const QString & selector, const QString & data);
-  };
 
 }
 

@@ -22,48 +22,48 @@ namespace SupercolliderBridge
 		connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
 	}
 
-  void ScBridge::killBridge()
-  {
-    if (stateServer == StateServer::RUNNING)
-    {
-      connect(this, SIGNAL(serverKillDoneAct()), this, SLOT(killBridge())); // second loop for interpreter
-      emit changeServerState();
-      emit msgStatusAct("1st round killing");
-      return;
-    };
+	void ScBridge::killBridge()
+	{
+		if (stateServer == StateServer::RUNNING)
+		{
+			connect(this, SIGNAL(serverKillDoneAct()), this, SLOT(killBridge())); // second loop for interpreter
+			emit changeServerState();
+			emit msgStatusAct("1st round killing");
+			return;
+		};
 
-    if (stateInterpret == StateInterpret::RUNNING)
-    {
-      connect(this, SIGNAL(interpretrKillDoneAct()), this, SLOT(killBridge())); // third loop for emit signal
-      emit changeInterpretState();
-      emit msgStatusAct("2nd round killing");
-    };
+		if (stateInterpret == StateInterpret::RUNNING)
+		{
+			connect(this, SIGNAL(interpretrKillDoneAct()), this, SLOT(killBridge())); // third loop for emit signal
+			emit changeInterpretState();
+			emit msgStatusAct("2nd round killing");
+		};
 
-    if (stateInterpret == StateInterpret::OFF)
-    {
-      emit msgStatusAct("3rd round killing");
-      emit killBridgeDoneAct();
-    };
-  }
+		if (stateInterpret == StateInterpret::OFF)
+		{
+			emit msgStatusAct("3rd round killing");
+			emit killBridgeDoneAct();
+		};
+	}
 
-  void ScBridge::changeInterpretState()
-  {
-    switch (stateInterpret)
-    {
-    case StateInterpret::OFF:
-      emit interpretBootInitAct();
-      startInterpretr();
-      break;
+	void ScBridge::changeInterpretState()
+	{
+		switch (stateInterpret)
+		{
+		case StateInterpret::OFF:
+			emit interpretBootInitAct();
+			startInterpretr();
+			break;
 
-    case StateInterpret::RUNNING:
-      emit interpretKillInitAct();
-      killInterpreter();
-      break;
-    }
-  }
-  void ScBridge::changeServerState()
-  {
-    QString oscFunc;
+		case StateInterpret::RUNNING:
+			emit interpretKillInitAct();
+			killInterpreter();
+			break;
+		}
+	}
+	void ScBridge::changeServerState()
+	{
+		QString oscFunc;
 
 		switch (stateServer)
 		{
@@ -235,21 +235,21 @@ namespace SupercolliderBridge
 		QString sclangCommand = "sclang";
 		QString configFile;
 
-    QStringList sclangArguments;
-    if (!configFile.isEmpty())
-      sclangArguments << "-l" << configFile;
-    sclangArguments << "-i" << "scqt";
+		QStringList sclangArguments;
+		if (!configFile.isEmpty())
+			sclangArguments << "-l" << configFile;
+		sclangArguments << "-i" << "scqt";
 
-    QProcess::start(sclangCommand, sclangArguments);
-    bool processStarted = QProcess::waitForStarted();
-    if (!processStarted)
-    {
-      emit msgStatusAct(tr("Failed to start interpreter!"));
-    }
-    else
-    {
-      if (!mIpcServer->isListening()) // avoid a warning on stderr
-        mIpcServer->listen(mIpcServerName);
+		QProcess::start(sclangCommand, sclangArguments);
+		bool processStarted = QProcess::waitForStarted();
+		if (!processStarted)
+		{
+			emit msgStatusAct(tr("Failed to start interpreter!"));
+		}
+		else
+		{
+			if (!mIpcServer->isListening()) // avoid a warning on stderr
+				mIpcServer->listen(mIpcServerName);
 
 			QString command = QStringLiteral("ScIDE.connect(\"%1\")").arg(mIpcServerName);
 			this->evaluateNEW(command);
@@ -266,55 +266,55 @@ namespace SupercolliderBridge
 		//this->evaluateNEW("0.exit", false, true);
 		closeWriteChannel();
 
-    mCompiled = false;
-    mTerminationRequested = true;
-    mTerminationRequestTime = QDateTime::currentDateTimeUtc();
+		mCompiled = false;
+		mTerminationRequested = true;
+		mTerminationRequestTime = QDateTime::currentDateTimeUtc();
 
-    bool finished = waitForFinished(200);
-    if (!finished && (state() != QProcess::NotRunning)) {
+		bool finished = waitForFinished(200);
+		if (!finished && (state() != QProcess::NotRunning)) {
 #ifdef Q_OS_WIN32
-      kill();
+			kill();
 #else
-      terminate();
+			terminate();
 #endif
-      bool reallyFinished = waitForFinished(200);
-      if (!reallyFinished)
-        emit msgStatusAct(tr("Failed to stop interpreter!"));
-      else
-      {
-        stateInterpret = StateInterpret::OFF;
-      }
-    }
-    mTerminationRequested = false;
-  }
+			bool reallyFinished = waitForFinished(200);
+			if (!reallyFinished)
+				emit msgStatusAct(tr("Failed to stop interpreter!"));
+			else
+			{
+				stateInterpret = StateInterpret::OFF;
+			}
+		}
+		mTerminationRequested = false;
+	}
 
-  void ScBridge::onReadyRead()
-  {
-    if (mTerminationRequested) {
-      // when stopping the language, we don't want to post for longer than 200 ms to prevent the UI to freeze
-      if (QDateTime::currentDateTimeUtc().toMSecsSinceEpoch() - mTerminationRequestTime.toMSecsSinceEpoch() > 200)
-        return;
-    }
+	void ScBridge::onReadyRead()
+	{
+		if (mTerminationRequested) {
+			// when stopping the language, we don't want to post for longer than 200 ms to prevent the UI to freeze
+			if (QDateTime::currentDateTimeUtc().toMSecsSinceEpoch() - mTerminationRequestTime.toMSecsSinceEpoch() > 200)
+				return;
+		}
 
-    QByteArray out = QProcess::readAll();
-    QString postString = QString::fromUtf8(out);
+		QByteArray out = QProcess::readAll();
+		QString postString = QString::fromUtf8(out);
 
-    this->msgFilter(postString);
-  }
+		this->msgFilter(postString);
+	}
 
 	void ScBridge::msgFilter(QString msg)
 	{
 		//qDebug() << "msg: " << msg;
 
-    if (msg.contains("ERROR"))
-    {
-      emit msgErrorAct(msg);
-      /*
-      QStringList msgLines = postString.split("\n");
-      for (int i = 0; i < msgLines.size(); i = i + 1)
-      {
-      QString msg = msgLines.at(i);
-      msg = msg.replace("\r", "");
+		if (msg.contains("ERROR"))
+		{
+			emit msgErrorAct(msg);
+			/*
+			QStringList msgLines = postString.split("\n");
+			for (int i = 0; i < msgLines.size(); i = i + 1)
+			{
+			QString msg = msgLines.at(i);
+			msg = msg.replace("\r", "");
 
 			if (msg.startsWith("ERROR:"))
 			{
@@ -345,19 +345,19 @@ namespace SupercolliderBridge
 						oneMSG = oneMSG.replace("\n", "");
 						//qDebug() << "oneMSG: " << oneMSG;
 
-            QStringList msgParts = oneMSG.split(",");
-            //qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
+						QStringList msgParts = oneMSG.split(",");
+						//qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
 
 						QUuid id;
 						QStringList oneAnswer;
 						int selector, printAnswer;
 
-            for (int i = 0; i < msgParts.size(); i = i + 1)
-            {
-              QString onePart = msgParts.at(i);
-              onePart = onePart.replace(" ", "");
-              onePart = onePart.replace("[", "");
-              onePart = onePart.replace("]", "");
+						for (int i = 0; i < msgParts.size(); i = i + 1)
+						{
+							QString onePart = msgParts.at(i);
+							onePart = onePart.replace(" ", "");
+							onePart = onePart.replace("[", "");
+							onePart = onePart.replace("]", "");
 
 							//qDebug() << "i: " << i;
 							if (i == 0) { /* skiping marker */ }
@@ -462,102 +462,96 @@ namespace SupercolliderBridge
 			// we can handle only one ipc connection at a time
 			mIpcSocket->disconnect();
 
-  void ScBridge::onNewIpcConnection()
-  {
-    if (mIpcSocket)
-      // we can handle only one ipc connection at a time
-      mIpcSocket->disconnect();
+		mIpcSocket = mIpcServer->nextPendingConnection();
 
-    mIpcSocket = mIpcServer->nextPendingConnection();
+		connect(mIpcSocket, SIGNAL(disconnected()), this, SLOT(finalizeConnection()));
+		connect(mIpcSocket, SIGNAL(readyRead()), this, SLOT(onIpcData()));
 
-    connect(mIpcSocket, SIGNAL(disconnected()), this, SLOT(finalizeConnection()));
-    connect(mIpcSocket, SIGNAL(readyRead()), this, SLOT(onIpcData()));
+		stateInterpret = StateInterpret::RUNNING;
+		emit interpretBootDoneAct();
+	}
 
-    stateInterpret = StateInterpret::RUNNING;
-    emit interpretBootDoneAct();
-  }
+	void ScBridge::finalizeConnection()
+	{
+		mIpcData.clear();
+		mIpcSocket->deleteLater();
+		mIpcSocket = NULL;
+		emit interpretKillDoneAct();
+	}
 
-  void ScBridge::finalizeConnection()
-  {
-    mIpcData.clear();
-    mIpcSocket->deleteLater();
-    mIpcSocket = NULL;
-    emit interpretKillDoneAct();
-  }
+	void ScBridge::onIpcData()
+	{
+		mIpcData.append(mIpcSocket->readAll());
 
-  void ScBridge::onIpcData()
-  {
-    mIpcData.append(mIpcSocket->readAll());
+		while (mIpcData.size()) {
+			QBuffer receivedData(&mIpcData);
+			receivedData.open(QIODevice::ReadOnly);
 
-    while (mIpcData.size()) {
-      QBuffer receivedData(&mIpcData);
-      receivedData.open(QIODevice::ReadOnly);
+			QDataStream in(&receivedData);
+			in.setVersion(QDataStream::Qt_4_6);
+			QString selector, message;
+			in >> selector;
+			if (in.status() != QDataStream::Ok)
+				return;
 
-      QDataStream in(&receivedData);
-      in.setVersion(QDataStream::Qt_4_6);
-      QString selector, message;
-      in >> selector;
-      if (in.status() != QDataStream::Ok)
-        return;
+			in >> message;
+			if (in.status() != QDataStream::Ok)
+				return;
 
-      in >> message;
-      if (in.status() != QDataStream::Ok)
-        return;
+			mIpcData.remove(0, receivedData.pos());
 
-      mIpcData.remove(0, receivedData.pos());
+			onResponse(selector, message);
+			//emit response(selector, message);
+		}
+	}
 
-      onResponse(selector, message);
-      //emit response(selector, message);
-    }
-  }
+	void ScBridge::onResponse(const QString & selector, const QString & data)
+	{
+		static QString serverRunningSelector("defaultServerRunningChanged");
+		static QString introspectionSelector("introspection");
+		static QString classLibraryRecompiledSelector("classLibraryRecompiled");
+		static QString requestCurrentPathSelector("requestCurrentPath");
 
-  void ScBridge::onResponse(const QString & selector, const QString & data)
-  {
-    static QString serverRunningSelector("defaultServerRunningChanged");
-    static QString introspectionSelector("introspection");
-    static QString classLibraryRecompiledSelector("classLibraryRecompiled");
-    static QString requestCurrentPathSelector("requestCurrentPath");
+		//	emit msgStatusAct(tr("SELECTOR: %1").arg(selector));
 
-    //	emit msgStatusAct(tr("SELECTOR: %1").arg(selector));
+		if (selector == serverRunningSelector)
+		{
+			// DATA O STAVU SERVERU - msg[0] bool STATE; msg[1] int IP; msg[2] int PORT!!!!!!!!!!!
+			QStringList msg = data.split("\n");
 
-    if (selector == serverRunningSelector)
-    {
-      // DATA O STAVU SERVERU - msg[0] bool STATE; msg[1] int IP; msg[2] int PORT!!!!!!!!!!!
-      QStringList msg = data.split("\n");
+			//bool serverRunning;
+			//int ip;
+			//int port;
 
-      //bool serverRunning;
-      //int ip;
-      //int port;
+			//emit msgStatusAct(tr("SERVER msg size: %1").arg(msg.size()));
+			//emit msgStatusAct(tr("SERVER msg[0]: %1").arg(msg[0]));
+			//emit msgStatusAct(tr("SERVER msg[1]: %1").arg(msg[1]));
+			//emit msgStatusAct(tr("SERVER msg[2]: %1").arg(msg[2]));
 
-      //emit msgStatusAct(tr("SERVER msg size: %1").arg(msg.size()));
-      //emit msgStatusAct(tr("SERVER msg[0]: %1").arg(msg[0]));
-      //emit msgStatusAct(tr("SERVER msg[1]: %1").arg(msg[1]));
-      //emit msgStatusAct(tr("SERVER msg[2]: %1").arg(msg[2]));
+			if (msg[0] == "- false")
+			{
+				stateServer = StateServer::OFF;
+				emit serverKillDoneAct();
+			}
+			else if (msg[0] == "- true")
+			{
+				stateServer = StateServer::RUNNING;
+				emit serverBootDoneAct();
+			}
 
-      if (msg[0] == "- false")
-      {
-        stateServer = StateServer::OFF;
-        emit serverKillDoneAct();
-      }
-      else if (msg[0] == "- true")
-      {
-        stateServer = StateServer::RUNNING;
-        emit serverBootDoneAct();
-      }
+			//emit msgStatusAct(tr("STATUS: %1").arg(data));
+		}
+		else if (selector == introspectionSelector)
+		{
+			// DATA O VSECH CLASS PRO SUPERCOLIDER!!!!!!
+			//emit msgStatusAct(tr("INTROSPECTION message: %1").arg(data));
+		}
+		else
+		{
+			//emit msgStatusAct(tr("IPC message: %1").arg(data));
+		}
+	}
 
-      //emit msgStatusAct(tr("STATUS: %1").arg(data));
-    }
-    else if (selector == introspectionSelector)
-    {
-      // DATA O VSECH CLASS PRO SUPERCOLIDER!!!!!!
-      //emit msgStatusAct(tr("INTROSPECTION message: %1").arg(data));
-    }
-    else
-    {
-      //emit msgStatusAct(tr("IPC message: %1").arg(data));
-    }
-  }
-
-  ScBridge::~ScBridge() {	}
+	ScBridge::~ScBridge() {	}
 }
 

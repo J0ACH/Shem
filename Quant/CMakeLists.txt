@@ -35,32 +35,29 @@ FIND_PACKAGE(Qt5Core)
 FIND_PACKAGE(Qt5Widgets)
 FIND_PACKAGE(Qt5Gui)
 
-SET(QT_LIBRARIES
+SET(QT_LIBRARIES 
   Qt5::Core
-  Qt5::Gui
+  Qt5::Gui 
   Qt5::Widgets
   )
 
 ADD_SUBDIRECTORY(Jui)  
 
-
 # SOURCES ##################################################
 
-SET(Quant_hdr
+SET(Quant_hdr 
   Quant.h
   NodePanel.h
   Node.h
   ControlEnvelope.h
-  UDPServer.h
-  )
+)
 
-SET(Quant_src
+SET(Quant_src 
   Quant.cpp
   NodePanel.cpp
   Node.cpp
   ControlEnvelope.cpp
-  UDPServer.cpp
-  )
+)
 
 SET(Quant_res 
   Quant.qrc
@@ -100,3 +97,7 @@ TARGET_LINK_LIBRARIES(Quant
 # INSTALL ########################################################
 
 INSTALL(TARGETS Quant DESTINATION ${SC_INSTALL_DIR})
+
+
+
+

@@ -15,7 +15,6 @@
 
 #include "NodePanel.h"
 #include "Node.h"
-#include "UDPServer.h"
 
 using namespace SupercolliderBridge;
 using namespace Jui;
@@ -87,7 +86,6 @@ namespace QuantIDE
 
 		QLabel *labelServerMeter, *labelServerSynths;
 		QTimer serverTask;
-                UDPServer *udpServer;
 	};
 }
 #endif // QUANT

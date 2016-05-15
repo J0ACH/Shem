@@ -22,42 +22,42 @@ using namespace SupercolliderBridge;
 namespace QuantIDE
 {
 
-  class NodePanel : public Panel
-  {
-    Q_OBJECT
+	class NodePanel : public Panel
+	{
+		Q_OBJECT
 
-  public:
-    NodePanel(QWidget *parent, ScBridge *bridge);
-    ~NodePanel();
+	public:
+		NodePanel(QWidget *parent, ScBridge *bridge);
+		~NodePanel();
 
-    QRect bounds();
+		QRect bounds();
 
-    public slots:
-    void fitNodesPosition();
-    void onConfigData(QMap<QString, QVariant*> config);
+	public slots:
+		void fitNodesPosition();
+		void onConfigData(QMap<QString, QVariant*> config);
 
-    void addNode();
-    void deleteNode(QString name);
+		void addNode();
+		void deleteNode(QString name);
 
-  signals:
-    void actConfigData(QMap<QString, QVariant*> config);
+	signals:
+		void actConfigData(QMap<QString, QVariant*> config);
 
-  protected:
-    void paintEvent(QPaintEvent *event);
-    void resizeEvent(QResizeEvent *event);
+	protected:
+		void paintEvent(QPaintEvent *event);
+		void resizeEvent(QResizeEvent *event);
 
-  private:
-    void initControl();
-    QMap<QString, QVariant*> configData;
-    QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-    QFont fontTextSmall;
-    Button *buttAddNode;
-    QScrollArea *scrollArea;
-    QWidget *scrollWidget;
-    QMap<QString, Node*> dictNode;
-    ScBridge *mBridge;
+	private:
+		void initControl();
+		QMap<QString, QVariant*> configData;
+		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+		QFont fontTextSmall;
+		Button *buttAddNode;
+		QScrollArea *scrollArea;
+		QWidget *scrollWidget;
+		QMap<QString, Node*> dictNode;
+		ScBridge *mBridge;
 
-  };
+	};
 }
 
 #endif // QUANT
