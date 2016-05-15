@@ -174,7 +174,7 @@ namespace SupercolliderBridge
 	QVariant ScBridge::questionNEW(QString code, bool print)
 	{
 		//answer = QStringList();
-		answer = NULL;
+		//answer = NULL;
 
 		qint64 evalTime = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
 		qint64 answerTime;
