@@ -26,7 +26,7 @@ namespace QuantIDE
 
 		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(sendSourceCode(QString)));
 
-		this->sendInitNode();
+		this->initNode();
 	}
 
 	void Node::initControl()
@@ -84,20 +84,23 @@ namespace QuantIDE
 	void Node::setName(QString name) { nameLabel->setText(name); }
 	//QString Node::name() { return nameLabel->text(); }
 
-	QString Node::getNodeID()
+	void Node::initNode()
 	{
-		QString txtNodeID = tr("~%1.nodeID;").arg(nodeName);
-		return mBridge->questionNEW(txtNodeID, true);
-	}
+		//QString groupID = mBridge->questionNEW("Group.new().nodeID", true).toString();
 
-	void Node::sendInitNode()
-	{
 		mBridge->evaluateNEW(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-		mBridge->evaluateNEW(tr("~%1.play(out:0);").arg(nodeName), true);
+		mBridge->evaluateNEW(tr("~%1.play(out:0, group:~%1.source.nodeID);").arg(nodeName), true); 
 		mBridge->evaluateNEW(tr("~%1.fadeTime = 0.5;").arg(nodeName), true);
 		mBridge->evaluateNEW(tr("~%1.quant_(1);").arg(nodeName), true);
 
+		//labelGroupID->setText(tr("groupID: %1").arg(groupID));
 		labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
+	}
+
+	QString Node::getNodeID()
+	{
+		QString txtNodeID = tr("~%1.nodeID;").arg(nodeName);
+		return mBridge->questionNEW(txtNodeID, true).toString();
 	}
 	void Node::sendFreeNode()
 	{
@@ -112,7 +115,7 @@ namespace QuantIDE
 	void Node::sendSourceCode(QString txt)
 	{
 		mBridge->evaluateNEW(tr("(~%1[0] = { %2 })").arg(nodeName, txt), true);
-		QString controlKeys = mBridge->questionNEW(tr("~%1.controlKeys").arg(nodeName), true);
+		QStringList controlKeys = mBridge->questionNEW(tr("~%1.controlKeys").arg(nodeName), true).toStringList();
 		/*
 		foreach(QString oneAnsw, answer)
 		{
@@ -120,7 +123,7 @@ namespace QuantIDE
 		}
 		*/
 		qDebug() << "Node::onBridgeAnswer::target: " << controlKeys;
-		labelNamedControls->setText(tr("controls: %1").arg(controlKeys));
+		labelNamedControls->setText(tr("controls: %1").arg(controlKeys.join("; ")));
 
 		//this->initControlsEditor(answer);
 
@@ -320,8 +323,8 @@ namespace QuantIDE
 	{
 		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
 		sourceCode->setGeometry(10, 45, width() - 20, 60);
-		labelNodeID->setGeometry(this->width() - 200, 20, 100, 20);
-		labelNamedControls->setGeometry(this->width() - 200, 5, 100, 20);
+		labelNodeID->setGeometry(this->width() - 300, 5, 250, 20);
+		labelNamedControls->setGeometry(this->width() - 300, 20, 250, 20);
 
 		foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
 		{
