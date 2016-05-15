@@ -342,7 +342,7 @@ namespace QuantIDE
 			//this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
 
 			QString code1 = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), QString::number(oneX));
-			QString answer1 = tr("QA: %1 = %2").arg(code1, mBridge->questionNEW(code1, true).toString());
+			QString answer1 = tr("QA: %1 = %2").arg(code1, mBridge->questionNEW(code1, true));
 			qDebug() << answer1;
 		}
 	}

@@ -54,6 +54,7 @@ namespace QuantIDE
 
     void changeNodePlay();
 
+		void sendInitNode();
 		void sendFreeNode();
 		void sendSourceCode(QString txt);
 		void sendSetNode(QString nameControl, QString txt);
@@ -73,7 +74,6 @@ namespace QuantIDE
 	private:
 		void initControl();
 		void initControlsEditor(QStringList namedControls);
-		void initNode();
 
     void addControl(QString name);
     void removeControl(QString name);
