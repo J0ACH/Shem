@@ -16,7 +16,7 @@ namespace SupercolliderBridge
 		stateInterpret = StateInterpret::OFF;
 		stateServer = StateServer::OFF;
 
-		lateFlagBreakTime = 200;
+		lateFlagBreakTime = 500;
 
 		connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 		connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
@@ -117,10 +117,10 @@ namespace SupercolliderBridge
 	//////// bude odsraneno
 	/////////////////////////////////////////////////////////
 
-	bool ScBridge::evaluateNEW(QString code, bool print)
+	bool ScBridge::evaluateNEW(QString code, bool print, bool silent)
 	{
 		bool synced = false;
-		bool silent = false;
+		silent = false;
 
 		qint64 evalTime = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
 		qint64 syncTime;
@@ -171,9 +171,10 @@ namespace SupercolliderBridge
 		return true;
 	}
 
-	QString ScBridge::questionNEW(QString code, bool print)
+	QVariant ScBridge::questionNEW(QString code, bool print)
 	{
-		answer = QStringList();
+		//answer = QStringList();
+		answer = NULL;
 
 		qint64 evalTime = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
 		qint64 answerTime;
@@ -182,7 +183,7 @@ namespace SupercolliderBridge
 		QTimer time;
 		time.setSingleShot(true);
 		time.start(lateFlagBreakTime);
-		answer.append("NaN");
+		//answer.append("NaN");
 
 		{
 			QEventLoop loop;
@@ -193,14 +194,14 @@ namespace SupercolliderBridge
 			//this->evaluateCode(command, false, false);
 			if (state() != QProcess::Running) {
 				emit msgStatusAct(tr("Interpreter is not running!\r\n"));
-				return "";
+				return QStringList();
 			}
 			QByteArray bytesToWrite = command.toUtf8();
 			size_t writtenBytes = write(bytesToWrite);
 
 			if (writtenBytes != bytesToWrite.size()) {
 				emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
-				return "";
+				return QStringList();
 			}
 
 			char commandChar = '\x0c';
@@ -213,14 +214,20 @@ namespace SupercolliderBridge
 		durationTime = answerTime - evalTime;
 
 		if (print) {
+			QString txt;
+			if (answer.toList().isEmpty()) { txt = answer.toString(); }
+			else
+			{
+				txt = answer.toStringList().join(" || ");
+			}
 			emit msgNormalAct(tr("QA [%1 ms]: %2 = %3\r\n").arg(
 				QString::number(durationTime),
 				code,
-				answer.join(" || "))
-				);
+				txt
+				));
 		}
 
-		return answer.join(" || ");
+		return answer;
 	}
 
 	void ScBridge::startInterpretr()
@@ -245,7 +252,7 @@ namespace SupercolliderBridge
 				mIpcServer->listen(mIpcServerName);
 
 			QString command = QStringLiteral("ScIDE.connect(\"%1\")").arg(mIpcServerName);
-			evaluateCode(command, true);
+			this->evaluateNEW(command);
 		}
 	}
 	void ScBridge::killInterpreter()
@@ -255,7 +262,8 @@ namespace SupercolliderBridge
 			return;
 		}
 
-		evaluateCode("0.exit", true);
+		this->evaluateCode("0.exit", true);
+		//this->evaluateNEW("0.exit", false, true);
 		closeWriteChannel();
 
 		mCompiled = false;
@@ -278,7 +286,7 @@ namespace SupercolliderBridge
 			}
 		}
 		mTerminationRequested = false;
-}
+	}
 
 	void ScBridge::onReadyRead()
 	{
@@ -380,38 +388,11 @@ namespace SupercolliderBridge
 			//////// bude odsraneno
 			//////////////////////////////////////////////
 
-			else if (msg.contains("syncFlag"))
-			{
-				answer = QStringList();
-				//qDebug() << "msg [syncFlag]: " << msg;
-				QStringList incomingMSG = msg.split("->");
-				foreach(QString oneMSG, incomingMSG)
-				{
-					if (oneMSG.contains("syncFlag"))
-					{
-						oneMSG = oneMSG.replace("\r", "");
-						oneMSG = oneMSG.replace("\n", "");
-						//qDebug() << "oneMSG: " << oneMSG;
+			else if (msg.contains("syncFlag"))	{ emit actSynced(); }
 
-						QStringList msgParts = oneMSG.split(",");
-
-						for (int i = 0; i < msgParts.size(); i = i + 1)
-						{
-							QString onePart = msgParts.at(i);
-							onePart = onePart.replace(" ", "");
-							onePart = onePart.replace("[", "");
-							onePart = onePart.replace("]", "");
-
-							if (i == 0) { /* skiping marker */ }
-							else { answer.append(onePart); }
-						}
-					}
-				}
-				emit actSynced();
-			}
 			else if (msg.contains("answerFlag"))
 			{
-				answer = QStringList();
+				answer = QVariant();
 				//qDebug() << "msg [answerFlag]: " << msg;
 				QStringList incomingMSG = msg.split("->");
 				foreach(QString oneMSG, incomingMSG)
@@ -423,16 +404,29 @@ namespace SupercolliderBridge
 						//qDebug() << "oneMSG: " << oneMSG;
 
 						QStringList msgParts = oneMSG.split(",");
-
-						for (int i = 0; i < msgParts.size(); i = i + 1)
+						if (msgParts.size() == 1)
 						{
-							QString onePart = msgParts.at(i);
+							QString onePart = msgParts.at(1);
 							onePart = onePart.replace(" ", "");
 							onePart = onePart.replace("[", "");
 							onePart = onePart.replace("]", "");
 
-							if (i == 0) { /* skiping marker */ }
-							else { answer.append(onePart); }
+							//qDebug() << "oneAnswer : " << msgParts;
+							answer = QVariant(onePart);
+						}
+						else
+						{
+							QStringList answerList;
+							for (int i = 1; i < msgParts.size(); i = i + 1)
+							{
+								QString onePart = msgParts.at(i);
+								onePart = onePart.replace(" ", "");
+								onePart = onePart.replace("[", "");
+								onePart = onePart.replace("]", "");
+
+								answerList.append(onePart);
+							}
+							answer = QVariant(answerList);
 						}
 					}
 				}
@@ -453,6 +447,14 @@ namespace SupercolliderBridge
 			if (!msg.isEmpty())	{ emit msgNormalAct(msg); }
 		}
 	}
+
+	QString ScBridge::nextID()
+	{
+		QString newID = this->questionNEW("s.nextNodeID", true).toString();
+		qDebug() << "newID " << newID;
+		return newID;
+	}
+
 
 	void ScBridge::onNewIpcConnection()
 	{

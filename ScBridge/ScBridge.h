@@ -33,8 +33,9 @@ namespace SupercolliderBridge
 		StateInterpret stateInterpret;
 		StateServer stateServer;
 
-		bool evaluateNEW(QString code, bool print = false);
-		QString questionNEW(QString code, bool print = false);
+		QString nextID();
+		bool evaluateNEW(QString code, bool print = false, bool silent = false);
+		QVariant questionNEW(QString code, bool print = false);
 
 	private slots:
 		void onReadyRead(void);
@@ -94,7 +95,8 @@ namespace SupercolliderBridge
 
 		void onResponse(const QString & selector, const QString & data);
 				
-		QStringList answer;
+		//QStringList answer;
+		QVariant answer;
 	};
 
 }

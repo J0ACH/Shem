@@ -106,7 +106,7 @@ namespace QuantIDE
 		buttCustomize->setToolTip("Customize");
 
 		globalCode = new CodeEditor(nodePanel);
-		globalCode->setText("s.sendMsg('/g_dumpTree', 0, 1)");
+		globalCode->setText("s.plotTree");
 
 		labelServerMeter = new QLabel(canvan->tail);
 		labelServerMeter->setText("NaN");
@@ -258,8 +258,8 @@ namespace QuantIDE
 	void Quant::onServerBootDone()
 	{
 		onMsgStatus("ScServer boot done...\r\n");
-		bridge->evaluateNEW("p = ProxySpace.push(s);", true);
-		bridge->evaluateNEW("p.makeTempoClock;", true);
+		bridge->evaluateNEW("p = ProxySpace.push(s).makeTempoClock;", true);
+		//bridge->evaluateNEW("s.waitForBoot({ p = ProxySpace.push(s).makeTempoClock; })", true);
 		bridge->evaluateNEW("p.clock.tempo_(60/60);", true);
 
 		buttServer->setState(Jui::Button::State::ON);
@@ -287,15 +287,16 @@ namespace QuantIDE
 
 	void Quant::onServerTask()
 	{
-		QString txtCPU = bridge->questionNEW("s.peakCPU");
-		if (txtCPU != "NaN")
+		
+		QString txtCPU = bridge->questionNEW("s.peakCPU").toString();	
+		if (txtCPU != NULL)
 		{
 			double serverCPU = txtCPU.toDouble();
 			labelServerMeter->setText(tr("%1 %").arg(QString::number(serverCPU, 'f', 2)));
 		}
 
-		QString numSynths = bridge->questionNEW("s.numSynths");
-		if (numSynths != "NaN")	{ labelServerSynths->setText(numSynths); }
+		QString numSynths = bridge->questionNEW("s.numSynths").toString();
+		if (numSynths != NULL)	{ labelServerSynths->setText(numSynths); }
 
 	}
 
