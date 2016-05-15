@@ -11,20 +11,20 @@ namespace QuantIDE
 		//setObjectName("Node");
 		objectID = QUuid::createUuid();
 
-		setFocusPolicy(Qt::StrongFocus);
+    setFocusPolicy(Qt::StrongFocus);
 
-		this->initControl();
+    this->initControl();
 
-		stateNodePlay = StateNodePlay::FREE;
+    stateNodePlay = StateNodePlay::FREE;
 
-		connect(this, SIGNAL(actCodeEvaluated(QString, bool, bool)), mBridge, SLOT(evaluateCode(QString, bool, bool)));
-		connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
-		connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
+    connect(this, SIGNAL(actCodeEvaluated(QString, bool, bool)), mBridge, SLOT(evaluateCode(QString, bool, bool)));
+    connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
+    connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
 
-		connect(playButton, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
-		connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
+    connect(playButton, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
+    connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
 
-		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(sendSourceCode(QString)));
+    connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(sendSourceCode(QString)));
 
 		this->initNode();
 	}
@@ -35,50 +35,50 @@ namespace QuantIDE
 		nameLabel->setText(nodeName);
 		nameLabel->setGeometry(10, 5, 80, 30);
 
-		closeButton = new Button(this);
-		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
-		closeButton->setText("X");
+    closeButton = new Button(this);
+    closeButton->setIcon(QImage(":/smallClose16.png"), 0);
+    closeButton->setText("X");
 
-		playButton = new Button(this);
-		playButton->setText("play");
-		playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
-		playButton->setGeometry(90, 10, 40, 20);
+    playButton = new Button(this);
+    playButton->setText("play");
+    playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
+    playButton->setGeometry(90, 10, 40, 20);
 
-		sourceCode = new CodeEditor(this);
+    sourceCode = new CodeEditor(this);
 
-		labelNodeID = new QLabel(this);
-		labelNamedControls = new QLabel(this);
-	}
-	void Node::onConfigData(QMap<QString, QVariant*> config)
-	{
-		colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
-		colorNormal = config.value("color_shem_Normal")->value<QColor>();
-		colorOver = config.value("color_shem_Over")->value<QColor>();
-		colorActive = config.value("color_shem_Active")->value<QColor>();
-		fontTextBig = config.value("font_shem_TextBig")->value<QFont>();
-		fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
-		fontTextCode = config.value("font_shem_TextCode")->value<QFont>();
+    labelNodeID = new QLabel(this);
+    labelNamedControls = new QLabel(this);
+  }
+  void Node::onConfigData(QMap<QString, QVariant*> config)
+  {
+    colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
+    colorNormal = config.value("color_shem_Normal")->value<QColor>();
+    colorOver = config.value("color_shem_Over")->value<QColor>();
+    colorActive = config.value("color_shem_Active")->value<QColor>();
+    fontTextBig = config.value("font_shem_TextBig")->value<QFont>();
+    fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
+    fontTextCode = config.value("font_shem_TextCode")->value<QFont>();
 
-		sourceCode->setFontCode(fontTextCode);
+    sourceCode->setFontCode(fontTextCode);
 
-		closeButton->setColorNormal(colorNormal);
-		closeButton->setColorOver(colorOver);
-		closeButton->setColorActive(colorActive);
+    closeButton->setColorNormal(colorNormal);
+    closeButton->setColorOver(colorOver);
+    closeButton->setColorActive(colorActive);
 
-		playButton->setColorNormal(colorNormal);
-		playButton->setColorOver(colorOver);
-		playButton->setColorActive(colorActive);
-		playButton->setFont(fontTextSmall);
+    playButton->setColorNormal(colorNormal);
+    playButton->setColorOver(colorOver);
+    playButton->setColorActive(colorActive);
+    playButton->setFont(fontTextSmall);
 
-		nameLabel->setFont(fontTextBig);
-		labelNodeID->setFont(fontTextSmall);
-		labelNamedControls->setFont(fontTextSmall);
+    nameLabel->setFont(fontTextBig);
+    labelNodeID->setFont(fontTextSmall);
+    labelNamedControls->setFont(fontTextSmall);
 
-		configData = config;
-		//emit actConfigData(config);
+    configData = config;
+    //emit actConfigData(config);
 
-		update();
-	}
+    update();
+  }
 
 	QRect Node::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 	void Node::setName(QString name) { nameLabel->setText(name); }
@@ -140,22 +140,21 @@ namespace QuantIDE
 	{
 		QString code = tr("~%1.set('%2', %3);").arg(nodeName, nameControl, txt);
 
-		/*
-		for (int i = 0; i < conteinerControls.size(); i++)
-		{
-		QString key = conteinerControls.keys().at(i);
-		QString value = conteinerControls[key]->toPlainText();
-		code += tr("~%1.set('%2', %3);").arg(name(), key, value);
-		}
-		*/
+  void Node::sendSetNode(QString nameControl, QString txt)
+  {
+    QString code = tr("~%1.set('%2', %3);").arg(name(), nameControl, txt);
 
-		emit actCodeEvaluated(code, false, true);
-	}
+    /*
+    for (int i = 0; i < conteinerControls.size(); i++)
+    {
+    QString key = conteinerControls.keys().at(i);
+    QString value = conteinerControls[key]->toPlainText();
+    code += tr("~%1.set('%2', %3);").arg(name(), key, value);
+    }
+    */
 
-	void Node::onBridgeQuestion(QuestionType selector, QString args)
-	{
-		QString questionCode;
-		int selectorNum;
+    emit actCodeEvaluated(code, false, true);
+  }
 
 		switch (selector)
 		{
@@ -194,50 +193,51 @@ namespace QuantIDE
 			break;
 			*/
 
-			case namedControls:
-				foreach(QString oneAnsw, answer)
-				{
-					txt += tr("%1; ").arg(oneAnsw);
-				}
-				qDebug() << "Node::onBridgeAnswer::target: " << selector;
-				labelNamedControls->setText(tr("controls: %1").arg(txt));
-				this->initControlsEditor(answer);
-				break;
+      switch (selector)
+      {
+      case nodeID:
+        qDebug() << "Node::onBridgeAnswer::target: " << selector;
+        labelNodeID->setText(tr("nodeID: %1").arg(answer[0]));
+        break;
 
-			case namedValues:
-				qDebug() << "Node::onBridgeAnswer::namedValues: " << answer[1];
-				//conteinerControls[answer[0]]->setText(answer[1]);
+      case namedControls:
+        foreach(QString oneAnsw, answer)
+        {
+          txt += tr("%1; ").arg(oneAnsw);
+        }
+        qDebug() << "Node::onBridgeAnswer::target: " << selector;
+        labelNamedControls->setText(tr("controls: %1").arg(txt));
+        this->initControlsEditor(answer);
+        break;
 
-				//conteinerControlsGraph[answer[0]]->setDomainX(0, 1);
-				//conteinerControlsGraph[answer[0]]->setDomainY(0, answer[1].toInt()*1.5);
-				/*
-				double pointFromX = 0;
-				double pointFromY = answer[1].toDouble();
-				double pointToX = 1;
-				double pointToY = answer[1].toDouble();
-				*/
-				//conteinerControlsGraph[answer[0]]->addValuePoint(pointFromX, pointFromY);
-				//conteinerControlsGraph[answer[0]]->addValuePoint(pointToX, pointToY);
-				break;
+      case namedValues:
+        qDebug() << "Node::onBridgeAnswer::namedValues: " << answer[1];
+        //conteinerControls[answer[0]]->setText(answer[1]);
+
+        //conteinerControlsGraph[answer[0]]->setDomainX(0, 1);
+        //conteinerControlsGraph[answer[0]]->setDomainY(0, answer[1].toInt()*1.5);
+        /*
+        double pointFromX = 0;
+        double pointFromY = answer[1].toDouble();
+        double pointToX = 1;
+        double pointToY = answer[1].toDouble();
+        */
+        //conteinerControlsGraph[answer[0]]->addValuePoint(pointFromX, pointFromY);
+        //conteinerControlsGraph[answer[0]]->addValuePoint(pointToX, pointToY);
+        break;
 
 
-			}
-		}
-	}
+      }
+    }
+  }
 
-	void Node::initControlsEditor(QStringList namedControls)
-	{
-		QStringList existKeys = conteinerControlsGraph.keys();
-		foreach(QString key, existKeys)
-		{
-			if (!namedControls.contains(key)) { this->removeControl(key); }
-		}
-
-		foreach(QString key, namedControls)
-		{
-			if (!conteinerControlsGraph.contains(key)) { this->addControl(key); }
-		}
-	}
+  void Node::initControlsEditor(QStringList namedControls)
+  {
+    QStringList existKeys = conteinerControlsGraph.keys();
+    foreach(QString key, existKeys)
+    {
+      if (!namedControls.contains(key)) { this->removeControl(key); }
+    }
 
 	void Node::addControl(QString controlName)
 	{
@@ -246,20 +246,24 @@ namespace QuantIDE
 		newGraph->setFixedHeight(250);
 		newGraph->show();
 
-		conteinerControlsGraph.insert(controlName, newGraph);
+  void Node::addControl(QString controlName)
+  {
+    int busIndex = nodeNumber * 100 + conteinerControlsGraph.size();
+    ControlEnvelope *newGraph = new ControlEnvelope(this, mBridge, nameLabel->text(), controlName, busIndex);
+    newGraph->setFixedHeight(250);
+    newGraph->show();
 
-		onBridgeQuestion(QuestionType::namedValues, controlName);
+    conteinerControlsGraph.insert(controlName, newGraph);
 
-		this->fitControlsPosition();
-	}
-	void Node::removeControl(QString controlName)
-	{
-		conteinerControlsGraph.value(controlName)->sendFreeBusIndex();
-		conteinerControlsGraph.value(controlName)->close();
-		conteinerControlsGraph.remove(controlName);
+    onBridgeQuestion(QuestionType::namedValues, controlName);
 
-		this->fitControlsPosition();
-	}
+    this->fitControlsPosition();
+  }
+  void Node::removeControl(QString controlName)
+  {
+    conteinerControlsGraph.value(controlName)->sendFreeBusIndex();
+    conteinerControlsGraph.value(controlName)->close();
+    conteinerControlsGraph.remove(controlName);
 
 	void Node::changeNodePlay()
 	{
@@ -288,36 +292,36 @@ namespace QuantIDE
 		onBridgeQuestion(QuestionType::namedControls);
 	}
 
-	void Node::fitControlsPosition()
-	{
-		int nextControlOriginY = 110;
-		foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
-		{
-			oneEnv->setGeometry(10, nextControlOriginY, oneEnv->width(), oneEnv->height());
-			nextControlOriginY += oneEnv->bounds().height() + 10;
-		}
-		this->setFixedHeight(nextControlOriginY);
-	}
+    onBridgeQuestion(QuestionType::nodeID);
+    onBridgeQuestion(QuestionType::namedControls);
+  }
 
-	bool Node::eventFilter(QObject* target, QEvent* event)
-	{
-		if (event->type() == QEvent::FocusIn)
-		{
-			qDebug() << "QEvent::FocusIn";
-			installEventFilter(this);
-			update();
-			return true;
-		}
-		if (event->type() == QEvent::FocusOut)
-		{
-			qDebug() << "QEvent::FocusOut";
-			update();
-			return true;
-		}
+  void Node::fitControlsPosition()
+  {
+    int nextControlOriginY = 110;
+    foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
+    {
+      oneEnv->setGeometry(10, nextControlOriginY, oneEnv->width(), oneEnv->height());
+      nextControlOriginY += oneEnv->bounds().height() + 10;
+    }
+    this->setFixedHeight(nextControlOriginY);
+  }
 
-		QWidget::eventFilter(target, event);
-		return false;
-	}
+  bool Node::eventFilter(QObject* target, QEvent* event)
+  {
+    if (event->type() == QEvent::FocusIn)
+    {
+      qDebug() << "QEvent::FocusIn";
+      installEventFilter(this);
+      update();
+      return true;
+    }
+    if (event->type() == QEvent::FocusOut)
+    {
+      qDebug() << "QEvent::FocusOut";
+      update();
+      return true;
+    }
 
 	void Node::resizeEvent(QResizeEvent *resizeEvent)
 	{
@@ -336,19 +340,15 @@ namespace QuantIDE
 		//qDebug("Node::resizeEvent");
 	}
 
-	void Node::paintEvent(QPaintEvent *paintEvent)
-	{
-		QPainter painter(this);
-		painter.fillRect(this->bounds(), colorPanelBackground);
-		//painter.fillRect(this->bounds(), QColor(120, 30, 30));
+    foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
+    {
+      oneEnv->setFixedWidth(width() - 20);
+    }
 
-		if (this->hasFocus()) { painter.setPen(colorActive); }
-		else { painter.setPen(colorNormal); }
 
-		//painter.setPen(colorOver);
-		painter.drawLine(0, 0, width(), 0);
-		painter.drawLine(0, height() - 1, width(), height() - 1);
-	}
+    emit actChangedHeight();
+    //qDebug("Node::resizeEvent");
+  }
 
 	void Node::closeEvent(QCloseEvent *event)
 	{
@@ -358,8 +358,24 @@ namespace QuantIDE
 		qDebug("Node::closeEvent()");
 	}
 
-	Node::~Node()
-	{
+    if (this->hasFocus()) { painter.setPen(colorActive); }
+    else { painter.setPen(colorNormal); }
 
-	}
+    //painter.setPen(colorOver);
+    painter.drawLine(0, 0, width(), 0);
+    painter.drawLine(0, height() - 1, width(), height() - 1);
+  }
+
+  void Node::closeEvent(QCloseEvent *event)
+  {
+    this->sendFreeNode();
+    stateNodePlay = StateNodePlay::FREE;
+    emit killAct(name());
+    qDebug("Node::closeEvent()");
+  }
+
+  Node::~Node()
+  {
+
+  }
 }
