@@ -1,68 +1,53 @@
-p = ProxySpace.push(s).makeTempoClock;
-p.clock.tempo_(60/60);
+p = ProxySpace.push(s)
+s.scope(3,0, rate:\control);
+
+SynthDef(\envControl, { |bus| Out.kr(bus, EnvGen.kr(\env.kr( Env.newClear().asArray ), doneAction: 2)); }).add;
+~sig.play(vol:0.5).quant_(4);
+
+Bus.new(\control, 0, 1, s).set(1);
 
 (
-//var nodeGroup = Group.new();
-//("groupID" + nodeGroup.nodeID).postln;
+~sig[0] = { SinOsc.ar(60 + \freq.kr(0).range(0,60)!2, mul:\amp.kr(0.1)) * \masterVolume.kr(1)};
 
-//~test.synth.postln;
-//.synthDef.nameDef(\ahoj);//.postln;
-~test = NodeProxy.audio(s, 2);
-~test.play(vol: 0.9, fadeTime: 1);
-~test.group_(nodeGroup);
-
-~test[0] = {
-	var osc = SinOsc.ar(( \freq.kr(90) + \fplus.kr(0) ), mul: 1, add: 0);
-	var noise = BrownNoise.ar(\noise.kr(0), (1 - \noise.kr(0)));
-	var sig = osc * noise;
-	Pan2.ar( sig * \amp.kr(1), \pan.kr(0) );
-};
-
+~sig.set(\masterVolume, BusPlug.for(0));
+~sig.set(\amp, BusPlug.for(1));
+~sig.set(\freq, BusPlug.for(2));
 )
 
+~sig[1] = Pbind(\instrument, \envControl, \bus, 1, \dur, 2, \env, [Env([0,1,0], [0.05,1.85], \lin)]);
+~sig[2] = Pbind(\instrument, \envControl, \bus, 2, \dur, 0.5, \env, [Env([0.01,0.9,0.01], [0.05,0.15], \exp)]);
+
 (
-var busIndex = 10;
-var bus = Bus.new(\control, busIndex, 1, s);
-var cNode = NodeProxy.for(bus);
-var pattern = Pseq([0,0,1,0,2], 2);
+var loop = 0;
+var pattern = Pseq([0,0,0,1], inf);
 var envs = Pswitch([
-	Env([0,1,0],[0.05,0.45]),
-	Env([0,1,0],[0.75,0.25]),
-	Env([0,1,0],[0.25,0.75])
-], pattern );
+	[Env([0.01,0.9,0.01], [0.05,0.45], \exp)],
+	[Env([0.01,0.9,0.01], [0.45,1.55], \exp)]
+], pattern);
 
-//cNode.group_(nodeGroup);
-//cNode.group_(Group.basicNew(s,1005));
-
-~test[10] = Task({
-	var cntLoops = envs.which.list.size * envs.which.repeats;
-	cntLoops.do({|noLoop|
-		var currentNum = envs.which.list[noLoop % envs.which.list.size];
+~sig[2] = Pbind(
+	\instrument, \envControl,
+	\bus, 2,
+	\env, envs,
+	\dur, Pfunc({
+		var currentNum = envs.which.list[loop % envs.which.list.size];
 		var currentEnv = envs.list[currentNum];
 
-		~test.set(\amp, cNode.source_({
-			EnvGen.kr(
-				currentEnv,
-				timeScale: currentEnvironment[\tempo].clock.tempo.reciprocal,
-				doneAction:2
-			)
-		}));
-		//noLoop.postln;
-		//("currentNum" + currentNum).postcs;
-		//currentEnv.postcs;
+		loop = loop + 1;
+		("env time" + currentEnv[0].totalDuration).postln;
 
-		currentEnv.totalDuration.wait;
+		currentEnv[0].totalDuration;
 	})
-});
+
+);
 )
 
 
+~sig[2] = nil
 
+Synth(\envControl, [\bus, 1, \env, Env([1,0], 8, \sin)]);
 
-
-
-
-
+~sig.free
 
 
 
