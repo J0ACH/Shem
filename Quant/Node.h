@@ -79,8 +79,9 @@ namespace QuantIDE
     void removeControl(QString name);
 
     QUuid objectID;
-
+    
     int nodeNumber;
+    int nodeBusIndexReserve;
     QMap<QString, QVariant*> configData;
     QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QFont fontTextBig, fontTextSmall, fontTextCode;

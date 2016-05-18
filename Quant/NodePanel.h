@@ -50,6 +50,8 @@ namespace QuantIDE
     void initControl();
     QString nextNodeName(QString);
 
+    int numOfNode;
+    
     QMap<QString, QVariant*> configData;
     QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QFont fontTextSmall;

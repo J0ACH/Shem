@@ -15,6 +15,8 @@ namespace QuantIDE
 
     this->initControl();
 
+    nodeBusIndexReserve = 30;
+
     stateNodePlay = StateNodePlay::FREE;
 
     connect(this, SIGNAL(actCodeEvaluated(QString, bool, bool)), mBridge, SLOT(evaluateCode(QString, bool, bool)));
@@ -89,11 +91,14 @@ namespace QuantIDE
     //QString groupID = mBridge->questionNEW("Group.new().nodeID", true).toString();
 
     mBridge->evaluateNEW(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-    mBridge->evaluateNEW(tr("~%1.play(out:0, group:~%1.source.nodeID);").arg(nodeName), true);
-    mBridge->evaluateNEW(tr("~%1.fadeTime = 0.5;").arg(nodeName), true);
-    mBridge->evaluateNEW(tr("~%1.quant_(1);").arg(nodeName), true);
+    mBridge->evaluateNEW(tr("~%1.play(vol:0.5).quant_(2);").arg(nodeName), true);
+    //mBridge->evaluateNEW(tr("~%1.play(vol:0.5);").arg(nodeName), true);
+    //mBridge->evaluateNEW(tr("~%1.play(out:0, group:~%1.source.nodeID);").arg(nodeName), true);
+    // mBridge->evaluateNEW(tr("~%1.fadeTime = 0.5;").arg(nodeName), true);
+    // mBridge->evaluateNEW(tr("~%1.quant_(1);").arg(nodeName), true);
 
     //labelGroupID->setText(tr("groupID: %1").arg(groupID));
+
     labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
   }
 
@@ -241,7 +246,7 @@ namespace QuantIDE
 
   void Node::addControl(QString controlName)
   {
-    int busIndex = nodeNumber * 100 + conteinerControlsGraph.size();
+    int busIndex = nodeNumber * nodeBusIndexReserve + conteinerControlsGraph.size();
     ControlEnvelope *newGraph = new ControlEnvelope(this, mBridge, nameLabel->text(), controlName, busIndex);
     newGraph->setFixedHeight(250);
     newGraph->show();

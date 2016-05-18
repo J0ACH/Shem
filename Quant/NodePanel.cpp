@@ -9,6 +9,7 @@ namespace QuantIDE
     setObjectName("NodePanel");
 
     this->initControl();
+    numOfNode = 0;
     
     connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
   }
@@ -59,7 +60,7 @@ namespace QuantIDE
   void NodePanel::addNode()
   {
     QString newName = this->nextNodeName("temp");
-    Node *newNode = new Node(scrollWidget, mBridge, newName, dictNode.values().size() + 1);
+    Node *newNode = new Node(scrollWidget, mBridge, newName, numOfNode);
 
     newNode->setSourceCode("SinOsc.ar(140!2, mul:\\amp.kr())");
     newNode->setFixedWidth(scrollArea->width() - 10);
@@ -76,6 +77,8 @@ namespace QuantIDE
     emit actConfigData(configData);
 
     scrollArea->ensureWidgetVisible(newNode, 0, newNode->height());
+
+    numOfNode++;
   }
 
   void NodePanel::deleteNode(QString nodeName)
