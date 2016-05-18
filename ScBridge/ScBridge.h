@@ -18,86 +18,86 @@
 
 namespace SupercolliderBridge
 {
-	enum class StateInterpret{ OFF, RUNNING };
-	enum class StateServer{ OFF, RUNNING };
-	enum class MessageType{ ERROR, WARNING, STATUS, EVAULATE, RESULT, ANSWER};
+  enum class StateInterpret{ OFF, RUNNING };
+  enum class StateServer{ OFF, RUNNING };
+  enum class MessageType{ ERROR, WARNING, STATUS, EVAULATE, RESULT, ANSWER };
 
-	class ScBridge : public QProcess
-	{
-		Q_OBJECT
-		
-	public:
-		ScBridge(QObject *parent);
-		~ScBridge();
+  class ScBridge : public QProcess
+  {
+    Q_OBJECT
 
-		StateInterpret stateInterpret;
-		StateServer stateServer;
+  public:
+    ScBridge(QObject *parent);
+    ~ScBridge();
 
-		QString nextID();
-		bool evaluateNEW(QString code, bool print = false, bool silent = false);
-		QVariant questionNEW(QString code, bool print = false);
+    StateInterpret stateInterpret;
+    StateServer stateServer;
 
-	private slots:
-		void onReadyRead(void);
-		void onNewIpcConnection();
-		void finalizeConnection();
-		void onIpcData();
+    QString nextID();
+    bool evaluateNEW(QString code, bool print = false, bool silent = false);
+    QVariant questionNEW(QString code, bool print = false);
 
-		void killBridge();
-		void changeInterpretState();
-		void changeServerState();
+    private slots:
+    void onReadyRead(void);
+    void onNewIpcConnection();
+    void finalizeConnection();
+    void onIpcData();
 
-		void evaluateCode(QString const & commandString, bool silent = false, bool printAnswer = false);
-		void question(QUuid id, int selector, QString commandString, bool printAnswer = false);
+    void killBridge();
+    void changeInterpretState();
+    void changeServerState();
 
-	signals:
-		void interpretBootInitAct();
-		void interpretBootDoneAct();
-		void interpretKillInitAct();
-		void interpretKillDoneAct();
+    void evaluateCode(QString const & commandString, bool silent = false, bool printAnswer = false);
+    void question(QUuid id, int selector, QString commandString, bool printAnswer = false);
 
-		void serverBootInitAct();
-		void serverBootDoneAct();
-		void serverKillInitAct();
-		void serverKillDoneAct();
+  signals:
+    void interpretBootInitAct();
+    void interpretBootDoneAct();
+    void interpretKillInitAct();
+    void interpretKillDoneAct();
 
-		void msgErrorAct(QString const &);
-		void msgWarningAct(QString const &);
-		void msgNormalAct(QString const &);
-		void msgStatusAct(QString const &);
-		void msgEvaluateAct(QString const &);
-		void msgResultAct(QString const &);
-		void msgBundleAct(QString const &);
+    void serverBootInitAct();
+    void serverBootDoneAct();
+    void serverKillInitAct();
+    void serverKillDoneAct();
 
-		void answerAct(QUuid id, int selector, QStringList answer);
-		void actSynced();
-		void actAnswered();
+    void msgErrorAct(QString const &);
+    void msgWarningAct(QString const &);
+    void msgNormalAct(QString const &);
+    void msgStatusAct(QString const &);
+    void msgEvaluateAct(QString const &);
+    void msgResultAct(QString const &);
+    void msgBundleAct(QString const &);
 
-		void killBridgeDoneAct();
+    void answerAct(QUuid id, int selector, QStringList answer);
+    void actSynced();
+    void actAnswered();
 
-		//void response(const QString & selector, const QString & data);
+    void killBridgeDoneAct();
 
-	private:
-		QLocalServer *mIpcServer;
-		QLocalSocket *mIpcSocket;
-		QString mIpcServerName;
-		QByteArray mIpcData;
+    //void response(const QString & selector, const QString & data);
 
-		int lateFlagBreakTime;
-		bool mTerminationRequested;
-		QDateTime mTerminationRequestTime;
-		bool mCompiled;
+  private:
+    QLocalServer *mIpcServer;
+    QLocalSocket *mIpcSocket;
+    QString mIpcServerName;
+    QByteArray mIpcData;
 
-		void startInterpretr();
-		void killInterpreter();
+    int lateFlagBreakTime;
+    bool mTerminationRequested;
+    QDateTime mTerminationRequestTime;
+    bool mCompiled;
 
-		void msgFilter(QString msg);
+    void startInterpretr();
+    void killInterpreter();
 
-		void onResponse(const QString & selector, const QString & data);
-				
-		//QStringList answer;
-		QVariant answer;
-	};
+    void msgFilter(QString msg);
+
+    void onResponse(const QString & selector, const QString & data);
+
+    //QStringList answer;
+    QVariant answer;
+  };
 
 }
 
