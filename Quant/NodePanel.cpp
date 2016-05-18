@@ -9,7 +9,7 @@ namespace QuantIDE
     setObjectName("NodePanel");
 
     this->initControl();
-
+    
     connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
   }
 
@@ -91,13 +91,13 @@ namespace QuantIDE
     {
       if (oneKey.startsWith(baseName))
       {
-        QString num = oneKey.remove(tr("%1_").arg(baseName));
+        QString num = oneKey.remove(tr("%1").arg(baseName));
         if (num.toInt() > cntOfNames) { cntOfNames = num.toInt() + 1; }
         else { cntOfNames++; }
       }
     };
     if (cntOfNames == 0) { return baseName; }
-    else { return tr("%1_%2").arg(baseName, QString::number(cntOfNames)); };
+    else { return tr("%1%2").arg(baseName, QString::number(cntOfNames)); };
   }
 
   void NodePanel::fitNodesPosition()

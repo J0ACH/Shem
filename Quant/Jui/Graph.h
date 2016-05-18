@@ -9,116 +9,116 @@
 
 namespace Jui
 {
-	class GraphPoint : public QWidget
-	{
-		Q_OBJECT
+  class GraphPoint : public QWidget
+  {
+    Q_OBJECT
 
-	public:
-		GraphPoint(QWidget *parent, int ptID, int pX, int pY, double valX, double valY);
-		~GraphPoint();
+  public:
+    GraphPoint(QWidget *parent, int ptID, int pX, int pY, double valX, double valY);
+    ~GraphPoint();
 
-		QRect bounds();
-		int ID;
-		int pixelX, pixelY;
-		double valueX, valueY;
-		int pointSize;
-		int curvature;
+    QRect bounds();
+    int ID;
+    int pixelX, pixelY;
+    double valueX, valueY;
+    int pointSize;
+    int curvature;
 
-		enum PointType {vertex, startPoint, endPoint, curvePoint};
-		PointType type;
+    enum PointType { vertex, startPoint, endPoint, curvePoint };
+    PointType type;
 
-	signals:
-		void actDelete(int ID);
-		void actMoved(int ID, int pixelX, int pixelY);
+  signals:
+    void actDelete(int ID);
+    void actMoved(int ID, int pixelX, int pixelY);
 
-	protected:
-		void paintEvent(QPaintEvent *);
-		void mousePressEvent(QMouseEvent *);
-		void mouseMoveEvent(QMouseEvent *);
-		void mouseReleaseEvent(QMouseEvent *mouseEvent);
-		void closeEvent(QCloseEvent *);
-		void focusInEvent(QFocusEvent* );
-		void focusOutEvent(QFocusEvent* );
+  protected:
+    void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *);
+    void mouseMoveEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *mouseEvent);
+    void closeEvent(QCloseEvent *);
+    void focusInEvent(QFocusEvent*);
+    void focusOutEvent(QFocusEvent*);
 
-		virtual bool eventFilter(QObject * watched, QEvent * event);
+    virtual bool eventFilter(QObject * watched, QEvent * event);
 
-	private:
-		QPoint mousePressCoor;
-		QPoint mouseGlobalCoor;
+  private:
+    QPoint mousePressCoor;
+    QPoint mouseGlobalCoor;
 
-		QLabel *labelID;
-		QLabel *labelLevel, *labelTime;
-	};
-
-
-	// GRAPH POINT END
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// GRAPH 
+    QLabel *labelID;
+    QLabel *labelLevel, *labelTime;
+  };
 
 
-	class Graph : public QWidget
-	{
-		Q_OBJECT
+  // GRAPH POINT END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH 
 
-	public:
-		Graph(QWidget *parent);
-		~Graph();
 
-		QRect bounds();
-		QRect boundsGraph();
-		void setDomainX(int min, int max);
-		void setDomainY(int min, int max);
-		QList<double> getDomainX();
-		QList<double> getDomainY();
-		
-		//void addPixelPoint(int pixelX, int pixelY);
-		GraphPoint *addValuePoint(double valueX, double valueY, GraphPoint::PointType type);
-		void addCurvePoint(double valueX, double valueY, int curveValue);
+  class Graph : public QWidget
+  {
+    Q_OBJECT
 
-		void drawPoint(double valueX, double valueY);
-		void drawLine(double valueX1, double valueY1, double valueX2, double valueY2);
-		void drawPolyline(QVector<QPointF> collPoints);
+  public:
+    Graph(QWidget *parent);
+    ~Graph();
 
-		void deleteGraph();
+    QRect bounds();
+    QRect boundsGraph();
+    void setDomainX(int min, int max);
+    void setDomainY(int min, int max);
+    QList<double> getDomainX();
+    QList<double> getDomainY();
 
-	public slots:
-		void onDeletePoint(int ID);
-		void onMovePoint(int ID, int pixelX, int pixelY);
-		void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
+    //void addPixelPoint(int pixelX, int pixelY);
+    GraphPoint *addValuePoint(double valueX, double valueY, GraphPoint::PointType type);
+    void addCurvePoint(double valueX, double valueY, int curveValue);
 
-	signals:
-		void actPointAdded(double valueX, double valueY);
-		void actGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
+    void drawPoint(double valueX, double valueY);
+    void drawLine(double valueX1, double valueY1, double valueX2, double valueY2);
+    void drawPolyline(QVector<QPointF> collPoints);
 
-	protected:
-		void paintEvent(QPaintEvent *);
-		void resizeEvent(QResizeEvent *event);
+    void deleteGraph();
 
-	private:
-		void mousePressEvent(QMouseEvent *mouseEvent);
-		void mouseReleaseEvent(QMouseEvent *mouseEvent);
+    public slots:
+    void onDeletePoint(int ID);
+    void onMovePoint(int ID, int pixelX, int pixelY);
+    void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
 
-		void makeEnv();
-		void sortPointsByX();
+  signals:
+    void actPointAdded(double valueX, double valueY);
+    void actGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
 
-		int frameOffset;
-		int minDomainX, maxDomainX, minDomainY, maxDomainY;
+  protected:
+    void paintEvent(QPaintEvent *);
+    void resizeEvent(QResizeEvent *event);
 
-		QList<GraphPoint*> controlPts;
-		QList<GraphPoint*> curvePts;
+  private:
+    void mousePressEvent(QMouseEvent *mouseEvent);
+    void mouseReleaseEvent(QMouseEvent *mouseEvent);
 
-		QList<QPointF*> collDrawPoints;
-		QList<QLineF*> collDrawLines;
-		QPolygonF *graphPolylines;
+    void makeEnv();
+    void sortPointsByX();
 
-		QList<double> graphValues;
+    int frameOffset;
+    int minDomainX, maxDomainX, minDomainY, maxDomainY;
 
-		double getValueX(int displayX);
-		double getValueY(int displayY);
-		double getPixelX(double valueX);
-		double getPixelY(double valueY);
+    QList<GraphPoint*> controlPts;
+    QList<GraphPoint*> curvePts;
 
-	};
+    QList<QPointF*> collDrawPoints;
+    QList<QLineF*> collDrawLines;
+    QPolygonF *graphPolylines;
+
+    QList<double> graphValues;
+
+    double getValueX(int displayX);
+    double getValueY(int displayY);
+    double getPixelX(double valueX);
+    double getPixelY(double valueY);
+
+  };
 
 }
 #endif // GRAPH_H
