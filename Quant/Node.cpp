@@ -127,10 +127,10 @@ namespace QuantIDE
     txt += tr("%1; ").arg(oneAnsw);
     }
     */
-    qDebug() << "Node::onBridgeAnswer::target: " << controlKeys;
+    qDebug() << "Node::sendSourceCode::controlKeys: " << controlKeys;
     labelNamedControls->setText(tr("controls: %1").arg(controlKeys.join("; ")));
 
-    //this->initControlsEditor(answer);
+    this->initControlsEditor(controlKeys);
 
     /*
     //QString code = tr("~%1[0] = {Out.ar(0, %2)}").arg(name(), txt);
@@ -138,7 +138,7 @@ namespace QuantIDE
     emit actCodeEvaluated(code, false, true);
 
     */
-    onBridgeQuestion(QuestionType::namedControls);
+    //onBridgeQuestion(QuestionType::namedControls);
   }
 
   void Node::sendSetNode(QString nameControl, QString txt)
@@ -232,16 +232,19 @@ namespace QuantIDE
 
   void Node::initControlsEditor(QStringList namedControls)
   {
+    qDebug() << "Node::initControlsEditor::namedControls: " << namedControls;
+    qDebug() << "Node::initControlsEditor::keys1: " << conteinerControlsGraph.keys();
     QStringList existKeys = conteinerControlsGraph.keys();
     foreach(QString key, existKeys)
     {
       if (!namedControls.contains(key)) { this->removeControl(key); }
     }
-
+    qDebug() << "Node::initControlsEditor::keys2: " << conteinerControlsGraph.keys();
     foreach(QString key, namedControls)
     {
       if (!conteinerControlsGraph.contains(key)) { this->addControl(key); }
     }
+    qDebug() << "Node::initControlsEditor::keys3: " << conteinerControlsGraph.keys();
   }
 
   void Node::addControl(QString controlName)

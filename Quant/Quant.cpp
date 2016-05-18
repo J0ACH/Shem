@@ -310,7 +310,7 @@ namespace QuantIDE
 
   // GLOBAL CODE
 
-  void Quant::onRecivedGlobalCode(QString code) { bridge->evaluateNEW(code, true); }
+  void Quant::onRecivedGlobalCode(QString code) { bridge->questionNEW(code, true); }
 
   Quant::~Quant() { }
 }
