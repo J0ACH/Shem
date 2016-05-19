@@ -220,7 +220,7 @@ namespace SupercolliderBridge
       {
         txt = answer.toStringList().join(" || ");
       }
-      emit msgNormalAct(tr("QA [%1 ms]: %2 = %3\r\n").arg(
+      emit msgResultAct(tr("QA [%1 ms]: %2 = %3\r\n").arg(
         QString::number(durationTime),
         code,
         txt

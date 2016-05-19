@@ -32,7 +32,6 @@ namespace QuantIDE
     ~Node();
 
     StateNodePlay stateNodePlay;
-    enum QuestionType { /*nodeID,*/ namedControls, namedValues };
 
     void setName(QString);
     void setSourceCode(QString);
@@ -47,21 +46,11 @@ namespace QuantIDE
     void fitControlsPosition();
     void onConfigData(QMap<QString, QVariant*> config);
 
-    //void onEvaluateNode();
-    //void onReciveText(QString);
-    void onBridgeQuestion(QuestionType selector, QString args = QString::null);
-    void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
-
-    void changeNodePlay();
-
-    void sendFreeNode();
+    void changeNodePlay();  
     void sendSourceCode(QString txt);
-    void sendSetNode(QString nameControl, QString txt);
 
   signals:
-    void actCodeEvaluated(QString, bool silent = false, bool print = false);
     void killAct(QString);
-    void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
     void actChangedHeight();
 
   protected:
@@ -78,8 +67,6 @@ namespace QuantIDE
     void addControl(QString name);
     void removeControl(QString name);
 
-    QUuid objectID;
-    
     int nodeNumber;
     int nodeBusIndexReserve;
     int nextEmptyBusIndex();
