@@ -34,6 +34,7 @@ namespace QuantIDE
     };
 
     QRect bounds();
+    int busIndex;
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
     QString getEnv();
 
@@ -79,10 +80,6 @@ namespace QuantIDE
     //QLabel *levelLabel, *timeLabel, *curveLabel;
     CodeEditor *envelopeCode;
     Graph *envGraph;
-
-    int busIndex;
-
-
 
     void initControl();
   };

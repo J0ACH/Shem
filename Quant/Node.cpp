@@ -249,8 +249,14 @@ namespace QuantIDE
 
   void Node::addControl(QString controlName)
   {
-    int busIndex = nodeNumber * nodeBusIndexReserve + conteinerControlsGraph.size();
-    ControlEnvelope *newGraph = new ControlEnvelope(this, mBridge, nameLabel->text(), controlName, busIndex);
+    int busIndex = this->nextEmptyBusIndex();
+    ControlEnvelope *newGraph = new ControlEnvelope(
+      this,
+      mBridge,
+      nameLabel->text(),
+      controlName,
+      busIndex
+      );
     newGraph->setFixedHeight(250);
     newGraph->show();
 
@@ -267,6 +273,29 @@ namespace QuantIDE
     conteinerControlsGraph.remove(controlName);
 
     this->fitControlsPosition();
+  }
+
+  int Node::nextEmptyBusIndex()
+  {
+    int startIndex = nodeNumber * nodeBusIndexReserve;
+    for (int i = startIndex; i < startIndex + nodeBusIndexReserve; i++)
+    {
+      bool indexFound = false;
+      foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
+      {
+        if (i == oneEnv->busIndex)
+        {
+          indexFound = true;
+          break;
+        }
+      }
+      if (!indexFound) {
+        qDebug() <<"Node::nextEmptyBusIndex(): " << i;
+        return i; 
+      };
+    }
+    mBridge->msgWarningAct(tr("Array of reserved bus index for node %1 is full").arg(nodeName));
+    return startIndex;
   }
 
   void Node::changeNodePlay()

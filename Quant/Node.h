@@ -82,6 +82,8 @@ namespace QuantIDE
     
     int nodeNumber;
     int nodeBusIndexReserve;
+    int nextEmptyBusIndex();
+
     QMap<QString, QVariant*> configData;
     QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QFont fontTextBig, fontTextSmall, fontTextCode;
