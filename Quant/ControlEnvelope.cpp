@@ -30,10 +30,10 @@ namespace QuantIDE
       this, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
       );
 
-    // ??????? prob
-    //mBridge->evaluateNEW(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
-    
     this->onEnvelopeCodeEvaluate();
+
+    // ??????? prob
+    mBridge->evaluateNEW(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
   }
 
   QRect ControlEnvelope::bounds() { return QRect(0, 0, width() - 1, height() - 1); }

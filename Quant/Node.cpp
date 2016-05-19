@@ -82,7 +82,7 @@ namespace QuantIDE
     //QString groupID = mBridge->questionNEW("Group.new().nodeID", true).toString();
 
     mBridge->evaluateNEW(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-    mBridge->evaluateNEW(tr("~%1.play(vol:0.5).quant_(2);").arg(nodeName), true);
+    mBridge->evaluateNEW(tr("~%1.play(vol:0.0).quant_(2);").arg(nodeName), true);
     //mBridge->evaluateNEW(tr("~%1.play(vol:0.5);").arg(nodeName), true);
     //mBridge->evaluateNEW(tr("~%1.play(out:0, group:~%1.source.nodeID);").arg(nodeName), true);
     // mBridge->evaluateNEW(tr("~%1.fadeTime = 0.5;").arg(nodeName), true);
@@ -98,7 +98,7 @@ namespace QuantIDE
     QString txtNodeID = tr("~%1.nodeID;").arg(nodeName);
     return mBridge->questionNEW(txtNodeID, true).toString();
   }
-  
+
   void Node::setSourceCode(QString txt)
   {
     sourceCode->setText(txt);
@@ -107,25 +107,39 @@ namespace QuantIDE
   void Node::sendSourceCode(QString txt)
   {
     mBridge->evaluateNEW(tr("(~%1[0] = { %2 })").arg(nodeName, txt), true);
-    QStringList controlKeys = mBridge->questionNEW(tr("~%1.controlKeys").arg(nodeName), true).toStringList();
-
+  
     //qDebug() << "Node::sendSourceCode::controlKeys: " << controlKeys;
-    labelNamedControls->setText(tr("controls: %1").arg(controlKeys.join("; ")));
-
-    this->initControlsEditor(controlKeys);
+    labelNamedControls->setText(tr("controls: %1").arg(this->getControlKeys().join("; ")));
   }
 
-  void Node::initControlsEditor(QStringList namedControls)
+  QStringList Node::getControlKeys()
   {
+    QStringList controlKeys = mBridge->questionNEW(tr("~%1.controlKeys").arg(nodeName), true).toStringList();
+
+    //check pouze pro source (index[0])
+    //controlKeys obsahuje i namapovane klice, ktere je treba jeste ~node.unmap(\key)
+    QStringList constants = mBridge->questionNEW(tr("~%1.source.def.constants").arg(nodeName), true).toStringList();
+
+    foreach(QString key, controlKeys)
+    {
+      if (!constants.contains(key))
+      {
+        mBridge->evaluateNEW(tr("~%1.unmap(\\%2)").arg(nodeName, key), true);
+        controlKeys.removeAt(controlKeys.indexOf(key, 0));
+      }
+    }
+
     QStringList existKeys = conteinerControlsGraph.keys();
     foreach(QString key, existKeys)
     {
-      if (!namedControls.contains(key)) { this->removeControl(key); }
+      if (!controlKeys.contains(key)) { this->removeControl(key); }
     }
-    foreach(QString key, namedControls)
+    foreach(QString key, controlKeys)
     {
       if (!conteinerControlsGraph.contains(key)) { this->addControl(key); }
     }
+
+    return controlKeys;
   }
 
   void Node::addControl(QString controlName)

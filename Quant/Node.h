@@ -60,7 +60,6 @@ namespace QuantIDE
 
   private:
     void initControl();
-    void initControlsEditor(QStringList namedControls);
     void initNode();
 
     void addControl(QString name);
@@ -81,7 +80,7 @@ namespace QuantIDE
     Button *closeButton, *playButton;
 
     QMap<QString, ControlEnvelope*> conteinerControlsGraph;
-
+    QStringList getControlKeys();
   };
 }
 
