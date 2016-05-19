@@ -7,7 +7,7 @@
 #include "ScBridge.h"
 
 #include <QWidget>
-#include <QPushButton>
+//#include <QPushButton>
 #include <QLabel>
 #include <QPainter>
 #include <QTextEdit>
@@ -25,8 +25,7 @@ namespace QuantIDE
   class Node : public QWidget
   {
     Q_OBJECT
-
-
+      
   public:
     Node(QWidget *parent, ScBridge *bridge, QString name, int nodeNum);
     ~Node();

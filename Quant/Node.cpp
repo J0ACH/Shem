@@ -130,13 +130,13 @@ namespace QuantIDE
 
   void Node::addControl(QString controlName)
   {
-    int busIndex = this->nextEmptyBusIndex();
+    //int busIndex = this->nextEmptyBusIndex();
     ControlEnvelope *newGraph = new ControlEnvelope(
       this,
       mBridge,
       nameLabel->text(),
       controlName,
-      busIndex
+      this->nextEmptyBusIndex()
       );
     newGraph->setFixedHeight(250);
     newGraph->show();

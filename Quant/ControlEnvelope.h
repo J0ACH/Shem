@@ -63,7 +63,7 @@ namespace QuantIDE
   private:
     ScBridge *mBridge;
     QUuid objectID;
-    QString name, parentName;
+    QString nodeName, controlName;
 
     QList<double> levels;
     QList<double> times;

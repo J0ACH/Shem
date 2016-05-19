@@ -2,11 +2,11 @@
 
 namespace QuantIDE
 {
-  ControlEnvelope::ControlEnvelope(QWidget *parent, ScBridge *bridge, QString nodeName, QString controlName, int cBus) :
+  ControlEnvelope::ControlEnvelope(QWidget *parent, ScBridge *bridge, QString inNodeName, QString cntName, int cBus) :
     QWidget(parent),
     mBridge(bridge),
-    parentName(nodeName),
-    name(controlName),
+    nodeName(inNodeName),
+    controlName(cntName),
     busIndex(cBus)
   {
     this->setObjectName("ControlEnvelope");
@@ -30,7 +30,9 @@ namespace QuantIDE
       this, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
       );
 
-    //this->onBridgeQuestion(QuestionType::initBusIndex);
+    // ??????? prob
+    //mBridge->evaluateNEW(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
+    
     this->onEnvelopeCodeEvaluate();
   }
 
@@ -39,7 +41,7 @@ namespace QuantIDE
   void ControlEnvelope::initControl()
   {
     nameLabel = new QLabel(this);
-    nameLabel->setText(name);
+    nameLabel->setText(controlName);
 
     busLabel = new QLabel(this);
     busLabel->setText(tr("busIndex : %1").arg(busIndex));
@@ -321,26 +323,14 @@ namespace QuantIDE
 
   void ControlEnvelope::mouseReleaseEvent(QMouseEvent *mouseEvent)
   {
-    //qDebug() << "ControlEnvelope::mousePressEvent";
-    //QString code1 = tr("~%1.nodeID").arg(parentName);
-    //QString code2 = tr("~%1.source.def.sourceCode").arg(parentName);
-    //QString code3 = tr("~%1.isPlaying").arg(parentName);
 
-    mBridge->questionNEW(tr("~%1.nodeID").arg(parentName), true);
-    mBridge->questionNEW(tr("~%1.source.def.sourceCode").arg(parentName), true);
-    mBridge->questionNEW(tr("~%1.isPlaying").arg(parentName), true);
-
-    //QString answer1 = tr("QA: %1 = %2").arg(code1, mBridge->questionNEW(code1, true));
-    //QString answer2 = tr("QA: %1 = %2").arg(code2, mBridge->questionNEW(code2, true));
-    //QString answer3 = tr("QA: %1 = %2").arg(code3, mBridge->questionNEW(code3, true));
-    //mBridge->msgStatusAct(answer1);
-    //mBridge->msgStatusAct(answer2);
-    //mBridge->msgStatusAct(answer3);
+    mBridge->questionNEW(tr("~%1.nodeID").arg(nodeName), true);
+    mBridge->questionNEW(tr("~%1.source.def.sourceCode").arg(nodeName), true);
+    mBridge->questionNEW(tr("~%1.isPlaying").arg(nodeName), true);
 
     for (int i = 0; i <= 10; i++)
     {
       double oneX = 1 / 10.0*i;
-      //this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
 
       QString code1 = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), QString::number(oneX));
       QString answer1 = tr("QA: %1 = %2").arg(code1, mBridge->questionNEW(code1, true).toString());
@@ -358,19 +348,6 @@ namespace QuantIDE
     foreach(double oneX, graphCurveX) {
       this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
     }
-    /*
-    for (int i = 0; i <= 10; i++)
-    {
-    double oneX = 1 / 10.0*i;
-    //this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
-
-    QString code1 = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), QString::number(oneX));
-    QString answer1 = tr("resize QA: %1 = %2").arg(code1, mBridge->questionNEW(code1,false));
-    qDebug() << answer1;
-    }
-    */
-
-    //this->onBridgeQuestion(QuestionType::redrawEnvGraph);
   }
 
   void ControlEnvelope::paintEvent(QPaintEvent *event)
