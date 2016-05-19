@@ -98,6 +98,7 @@ namespace QuantIDE
   }
   void ControlEnvelope::sendTask()
   {
+    /*
     qDebug() << "TASK TEST";
 
     QString code;
@@ -119,6 +120,7 @@ namespace QuantIDE
     code += "});\n";
     code += ")";
     emit actCodeEvaluated(code, false, false);
+    */
   }
 
   void ControlEnvelope::onEnvelopeCodeEvaluate()
@@ -137,7 +139,7 @@ namespace QuantIDE
     }
     this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 
-    this->sendTask();
+    //this->sendTask();
   }
 
 
