@@ -68,8 +68,6 @@ namespace QuantIDE
     labelNamedControls->setFont(fontTextSmall);
 
     configData = config;
-    //emit actConfigData(config);
-
     update();
   }
 
@@ -79,11 +77,8 @@ namespace QuantIDE
 
   void Node::initNode()
   {
-    //QString groupID = mBridge->questionNEW("Group.new().nodeID", true).toString();
-
     mBridge->evaluateNEW(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-    mBridge->evaluateNEW(tr("~%1.play(vol:0.0).quant_(2);").arg(nodeName), true);
-    //mBridge->evaluateNEW(tr("~%1.play(vol:0.5);").arg(nodeName), true);
+    mBridge->evaluateNEW(tr("~%1.play(vol:0.2).quant_(2);").arg(nodeName), true);
     //mBridge->evaluateNEW(tr("~%1.play(out:0, group:~%1.source.nodeID);").arg(nodeName), true);
     // mBridge->evaluateNEW(tr("~%1.fadeTime = 0.5;").arg(nodeName), true);
     // mBridge->evaluateNEW(tr("~%1.quant_(1);").arg(nodeName), true);
@@ -107,18 +102,18 @@ namespace QuantIDE
   void Node::sendSourceCode(QString txt)
   {
     mBridge->evaluateNEW(tr("(~%1[0] = { %2 })").arg(nodeName, txt), true);
-  
+
     //qDebug() << "Node::sendSourceCode::controlKeys: " << controlKeys;
     labelNamedControls->setText(tr("controls: %1").arg(this->getControlKeys().join("; ")));
   }
 
   QStringList Node::getControlKeys()
   {
-    QStringList controlKeys = mBridge->questionNEW(tr("~%1.controlKeys").arg(nodeName), true).toStringList();
+    QStringList controlKeys = mBridge->questionNEW(tr("~%1.controlKeys").arg(nodeName)).toStringList();
 
     //check pouze pro source (index[0])
     //controlKeys obsahuje i namapovane klice, ktere je treba jeste ~node.unmap(\key)
-    QStringList constants = mBridge->questionNEW(tr("~%1.source.def.constants").arg(nodeName), true).toStringList();
+    QStringList constants = mBridge->questionNEW(tr("~%1.source.def.constants").arg(nodeName)).toStringList();
 
     foreach(QString key, controlKeys)
     {
@@ -144,6 +139,9 @@ namespace QuantIDE
 
   void Node::addControl(QString controlName)
   {
+    QString defaultValue = mBridge->questionNEW(tr("~%1.controlKeysValues ([\\%2])[1]").arg(nodeName, controlName)).toString();
+   // qDebug() << controlName << "control default value is " << defaultValue;
+
     //int busIndex = this->nextEmptyBusIndex();
     ControlEnvelope *newGraph = new ControlEnvelope(
       this,
@@ -153,13 +151,15 @@ namespace QuantIDE
       this->nextEmptyBusIndex()
       );
     newGraph->setFixedHeight(250);
+    newGraph->setEnv(tr("Env([%1,%1], 4, 0)").arg(defaultValue));
     newGraph->show();
+
+
 
     conteinerControlsGraph.insert(controlName, newGraph);
 
     //chyba, doresit pro nastaveni zakladu envelopy
-    QString defaultValue = mBridge->questionNEW(tr("~%1.controlKeysValues (['%2'])").arg(nodeName, controlName)).toString();
-    qDebug() << controlName << "control default value is " << defaultValue;
+    
     //
 
     this->fitControlsPosition();

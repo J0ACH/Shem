@@ -35,8 +35,10 @@ namespace QuantIDE
 
     QRect bounds();
     int busIndex;
+    void setEnv(QString envCode);
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
     QString getEnv();
+    QVector<QPointF> getEnvValues(int segments);
 
     public slots:
     void sendFreeBusIndex();
@@ -65,6 +67,7 @@ namespace QuantIDE
     QUuid objectID;
     QString nodeName, controlName;
 
+    double duration;
     QList<double> levels;
     QList<double> times;
     QList<QString> curves;
