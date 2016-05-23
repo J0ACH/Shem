@@ -224,13 +224,13 @@ namespace Jui
     return bounds().adjusted(frameOffset * 2, 14, -14, -frameOffset);
   }
 
-  void Graph::setDomainX(int min, int max)
+  void Graph::setDomainX(double min, double max)
   {
     minDomainX = min;
     maxDomainX = max;
     update();
   }
-  void Graph::setDomainY(int min, int max)
+  void Graph::setDomainY(double min, double max)
   {
     minDomainY = min;
     maxDomainY = max;
@@ -272,40 +272,7 @@ namespace Jui
     double perc = (valueY - minDomainY) / (double)(maxDomainY - minDomainY);
     return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
   }
-  /*
-  void Graph::addPixelPoint(int pixelX, int pixelY)
-  {
-  GraphPoint *pt = new GraphPoint(
-  this,
-  controlPts.size(),
-  pixelX,
-  pixelY,
-  getValueX(pixelX),
-  getValueY(pixelY)
-  );
-  pt->show();
-
-  this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
-  this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
-
-  if (controlPts.size() == 0) { controlPts.append(pt); }
-  else
-  {
-  for (int i = 0; i <= controlPts.size(); i++)
-  {
-  if (i == controlPts.size()) {
-  controlPts.append(pt);
-  break;
-  }
-  if (controlPts[i]->valueX > pt->valueX)
-  {
-  controlPts.insert(i, pt);
-  break;
-  }
-  }
-  }
-  }
-  */
+ 
   GraphPoint *Graph::addValuePoint(double valueX, double valueY, GraphPoint::PointType type = GraphPoint::PointType::vertex)
   {
     GraphPoint *pt = new GraphPoint(

@@ -1,4 +1,4 @@
-#include "ControlEnvelope.h"
+﻿#include "ControlEnvelope.h"
 
 namespace QuantIDE
 {
@@ -30,7 +30,7 @@ namespace QuantIDE
       this, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
       );
 
-    this->onEnvelopeCodeEvaluate();
+   // this->onEnvelopeCodeEvaluate();
 
     mBridge->evaluateNEW(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
   }
@@ -70,9 +70,17 @@ namespace QuantIDE
     levels = QList<double>();
     times = QList<double>();
     curves = QList<QString>();
+    double minLevel = 0;
+    double maxLevel = 1;
 
     QStringList txtLevels = mBridge->questionNEW(tr("%1.levels").arg(envCode)).toStringList();
-    foreach(QString oneLevel, txtLevels) { levels.append(oneLevel.toDouble()); }
+    foreach(QString oneLevel, txtLevels)
+    {
+      double dLev = oneLevel.toDouble();
+      levels.append(dLev);
+      if (dLev > maxLevel) { maxLevel = dLev; }
+      if (dLev < minLevel) { minLevel = dLev; }
+    }
 
     QStringList txtTimes = mBridge->questionNEW(tr("%1.times").arg(envCode)).toStringList();
     foreach(QString oneTime, txtTimes) { times.append(oneTime.toDouble()); }
@@ -82,9 +90,14 @@ namespace QuantIDE
 
     duration = mBridge->questionNEW(tr("%1.totalDuration").arg(this->getEnv()), true).toString().toDouble();
     qDebug() << "duration:" << duration;
-    envGraph->setDomainX(0, (int)duration);
+    envGraph->setDomainX(0, duration);
+    envGraph->setDomainY(minLevel, maxLevel);
 
-    envGraph->drawPolyline(this->getEnvValues(10));
+    //envGraph->addValuePoint(0, levels[0], Jui::GraphPoint::startPoint);
+   // envGraph->addValuePoint(duration, levels[levels.size() - 1], Jui::GraphPoint::endPoint);
+
+
+    envGraph->drawPolyline(this->getEnvValues(200));
     update();
     envelopeCode->setText(envCode);
   }
@@ -94,9 +107,21 @@ namespace QuantIDE
     levels = listLevels;
     times = listTimes;
     curves = listCurves;
+    double minLevel = 0;
+    double maxLevel = 1;
+
+    foreach(double oneLevel, levels)
+    {
+      if (oneLevel > maxLevel) { maxLevel = oneLevel; }
+      if (oneLevel < minLevel) { minLevel = oneLevel; }
+    }
 
     duration = mBridge->questionNEW(tr("%1.totalDuration").arg(this->getEnv()), true).toDouble();
-    //envGraph->setDomainX(0, mBridge->questionNEW(tr("%1.totalDuration").arg(this->getEnv()), true).toInt());
+    envGraph->setDomainX(0, duration);
+    envGraph->setDomainY(minLevel, maxLevel);
+
+    envGraph->drawPolyline(this->getEnvValues(200));
+    update();
     envelopeCode->setText(this->getEnv());
   }
 
@@ -128,7 +153,7 @@ namespace QuantIDE
     {
       double xVal = (duration / (double)segments * i);
       //qDebug() << "xVal:" << xVal;
-      QString txtVal = mBridge->questionNEW(tr("%1.at(%2)").arg(this->getEnv(), QString::number(xVal)), true).toString();
+      QString txtVal = mBridge->questionNEW(tr("%1.at(%2)").arg(this->getEnv(), QString::number(xVal))).toString();
       // qDebug() << "txtVal:" << txtVal;
       //values.append(txtVal.toDouble());
       points.append(QPointF(xVal, txtVal.toDouble()));
@@ -171,34 +196,88 @@ namespace QuantIDE
 
   void ControlEnvelope::onEnvelopeCodeEvaluate()
   {
-    // envGraph->deleteGraph();
+    qDebug() << "onEnvelopeCodeEvaluate TED";
+    envGraph->deleteGraph();
+    //this->setEnv(envelopeCode->toPlainText());
 
-    graphCurveY = QList<double>();
-    graphPolyline = QVector<QPointF>();
+    //graphCurveY = QList<double>();
+    //graphPolyline = QVector<QPointF>();
 
     // this->onBridgeQuestion(QuestionType::envArray);
 
-
+    /*
     foreach(double oneX, graphCurveX)
     {
       //   this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
     }
+    */
     //this->onBridgeQuestion(QuestionType::redrawEnvGraph);
 
     //this->sendTask();
+
+    double currentPointTime;
+    QList<double> dblList;
+    QList<double> levels;
+    QList<double> times;
+    QList<double> type;
+    QList<double> curves;
+
+    QStringList answer = mBridge->questionNEW(tr("%1.asArray").arg(this->getEnv()), true).toStringList();
+
+    foreach(QString oneAnsw, answer) { dblList.append(oneAnsw.toDouble()); }
+   // qDebug() << "ControlEnvelope::envArray: " << answer;
+    
+    currentPointTime = 0 - answer[1].toDouble();
+    for (int i = 0; i < answer.size(); i += 4)
+    {
+      currentPointTime += answer[i + 1].toDouble();
+
+      levels.append(answer[i].toDouble());
+      times.append(currentPointTime);
+      curves.append(answer[i + 3].toDouble());
+      
+      qDebug() << "level: " << answer[i];
+      qDebug() << "time: " << answer[i + 1];
+      qDebug() << "type: " << answer[i + 2];
+      qDebug() << "curve: " << answer[i + 3];
+      qDebug() << "///////////////////\n";
+      
+    }
+    /*
+    if (times.size() > 0)
+    {
+      midCurvePointX = QList<double>();
+      midCurvePointY = QList<double>();
+
+      for (int i = 1; i < times.size(); i++)
+      {
+        //qDebug() << "times[i] " << times[i];
+        //qDebug() << "times[i-1] " << times[i-1];
+        currentPointTime = ((times[i] - times[i - 1]) / 2) + times[i - 1];
+        midCurvePointX.append(currentPointTime);
+        //qDebug() << "currentTime " << currentPointTime;
+        //this->onBridgeQuestion(QuestionType::envAt, QString::number(currentPointTime));
+        QString txtVal = mBridge->questionNEW(tr("%1.at(%2)").arg(this->getEnv(), QString::number(currentPointTime))).toString();
+        points.append(QPointF(currentPointTime, txtVal.toDouble()));
+        //currentPointTime += times[i];
+      }
+    }
+    */
+    envGraph->drawPolyline(this->getEnvValues(200));
+
+   //☻ emit actGraphEnv(levels, times, curves);
+    
+   // update();
   }
-
-
 
   void ControlEnvelope::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
   {
-    /*
+    
     qDebug() << "ControlEnvelope::onControlPointsChange";
     qDebug() << "levels: " << envLevels;
     qDebug() << "times: " << envTimes;
     qDebug() << "curves: " << envCurves;
-    */
-
+  
     QStringList txtLevels;
     QStringList txtTime;
     QStringList txtCurves;

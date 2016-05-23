@@ -66,8 +66,8 @@ namespace Jui
 
     QRect bounds();
     QRect boundsGraph();
-    void setDomainX(int min, int max);
-    void setDomainY(int min, int max);
+    void setDomainX(double min, double max);
+    void setDomainY(double min, double max);
     QList<double> getDomainX();
     QList<double> getDomainY();
 
@@ -102,7 +102,7 @@ namespace Jui
     void sortPointsByX();
 
     int frameOffset;
-    int minDomainX, maxDomainX, minDomainY, maxDomainY;
+    double minDomainX, maxDomainX, minDomainY, maxDomainY;
 
     QList<GraphPoint*> controlPts;
     QList<GraphPoint*> curvePts;
