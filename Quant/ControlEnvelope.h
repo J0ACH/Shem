@@ -70,9 +70,11 @@ namespace QuantIDE
     QString nodeName, controlName;
 
     double duration;
+    int numLevelPoints;
     QList<double> levels;
     QList<double> times;
-    QList<QString> curves;
+    QList<QString> symbols;
+    QList<int> curves;
 
     QVector<QPointF> graphPolyline;
     QList<double> graphCurveX;
