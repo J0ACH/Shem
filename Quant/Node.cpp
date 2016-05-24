@@ -168,7 +168,8 @@ namespace QuantIDE
 
   int Node::nextEmptyBusIndex()
   {
-    int startIndex = nodeNumber * nodeBusIndexReserve;
+    QString fisrtPrivateBus = mBridge->questionNEW("s.options.numOutputBusChannels + s.options.numInputBusChannels").toString();
+    int startIndex = nodeNumber * nodeBusIndexReserve + fisrtPrivateBus.toInt();
     for (int i = startIndex; i < startIndex + nodeBusIndexReserve; i++)
     {
       bool indexFound = false;

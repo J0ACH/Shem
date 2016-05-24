@@ -454,8 +454,7 @@ namespace SupercolliderBridge
     qDebug() << "newID " << newID;
     return newID;
   }
-
-
+  
   void ScBridge::onNewIpcConnection()
   {
     if (mIpcSocket)

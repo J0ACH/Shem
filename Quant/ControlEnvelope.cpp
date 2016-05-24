@@ -16,23 +16,12 @@ namespace QuantIDE
 
     this->initControl();
     cntVertex = 0;
-    connect(envelopeCode, SIGNAL(sendText(QString)), this, SLOT(setEnv(QString)));
-    // connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
-    //  connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
-    // connect(this, SIGNAL(actCodeEvaluated(QString, bool, bool)), mBridge, SLOT(evaluateCode(QString, bool, bool)));
 
-    /*
-    connect(
-    this, SIGNAL(actGraphEnv(QList<double>, QList<double>, QList<double>)),
-    envGraph, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
-    );
-    */
+    connect(envelopeCode, SIGNAL(sendText(QString)), this, SLOT(setEnv(QString)));
     connect(
       envGraph, SIGNAL(actEnvGraphChanged(QList<double>, QList<double>, QList<QString>)),
       this, SLOT(setEnv(QList<double>, QList<double>, QList<QString>))
       );
-
-    // this->onEnvelopeCodeEvaluate();
 
     mBridge->evaluateNEW(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
   }
@@ -60,7 +49,6 @@ namespace QuantIDE
 
     //stane se jen pri prvnim nastaveni env
     if (cntVertex == 0) { envelopeCode->setText(envCode); };
-    //if (envGraph->getNumVertexPoints() == 0) { envelopeCode->setText(envCode); };
 
     levels = QList<double>();
     times = QList<double>();
@@ -70,7 +58,6 @@ namespace QuantIDE
 
     QStringList answer = mBridge->questionNEW(tr("%1.asArray").arg(envCode)).toStringList();
 
-    //double currentPointTime = 0 - answer[1].toDouble();
     int newNumLevelPoints;
     for (int i = 0; i < answer.size(); i += 4)
     {
@@ -86,8 +73,6 @@ namespace QuantIDE
       }
       else
       {
-        //currentPointTime += answer[i + 1].toDouble();
-
         levels.append(answer[i].toDouble());
         times.append(answer[i + 1].toDouble());
 
@@ -128,13 +113,15 @@ namespace QuantIDE
         envGraph->addVertexPoint(vertex);
       }
     }
+    QString env = this->getEnv();
 
     //qDebug() << "ControlEnvelope::levels: " << levels;
     //qDebug() << "ControlEnvelope::timse: " << times;
     //qDebug() << "ControlEnvelope::curve: " << curves;
-    qDebug() << "ControlEnvelope::getEnv(): " << this->getEnv();
+    qDebug() << "ControlEnvelope::getEnv(): " << env;
 
     envGraph->drawPolyline(this->getEnvPoints(200));
+    this->makeTask(env);
   }
 
   void ControlEnvelope::setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves)
@@ -212,156 +199,25 @@ namespace QuantIDE
     // emit actCodeEvaluated(code);
   }
 
-  void ControlEnvelope::sendTask()
+  void ControlEnvelope::makeTask(QString env)
   {
-    /*
-    qDebug() << "TASK TEST";
-
-    QString code;
-    code += "(\n";
-    //code += tr("var bus = Bus.new('control', %1, 1, s);\n").arg(QString::number(busIndex));
-    //code += "var cNode = NodeProxy.for (bus);\n";
-    code += tr("var cNode = NodeProxy.for (%1);\n").arg(QString::number(busIndex));;
-    code += "var pattern = Pseq([0, 0], inf);\n";
-    code += tr("var envs = Pswitch([%1], pattern);\n").arg(envelopeCode->toPlainText());
-    code += "cNode.quant_(1);\n";
-    code += tr("~%1[%2] = Task({\n").arg(parentName, QString::number(busIndex));
-    code += "\tvar cntLoops = envs.which.list.size * envs.which.repeats;\n";
-    code += "\tcntLoops.do({ | noLoop |\n";
-    code += "\t\tvar currentNum = envs.which.list[noLoop % envs.which.list.size];\n";
-    code += "\t\tvar currentEnv = envs.list[currentNum];\n";
-    code += tr("\t\t~%1.set('%2', cNode.source_({EnvGen.kr(currentEnv,doneAction:2)}));\n").arg(parentName, name);
-    code += "\t\tcurrentEnv.totalDuration.wait;\n";
-    code += "\t})\n";
-    code += "});\n";
-    code += ")";
-    emit actCodeEvaluated(code, false, false);
-    */
-  }
-
-  void ControlEnvelope::onEnvelopeCodeEvaluate()
-  {
-    qDebug() << "onEnvelopeCodeEvaluate TED";
-    envGraph->deleteGraph();
-    //this->setEnv(envelopeCode->toPlainText());
-
-    //graphCurveY = QList<double>();
-    //graphPolyline = QVector<QPointF>();
-
-    // this->onBridgeQuestion(QuestionType::envArray);
-
-    /*
-    foreach(double oneX, graphCurveX)
-    {
-    //   this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
-    }
-    */
-    //this->onBridgeQuestion(QuestionType::redrawEnvGraph);
-
-    //this->sendTask();
-    /*
-    double currentPointTime;
-    QList<double> dblList;
-    QList<double> levels;
-    QList<double> times;
-    QList<double> type;
-    QList<double> curves;
-
-    QStringList answer = mBridge->questionNEW(tr("%1.asArray").arg(this->getEnv()), true).toStringList();
-
-    foreach(QString oneAnsw, answer) { dblList.append(oneAnsw.toDouble()); }
-    // qDebug() << "ControlEnvelope::envArray: " << answer;
-
-    currentPointTime = 0 - answer[1].toDouble();
-    for (int i = 0; i < answer.size(); i += 4)
-    {
-    currentPointTime += answer[i + 1].toDouble();
-
-    levels.append(answer[i].toDouble());
-    times.append(currentPointTime);
-    curves.append(answer[i + 3].toDouble());
-
-    qDebug() << "level: " << answer[i];
-    qDebug() << "time: " << answer[i + 1];
-    qDebug() << "type: " << answer[i + 2];
-    qDebug() << "curve: " << answer[i + 3];
-    qDebug() << "///////////////////\n";
-
-    }
-    */
-
-    /*
-    if (times.size() > 0)
-    {
-    midCurvePointX = QList<double>();
-    midCurvePointY = QList<double>();
-
-    for (int i = 1; i < times.size(); i++)
-    {
-    //qDebug() << "times[i] " << times[i];
-    //qDebug() << "times[i-1] " << times[i-1];
-    currentPointTime = ((times[i] - times[i - 1]) / 2) + times[i - 1];
-    midCurvePointX.append(currentPointTime);
-    //qDebug() << "currentTime " << currentPointTime;
-    //this->onBridgeQuestion(QuestionType::envAt, QString::number(currentPointTime));
-    QString txtVal = mBridge->questionNEW(tr("%1.at(%2)").arg(this->getEnv(), QString::number(currentPointTime))).toString();
-    points.append(QPointF(currentPointTime, txtVal.toDouble()));
-    //currentPointTime += times[i];
-    }
-    }
-    */
-    // envGraph->drawPolyline(this->getEnvValues(200));
-
-    //☻ emit actGraphEnv(levels, times, curves);
-
-    // update();
-  }
-
-  void ControlEnvelope::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
-  {
-
-    qDebug() << "ControlEnvelope::onControlPointsChange";
-    qDebug() << "levels: " << envLevels;
-    qDebug() << "times: " << envTimes;
-    qDebug() << "curves: " << envCurves;
-
-    QStringList txtLevels;
-    QStringList txtTime;
-    QStringList txtCurves;
-
-    foreach(double oneLevel, envLevels) { txtLevels.append(QString::number(oneLevel, 'f', 2)); }
-    foreach(double oneTime, envTimes) { txtTime.append(QString::number(oneTime, 'f', 2)); }
-    foreach(double oneCurve, envCurves) { txtCurves.append(QString::number(oneCurve)); }
-
-    QString codeEnv = tr("Env([%1], [%2], [%3])").arg(
-      txtLevels.join(", "),
-      txtTime.join(", "),
-      txtCurves.join(", ")
+    // pozor na index, bude treba doresit
+    QString code = tr("~%1[%2] = Pbind(\\instrument, \\envControl, \\bus, %2, \\dur, %3, \\env, [%4])").arg(
+      nodeName,
+      QString::number(busIndex),
+      QString::number(duration),
+      env
       );
-
-    envelopeCode->setText(codeEnv);
-    envGraph->deleteGraph();
-    envelopeCode->evaluateAct();
-
-    qDebug() << "ENV: " << codeEnv;
+    mBridge->evaluateNEW(code);
   }
-
 
   void ControlEnvelope::mouseReleaseEvent(QMouseEvent *mouseEvent)
   {
-
     mBridge->questionNEW(tr("~%1.nodeID").arg(nodeName), true);
     mBridge->questionNEW(tr("~%1.source.def.sourceCode").arg(nodeName), true);
     mBridge->questionNEW(tr("~%1.isPlaying").arg(nodeName), true);
 
-    for (int i = 0; i <= 10; i++)
-    {
-      double oneX = 1 / 10.0*i;
-
-      QString code1 = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), QString::number(oneX));
-      QString answer1 = tr("QA: %1 = %2").arg(code1, mBridge->questionNEW(code1, true).toString());
-      qDebug() << answer1;
-    }
+    envGraph->drawPolyline(this->getEnvPoints(200));
   }
 
   void ControlEnvelope::resizeEvent(QResizeEvent *event)
@@ -395,155 +251,5 @@ namespace QuantIDE
 
   }
 
-  ControlEnvelope::~ControlEnvelope()
-  {
-
-  }
-
-  /*
-  void ControlEnvelope::onBridgeQuestion(QuestionType selector, QString args)
-  {
-  QString questionCode;
-  int selectorNum;
-
-  switch (selector)
-  {
-  case envArray:
-  selectorNum = QuestionType::envArray;
-  questionCode = tr("%1.asArray").arg(envelopeCode->toPlainText());
-  // emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
-  break;
-  case envAt:
-  selectorNum = QuestionType::envAt;
-  questionCode = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), args);
-  //  emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
-  break;
-  case graphAt:
-  selectorNum = QuestionType::graphAt;
-  questionCode = tr("%1.at(%2)").arg(envelopeCode->toPlainText(), args);
-  //  emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
-  break;
-  case redrawEnvGraph:
-  selectorNum = QuestionType::redrawEnvGraph;
-  questionCode = tr("\" \"").arg(envelopeCode->toPlainText());
-  // emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
-  break;
-  case initBusIndex:
-  selectorNum = QuestionType::initBusIndex;
-  questionCode = "Bus.control(s,1).index";
-  // emit bridgeQuestionAct(objectID, selectorNum, questionCode, false);
-  break;
-  }
-  }
-  void ControlEnvelope::onBridgeAnswer(QUuid id, int selectorNum, QStringList answer)
-  {
-
-  if (id == objectID)
-  {
-  QuestionType selector = static_cast<QuestionType>(selectorNum);
-
-  double currentPointTime;
-  QList<double> dblList;
-  QList<double> levels;
-  QList<double> times;
-  QList<double> type;
-  QList<double> curves;
-
-  switch (selector)
-  {
-  case envArray:
-  foreach(QString oneAnsw, answer) { dblList.append(oneAnsw.toDouble()); }
-  //qDebug() << "ControlEnvelope::envArray: " << dblList;
-
-  currentPointTime = 0 - answer[1].toDouble();
-  for (int i = 0; i < answer.size(); i += 4)
-  {
-  currentPointTime += answer[i + 1].toDouble();
-
-  levels.append(answer[i].toDouble());
-  times.append(currentPointTime);
-  curves.append(answer[i + 3].toDouble());
-
-  qDebug() << "level: " << answer[i];
-  qDebug() << "time: " << answer[i + 1];
-  qDebug() << "type: " << answer[i + 2];
-  qDebug() << "curve: " << answer[i + 3];
-  qDebug() << "///////////////////\n";
-
-  }
-
-  if (times.size() > 0)
-  {
-  midCurvePointX = QList<double>();
-  midCurvePointY = QList<double>();
-
-  for (int i = 1; i < times.size(); i++)
-  {
-  //qDebug() << "times[i] " << times[i];
-  //qDebug() << "times[i-1] " << times[i-1];
-  currentPointTime = ((times[i] - times[i - 1]) / 2) + times[i - 1];
-  midCurvePointX.append(currentPointTime);
-  //qDebug() << "currentTime " << currentPointTime;
-  this->onBridgeQuestion(QuestionType::envAt, QString::number(currentPointTime));
-  //currentPointTime += times[i];
-  }
-  }
-
-  emit actGraphEnv(levels, times, curves);
-  break;
-
-  case envAt:
-  qDebug() << "ControlEnvelope::envAt " << answer;
-  midCurvePointY.append(answer[0].toDouble());
-
-  for (int i = 0; i < midCurvePointY.size(); i++)
-  {
-  //envGraph->drawPoint(midCurvePointX[i], midCurvePointY[i]);
-  envGraph->addCurvePoint(midCurvePointX[i], midCurvePointY[i], 0);
-
-  envGraph->drawLine(
-  midCurvePointX[i],
-  0,
-  midCurvePointX[i],
-  midCurvePointY[i]
-  );
-  }
-
-
-  break;
-
-  case graphAt:
-  //qDebug() << "polyline size: " << graphPolyline.size();
-  //qDebug() << "ControlEnvelope::envAt " << answer[0];
-  //currentGraphPtID = graphPolyline.size();
-  graphCurveY.append(answer[0].toDouble());
-
-
-  break;
-
-  case redrawEnvGraph:
-  //qDebug() << "ControlEnvelope::refreshGraph NOW";
-  //qDebug() << "ControlEnvelope::graphCurveX " << graphCurveX.size();
-  //qDebug() << "ControlEnvelope::graphCurveY " << graphCurveY.size();
-  //qDebug() << "ControlEnvelope::graphPolyline " << graphPolyline.size();
-
-  if (graphCurveX.size() == graphCurveY.size())
-  {
-  for (int i = 0; i < graphCurveX.size(); i++)
-  {
-  graphPolyline.append(QPointF(graphCurveX[i], graphCurveY[i]));
-  }
-  envGraph->drawPolyline(graphPolyline);
-  }
-  break;
-
-  case initBusIndex:
-  busIndex = answer[0].toInt();
-  busLabel->setText(tr("busIndex : %1").arg(busIndex));
-  //qDebug() << "Control " << name << " busIndex : " << busIndex;
-  break;
-  }
-  }
-  }
-  */
+  ControlEnvelope::~ControlEnvelope()  {  }
 }

@@ -25,17 +25,8 @@ namespace QuantIDE
     ControlEnvelope(QWidget *parent, ScBridge *bridge, QString nodeName, QString controlName, int cBus);
     ~ControlEnvelope();
 
-    enum QuestionType {
-      envArray,
-      envAt,
-      graphAt,
-      redrawEnvGraph,
-      initBusIndex
-    };
-
     QRect bounds();
-    int busIndex;
-    
+    int busIndex;    
   
     QString getEnv();
     QPointF getEnvVertex(int ID);
@@ -46,22 +37,14 @@ namespace QuantIDE
    public slots:
     void setEnv(QString envCode);
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
-    void sendTask();
-
-    void onEnvelopeCodeEvaluate();
-    void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
    
   signals:
-    void actGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
-    void actChangeEnvCode(QString txt);
-
+   
   protected:
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
     void mouseReleaseEvent(QMouseEvent *mouseEvent);
-    //virtual bool eventFilter(QObject * watched, QEvent * event);
-
-
+    
   private:
     ScBridge *mBridge;
     QUuid objectID;
@@ -73,9 +56,6 @@ namespace QuantIDE
     QList<double> times;
     QList<QString> curves;
 
-    QVector<QPointF> graphPolyline;
-    QList<double> graphCurveX;
-    QList<double> graphCurveY;
     QList<double> midCurvePointX;
     QList<double> midCurvePointY;
 
@@ -86,6 +66,7 @@ namespace QuantIDE
     Graph *envGraph;
 
     void initControl();
+    void makeTask(QString env);
   };
 }
 

@@ -263,9 +263,9 @@ namespace QuantIDE
     bootDoneCode += "\n2.wait;";
     bootDoneCode = "\np = ProxySpace.push(s).makeTempoClock;";
     bootDoneCode += "\np.clock.tempo_(60 / 60);";
-    bootDoneCode += "\nSynthDef(\\envControl, { | bus | Out.kr(bus, EnvGen.kr(\\env.kr(Env.newClear().asArray), doneAction: 2)); }).add;";
+    bootDoneCode += "\nSynthDef(\\envControl, {|bus| Out.kr(bus, EnvGen.kr(\\env.kr(Env.newClear().asArray), doneAction: 2)); }).add;";
     bridge->evaluateNEW(tr("(s.waitForBoot({%1}))").arg(bootDoneCode));
-   
+
     onMsgStatus("ProxySpace init done...");
     onMsgStatus("TempoClock set done...");
     onMsgStatus("SynthDefs send done...");
