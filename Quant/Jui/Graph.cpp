@@ -39,6 +39,19 @@ namespace Jui
 
   QRect GraphPoint::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 
+  void GraphPoint::setX(int pX, double valX)
+  {
+    pixelX = pX;
+    valueX = valX;
+    this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
+  }
+  void GraphPoint::setY(int pY, double valY)
+  {
+    pixelY = pY;
+    valueY = valY;
+    this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
+  }
+
   void GraphPoint::mousePressEvent(QMouseEvent *mouseEvent)
   {
     mousePressCoor = mouseEvent->pos();
@@ -272,7 +285,9 @@ namespace Jui
     double perc = (valueY - minDomainY) / (double)(maxDomainY - minDomainY);
     return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
   }
- 
+
+  int Graph::getNumVertexPoints() { return controlPts.size(); }
+
   GraphPoint *Graph::addValuePoint(double valueX, double valueY, GraphPoint::PointType type = GraphPoint::PointType::vertex)
   {
     GraphPoint *pt = new GraphPoint(
@@ -316,7 +331,6 @@ namespace Jui
     {
       curvePts.append(pt);
     }
-
     return pt;
   }
   void Graph::addCurvePoint(double valueX, double valueY, int curveNum)
@@ -324,6 +338,16 @@ namespace Jui
     GraphPoint *pt = this->addValuePoint(valueX, valueY, GraphPoint::PointType::curvePoint);
     //pt->type = GraphPoint::PointType::curvePoint;
     pt->curvature = curveNum;
+  }
+
+  void Graph::addVertexPoint(QPointF pt)
+  {
+    this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::vertex);
+  }
+  void Graph::setVertexPoint(int ID, QPointF pt)
+  {
+    controlPts[ID]->setX(getPixelX(pt.x()), pt.x());
+    controlPts[ID]->setY(getPixelY(pt.y()), pt.y());
   }
 
   void Graph::drawPoint(double valueX, double valueY)
@@ -351,7 +375,7 @@ namespace Jui
     collDrawPoints = QList<QPointF*>();
     collDrawLines = QList<QLineF*>();
     graphPolylines = new QPolygonF();
-  //  graphValues = QList<double>();
+    //  graphValues = QList<double>();
 
     update();
   }
@@ -465,8 +489,6 @@ namespace Jui
   void Graph::resizeEvent(QResizeEvent *resizeEvent)
   {
     //qDebug() << "Graph::resizeEvent";
-   // graphValues = QList<double>();
-
     foreach(GraphPoint *onePt, controlPts)
     {
       int pointSize = onePt->pointSize;

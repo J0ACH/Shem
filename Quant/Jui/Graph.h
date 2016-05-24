@@ -27,6 +27,9 @@ namespace Jui
     enum PointType { vertex, startPoint, endPoint, curvePoint };
     PointType type;
 
+    void setX(int pX, double valX);
+    void setY(int pY, double valY);
+
   signals:
     void actDelete(int ID);
     void actMoved(int ID, int pixelX, int pixelY);
@@ -70,10 +73,14 @@ namespace Jui
     void setDomainY(double min, double max);
     QList<double> getDomainX();
     QList<double> getDomainY();
+    int getNumVertexPoints();
 
     //void addPixelPoint(int pixelX, int pixelY);
     GraphPoint *addValuePoint(double valueX, double valueY, GraphPoint::PointType type);
     void addCurvePoint(double valueX, double valueY, int curveValue);
+
+    void addVertexPoint(QPointF newPt);
+    void setVertexPoint(int ID, QPointF newPt);
 
     void drawPoint(double valueX, double valueY);
     void drawLine(double valueX1, double valueY1, double valueX2, double valueY2);

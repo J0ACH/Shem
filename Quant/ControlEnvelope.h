@@ -67,7 +67,6 @@ namespace QuantIDE
     QString nodeName, controlName;
 
     double duration;
-    int numVertexPoints;
     QList<double> levels;
     QList<double> times;
     QList<QString> curves;

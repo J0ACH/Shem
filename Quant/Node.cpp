@@ -140,7 +140,7 @@ namespace QuantIDE
   void Node::addControl(QString controlName)
   {
     QString defaultValue = mBridge->questionNEW(tr("~%1.controlKeysValues ([\\%2])[1]").arg(nodeName, controlName)).toString();
-   // qDebug() << controlName << "control default value is " << defaultValue;
+    // qDebug() << controlName << "control default value is " << defaultValue;
 
     //int busIndex = this->nextEmptyBusIndex();
     ControlEnvelope *newGraph = new ControlEnvelope(
@@ -155,11 +155,6 @@ namespace QuantIDE
     newGraph->show();
 
     conteinerControlsGraph.insert(controlName, newGraph);
-
-    //chyba, doresit pro nastaveni zakladu envelopy
-    
-    //
-
     this->fitControlsPosition();
   }
   void Node::removeControl(QString controlName)
