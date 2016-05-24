@@ -111,7 +111,7 @@ namespace Jui
     QList<QLineF*> collDrawLines;
     QPolygonF *graphPolylines;
 
-    QList<double> graphValues;
+    //QList<double> graphValues;
 
     double getValueX(int displayX);
     double getValueY(int displayY);

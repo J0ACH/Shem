@@ -210,7 +210,7 @@ namespace Jui
     //cursorPos = QPoint();
     controlPts = QList<GraphPoint*>();
     graphPolylines = new QPolygonF();
-    graphValues = QList<double>();
+    //graphValues = QList<double>();
 
     //newPointID = 0;
 
@@ -288,6 +288,11 @@ namespace Jui
     this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
     this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
 
+    qDebug() << "GraphPoint -> valueX: " << pt->valueX
+      << " valueY: " << pt->valueY
+      << " pixelX: " << pt->pixelX
+      << " pixelY: " << pt->pixelY;
+
     if (type == GraphPoint::PointType::vertex)
     {
       if (controlPts.size() == 0) { controlPts.append(pt); }
@@ -334,7 +339,6 @@ namespace Jui
   void Graph::drawPolyline(QVector<QPointF> collPoints)
   {
     graphPolylines = new QPolygonF(collPoints);
-    //graphPolylines.append(polygon);
     update();
   }
 
@@ -347,7 +351,7 @@ namespace Jui
     collDrawPoints = QList<QPointF*>();
     collDrawLines = QList<QLineF*>();
     graphPolylines = new QPolygonF();
-    graphValues = QList<double>();
+  //  graphValues = QList<double>();
 
     update();
   }
@@ -461,7 +465,7 @@ namespace Jui
   void Graph::resizeEvent(QResizeEvent *resizeEvent)
   {
     //qDebug() << "Graph::resizeEvent";
-    graphValues = QList<double>();
+   // graphValues = QList<double>();
 
     foreach(GraphPoint *onePt, controlPts)
     {

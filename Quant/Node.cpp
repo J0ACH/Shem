@@ -151,7 +151,7 @@ namespace QuantIDE
       this->nextEmptyBusIndex()
       );
     newGraph->setFixedHeight(250);
-    newGraph->setEnv(tr("Env([%1,%1], 1, 'lin')").arg(defaultValue));
+    newGraph->setEnv(tr("Env([%1,%1], 1, \\sin)").arg(defaultValue));
     newGraph->show();
 
     conteinerControlsGraph.insert(controlName, newGraph);

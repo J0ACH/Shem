@@ -38,7 +38,8 @@ namespace QuantIDE
     
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
     QString getEnv();
-    QVector<QPointF> getEnvValues(int segments);
+    QPointF getEnvVertex(int ID);
+    QVector<QPointF> getEnvPoints(int segments);
 
     void freeControlBusIndex();
    
@@ -48,12 +49,8 @@ namespace QuantIDE
 
     void onEnvelopeCodeEvaluate();
     void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
-   // void onBridgeQuestion(QuestionType selector, QString args = QString::null);
-   // void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
-
+   
   signals:
-   // void actCodeEvaluated(QString, bool silent = false, bool print = false);
-   // void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
     void actGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
     void actChangeEnvCode(QString txt);
 
@@ -70,11 +67,10 @@ namespace QuantIDE
     QString nodeName, controlName;
 
     double duration;
-    int numLevelPoints;
+    int numVertexPoints;
     QList<double> levels;
     QList<double> times;
-    QList<QString> symbols;
-    QList<int> curves;
+    QList<QString> curves;
 
     QVector<QPointF> graphPolyline;
     QList<double> graphCurveX;
