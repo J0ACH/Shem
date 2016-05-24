@@ -15,7 +15,7 @@ namespace QuantIDE
     setFocusPolicy(Qt::StrongFocus);
 
     this->initControl();
-
+    cntVertex = 0;
     connect(envelopeCode, SIGNAL(sendText(QString)), this, SLOT(setEnv(QString)));
     // connect(this, SIGNAL(bridgeQuestionAct(QUuid, int, QString, bool)), mBridge, SLOT(question(QUuid, int, QString, bool)));
     //  connect(mBridge, SIGNAL(answerAct(QUuid, int, QStringList)), this, SLOT(onBridgeAnswer(QUuid, int, QStringList)));
@@ -26,11 +26,11 @@ namespace QuantIDE
     this, SIGNAL(actGraphEnv(QList<double>, QList<double>, QList<double>)),
     envGraph, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
     );
-    connect(
-    envGraph, SIGNAL(actGraphEnv(QList<double>, QList<double>, QList<double>)),
-    this, SLOT(onGraphEnv(QList<double>, QList<double>, QList<double>))
-    );
     */
+    connect(
+      envGraph, SIGNAL(actEnvGraphChanged(QList<double>, QList<double>, QList<QString>)),
+      this, SLOT(setEnv(QList<double>, QList<double>, QList<QString>))
+      );
 
     // this->onEnvelopeCodeEvaluate();
 
@@ -59,8 +59,8 @@ namespace QuantIDE
     // qDebug() << "ControlEnvelope::setEnv: " << envCode;
 
     //stane se jen pri prvnim nastaveni env
-    //if (numVertexPoints == 0) { envelopeCode->setText(envCode); };
-    if (envGraph->getNumVertexPoints() == 0) { envelopeCode->setText(envCode); };
+    if (cntVertex == 0) { envelopeCode->setText(envCode); };
+    //if (envGraph->getNumVertexPoints() == 0) { envelopeCode->setText(envCode); };
 
     levels = QList<double>();
     times = QList<double>();
@@ -106,10 +106,10 @@ namespace QuantIDE
     envGraph->setDomainX(0, duration);
     envGraph->setDomainY(minLevel, maxLevel);
 
-    if (envGraph->getNumVertexPoints() - 1 == newNumLevelPoints)
+    if (cntVertex == newNumLevelPoints)
     {
       qDebug() << "pocet controlnich bodu nezmenen";
-      for (int i = 0; i < envGraph->getNumVertexPoints(); i++)
+      for (int i = 0; i <= cntVertex; i++)
       {
         QPointF vertex = this->getEnvVertex(i);
         qDebug() << vertex;
@@ -119,6 +119,7 @@ namespace QuantIDE
     else
     {
       envGraph->deleteGraph();
+      cntVertex = newNumLevelPoints;
       qDebug() << "pocet controlnich bodu ZMENEN";
       for (int i = 0; i <= newNumLevelPoints; i++)
       {
@@ -128,9 +129,9 @@ namespace QuantIDE
       }
     }
 
-    qDebug() << "ControlEnvelope::levels: " << levels;
-    qDebug() << "ControlEnvelope::timse: " << times;
-    qDebug() << "ControlEnvelope::curve: " << curves;
+    //qDebug() << "ControlEnvelope::levels: " << levels;
+    //qDebug() << "ControlEnvelope::timse: " << times;
+    //qDebug() << "ControlEnvelope::curve: " << curves;
     qDebug() << "ControlEnvelope::getEnv(): " << this->getEnv();
 
     envGraph->drawPolyline(this->getEnvPoints(200));
@@ -151,7 +152,8 @@ namespace QuantIDE
       txtTime.join(", "),
       txtCurves.join(", ")
       );
-
+    qDebug() << "setEnv: " << codeEnv;
+    envelopeCode->setText(codeEnv);
     this->setEnv(codeEnv);
   }
 
