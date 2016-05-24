@@ -151,7 +151,7 @@ namespace QuantIDE
       this->nextEmptyBusIndex()
       );
     newGraph->setFixedHeight(250);
-    newGraph->setEnv(tr("Env([%1,%1], 1, 0)").arg(defaultValue));
+    newGraph->setEnv(tr("Env([%1,%1], 1, 'lin')").arg(defaultValue));
     newGraph->show();
 
     conteinerControlsGraph.insert(controlName, newGraph);
@@ -164,7 +164,7 @@ namespace QuantIDE
   }
   void Node::removeControl(QString controlName)
   {
-    conteinerControlsGraph.value(controlName)->sendFreeBusIndex();
+    conteinerControlsGraph.value(controlName)->freeControlBusIndex();
     conteinerControlsGraph.value(controlName)->close();
     conteinerControlsGraph.remove(controlName);
 

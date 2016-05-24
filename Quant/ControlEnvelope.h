@@ -35,23 +35,25 @@ namespace QuantIDE
 
     QRect bounds();
     int busIndex;
-    void setEnv(QString envCode);
+    
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
     QString getEnv();
     QVector<QPointF> getEnvValues(int segments);
 
-    public slots:
-    void sendFreeBusIndex();
+    void freeControlBusIndex();
+   
+   public slots:
+    void setEnv(QString envCode);
     void sendTask();
 
     void onEnvelopeCodeEvaluate();
     void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
-    void onBridgeQuestion(QuestionType selector, QString args = QString::null);
-    void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
+   // void onBridgeQuestion(QuestionType selector, QString args = QString::null);
+   // void onBridgeAnswer(QUuid id, int selectorNum, QStringList answer);
 
   signals:
-    void actCodeEvaluated(QString, bool silent = false, bool print = false);
-    void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
+   // void actCodeEvaluated(QString, bool silent = false, bool print = false);
+   // void bridgeQuestionAct(QUuid id, int selectorNum, QString question, bool print);
     void actGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
     void actChangeEnvCode(QString txt);
 
