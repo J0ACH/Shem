@@ -45,6 +45,7 @@ namespace Jui
     void closeEvent(QCloseEvent *);
     void focusInEvent(QFocusEvent*);
     void focusOutEvent(QFocusEvent*);
+    void moveEvent(QMoveEvent * event);
 
     virtual bool eventFilter(QObject * watched, QEvent * event);
 
@@ -103,7 +104,7 @@ namespace Jui
   protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *event);
-
+   
   private:
     void mousePressEvent(QMouseEvent *mouseEvent);
     void mouseReleaseEvent(QMouseEvent *mouseEvent);

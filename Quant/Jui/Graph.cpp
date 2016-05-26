@@ -40,6 +40,10 @@ namespace Jui
     labelCurve->setText(tr("crv: %1").arg(curvature));
     labelCurve->setGeometry(pixelX, pixelY + 15, 80, 25);
 
+    labelID->hide();
+    labelTime->hide();
+    labelLevel->hide();
+    labelCurve->hide();
   }
 
   QRect GraphPoint::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
@@ -66,7 +70,7 @@ namespace Jui
   void GraphPoint::setType(GraphPoint::PointType newType)
   {
     type = newType;
-    update();
+   // update();
   }
   void GraphPoint::setCurvature(QString newCurvature)
   {
@@ -108,6 +112,15 @@ namespace Jui
       break;
     }
 
+    int tempX = this->pos().x() + pointSize / 2;
+    int tempY = this->pos().y() + pointSize / 2;
+
+    labelID->setGeometry(tempX, tempY, 80, 25);
+    labelTime->setGeometry(tempX, tempY + 15, 80, 25);
+    labelLevel->setGeometry(tempX, tempY + 30, 80, 25);
+    labelCurve->setGeometry(tempX, tempY + 15, 80, 25);
+    //update();
+    
   }
 
   void GraphPoint::mouseReleaseEvent(QMouseEvent *mouseEvent)
@@ -123,7 +136,6 @@ namespace Jui
       pixelX += deltaX;
       pixelY += deltaY;
       if (deltaX != 0 || deltaY != 0) { moved = true; }
-
       break;
 
     case startPoint:
@@ -134,14 +146,7 @@ namespace Jui
       break;
     }
 
-    if (moved)
-    {
-      labelID->setGeometry(pixelX, pixelY, 80, 25);
-      labelTime->setGeometry(pixelX, pixelY + 15, 80, 25);
-      labelLevel->setGeometry(pixelX, pixelY + 30, 80, 25);
-      labelCurve->setGeometry(pixelX, pixelY + 15, 80, 25);
-      emit actMoved(ID, pixelX, pixelY);
-    }
+    if (moved) { emit actMoved(ID, pixelX, pixelY); }
   }
 
   bool GraphPoint::eventFilter(QObject* target, QEvent* event)
@@ -222,14 +227,15 @@ namespace Jui
       labelTime->show();
       labelLevel->show();
       labelCurve->hide();
-      update();
+      break;
     case Jui::GraphPoint::curvePoint:
       labelID->show();
       labelTime->hide();
       labelLevel->hide();
       labelCurve->show();
-      update();
+      break;
     }
+    update();
   }
 
   void GraphPoint::focusOutEvent(QFocusEvent* event)
@@ -238,6 +244,15 @@ namespace Jui
     labelTime->hide();
     labelLevel->hide();
     labelCurve->hide();
+    update();
+  }
+
+  void GraphPoint::moveEvent(QMoveEvent * event)
+  {
+    labelID->setGeometry(pixelX, pixelY, 80, 25);
+    labelTime->setGeometry(pixelX, pixelY + 15, 80, 25);
+    labelLevel->setGeometry(pixelX, pixelY + 30, 80, 25);
+    labelCurve->setGeometry(pixelX, pixelY + 15, 80, 25);
     update();
   }
 
@@ -322,8 +337,6 @@ namespace Jui
     double perc = (valueY - minDomainY) / (double)(maxDomainY - minDomainY);
     return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
   }
-
-  // int Graph::getNumVertexPoints() { return controlPts.size(); }
 
   GraphPoint *Graph::addValuePoint(double valueX, double valueY, GraphPoint::PointType type = GraphPoint::PointType::vertex)
   {
@@ -479,7 +492,7 @@ namespace Jui
       sorted = true;
       for (int i = 1; i < controlPts.size(); i++)
       {
-        if (controlPts[i]->pixelX < controlPts[i - 1]->pixelX)
+        if (controlPts[i]->valueX < controlPts[i - 1]->valueX)
         {
           sorted = false;
           controlPts[i]->setID(i - 1);
@@ -490,30 +503,6 @@ namespace Jui
       }
     }
   }
-
-  /*
-  void Graph::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
-  {
-    
-    qDebug() << "Graph::onGraphEnv";
-    qDebug() << "levels: " << envLevels;
-    qDebug() << "times: " << envTimes;
-    qDebug() << "curves: " << envCurves;
-    
-
-    this->deleteGraph();
-    for (int i = 0; i < envLevels.size(); i++)
-    {
-      this->addValuePoint(envTimes[i], envLevels[i]);
-    }
-
-    if (controlPts.size() >= 1)
-    {
-      controlPts[0]->type = GraphPoint::PointType::startPoint;
-      controlPts[controlPts.size() - 1]->type = GraphPoint::PointType::endPoint;
-    }
-  }
-  */
 
   void Graph::makeEnv()
   {
