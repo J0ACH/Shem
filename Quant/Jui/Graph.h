@@ -22,7 +22,7 @@ namespace Jui
     int pixelX, pixelY;
     double valueX, valueY;
     int pointSize;
-    int curvature;
+    QString curvature;
 
     enum PointType { vertex, startPoint, endPoint, curvePoint };
     PointType type;
@@ -30,6 +30,8 @@ namespace Jui
     void setID(int newID);
     void setX(int pX, double valX);
     void setY(int pY, double valY);
+    void setType(PointType newType);
+    void setCurvature(QString txt);
 
   signals:
     void actDelete(int ID);
@@ -51,7 +53,7 @@ namespace Jui
     QPoint mouseGlobalCoor;
 
     QLabel *labelID;
-    QLabel *labelLevel, *labelTime;
+    QLabel *labelLevel, *labelTime, *labelCurve;
   };
 
 
@@ -74,13 +76,14 @@ namespace Jui
     void setDomainY(double min, double max);
     QList<double> getDomainX();
     QList<double> getDomainY();
-    //int getNumVertexPoints();
-
-    //void addPixelPoint(int pixelX, int pixelY);
-    void addCurvePoint(double valueX, double valueY, int curveValue);
-
-    void addVertexPoint(QPointF newPt);
+    
+    GraphPoint *addVertexPoint(QPointF newPt);
     void setVertexPoint(int ID, QPointF newPt);
+    void setVertexType(int ID, GraphPoint::PointType newType);
+    
+    GraphPoint *addCurvePoint(QPointF newPt);
+    void setCurvePoint(int ID, QPointF newPt);
+    void setCurveCurvature(int ID, QString txt);
 
     void drawPoint(double valueX, double valueY);
     void drawLine(double valueX1, double valueY1, double valueX2, double valueY2);
@@ -91,7 +94,7 @@ namespace Jui
     public slots:
     void onDeletePoint(int ID);
     void onMovePoint(int ID, int pixelX, int pixelY);
-    void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
+   // void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
 
   signals:
     void actPointAdded(double valueX, double valueY);

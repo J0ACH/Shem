@@ -14,7 +14,7 @@ namespace Jui
   {
     parent->installEventFilter(this);
     pointSize = 10;
-    curvature = 0;
+    curvature = "lin";
     this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
 
     setFocusPolicy(Qt::StrongFocus);
@@ -35,6 +35,11 @@ namespace Jui
     labelLevel->setText(tr("y: %1").arg(QString::number(valY)));
     labelLevel->setGeometry(pixelX, pixelY + 30, 80, 25);
 
+    labelCurve = new QLabel(parentWidget());
+    labelCurve->setAttribute(Qt::WA_NoMousePropagation);
+    labelCurve->setText(tr("crv: %1").arg(curvature));
+    labelCurve->setGeometry(pixelX, pixelY + 15, 80, 25);
+
   }
 
   QRect GraphPoint::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
@@ -44,7 +49,6 @@ namespace Jui
     ID = newID;
     labelID->setText(tr("ID: %1").arg(QString::number(ID)));
   }
-
   void GraphPoint::setX(int pX, double valX)
   {
     pixelX = pX;
@@ -58,6 +62,16 @@ namespace Jui
     valueY = valY;
     this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
     labelLevel->setText(tr("y: %1").arg(QString::number(valY)));
+  }
+  void GraphPoint::setType(GraphPoint::PointType newType)
+  {
+    type = newType;
+    update();
+  }
+  void GraphPoint::setCurvature(QString newCurvature)
+  {
+    curvature = newCurvature;
+    labelCurve->setText(tr("crv: %1").arg(curvature));
   }
 
   void GraphPoint::mousePressEvent(QMouseEvent *mouseEvent)
@@ -125,6 +139,7 @@ namespace Jui
       labelID->setGeometry(pixelX, pixelY, 80, 25);
       labelTime->setGeometry(pixelX, pixelY + 15, 80, 25);
       labelLevel->setGeometry(pixelX, pixelY + 30, 80, 25);
+      labelCurve->setGeometry(pixelX, pixelY + 15, 80, 25);
       emit actMoved(ID, pixelX, pixelY);
     }
   }
@@ -198,10 +213,23 @@ namespace Jui
 
   void GraphPoint::focusInEvent(QFocusEvent* event)
   {
-    labelID->show();
-    labelTime->show();
-    labelLevel->show();
-    update();
+    switch (type)
+    {
+    case Jui::GraphPoint::vertex:
+    case Jui::GraphPoint::startPoint:
+    case Jui::GraphPoint::endPoint:
+      labelID->show();
+      labelTime->show();
+      labelLevel->show();
+      labelCurve->hide();
+      update();
+    case Jui::GraphPoint::curvePoint:
+      labelID->show();
+      labelTime->hide();
+      labelLevel->hide();
+      labelCurve->show();
+      update();
+    }
   }
 
   void GraphPoint::focusOutEvent(QFocusEvent* event)
@@ -209,6 +237,7 @@ namespace Jui
     labelID->hide();
     labelTime->hide();
     labelLevel->hide();
+    labelCurve->hide();
     update();
   }
 
@@ -341,21 +370,33 @@ namespace Jui
     }
     return pt;
   }
-  void Graph::addCurvePoint(double valueX, double valueY, int curveNum)
-  {
-    GraphPoint *pt = this->addValuePoint(valueX, valueY, GraphPoint::PointType::curvePoint);
-    //pt->type = GraphPoint::PointType::curvePoint;
-    pt->curvature = curveNum;
-  }
 
-  void Graph::addVertexPoint(QPointF pt)
+  GraphPoint *Graph::addVertexPoint(QPointF pt)
   {
-    this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::vertex);
+    return this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::vertex);
   }
   void Graph::setVertexPoint(int ID, QPointF pt)
   {
     controlPts[ID]->setX(getPixelX(pt.x()), pt.x());
     controlPts[ID]->setY(getPixelY(pt.y()), pt.y());
+  }
+  void Graph::setVertexType(int ID, GraphPoint::PointType newType)
+  {
+    controlPts[ID]->setType(newType);
+  }
+
+  GraphPoint *Graph::addCurvePoint(QPointF pt)
+  {
+    return this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::curvePoint);
+  }
+  void Graph::setCurvePoint(int ID, QPointF pt)
+  {
+    curvePts[ID]->setX(getPixelX(pt.x()), pt.x());
+    curvePts[ID]->setY(getPixelY(pt.y()), pt.y());
+  }
+  void Graph::setCurveCurvature(int ID, QString txt)
+  {
+    curvePts[ID]->setCurvature(txt);
   }
 
   void Graph::drawPoint(double valueX, double valueY)
@@ -404,23 +445,23 @@ namespace Jui
     /*
     for (int i = 0; i < controlPts.size(); i++)
     {
-      if (controlPts[i]->ID == ID)
-      {
-        switch (controlPts[i]->type)
-        {
-        case GraphPoint::PointType::vertex:
-          controlPts[ID]->setX(pixelX getValueX(pixelX));
-          controlPts[ID]->setY(pixelY, getValueY(pixelY));
-          //controlPts[i]->valueX = getValueX(pixelX);
-          //controlPts[i]->valueY = getValueY(pixelY);
-          break;
-        case GraphPoint::PointType::startPoint:
-        case GraphPoint::PointType::endPoint:
-          //controlPts[i]->valueX = getValueX(pixelX);
-          controlPts[i]->valueY = getValueY(pixelY);
-          break;
-        }
-      }
+    if (controlPts[i]->ID == ID)
+    {
+    switch (controlPts[i]->type)
+    {
+    case GraphPoint::PointType::vertex:
+    controlPts[ID]->setX(pixelX getValueX(pixelX));
+    controlPts[ID]->setY(pixelY, getValueY(pixelY));
+    //controlPts[i]->valueX = getValueX(pixelX);
+    //controlPts[i]->valueY = getValueY(pixelY);
+    break;
+    case GraphPoint::PointType::startPoint:
+    case GraphPoint::PointType::endPoint:
+    //controlPts[i]->valueX = getValueX(pixelX);
+    controlPts[i]->valueY = getValueY(pixelY);
+    break;
+    }
+    }
     }
     */
     this->sortPointsByX();
@@ -450,14 +491,15 @@ namespace Jui
     }
   }
 
+  /*
   void Graph::onGraphEnv(QList<double> envLevels, QList<double> envTimes, QList<double> envCurves)
   {
-    /*
+    
     qDebug() << "Graph::onGraphEnv";
     qDebug() << "levels: " << envLevels;
     qDebug() << "times: " << envTimes;
     qDebug() << "curves: " << envCurves;
-    */
+    
 
     this->deleteGraph();
     for (int i = 0; i < envLevels.size(); i++)
@@ -471,6 +513,7 @@ namespace Jui
       controlPts[controlPts.size() - 1]->type = GraphPoint::PointType::endPoint;
     }
   }
+  */
 
   void Graph::makeEnv()
   {
@@ -497,9 +540,13 @@ namespace Jui
           }
         }
         times.append(controlPts[i]->valueX - previousTime);
-        curves.append("0");
       }
-    }
+    };
+
+    foreach(GraphPoint *onePt, curvePts)
+    {
+      curves.append(onePt->curvature);
+    };
 
     emit actEnvGraphChanged(levels, times, curves);
   }

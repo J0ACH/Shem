@@ -26,25 +26,26 @@ namespace QuantIDE
     ~ControlEnvelope();
 
     QRect bounds();
-    int busIndex;    
-  
+    int busIndex;
+
     QString getEnv();
     QPointF getEnvVertex(int ID);
+    QPointF getEnvMidCurve(int ID);
     QVector<QPointF> getEnvPoints(int segments);
 
     void freeControlBusIndex();
-   
-   public slots:
+
+    public slots:
     void setEnv(QString envCode);
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
-   
+
   signals:
-   
+
   protected:
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
     void mouseReleaseEvent(QMouseEvent *mouseEvent);
-    
+
   private:
     ScBridge *mBridge;
     QUuid objectID;

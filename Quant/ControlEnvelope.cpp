@@ -45,7 +45,7 @@ namespace QuantIDE
 
   void ControlEnvelope::setEnv(QString envCode)
   {
-    // qDebug() << "ControlEnvelope::setEnv: " << envCode;
+     qDebug() << "ControlEnvelope::setEnv: " << envCode;
 
     //stane se jen pri prvnim nastaveni env
     if (cntVertex == 0) { envelopeCode->setText(envCode); };
@@ -56,7 +56,16 @@ namespace QuantIDE
     double minLevel = 0;
     double maxLevel = 1;
 
-    QStringList answer = mBridge->questionNEW(tr("%1.asArray").arg(envCode)).toStringList();
+    QStringList answer;
+    while (true)
+    {
+      answer = mBridge->questionNEW(tr("%1.asArray").arg(envCode)).toStringList();
+      qDebug() << "ControlEnvelope:: answer.size: " << answer.size();
+      // odchytava spatnou odpoved ze servru, proc prichazi single cislo????
+      if (answer.size() % 4 == 0) { break; } 
+    }
+    
+    qDebug() << "ControlEnvelope answer: " << answer;
 
     int newNumLevelPoints;
     for (int i = 0; i < answer.size(); i += 4)
@@ -66,8 +75,8 @@ namespace QuantIDE
 
       if (i == 0)
       {
-        // qDebug() << "pocet levelu: " << answer[i + 1].toInt();
-        // qDebug() << "level: " << answer[i].toDouble();
+         qDebug() << "pocet levelu: " << answer[i + 1].toInt();
+         qDebug() << "level: " << answer[i].toDouble();
         newNumLevelPoints = answer[i + 1].toInt();
         levels.append(answer[i].toDouble());
       }
@@ -76,15 +85,15 @@ namespace QuantIDE
         levels.append(answer[i].toDouble());
         times.append(answer[i + 1].toDouble());
 
-        // qDebug() << "level: " << answer[i];
-        // qDebug() << "time: " << answer[i + 1];
+         qDebug() << "level: " << answer[i];
+         qDebug() << "time: " << answer[i + 1];
 
         QString symbol = mBridge->questionNEW(tr("Env.shapeNames.findKeyForValue(%1)").arg(answer[i + 2])).toString();
 
         if (symbol != "nil") { curves.append(tr("'%1'").arg(symbol)); }
         else { curves.append(answer[i + 3]); }
       }
-      // qDebug() << "///////////////////\n";
+       qDebug() << "///////////////////\n";
     }
 
     duration = mBridge->questionNEW(tr("%1.totalDuration").arg(envCode)).toString().toDouble();
@@ -99,6 +108,13 @@ namespace QuantIDE
         QPointF vertex = this->getEnvVertex(i);
         qDebug() << vertex;
         envGraph->setVertexPoint(i, vertex);
+
+        if (i < cntVertex) // times je o cntVertex - 1
+        {
+          QPointF midPoint = this->getEnvMidCurve(i);
+          envGraph->setCurvePoint(i, midPoint);
+          envGraph->setCurveCurvature(i, curves[i]);
+        }
       }
     }
     else
@@ -110,15 +126,28 @@ namespace QuantIDE
       {
         QPointF vertex = this->getEnvVertex(i);
         qDebug() << vertex;
-        envGraph->addVertexPoint(vertex);
+        GraphPoint *pt = envGraph->addVertexPoint(vertex);
+        if (i == 0) { pt->setType(GraphPoint::PointType::startPoint); }
+        if (i == newNumLevelPoints) { pt->setType(GraphPoint::PointType::endPoint); }
+
+        if (i < newNumLevelPoints) // times je o newNumLevelPoints - 1
+        {
+          QPointF midPoint = this->getEnvMidCurve(i);
+          GraphPoint *mid = envGraph->addCurvePoint(midPoint);
+          mid->setCurvature(curves[i]);
+        }
       }
     }
-    QString env = this->getEnv();
 
+
+
+    QString env = this->getEnv();
     //qDebug() << "ControlEnvelope::levels: " << levels;
     //qDebug() << "ControlEnvelope::timse: " << times;
     //qDebug() << "ControlEnvelope::curve: " << curves;
     qDebug() << "ControlEnvelope::getEnv(): " << env;
+
+    // chyba, obcas je prvni curves prazdny!!!!
 
     envGraph->drawPolyline(this->getEnvPoints(200));
     this->makeTask(env);
@@ -172,6 +201,23 @@ namespace QuantIDE
       else { vertexTime += times[i]; }
     }
     return QPointF(vertexTime, levels[ID]);
+  }
+
+  QPointF ControlEnvelope::getEnvMidCurve(int ID)
+  {
+    double midPtTime = 0;
+    for (int i = 0; i < times.size(); i++)
+    {
+      if (ID == i)
+      {
+        midPtTime += times[i] / 2;
+        break;
+      }
+      else { midPtTime += times[i]; }
+    }
+    QString env = this->getEnv();
+    QString txtVal = mBridge->questionNEW(tr("%1.at(%2)").arg(env, QString::number(midPtTime))).toString();
+    return QPointF(midPtTime, txtVal.toDouble());
   }
 
   QVector<QPointF> ControlEnvelope::getEnvPoints(int segments)
