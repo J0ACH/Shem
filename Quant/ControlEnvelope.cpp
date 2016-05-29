@@ -210,7 +210,7 @@ namespace QuantIDE
       txtCurves.join(", ")
       );
     qDebug() << "setEnv: " << codeEnv;
-    envelopeCode->setText(codeEnv);
+    //envelopeCode->setText(codeEnv);
     this->setEnv(codeEnv);
   }
 

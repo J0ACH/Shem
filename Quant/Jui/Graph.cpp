@@ -545,6 +545,19 @@ namespace Jui
     {
       int pointSize = onePt->pointSize;
       onePt->pixelX = getPixelX(onePt->valueX);
+      onePt->pixelY = getPixelY(onePt->valueY);
+      onePt->setGeometry(
+        onePt->pixelX - pointSize / 2,
+        onePt->pixelY - pointSize / 2,
+        pointSize + 1,
+        pointSize + 1
+        );
+    }
+    foreach(GraphPoint *onePt, curvePts)
+    {
+      int pointSize = onePt->pointSize;
+      onePt->pixelX = getPixelX(onePt->valueX);
+      onePt->pixelY = getPixelY(onePt->valueY);
       onePt->setGeometry(
         onePt->pixelX - pointSize / 2,
         onePt->pixelY - pointSize / 2,
@@ -635,6 +648,7 @@ namespace Jui
 
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)
   {
+    qDebug() << "Graph::mousePressEvent NEW POINT ADD";
     this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
     this->makeEnv();
   }
