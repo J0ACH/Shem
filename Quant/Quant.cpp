@@ -23,10 +23,8 @@ namespace QuantIDE
   {
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
-    customize = new Customize(this);
+    customize = new Customize(this, bridge);
     udpServer = new UDPServer(this);
-
-    customize->setTargetBridge(bridge);
 
     canvan->setHeaderHeight(42);
     canvan->setTailHeight(34);
