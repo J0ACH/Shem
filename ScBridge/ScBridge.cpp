@@ -80,12 +80,12 @@ namespace SupercolliderBridge
     }
   }
 
-
+  /*
   //////////////////////////////////////////////
   //////// bude odsraneno
   void ScBridge::evaluateCode(QString const & commandString, bool silent, bool printAnswer)
   {
-    //emit msgWarningAct(tr("Called mathod ScBridge::evaluateCode() for code %1. Method deprecated, use ScBridge::evaluateNEW() instead").arg(commandString));
+    emit msgWarningAct(tr("Called mathod ScBridge::evaluateCode() for code %1. Method deprecated, use ScBridge::evaluateNEW() instead").arg(commandString));
 
     if (state() != QProcess::Running) {
       emit msgStatusAct(tr("Interpreter is not running!\r\n"));
@@ -116,6 +116,8 @@ namespace SupercolliderBridge
   }
   //////// bude odsraneno
   /////////////////////////////////////////////////////////
+  */
+  
 
   bool ScBridge::evaluateNEW(QString code, bool print, bool silent)
   {
@@ -262,8 +264,8 @@ namespace SupercolliderBridge
       return;
     }
 
-    this->evaluateCode("0.exit", true);
-    //this->evaluateNEW("0.exit", false, true);
+   // this->evaluateCode("0.exit", true);
+    this->evaluateNEW("0.exit", false, true);
     closeWriteChannel();
 
     mCompiled = false;
@@ -454,7 +456,7 @@ namespace SupercolliderBridge
     qDebug() << "newID " << newID;
     return newID;
   }
-  
+
   void ScBridge::onNewIpcConnection()
   {
     if (mIpcSocket)

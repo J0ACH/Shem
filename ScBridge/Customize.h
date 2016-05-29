@@ -17,8 +17,6 @@ namespace SupercolliderBridge
   {
     Q_OBJECT
 
-   // enum QuestionType { appExtensionDir };
-
   public:
     Customize(QObject *parent, ScBridge *bridge);
     ~Customize();
@@ -33,7 +31,6 @@ namespace SupercolliderBridge
     ScBridge *mBridge;
     QFile *configFile;
 
-  //  void onBridgeQuestion(QuestionType selector, QString args = QString::null);
     void initConfigFile(QString systemExtensionDir);
     void mergeConfigData();
 

@@ -47,8 +47,8 @@ namespace SupercolliderBridge
     void changeInterpretState();
     void changeServerState();
 
-    void evaluateCode(QString const & commandString, bool silent = false, bool printAnswer = false);
-    void question(QUuid id, int selector, QString commandString, bool printAnswer = false);
+   // void evaluateCode(QString const & commandString, bool silent = false, bool printAnswer = false);
+   // void question(QUuid id, int selector, QString commandString, bool printAnswer = false);
 
   signals:
     void interpretBootInitAct();
