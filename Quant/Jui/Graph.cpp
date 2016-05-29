@@ -584,7 +584,7 @@ namespace Jui
     QTextOption option;
     option.setAlignment(Qt::AlignCenter);
 
-    painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(controlPts.size()), option);
+    //painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(controlPts.size()), option);
 
     painter.setPen(QPen(QColor(70, 70, 70), 1));
 
