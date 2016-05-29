@@ -263,7 +263,7 @@ namespace QuantIDE
     bootDoneCode = "\np = ProxySpace.push(s).makeTempoClock;";
     bootDoneCode += "\np.clock.tempo_(60 / 60);";
     bootDoneCode += "\nSynthDef(\\envControl, {|bus| ReplaceOut.kr(bus, EnvGen.kr(\\env.kr(Env.newClear().asArray), doneAction: 2)); }).add;";
-    bridge->evaluateNEW(tr("(s.waitForBoot({%1}))").arg(bootDoneCode));
+    bridge->evaluate(tr("(s.waitForBoot({%1}))").arg(bootDoneCode));
 
     onMsgStatus("ProxySpace init done...");
     onMsgStatus("TempoClock set done...");
@@ -295,21 +295,21 @@ namespace QuantIDE
   void Quant::onServerTask()
   {
 
-    QString txtCPU = bridge->questionNEW("s.peakCPU").toString();
+    QString txtCPU = bridge->question("s.peakCPU").toString();
     if (txtCPU != NULL)
     {
       double serverCPU = txtCPU.toDouble();
       labelServerMeter->setText(tr("%1 %").arg(QString::number(serverCPU, 'f', 2)));
     }
 
-    QString numSynths = bridge->questionNEW("s.numSynths").toString();
+    QString numSynths = bridge->question("s.numSynths").toString();
     if (numSynths != NULL)	{ labelServerSynths->setText(numSynths); }
 
   }
 
   // GLOBAL CODE
 
-  void Quant::onRecivedGlobalCode(QString code) { bridge->questionNEW(code, true); }
+  void Quant::onRecivedGlobalCode(QString code) { bridge->question(code, true); }
 
   Quant::~Quant() { }
 }

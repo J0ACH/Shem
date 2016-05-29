@@ -69,57 +69,18 @@ namespace SupercolliderBridge
     {
     case StateServer::OFF:
       emit serverBootInitAct();
-      evaluateNEW("Server.local = Server.default = s;");
+      evaluate("Server.local = Server.default = s;");
       // evaluateCode("s.dumpOSC;");
-      evaluateNEW("s.boot;");
+      evaluate("s.boot;");
       break;
     case StateServer::RUNNING:
       emit serverKillInitAct();
-      evaluateNEW("s.quit;");
+      evaluate("s.quit;");
       break;
     }
   }
 
-  /*
-  //////////////////////////////////////////////
-  //////// bude odsraneno
-  void ScBridge::evaluateCode(QString const & commandString, bool silent, bool printAnswer)
-  {
-    emit msgWarningAct(tr("Called mathod ScBridge::evaluateCode() for code %1. Method deprecated, use ScBridge::evaluateNEW() instead").arg(commandString));
-
-    if (state() != QProcess::Running) {
-      emit msgStatusAct(tr("Interpreter is not running!\r\n"));
-      return;
-    }
-
-    QByteArray bytesToWrite = commandString.toUtf8();
-    size_t writtenBytes = write(bytesToWrite);
-    if (writtenBytes != bytesToWrite.size()) {
-      emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
-      return;
-    }
-
-    char commandChar = silent ? '\x1b' : '\x0c';
-    if (printAnswer) { emit msgEvaluateAct(tr("EVALUATE: %1\r\n").arg(commandString)); }
-    write(&commandChar, 1);
-  }
-  void ScBridge::question(QUuid id, int selector, QString commandString, bool printAnswer)
-  {
-    QString command = QStringLiteral("[\"ANSWER_MARKER\",\"%1\",%2,%3,%4]").arg(
-      id.toString(),
-      QString::number(selector),
-      commandString,
-      QString::number(printAnswer)
-      );
-    if (printAnswer) { qDebug() << "ScBridge::question: " << command; };
-    evaluateCode(command, false);
-  }
-  //////// bude odsraneno
-  /////////////////////////////////////////////////////////
-  */
-  
-
-  bool ScBridge::evaluateNEW(QString code, bool print, bool silent)
+  bool ScBridge::evaluate(QString code, bool print, bool silent)
   {
     bool synced = false;
     silent = false;
@@ -154,7 +115,7 @@ namespace SupercolliderBridge
       }
 
       char commandChar = silent ? '\x1b' : '\x0c';
-      if (print) { emit msgEvaluateAct(tr("evalNew: %1\r\n").arg(code)); }
+      if (print) { emit msgEvaluateAct(tr("evaluate: %1\r\n").arg(code)); }
       write(&commandChar, 1);
 
       loop.exec();
@@ -164,16 +125,13 @@ namespace SupercolliderBridge
     durationTime = syncTime - evalTime;
 
     if (print) {
-      emit msgNormalAct(tr("synced [%1 ms]: %2\r\n").arg(
-        QString::number(durationTime),
-        code)
-        );
+      emit msgNormalAct(tr("synced [%1 ms]\r\n").arg(QString::number(durationTime)));
     }
 
     return true;
   }
 
-  QVariant ScBridge::questionNEW(QString code, bool print)
+  QVariant ScBridge::question(QString code, bool print)
   {
     answer = QStringList();
     //answer = NULL;
@@ -254,7 +212,7 @@ namespace SupercolliderBridge
         mIpcServer->listen(mIpcServerName);
 
       QString command = QStringLiteral("ScIDE.connect(\"%1\")").arg(mIpcServerName);
-      this->evaluateNEW(command);
+      this->evaluate(command);
     }
   }
   void ScBridge::killInterpreter()
@@ -264,8 +222,7 @@ namespace SupercolliderBridge
       return;
     }
 
-   // this->evaluateCode("0.exit", true);
-    this->evaluateNEW("0.exit", false, true);
+    this->evaluate("0.exit", false, true);
     closeWriteChannel();
 
     mCompiled = false;
@@ -452,7 +409,7 @@ namespace SupercolliderBridge
 
   QString ScBridge::nextID()
   {
-    QString newID = this->questionNEW("s.nextNodeID", true).toString();
+    QString newID = this->question("s.nextNodeID", true).toString();
     qDebug() << "newID " << newID;
     return newID;
   }

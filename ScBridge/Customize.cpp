@@ -10,7 +10,7 @@ namespace SupercolliderBridge
   }
 
   void Customize::onInterpretStart() {
-    QString path = mBridge->questionNEW("Platform.systemExtensionDir").toString();
+    QString path = mBridge->question("Platform.systemExtensionDir").toString();
     this->initConfigFile(path);
     this->mergeConfigData();
   }

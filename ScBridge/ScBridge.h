@@ -34,8 +34,8 @@ namespace SupercolliderBridge
     StateServer stateServer;
 
     QString nextID();
-    bool evaluateNEW(QString code, bool print = false, bool silent = false);
-    QVariant questionNEW(QString code, bool print = false);
+    bool evaluate(QString code, bool print = false, bool silent = false);
+    QVariant question(QString code, bool print = false);
 
     private slots:
     void onReadyRead(void);
@@ -47,10 +47,7 @@ namespace SupercolliderBridge
     void changeInterpretState();
     void changeServerState();
 
-   // void evaluateCode(QString const & commandString, bool silent = false, bool printAnswer = false);
-   // void question(QUuid id, int selector, QString commandString, bool printAnswer = false);
-
-  signals:
+    signals:
     void interpretBootInitAct();
     void interpretBootDoneAct();
     void interpretKillInitAct();

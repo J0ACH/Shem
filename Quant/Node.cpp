@@ -77,11 +77,11 @@ namespace QuantIDE
 
   void Node::initNode()
   {
-    mBridge->evaluateNEW(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-    mBridge->evaluateNEW(tr("~%1.play(vol:0.2).quant_(2);").arg(nodeName), true);
-    //mBridge->evaluateNEW(tr("~%1.play(out:0, group:~%1.source.nodeID);").arg(nodeName), true);
-    // mBridge->evaluateNEW(tr("~%1.fadeTime = 0.5;").arg(nodeName), true);
-    // mBridge->evaluateNEW(tr("~%1.quant_(1);").arg(nodeName), true);
+    mBridge->evaluate(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
+    mBridge->evaluate(tr("~%1.play(vol:0.2).quant_(2);").arg(nodeName), true);
+    //mBridge->evaluate(tr("~%1.play(out:0, group:~%1.source.nodeID);").arg(nodeName), true);
+    // mBridge->evaluate(tr("~%1.fadeTime = 0.5;").arg(nodeName), true);
+    // mBridge->evaluate(tr("~%1.quant_(1);").arg(nodeName), true);
 
     //labelGroupID->setText(tr("groupID: %1").arg(groupID));
 
@@ -91,7 +91,7 @@ namespace QuantIDE
   QString Node::getNodeID()
   {
     QString txtNodeID = tr("~%1.nodeID;").arg(nodeName);
-    return mBridge->questionNEW(txtNodeID, true).toString();
+    return mBridge->question(txtNodeID, true).toString();
   }
 
   void Node::setSourceCode(QString txt)
@@ -101,7 +101,7 @@ namespace QuantIDE
   }
   void Node::sendSourceCode(QString txt)
   {
-    mBridge->evaluateNEW(tr("(~%1[0] = { %2 })").arg(nodeName, txt), true);
+    mBridge->evaluate(tr("(~%1[0] = { %2 })").arg(nodeName, txt), true);
 
     //qDebug() << "Node::sendSourceCode::controlKeys: " << controlKeys;
     labelNamedControls->setText(tr("controls: %1").arg(this->getControlKeys().join("; ")));
@@ -109,17 +109,17 @@ namespace QuantIDE
 
   QStringList Node::getControlKeys()
   {
-    QStringList controlKeys = mBridge->questionNEW(tr("~%1.controlKeys").arg(nodeName)).toStringList();
+    QStringList controlKeys = mBridge->question(tr("~%1.controlKeys").arg(nodeName)).toStringList();
 
     //check pouze pro source (index[0])
     //controlKeys obsahuje i namapovane klice, ktere je treba jeste ~node.unmap(\key)
-    QStringList constants = mBridge->questionNEW(tr("~%1.source.def.constants").arg(nodeName)).toStringList();
+    QStringList constants = mBridge->question(tr("~%1.source.def.constants").arg(nodeName)).toStringList();
 
     foreach(QString key, controlKeys)
     {
       if (!constants.contains(key))
       {
-        mBridge->evaluateNEW(tr("~%1.unmap(\\%2)").arg(nodeName, key), true);
+        mBridge->evaluate(tr("~%1.unmap(\\%2)").arg(nodeName, key), true);
         controlKeys.removeAt(controlKeys.indexOf(key, 0));
       }
     }
@@ -139,7 +139,7 @@ namespace QuantIDE
 
   void Node::addControl(QString controlName)
   {
-    QString defaultValue = mBridge->questionNEW(tr("~%1.controlKeysValues ([\\%2])[1]").arg(nodeName, controlName)).toString();
+    QString defaultValue = mBridge->question(tr("~%1.controlKeysValues ([\\%2])[1]").arg(nodeName, controlName)).toString();
     // qDebug() << controlName << "control default value is " << defaultValue;
 
     //int busIndex = this->nextEmptyBusIndex();
@@ -151,7 +151,7 @@ namespace QuantIDE
       this->nextEmptyBusIndex()
       );
     newGraph->setFixedHeight(250);
-    newGraph->setEnv(tr("Env([%1,%1], 1, \\lin)").arg(defaultValue));
+    newGraph->setEnv(tr("Env([%1,%1], 1, \\sin)").arg(defaultValue));
     newGraph->show();
 
     conteinerControlsGraph.insert(controlName, newGraph);
@@ -168,7 +168,7 @@ namespace QuantIDE
 
   int Node::nextEmptyBusIndex()
   {
-    QString fisrtPrivateBus = mBridge->questionNEW("s.options.numOutputBusChannels + s.options.numInputBusChannels").toString();
+    QString fisrtPrivateBus = mBridge->question("s.options.numOutputBusChannels + s.options.numInputBusChannels").toString();
     int startIndex = nodeNumber * nodeBusIndexReserve + fisrtPrivateBus.toInt();
     for (int i = startIndex; i < startIndex + nodeBusIndexReserve; i++)
     {
@@ -196,10 +196,10 @@ namespace QuantIDE
     switch (stateNodePlay)
     {
     case QuantIDE::StateNodePlay::PLAY:
-      mBridge->evaluateNEW(tr("~%1.stop(4)").arg(nodeName), true);
+      mBridge->evaluate(tr("~%1.stop(4)").arg(nodeName), true);
       break;
     case QuantIDE::StateNodePlay::STOP:
-      mBridge->evaluateNEW(tr("~%1.play(vol: 1, fadeTime: 4)").arg(nodeName), true);
+      mBridge->evaluate(tr("~%1.play(vol: 1, fadeTime: 4)").arg(nodeName), true);
       break;
     case QuantIDE::StateNodePlay::FREE:
       break;
@@ -271,7 +271,7 @@ namespace QuantIDE
 
   void Node::closeEvent(QCloseEvent *event)
   {
-    mBridge->evaluateNEW(tr("~%1.free").arg(nodeName), true);
+    mBridge->evaluate(tr("~%1.free").arg(nodeName), true);
     stateNodePlay = StateNodePlay::FREE;
     emit killAct(nodeName);
     qDebug("Node::closeEvent()");

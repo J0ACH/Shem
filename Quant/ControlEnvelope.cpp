@@ -33,7 +33,7 @@ namespace QuantIDE
       this, SLOT(setEnv(QList<double>, QList<double>, QList<QString>))
       );
 
-    mBridge->evaluateNEW(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
+    mBridge->evaluate(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
 
     // this->setEnv(this->getEnv());
   }
@@ -73,7 +73,7 @@ namespace QuantIDE
     int cntQuestionLoop = 0;
     while (true)
     {
-      answer = mBridge->questionNEW(tr("%1.asArray").arg(envCode)).toStringList();
+      answer = mBridge->question(tr("%1.asArray").arg(envCode)).toStringList();
       qDebug() << "ControlEnvelope asArray question loop: " << cntQuestionLoop;
       // odchytava spatnou odpoved ze servru, proc prichazi single cislo????
       if (answer.size() % 4 == 0) { break; }
@@ -137,7 +137,7 @@ namespace QuantIDE
       }
       qDebug() << "///////////////////\n";
     }
-    duration = mBridge->questionNEW(tr("%1.totalDuration").arg(envCode)).toString().toDouble();
+    duration = mBridge->question(tr("%1.totalDuration").arg(envCode)).toString().toDouble();
     envGraph->setDomainX(0, duration);
     envGraph->setDomainY(minLevel, maxLevel);
 
@@ -257,7 +257,7 @@ namespace QuantIDE
       else { midPtTime += times[i]; }
     }
     QString env = this->getEnv();
-    QString txtVal = mBridge->questionNEW(tr("%1.at(%2)").arg(env, QString::number(midPtTime))).toString();
+    QString txtVal = mBridge->question(tr("%1.at(%2)").arg(env, QString::number(midPtTime))).toString();
     return QPointF(midPtTime, txtVal.toDouble());
   }
 
@@ -270,7 +270,7 @@ namespace QuantIDE
     for (int i = 0; i <= segments; i++)
     {
       double xVal = (duration / (double)segments * i);
-      QString txtVal = mBridge->questionNEW(tr("%1.at(%2)").arg(env, QString::number(xVal))).toString();
+      QString txtVal = mBridge->question(tr("%1.at(%2)").arg(env, QString::number(xVal))).toString();
       points.append(QPointF(xVal, txtVal.toDouble()));
     }
     return points;
@@ -295,14 +295,14 @@ namespace QuantIDE
       QString::number(duration),
       env
       );
-    mBridge->evaluateNEW(code);
+    mBridge->evaluate(code);
   }
 
   void ControlEnvelope::mouseReleaseEvent(QMouseEvent *mouseEvent)
   {
-    mBridge->questionNEW(tr("~%1.nodeID").arg(nodeName), true);
-    mBridge->questionNEW(tr("~%1.source.def.sourceCode").arg(nodeName), true);
-    mBridge->questionNEW(tr("~%1.isPlaying").arg(nodeName), true);
+    mBridge->question(tr("~%1.nodeID").arg(nodeName), true);
+    mBridge->question(tr("~%1.source.def.sourceCode").arg(nodeName), true);
+    mBridge->question(tr("~%1.isPlaying").arg(nodeName), true);
 
     envGraph->drawPolyline(this->getEnvPoints(200));
 
