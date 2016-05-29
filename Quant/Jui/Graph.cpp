@@ -14,7 +14,7 @@ namespace Jui
   {
     parent->installEventFilter(this);
     pointSize = 10;
-    curvature = "lin";
+    curvature = "'lin'";
     this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
 
     setFocusPolicy(Qt::StrongFocus);
@@ -70,7 +70,7 @@ namespace Jui
   void GraphPoint::setType(GraphPoint::PointType newType)
   {
     type = newType;
-   // update();
+    // update();
   }
   void GraphPoint::setCurvature(QString newCurvature)
   {
@@ -120,7 +120,7 @@ namespace Jui
     labelLevel->setGeometry(tempX, tempY + 30, 80, 25);
     labelCurve->setGeometry(tempX, tempY + 15, 80, 25);
     //update();
-    
+
   }
 
   void GraphPoint::mouseReleaseEvent(QMouseEvent *mouseEvent)
@@ -214,6 +214,7 @@ namespace Jui
     labelID->close();
     labelTime->close();
     labelLevel->close();
+    labelCurve->close();
   }
 
   void GraphPoint::focusInEvent(QFocusEvent* event)
@@ -447,38 +448,30 @@ namespace Jui
   {
     qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
     controlPts.removeAt(ID);
+    curvePts[ID - 1]->close();
+    curvePts.removeAt(ID - 1);
     this->makeEnv();
     update();
   }
   void Graph::onMovePoint(int ID, int pixelX, int pixelY)
   {
     qDebug() << "Graph::onMovePoint: " << QString::number(ID);
-    controlPts[ID]->setX(pixelX, getValueX(pixelX));
-    controlPts[ID]->setY(pixelY, getValueY(pixelY));
-    /*
-    for (int i = 0; i < controlPts.size(); i++)
-    {
-    if (controlPts[i]->ID == ID)
-    {
-    switch (controlPts[i]->type)
-    {
-    case GraphPoint::PointType::vertex:
-    controlPts[ID]->setX(pixelX getValueX(pixelX));
-    controlPts[ID]->setY(pixelY, getValueY(pixelY));
-    //controlPts[i]->valueX = getValueX(pixelX);
-    //controlPts[i]->valueY = getValueY(pixelY);
-    break;
-    case GraphPoint::PointType::startPoint:
-    case GraphPoint::PointType::endPoint:
-    //controlPts[i]->valueX = getValueX(pixelX);
-    controlPts[i]->valueY = getValueY(pixelY);
-    break;
-    }
-    }
-    }
-    */
+
+    double newValX = getValueX(pixelX);
+    double newValY = getValueY(pixelY);
+    int newPixelX = pixelX;
+    int newPixelY = pixelY;
+
+    if (newValX > maxDomainX) { newValX = maxDomainX - 0.01; newPixelX = getPixelX(maxDomainX - 0.01); };
+    if (newValX < minDomainX) { newValX = minDomainX; newPixelX = getPixelX(minDomainX); };
+
+    if (newValY > maxDomainY) { newValY = maxDomainY; newPixelY = getPixelY(maxDomainY); };
+    if (newValY < minDomainY) { newValY = minDomainY; newPixelY = getPixelY(minDomainY); };
+
+    controlPts[ID]->setX(newPixelX, newValX);
+    controlPts[ID]->setY(newPixelY, newValY);
+
     this->sortPointsByX();
-    //update();
     this->makeEnv();
   }
 
@@ -506,7 +499,7 @@ namespace Jui
 
   void Graph::makeEnv()
   {
-    qDebug() << "Graph::makeEnv";
+
     QList<double> levels;
     QList<double> times;
     QList<QString> curves;
@@ -536,6 +529,11 @@ namespace Jui
     {
       curves.append(onePt->curvature);
     };
+
+    qDebug() << "Graph::makeEnv -> "
+      << "levels: " << levels
+      << "times: " << times
+      << "curves: " << curves;
 
     emit actEnvGraphChanged(levels, times, curves);
   }

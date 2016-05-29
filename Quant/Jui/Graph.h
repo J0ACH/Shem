@@ -77,11 +77,11 @@ namespace Jui
     void setDomainY(double min, double max);
     QList<double> getDomainX();
     QList<double> getDomainY();
-    
+
     GraphPoint *addVertexPoint(QPointF newPt);
     void setVertexPoint(int ID, QPointF newPt);
     void setVertexType(int ID, GraphPoint::PointType newType);
-    
+
     GraphPoint *addCurvePoint(QPointF newPt);
     void setCurvePoint(int ID, QPointF newPt);
     void setCurveCurvature(int ID, QString txt);
@@ -95,16 +95,14 @@ namespace Jui
     public slots:
     void onDeletePoint(int ID);
     void onMovePoint(int ID, int pixelX, int pixelY);
-   // void onGraphEnv(QList<double> levels, QList<double> times, QList<double> curves);
 
   signals:
-    void actPointAdded(double valueX, double valueY);
     void actEnvGraphChanged(QList<double> levels, QList<double> times, QList<QString> curves);
 
   protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *event);
-   
+
   private:
     void mousePressEvent(QMouseEvent *mouseEvent);
     void mouseReleaseEvent(QMouseEvent *mouseEvent);
@@ -123,8 +121,6 @@ namespace Jui
     QList<QPointF*> collDrawPoints;
     QList<QLineF*> collDrawLines;
     QPolygonF *graphPolylines;
-
-    //QList<double> graphValues;
 
     double getValueX(int displayX);
     double getValueY(int displayY);

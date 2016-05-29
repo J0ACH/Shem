@@ -62,7 +62,6 @@ namespace QuantIDE
 
     QLabel *nameLabel, *busLabel;
 
-    //QLabel *levelLabel, *timeLabel, *curveLabel;
     CodeEditor *envelopeCode;
     Graph *envGraph;
 
