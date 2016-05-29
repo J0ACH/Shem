@@ -8,6 +8,7 @@
 
 #include "ScBridge.h"
 #include "Customize.h"
+#include "UDPServer.h"
 #include "Canvan.h"
 #include "Panel.h"
 #include "Edges.h"
@@ -74,6 +75,7 @@ namespace QuantIDE
 		
 		ScBridge *bridge;
 		Customize *customize;
+  UDPServer *udpServer;
 		Canvan *canvan;
 		NodePanel *nodePanel;
 

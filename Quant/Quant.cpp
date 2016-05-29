@@ -24,6 +24,7 @@ namespace QuantIDE
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
     customize = new Customize(this);
+    udpServer = new UDPServer(this);
 
     customize->setTargetBridge(bridge);
 
