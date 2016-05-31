@@ -252,25 +252,26 @@ namespace Jui
       mCursorGlobal->x() - mCursorLocal->x(),
       mCursorGlobal->y() - mCursorLocal->y()
       );
-
+    /*
     emit consolePrintAct(
-      tr("pressedGlobal [%1,%2]").arg(
-      QString::number(mCursorGlobal->x()),
-      QString::number(mCursorGlobal->y())
-      ), QColor(120, 120, 120), true);
-
+    tr("pressedGlobal [%1,%2]").arg(
+    QString::number(mCursorGlobal->x()),
+    QString::number(mCursorGlobal->y())
+    ), QColor(120, 120, 120), true);
+    */
   }
 
   void Canvan::mouseMoveEvent(QMouseEvent *mouseEvent)
   {
-    if (isPressed)
-    {
-      QPoint mouseCurrentGlobal = mouseEvent->globalPos();
-      int posX = mFrameOriginGlobal->x() - mCursorGlobal->x() + mouseCurrentGlobal.x();
-      int posY = mFrameOriginGlobal->y() - mCursorGlobal->y() + mouseCurrentGlobal.y();
-      //msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
-
-      win->move(posX, posY);
+    if (win->windowState() == Qt::WindowNoState) {
+      if (isPressed)
+      {
+        QPoint mouseCurrentGlobal = mouseEvent->globalPos();
+        int posX = mFrameOriginGlobal->x() - mCursorGlobal->x() + mouseCurrentGlobal.x();
+        int posY = mFrameOriginGlobal->y() - mCursorGlobal->y() + mouseCurrentGlobal.y();
+        //msgConsole(tr("mCursor [%1,%2]").arg(QString::number(posX), QString::number(posY)));
+        win->move(posX, posY);
+      }
     }
   }
 
@@ -321,6 +322,7 @@ if (patch < 10) { strPatch.prepend(QString::number(0)); }
       win->move(0, 0);
       edges->edgeMoved(Jui::EdgeControler::Direction::RIGHT, scr.width() - 1);
       edges->edgeMoved(Jui::EdgeControler::Direction::BOTTOM, scr.height() - 1);
+      edges->hide();
     }
     else if (win->windowState() == Qt::WindowMaximized)
     {
@@ -328,6 +330,7 @@ if (patch < 10) { strPatch.prepend(QString::number(0)); }
       edges->edgeMoved(Jui::EdgeControler::Direction::RIGHT, canvanSize.width());
       edges->edgeMoved(Jui::EdgeControler::Direction::BOTTOM, canvanSize.height());
       win->move(canvanOrigin);
+      edges->show();
     }
   }
 
