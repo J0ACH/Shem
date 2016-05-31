@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QFontDatabase>
 #include <QMap>
+#include <QDesktopWidget>
 
 #include "Console.h"
 #include "Button.h"
@@ -89,6 +90,8 @@ namespace Jui
 		QPoint *mCursorLocal;
 		QPoint *mFrameOriginGlobal;
 
+  QPoint canvanOrigin;
+  QSize canvanSize;
 
 	};
 
