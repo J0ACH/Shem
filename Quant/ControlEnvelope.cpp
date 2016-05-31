@@ -220,8 +220,31 @@ namespace QuantIDE
     QStringList txtTime;
     QStringList txtCurves;
 
-    foreach(double oneLevel, levels) { txtLevels.append(QString::number(oneLevel, 'f', 2)); }
-    foreach(double oneTime, times) { txtTime.append(QString::number(oneTime, 'f', 2)); }
+    foreach(double oneLevel, levels) {
+      QString txt = QString::number(oneLevel, 'f', 2);
+      QStringList parts = txt.split(".");
+      QString decVal = parts[1];
+      if (!decVal.isEmpty())
+      {
+        if (decVal.endsWith("00")) { decVal.chop(2); }
+        if (decVal.endsWith("0")) { decVal.chop(1); }
+        if (!decVal.isEmpty()) { decVal.prepend("."); }
+      }
+      txtLevels.append(tr("%1%2").arg(parts[0], decVal));
+    }
+    foreach(double oneTime, times) {
+
+      QString txt = QString::number(oneTime, 'f', 2);
+      QStringList parts = txt.split(".");
+      QString decVal = parts[1];
+      if (!decVal.isEmpty())
+      {
+        if (decVal.endsWith("00")) { decVal.chop(2); }
+        if (decVal.endsWith("0")) { decVal.chop(1); }
+        if (!decVal.isEmpty()) { decVal.prepend("."); }
+      }
+      txtTime.append(tr("%1%2").arg(parts[0], decVal));
+    }
     foreach(QString oneCurve, curves) { txtCurves.append(oneCurve); }
 
     QString codeEnv = tr("Env([%1], [%2], [%3])").arg(
@@ -342,3 +365,4 @@ namespace QuantIDE
 
   ControlEnvelope::~ControlEnvelope()  {  }
 }
+
