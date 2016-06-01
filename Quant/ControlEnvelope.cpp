@@ -25,6 +25,7 @@ namespace QuantIDE
       envGraph, SIGNAL(actEnvGraphChanged(QList<double>, QList<double>, QList<QString>)),
       this, SLOT(setEnv(QList<double>, QList<double>, QList<QString>))
       );
+    connect(durationBox, SIGNAL(actValueChanged(QString)), this, SLOT(setDuration(QString)));
 
     mBridge->evaluate(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
 
@@ -46,6 +47,13 @@ namespace QuantIDE
     envGraph = new Graph(this);
     envGraph->setDomainX(0, 1);
     envGraph->setDomainY(0, 1);
+
+    durationBox = new ControlBox(this);
+    durationBox->setLabel("quant");
+    durationBox->setValue("1");
+    durationBox->setLabelSize(50);
+    durationBox->setColorBackground(QColor(60, 30, 30));
+    durationBox->setColorText(QColor(120, 120, 120));
   }
 
   void ControlEnvelope::setEnv(QString envCode)
@@ -207,6 +215,29 @@ namespace QuantIDE
     this->setEnv(codeEnv);
   }
 
+  void ControlEnvelope::setDuration(QString val)
+  {
+    double newDuration = val.toDouble();
+    qDebug() << "newDuration set to " << newDuration;
+    double restTime = newDuration - duration;
+    if (restTime > 0)
+    {
+      times[times.size() - 1] += restTime;
+      envGraph->setDomainX(0, newDuration);
+      qDebug() << "restTime set to " << restTime;
+    }
+    else
+    {
+      times[times.size() - 1] += restTime;
+      envGraph->setDomainX(0, newDuration);
+      qDebug() << "restTime reduce by " << restTime;
+    }
+
+    this->setEnv(this->getEnv());
+    //duration = mBridge->question(tr("%1.totalDuration").arg(envCode)).toString().toDouble();
+
+  }
+
   QString ControlEnvelope::getEnv()
   {
     QStringList txtLevels;
@@ -329,9 +360,10 @@ namespace QuantIDE
   {
     nameLabel->setGeometry(5, 5, 95, 25);
     busLabel->setGeometry(100, 5, 100, 25);
-    envelopeCode->setGeometry(5, 30, width() - 10, 25);
+    envelopeCode->setGeometry(5, 30, width() - 160, 25);
     envGraph->setGeometry(5, 60, width() - 10, height() - 65);
-      }
+    durationBox->setGeometry(width() - 150, 30, 140, 25);
+  }
 
   void ControlEnvelope::paintEvent(QPaintEvent *event)
   {

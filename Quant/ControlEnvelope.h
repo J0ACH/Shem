@@ -4,6 +4,7 @@
 #include "ScBridge.h"
 #include "CodeEditor.h"
 #include "Graph.h"
+#include "ControlBox.h"
 
 #include <QWidget>
 #include <QLabel>
@@ -38,9 +39,8 @@ namespace QuantIDE
     public slots:
     void setEnv(QString envCode);
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
-
-  signals:
-
+    void setDuration(QString);
+    
   protected:
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -61,6 +61,7 @@ namespace QuantIDE
     QList<double> midCurvePointY;
 
     QLabel *nameLabel, *busLabel;
+    ControlBox *durationBox;
     
     CodeEditor *envelopeCode;
     Graph *envGraph;
