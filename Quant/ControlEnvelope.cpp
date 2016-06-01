@@ -20,7 +20,7 @@ namespace QuantIDE
     times = QList<double>();
     curves = QList<QString>();
 
-     connect(envelopeCode, SIGNAL(sendText(QString)), this, SLOT(setEnv(QString)));
+    connect(envelopeCode, SIGNAL(sendText(QString)), this, SLOT(setEnv(QString)));
     connect(
       envGraph, SIGNAL(actEnvGraphChanged(QList<double>, QList<double>, QList<QString>)),
       this, SLOT(setEnv(QList<double>, QList<double>, QList<QString>))
@@ -331,14 +331,7 @@ namespace QuantIDE
     busLabel->setGeometry(100, 5, 100, 25);
     envelopeCode->setGeometry(5, 30, width() - 10, 25);
     envGraph->setGeometry(5, 60, width() - 10, height() - 65);
-
-
-    /*
-    foreach(double oneX, graphCurveX) {
-    this->onBridgeQuestion(QuestionType::graphAt, QString::number(oneX));
-    }
-    */
-  }
+      }
 
   void ControlEnvelope::paintEvent(QPaintEvent *event)
   {
@@ -358,4 +351,5 @@ namespace QuantIDE
 
   ControlEnvelope::~ControlEnvelope()  {  }
 }
+
 

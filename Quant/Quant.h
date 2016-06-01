@@ -2,8 +2,6 @@
 #define QUANT_H
 
 #include <QWidget>
-//#include <QPushButton>
-//#include <QTextEdit>
 #include <QDebug>
 
 #include "ScBridge.h"
@@ -13,7 +11,6 @@
 #include "Panel.h"
 #include "Edges.h"
 #include "CodeEditor.h"
-#include "ControlBox.h"
 
 #include "NodePanel.h"
 #include "Node.h"
@@ -86,8 +83,7 @@ namespace QuantIDE
 
     Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
     CodeEditor *globalCode;
-    ControlBox *testBox;
-
+  
     QLabel *labelServerMeter, *labelServerSynths;
     QTimer serverTask;
   };

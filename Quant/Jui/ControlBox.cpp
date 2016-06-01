@@ -16,9 +16,20 @@ namespace Jui
     //text->setTabStopWidth(30);
 
     value->installEventFilter(this);
+
+    colorText = Qt::white;
+    colorBackground = Qt::black;
+    this->updateStyleSheet();
   }
 
   QRect ControlBox::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+
+  void ControlBox::setLabel(QString txt) { label->setText(txt); }
+  void ControlBox::setValue(QString val)
+  {
+    value->setText(val);
+    oldValue = val;
+  }
 
   void ControlBox::setFont(QFont font)
   {
@@ -65,8 +76,9 @@ namespace Jui
 
       switch (eventKey->key())
       {
+      case Qt::Key::Key_Enter:
       case Qt::Key::Key_Return:
-        //qDebug() << "ControlBox ENTER";
+        qDebug() << "ControlBox ENTER";
         oldValue = value->displayText();
         emit actValueChanged(value->displayText());
         value->clearFocus();
@@ -87,16 +99,16 @@ namespace Jui
   /*
   void ControlBox::focusInEvent(QFocusEvent *event)
   {
-    qDebug() << "ControlBox Focus IN";
-    //value->setFocus(:: focusInEvent(event);
-    //value->parentWidget().focusNextChild();
+  qDebug() << "ControlBox Focus IN";
+  //value->setFocus(:: focusInEvent(event);
+  //value->parentWidget().focusNextChild();
   }
   */
   /*
   void ControlBox::mousePressEvent(QMouseEvent *event)
   {
-    qDebug() << "ControlBox CLICK";
-    //value->parentWidget().focusNextChild();
+  qDebug() << "ControlBox CLICK";
+  //value->parentWidget().focusNextChild();
   }
   */
 

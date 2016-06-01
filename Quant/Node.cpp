@@ -18,6 +18,8 @@ namespace QuantIDE
     connect(playButton, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
     connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
     connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(sendSourceCode(QString)));
+    connect(volumeBox, SIGNAL(actValueChanged(QString)), this, SLOT(setNodeVolume(QString)));
+    connect(fTimeBox, SIGNAL(actValueChanged(QString)), this, SLOT(setNodeFadeTime(QString)));
 
     this->initNode();
   }
@@ -41,6 +43,14 @@ namespace QuantIDE
 
     labelNodeID = new QLabel(this);
     labelNamedControls = new QLabel(this);
+
+    volumeBox = new ControlBox(this);
+    volumeBox->setLabel("volume");
+    volumeBox->setLabelSize(40);
+
+    fTimeBox = new ControlBox(this);
+    fTimeBox->setLabel("fTime");
+    fTimeBox->setLabelSize(40);
   }
   void Node::onConfigData(QMap<QString, QVariant*> config)
   {
@@ -67,6 +77,14 @@ namespace QuantIDE
     labelNodeID->setFont(fontTextSmall);
     labelNamedControls->setFont(fontTextSmall);
 
+    volumeBox->setFont(fontTextSmall);
+    volumeBox->setColorBackground(colorPanelBackground);
+    volumeBox->setColorText(colorNormal);
+
+    fTimeBox->setFont(fontTextSmall);
+    fTimeBox->setColorBackground(colorPanelBackground);
+    fTimeBox->setColorText(colorNormal);
+
     configData = config;
     update();
   }
@@ -77,21 +95,23 @@ namespace QuantIDE
 
   void Node::initNode()
   {
-    mBridge->evaluate(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-    mBridge->evaluate(tr("~%1.play(vol:0.2).quant_(2);").arg(nodeName), true);
-    //mBridge->evaluate(tr("~%1.play(out:0, group:~%1.source.nodeID);").arg(nodeName), true);
-    // mBridge->evaluate(tr("~%1.fadeTime = 0.5;").arg(nodeName), true);
-    // mBridge->evaluate(tr("~%1.quant_(1);").arg(nodeName), true);
+    volume = "0.2";
+    fTime = "0";
 
-    //labelGroupID->setText(tr("groupID: %1").arg(groupID));
+    mBridge->evaluate(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
+    mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(2);").arg(nodeName, volume, fTime), true);
+    mBridge->evaluate(tr("~%1.stop()").arg(nodeName), true);
+    stateNodePlay = StateNodePlay::STOP;
 
     labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
+    volumeBox->setValue("0.2");
+    fTimeBox->setValue("0");
   }
 
   QString Node::getNodeID()
   {
     QString txtNodeID = tr("~%1.nodeID;").arg(nodeName);
-    return mBridge->question(txtNodeID, true).toString();
+    return mBridge->question(txtNodeID).toString();
   }
 
   void Node::setSourceCode(QString txt)
@@ -196,16 +216,29 @@ namespace QuantIDE
     switch (stateNodePlay)
     {
     case QuantIDE::StateNodePlay::PLAY:
-      mBridge->evaluate(tr("~%1.stop(4)").arg(nodeName), true);
+      mBridge->evaluate(tr("~%1.stop(%2)").arg(nodeName, fTime), true);
+      stateNodePlay = StateNodePlay::STOP;
       break;
     case QuantIDE::StateNodePlay::STOP:
-      mBridge->evaluate(tr("~%1.play(vol: 1, fadeTime: 4)").arg(nodeName), true);
+      mBridge->evaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(nodeName, volume, fTime), true);
+      stateNodePlay = StateNodePlay::PLAY;
       break;
     case QuantIDE::StateNodePlay::FREE:
       break;
     }
 
     labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
+  }
+
+  void Node::setNodeVolume(QString vol)
+  {
+    volume = vol;
+    mBridge->evaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(nodeName, volume, fTime), true);
+  }
+  void Node::setNodeFadeTime(QString time)
+  {
+    fTime = time;
+    mBridge->evaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(nodeName, volume, fTime), true);
   }
 
   void Node::fitControlsPosition()
@@ -245,6 +278,8 @@ namespace QuantIDE
     sourceCode->setGeometry(10, 45, width() - 20, 60);
     labelNodeID->setGeometry(this->width() - 300, 5, 250, 20);
     labelNamedControls->setGeometry(this->width() - 300, 20, 250, 20);
+    volumeBox->setGeometry(200, 5, 80, 20);
+    fTimeBox->setGeometry(200, 25, 80, 20);
 
     foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
     {

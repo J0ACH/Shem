@@ -61,7 +61,7 @@ namespace QuantIDE
     QList<double> midCurvePointY;
 
     QLabel *nameLabel, *busLabel;
-
+    
     CodeEditor *envelopeCode;
     Graph *envGraph;
 

@@ -21,14 +21,16 @@ namespace Jui
 
     QRect bounds();
 
+    void setLabel(QString);
+
     void setFont(QFont);
     void setColorText(QColor);
     void setColorBackground(QColor);
 
     void setLabelSize(int);
 
-    public slots:
-    //void setValue(QString text);
+  public slots:
+    void setValue(QString text);
 
   signals :
     void actValueChanged(QString);
