@@ -116,8 +116,7 @@ namespace QuantIDE
     labelServerSynths->setToolTip("numSynths");
 
     testBox = new ControlBox(nodePanel);
-    testBox->setColorText(QColor(120, 120, 120));
-    testBox->setColorBackground(QColor(120, 30, 30));
+    testBox->setLabelSize(30);
   }
 
   void Quant::fitGeometry()
@@ -136,7 +135,7 @@ namespace QuantIDE
     labelServerMeter->setGeometry(canvan->tail->width() - 200, 5, 40, 25);
     labelServerSynths->setGeometry(canvan->tail->width() - 155, 5, 30, 25);
 
-    testBox->setGeometry(10, nodePanel->height() - 80, 350, 30);
+    testBox->setGeometry(10, nodePanel->height() - 80, 350, 20);
   }
 
   // MSG
@@ -207,7 +206,7 @@ namespace QuantIDE
     testBox->setFont(fontTextSmall);
     testBox->setColorBackground(colorPanelBackground);
     testBox->setColorText(colorNormal);
-
+    
     emit actConfigData(config);
     onMsgStatus("Cutomization done...");
 

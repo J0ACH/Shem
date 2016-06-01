@@ -20,14 +20,7 @@ namespace QuantIDE
     times = QList<double>();
     curves = QList<QString>();
 
-    /*
-    levels.append(0);
-    levels.append(0);
-    times.append(1);
-    curves.append("lin");
-    */
-
-    connect(envelopeCode, SIGNAL(sendText(QString)), this, SLOT(setEnv(QString)));
+     connect(envelopeCode, SIGNAL(sendText(QString)), this, SLOT(setEnv(QString)));
     connect(
       envGraph, SIGNAL(actEnvGraphChanged(QList<double>, QList<double>, QList<QString>)),
       this, SLOT(setEnv(QList<double>, QList<double>, QList<QString>))

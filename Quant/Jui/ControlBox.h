@@ -6,6 +6,8 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QPainter>
+#include <QMouseEvent>
+#include <QDebug>
 
 namespace Jui
 {
@@ -23,17 +25,27 @@ namespace Jui
     void setColorText(QColor);
     void setColorBackground(QColor);
 
+    void setLabelSize(int);
+
     public slots:
-   // void addText(QString text, QColor color, bool newLine);
+    //void setValue(QString text);
+
+  signals :
+    void actValueChanged(QString);
     
   protected:
+   // void mousePressEvent(QMouseEvent *event);
+   // void focusInEvent(QFocusEvent*);
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
+    virtual bool eventFilter(QObject * watched, QEvent * event);
 
   private:
-    QLabel *txt;
-    QLineEdit *val;
+    QLabel *label;
+    QLineEdit *value;
+    QString oldValue;
 
+    int labelSizeX;
     QColor colorText, colorBackground;
 
     void updateStyleSheet();
