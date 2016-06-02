@@ -273,15 +273,12 @@ namespace Jui
     maxDomainX = 1;
     minDomainY = 0;
     maxDomainY = 1;
-    //cursorPos = QPoint();
+
     controlPts = QList<GraphPoint*>();
     graphPolylines = new QPolygonF();
-    //graphValues = QList<double>();
-
-    //newPointID = 0;
+    collPolylinesNEW = QList<QPolygonF*>();
 
     setFocusPolicy(Qt::StrongFocus);
-
   }
 
   QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
@@ -398,6 +395,7 @@ namespace Jui
   {
     controlPts[ID]->setType(newType);
   }
+  GraphPoint *Graph::getVertex(int ID) { return controlPts.at(ID); }
 
   GraphPoint *Graph::addCurvePoint(QPointF pt)
   {
@@ -428,6 +426,10 @@ namespace Jui
     graphPolylines = new QPolygonF(collPoints);
     update();
   }
+  void Graph::addPolyline(QVector<QPointF> collPoints)
+  {
+    collPolylinesNEW.append(new QPolygonF(collPoints));
+  }
 
   void Graph::deleteGraph()
   {
@@ -440,6 +442,7 @@ namespace Jui
     collDrawPoints = QList<QPointF*>();
     collDrawLines = QList<QLineF*>();
     graphPolylines = new QPolygonF();
+    collPolylinesNEW = QList<QPolygonF*>();
 
     update();
   }
@@ -633,7 +636,23 @@ namespace Jui
       painter.drawLine(pt1, pt2);
     };
 
-    //collPolygons
+    // collPolylines
+    
+    painter.setPen(QColor(40, 240, 40));
+    foreach(QPolygonF *onePoly, collPolylinesNEW)
+    {
+      QPolygonF poly;
+      foreach(QPointF onePt, onePoly->toList())
+      {
+        //onePt.setX(getPixelX(onePt.x()));
+        //onePt.setY(getPixelY(onePt.y()));
+        poly.append(onePt);
+      }
+      painter.drawPolyline(poly);
+    }
+    
+
+    //graphPolylines
     painter.setPen(QColor(240, 70, 70));
     QPolygonF poly;
     foreach(QPointF onePt, graphPolylines->toList())

@@ -210,6 +210,39 @@ namespace QuantIDE
     envelopeCode->setText(env);
     envGraph->drawPolyline(this->getEnvPoints(200));
 
+
+    for (int i = 0; i < curves.size(); i++)
+    {
+      qDebug() << "curves: " << curves[i];
+      QVector<QPointF> pts;
+      GraphPoint *from = envGraph->getVertex(i);
+      GraphPoint *to = envGraph->getVertex(i + 1);
+      pts.append(QPointF(from->pixelX, from->pixelY));
+      /*
+      switch (curves[i])
+      {
+      case "'lin'":
+        qDebug() << "curves LIN found at " << curves[i];
+        break;
+      default:
+        break;
+      }
+      */
+      pts.append(QPointF(to->pixelX, to->pixelY));
+
+      if (changedCntVertex)
+      {
+        envGraph->addPolyline(pts);
+      }
+      else
+      {
+
+      }
+    }
+
+
+
+
     this->makeTask(env);
   }
 
@@ -236,13 +269,13 @@ namespace QuantIDE
   void ControlEnvelope::setDuration(QString val)
   {
     double newDuration = val.toDouble();
-   // qDebug() << "newDuration set to " << newDuration;
+    // qDebug() << "newDuration set to " << newDuration;
     double restTime = newDuration - duration;
     if (restTime > 0)
     {
       times[times.size() - 1] += restTime;
       envGraph->setDomainX(0, newDuration);
-     // qDebug() << "restTime set to " << restTime;
+      // qDebug() << "restTime set to " << restTime;
       this->setEnv(this->getEnv());
     }
     else
@@ -251,7 +284,7 @@ namespace QuantIDE
       {
         times[times.size() - 1] += restTime;
         envGraph->setDomainX(0, newDuration);
-      //  qDebug() << "restTime reduce by " << restTime;
+        //  qDebug() << "restTime reduce by " << restTime;
         this->setEnv(this->getEnv());
       }
       else
@@ -366,6 +399,7 @@ namespace QuantIDE
       QString::number(duration),
       env
       );
+    // pridat s.makeBundle(time2Quant, code) pro synchronizaci
     mBridge->evaluate(code);
   }
 

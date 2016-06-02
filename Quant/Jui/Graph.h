@@ -81,6 +81,7 @@ namespace Jui
     GraphPoint *addVertexPoint(QPointF newPt);
     void setVertexPoint(int ID, QPointF newPt);
     void setVertexType(int ID, GraphPoint::PointType newType);
+    GraphPoint *getVertex(int ID);
 
     GraphPoint *addCurvePoint(QPointF newPt);
     void setCurvePoint(int ID, QPointF newPt);
@@ -89,6 +90,7 @@ namespace Jui
     void drawPoint(double valueX, double valueY);
     void drawLine(double valueX1, double valueY1, double valueX2, double valueY2);
     void drawPolyline(QVector<QPointF> collPoints);
+    void addPolyline(QVector<QPointF> collPoints);
 
     void deleteGraph();
 
@@ -121,6 +123,7 @@ namespace Jui
     QList<QPointF*> collDrawPoints;
     QList<QLineF*> collDrawLines;
     QPolygonF *graphPolylines;
+    QList<QPolygonF*> collPolylinesNEW;
 
     double getValueX(int displayX);
     double getValueY(int displayY);
