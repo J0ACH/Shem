@@ -1,13 +1,13 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include "ControlBox.h"
 #include "CodeEditor.h"
 #include "ControlEnvelope.h"
 #include "Graph.h"
 #include "ScBridge.h"
 
 #include <QWidget>
-//#include <QPushButton>
 #include <QLabel>
 #include <QPainter>
 #include <QTextEdit>
@@ -46,6 +46,8 @@ namespace QuantIDE
     void onConfigData(QMap<QString, QVariant*> config);
 
     void changeNodePlay();  
+    void setNodeVolume(QString);
+    void setNodeFadeTime(QString);
     void sendSourceCode(QString txt);
 
   signals:
@@ -75,6 +77,10 @@ namespace QuantIDE
     ScBridge *mBridge;
 
     QLabel *nameLabel;
+    
+    ControlBox *volumeBox, *fTimeBox;
+    QString volume, fTime;
+
     QLabel *labelNodeID, *labelNamedControls;
     CodeEditor *sourceCode;
     Button *closeButton, *playButton;

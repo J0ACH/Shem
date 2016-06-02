@@ -198,7 +198,7 @@ namespace QuantIDE
     labelServerMeter->setFont(fontTextSmall);
     labelServerSynths->setFont(fontTextSmall);
 
-    emit actConfigData(config);
+        emit actConfigData(config);
     onMsgStatus("Cutomization done...");
 
     update();
