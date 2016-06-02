@@ -67,9 +67,7 @@ namespace Jui
     QString styleTxt;
     styleTxt.append(tr("QLabel { color: %1; }").arg(colorText.name()));
     styleTxt.append(tr("QLineEdit { color: %1; }").arg(colorText.name()));
-    // styleTxt.append(tr("QLineEdit { background-color: %1; }").arg(colorBackground.name()));
     styleTxt.append("QLineEdit { background-color: rgba(0,0,0,0); }");
-
     styleTxt.append("QLineEdit { border: none;}");
 
     label->setStyleSheet(styleTxt);

@@ -99,8 +99,9 @@ namespace QuantIDE
     fTime = "0";
 
     mBridge->evaluate(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-    mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(2);").arg(nodeName, volume, fTime), true);
-    mBridge->evaluate(tr("~%1.stop()").arg(nodeName), true);
+    mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(1);").arg(nodeName, volume, fTime), true);
+    mBridge->evaluate(tr("~%1.pause()").arg(nodeName), true);
+   // mBridge->evaluate(tr("~%1.stop()").arg(nodeName), true);
     stateNodePlay = StateNodePlay::STOP;
 
     labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
@@ -202,7 +203,7 @@ namespace QuantIDE
         }
       }
       if (!indexFound) {
-        qDebug() << "Node::nextEmptyBusIndex(): " << i;
+       // qDebug() << "Node::nextEmptyBusIndex(): " << i;
         return i;
       };
     }
@@ -217,13 +218,17 @@ namespace QuantIDE
     {
     case QuantIDE::StateNodePlay::PLAY:
       mBridge->evaluate(tr("~%1.stop(%2)").arg(nodeName, fTime), true);
+      mBridge->evaluate(tr("~%1.pause()").arg(nodeName), true);
+      // mBridge->evaluate(tr("s.makeBundle(%1, ~%2.pause();)").arg(fTime,nodeName), true);
       stateNodePlay = StateNodePlay::STOP;
       break;
     case QuantIDE::StateNodePlay::STOP:
+      mBridge->evaluate(tr("~%1.resume()").arg(nodeName), true);
       mBridge->evaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(nodeName, volume, fTime), true);
       stateNodePlay = StateNodePlay::PLAY;
       break;
     case QuantIDE::StateNodePlay::FREE:
+      mBridge->evaluate(tr("~%1.free(%2)").arg(nodeName, fTime), true);
       break;
     }
 

@@ -28,17 +28,17 @@ namespace Jui
     void setColorText(QColor);
     void setColorBackground(QColor);
     void setLabelSize(int);
-        
+
   public slots:
     void setValue(QString text);
     void alphaUpdate();
 
-  signals :
+  signals:
     void actValueChanged(QString);
-    
+
   protected:
-   // void mousePressEvent(QMouseEvent *event);
-   // void focusInEvent(QFocusEvent*);
+    // void mousePressEvent(QMouseEvent *event);
+    // void focusInEvent(QFocusEvent*);
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
     virtual bool eventFilter(QObject * watched, QEvent * event);
