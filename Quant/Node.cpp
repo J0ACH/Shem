@@ -46,11 +46,11 @@ namespace QuantIDE
 
     volumeBox = new ControlBox(this);
     volumeBox->setLabel("volume");
-    volumeBox->setLabelSize(40);
+    volumeBox->setLabelSize(45);
 
     fTimeBox = new ControlBox(this);
     fTimeBox->setLabel("fTime");
-    fTimeBox->setLabelSize(40);
+    fTimeBox->setLabelSize(45);
   }
   void Node::onConfigData(QMap<QString, QVariant*> config)
   {
@@ -275,11 +275,11 @@ namespace QuantIDE
   void Node::resizeEvent(QResizeEvent *resizeEvent)
   {
     closeButton->setGeometry(this->width() - 30, 10, 16, 16);
-    sourceCode->setGeometry(10, 45, width() - 20, 60);
+    sourceCode->setGeometry(10, 45, width() - 105, 60);
     labelNodeID->setGeometry(this->width() - 300, 5, 250, 20);
     labelNamedControls->setGeometry(this->width() - 300, 20, 250, 20);
-    volumeBox->setGeometry(200, 5, 80, 20);
-    fTimeBox->setGeometry(200, 25, 80, 20);
+    volumeBox->setGeometry(width() - 90, 45, 80, 27);
+    fTimeBox->setGeometry(width() - 90, 78, 80, 27);
 
     foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
     {

@@ -31,6 +31,8 @@ namespace Jui
     oldValue = val;
   }
 
+  double ControlBox::getValue()  { return value->displayText().toDouble(); }
+
   void ControlBox::setFont(QFont font)
   {
     label->setFont(font);

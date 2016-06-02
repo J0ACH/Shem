@@ -22,13 +22,13 @@ namespace Jui
     QRect bounds();
 
     void setLabel(QString);
+    double getValue();
 
     void setFont(QFont);
     void setColorText(QColor);
     void setColorBackground(QColor);
-
     void setLabelSize(int);
-
+        
   public slots:
     void setValue(QString text);
 
