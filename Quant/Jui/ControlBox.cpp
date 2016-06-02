@@ -15,11 +15,18 @@ namespace Jui
     labelSizeX = 30;
     //text->setTabStopWidth(30);
 
+    backgroundAlpha = 0;
+    fadeTimeOut = 800;
+    fps = 25;
+    timer = new QTimer(this);
+
     value->installEventFilter(this);
 
     colorText = Qt::white;
     colorBackground = Qt::black;
     this->updateStyleSheet();
+
+    connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
   }
 
   QRect ControlBox::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
@@ -60,7 +67,9 @@ namespace Jui
     QString styleTxt;
     styleTxt.append(tr("QLabel { color: %1; }").arg(colorText.name()));
     styleTxt.append(tr("QLineEdit { color: %1; }").arg(colorText.name()));
-    styleTxt.append(tr("QLineEdit { background-color: %1; }").arg(colorBackground.name()));
+    // styleTxt.append(tr("QLineEdit { background-color: %1; }").arg(colorBackground.name()));
+    styleTxt.append("QLineEdit { background-color: rgba(0,0,0,0); }");
+
     styleTxt.append("QLineEdit { border: none;}");
 
     label->setStyleSheet(styleTxt);
@@ -80,7 +89,12 @@ namespace Jui
       {
       case Qt::Key::Key_Enter:
       case Qt::Key::Key_Return:
-        qDebug() << "ControlBox ENTER";
+        //qDebug() << "ControlBox ENTER";
+        backgroundAlpha = 255;
+        timer->stop();
+        timer->setInterval(fadeTimeOut / fps);
+        timer->start();
+
         oldValue = value->displayText();
         emit actValueChanged(value->displayText());
         value->clearFocus();
@@ -117,7 +131,9 @@ namespace Jui
   void ControlBox::paintEvent(QPaintEvent *event)
   {
     QPainter painter(this);
-    painter.fillRect(this->bounds(), colorBackground);
+    QColor fillColor = QColor(255, 30, 30);// activeColor;
+    fillColor.setAlpha(backgroundAlpha);
+    painter.fillRect(this->bounds(), fillColor);
 
     painter.setPen(colorText);
     if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
@@ -141,6 +157,18 @@ namespace Jui
     //Panel::resizeEvent(event); // send event to superclass
     label->setGeometry(0, 0, labelSizeX, this->height());
     value->setGeometry(labelSizeX + 5, 1, this->width() - labelSizeX - 2, this->height() - 2);
+  }
+
+  void ControlBox::alphaUpdate()
+  {
+    backgroundAlpha -= 255 / fps;
+    if (backgroundAlpha <= 0)
+    {
+      timer->stop();
+      backgroundAlpha = 0;
+    }
+    //qDebug() << tr("buttonAlpha %1").arg(QString::number(backgroundAlpha));
+    update();
   }
 
   ControlBox::~ControlBox()	{ }

@@ -4,9 +4,9 @@
 #include <QWidget>
 #include <QLabel>
 #include <QLineEdit>
-#include <QTextEdit>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QTimer>
 #include <QDebug>
 
 namespace Jui
@@ -31,6 +31,7 @@ namespace Jui
         
   public slots:
     void setValue(QString text);
+    void alphaUpdate();
 
   signals :
     void actValueChanged(QString);
@@ -49,6 +50,11 @@ namespace Jui
 
     int labelSizeX;
     QColor colorText, colorBackground;
+
+    int fadeTimeOut;
+    int fps;
+    int backgroundAlpha;
+    QTimer *timer;
 
     void updateStyleSheet();
   };
