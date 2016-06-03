@@ -57,8 +57,30 @@ namespace Jui
     QLabel *labelLevel, *labelTime, *labelCurve;
   };
 
-
   // GRAPH POINT END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH CURVE
+
+  class GraphCurve : public QWidget
+  {
+    Q_OBJECT
+
+  public:
+    GraphCurve(QWidget *parent, GraphPoint *ptFrom, GraphPoint *ptTo);
+    ~GraphCurve();
+
+    QRect bounds();
+
+  protected:
+    void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
+    void mousePressEvent(QMouseEvent *);
+
+  private:
+    GraphPoint *from, *to;
+  };
+
+  // GRAPH CURVE END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH 
 

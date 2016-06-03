@@ -208,7 +208,7 @@ namespace QuantIDE
     qDebug() << "ControlEnvelope::getEnv(): " << env;
 
     envelopeCode->setText(env);
-    envGraph->drawPolyline(this->getEnvPoints(200));
+   // envGraph->drawPolyline(this->getEnvPoints(200));
 
 
     for (int i = 0; i < curves.size(); i++)
@@ -218,6 +218,8 @@ namespace QuantIDE
       GraphPoint *from = envGraph->getVertex(i);
       GraphPoint *to = envGraph->getVertex(i + 1);
       pts.append(QPointF(from->pixelX, from->pixelY));
+
+      
       /*
       switch (curves[i])
       {
@@ -232,6 +234,9 @@ namespace QuantIDE
 
       if (changedCntVertex)
       {
+        GraphCurve *crv = new GraphCurve(this, from, to);
+        crv->show();
+
         envGraph->addPolyline(pts);
       }
       else
@@ -242,7 +247,7 @@ namespace QuantIDE
 
 
 
-
+    update();
     this->makeTask(env);
   }
 

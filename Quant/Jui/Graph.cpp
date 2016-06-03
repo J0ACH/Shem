@@ -2,8 +2,8 @@
 
 namespace Jui
 {
+  // GRAPH POINT 
 
-  // GRAPH POINT	
   GraphPoint::GraphPoint(QWidget *parent, int pointID, int pX, int pY, double valX, double valY) :
     QWidget(parent),
     ID(pointID),
@@ -259,8 +259,50 @@ namespace Jui
 
   GraphPoint::~GraphPoint(){}
 
-
   // GRAPH POINT END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH CURVE	
+
+  GraphCurve::GraphCurve(QWidget *parent, GraphPoint *pt1, GraphPoint *pt2) :
+    QWidget(parent),
+    from(pt1),
+    to(pt2)
+  {
+    int fromX = pt1->x() + pt1->pointSize;
+    int fromY;
+    int newWidth = pt2->x() - pt1->x();
+    int newHeight = pt2->y() - pt1->y();
+
+    if (pt1->y() > pt2->y()) { fromY = pt1->y(); }
+    else { fromY = pt2->y(); }
+
+    this->setGeometry(fromX, fromY, newWidth, newHeight);
+
+  }
+
+  QRect GraphCurve::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+
+  void GraphCurve::mousePressEvent(QMouseEvent *mouseEvent)
+  {
+    //mouseEvent->ignore();
+  }
+
+  void GraphCurve::resizeEvent(QResizeEvent *resizeEvent)
+  {
+    // this->setGeometry(from->x(), from->y(), 100, 100);
+  }
+
+  void GraphCurve::paintEvent(QPaintEvent *event)
+  {
+    QPainter painter(this);
+    painter.setPen(QColor(120, 20, 20));
+    //painter.fillRect(this->bounds(), QColor(120, 30, 30));
+    painter.drawRect(this->bounds());
+  }
+
+  GraphCurve::~GraphCurve(){}
+
+  // GRAPH CURVE END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH 
 
@@ -637,7 +679,7 @@ namespace Jui
     };
 
     // collPolylines
-    
+
     painter.setPen(QColor(40, 240, 40));
     foreach(QPolygonF *onePoly, collPolylinesNEW)
     {
@@ -650,7 +692,7 @@ namespace Jui
       }
       painter.drawPolyline(poly);
     }
-    
+
 
     //graphPolylines
     painter.setPen(QColor(240, 70, 70));
