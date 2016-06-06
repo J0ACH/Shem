@@ -9,6 +9,32 @@
 
 namespace Jui
 {
+
+
+  class GraphObject : public QObject
+  {
+    Q_OBJECT
+
+  public:
+    GraphObject(QWidget *graph);
+    ~GraphObject();
+
+    public slots:
+    void onDomainChanged(QPair<float, float>, QPair<float, float>);
+
+    double test();
+
+  private:
+
+    float minDomainX, maxDomainX, minDomainY, maxDomainY;
+    
+    //Graph graph;
+    //QWidget *mParent;
+  };
+
+  
+
+
   class GraphPoint : public QWidget
   {
     Q_OBJECT
@@ -98,7 +124,7 @@ namespace Jui
   public:
     Graph(QWidget *parent);
     ~Graph();
-
+    double minDomainX, maxDomainX, minDomainY, maxDomainY;
     QRect bounds();
     QRect boundsGraph();
     void setDomainX(double min, double max);
@@ -130,6 +156,7 @@ namespace Jui
 
   signals:
     void actEnvGraphChanged(QList<double> levels, QList<double> times, QList<QString> curves);
+    void actDomainChanged(QPair<float, float>, QPair<float, float>);
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -145,8 +172,10 @@ namespace Jui
     void sortPointsByX();
 
     int frameOffset;
-    double minDomainX, maxDomainX, minDomainY, maxDomainY;
-
+    //    double minDomainX, maxDomainX, minDomainY, maxDomainY;
+    GraphObject *testObj;
+    //Jui::GraphObject2 *testObj2;
+   
     QList<GraphPoint*> controlPts;
     QList<GraphPoint*> curvePts;
     QList<GraphCurve*> curves;
@@ -163,6 +192,10 @@ namespace Jui
 
   };
 
+ 
 }
+
+
+
 #endif // GRAPH_H
 

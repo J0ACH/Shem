@@ -2,6 +2,47 @@
 
 namespace Jui
 {
+
+
+
+
+  // GRAPH OBJECT
+
+  GraphObject::GraphObject(QWidget *parent)
+    // graph(qobject_cast<Graph*>(parent))
+    //mParent(parent)
+  {
+    Graph *graph = qobject_cast<Graph*>(parent);
+
+    connect(
+      graph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)), 
+      this, SLOT(onDomainChanged(QPair<float, float>, QPair<float, float>))
+      );
+  }
+
+  void GraphObject::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
+  {
+    qDebug() << "new domain for GraphObject set to " << domX << " and " << domY;
+
+    minDomainX = domX.first;
+    maxDomainX = domX.second;
+    minDomainY = domY.first;
+    maxDomainY = domY.second;
+  }
+
+  double GraphObject::test()
+  {
+   // Graph graph = qobject_cast<Graph*>(mParent);
+    return maxDomainX;
+    //return 0.0;
+  }
+
+  GraphObject::~GraphObject(){};
+
+
+
+
+
   // GRAPH POINT 
 
   GraphPoint::GraphPoint(QWidget *parent, int pointID, int pX, int pY, double valX, double valY) :
@@ -335,6 +376,10 @@ namespace Jui
     collPolylinesNEW = QList<QPolygonF*>();
 
     setFocusPolicy(Qt::StrongFocus);
+
+    testObj = new GraphObject(this);
+    // GraphObject testObj(this);
+     qDebug() << "GraphObject test return maxDomainX : " << testObj->test();
   }
 
   QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
@@ -348,6 +393,13 @@ namespace Jui
     minDomainX = min;
     maxDomainX = max;
     update();
+
+    QPair<float, float> domX(1, 10);
+    QPair<float, float> domY(2, 20);
+    //emit actDomainChanged([ minDomainX, maxDomainX, minDomainY, maxDomainY ]);
+    emit actDomainChanged(domX, domY);
+
+     qDebug() << "GraphObject test return maxDomainX : " << testObj->test();
   }
   void Graph::setDomainY(double min, double max)
   {
@@ -478,7 +530,7 @@ namespace Jui
 
     if (controlPts[ID]->type != GraphPoint::PointType::startPoint)
     {
-       curves[ID-1]->setFrom(controlPts[ID]);
+      curves[ID - 1]->setFrom(controlPts[ID]);
     }
   }
   void Graph::setVertexType(int ID, GraphPoint::PointType newType)
@@ -774,4 +826,7 @@ namespace Jui
   }
 
   Graph::~Graph() { }
+
+
+
 }
