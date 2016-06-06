@@ -9,32 +9,48 @@ namespace Jui
   // GRAPH OBJECT
 
   GraphObject::GraphObject(QWidget *parent)
-    // graph(qobject_cast<Graph*>(parent))
-    //mParent(parent)
   {
+    size = parent->size();
+
     Graph *graph = qobject_cast<Graph*>(parent);
 
     connect(
-      graph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)), 
+      graph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
       this, SLOT(onDomainChanged(QPair<float, float>, QPair<float, float>))
       );
+
+    connect(graph, SIGNAL(actResized(QSize)), this, SLOT(onGraphResized(QSize)));
   }
+
+ // QRect GraphObject::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 
   void GraphObject::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
   {
     qDebug() << "new domain for GraphObject set to " << domX << " and " << domY;
-
+    domainX = domX;
+    domainY = domY;
     minDomainX = domX.first;
     maxDomainX = domX.second;
     minDomainY = domY.first;
     maxDomainY = domY.second;
   }
 
-  double GraphObject::test()
+  void GraphObject::onGraphResized(QSize newSize)
   {
-   // Graph graph = qobject_cast<Graph*>(mParent);
-    return maxDomainX;
-    //return 0.0;
+    size = newSize;
+ //   qDebug() << "new size for GraphObject is " << size;
+  //  qDebug() << "test pt at PIX " << this->getPixel();
+  }
+
+  QPointF GraphObject::getPixel()
+  {
+    float percX = (valueX - domainX.first) / (float)(domainX.second - domainX.first);
+    int pixelX = percX * size.width();
+
+    float percY = (valueY - domainY.first) / (float)(domainY.second - domainY.first);
+    int pixelY = size.height() - (percY * size.height());
+
+    return QPointF(pixelX, pixelY);
   }
 
   GraphObject::~GraphObject(){};
@@ -366,10 +382,10 @@ namespace Jui
   {
     this->setMouseTracking(true);
     frameOffset = 25;
-    minDomainX = 0;
-    maxDomainX = 1;
-    minDomainY = 0;
-    maxDomainY = 1;
+    domainX.first = 0;
+    domainX.second = 1;
+    domainY.first = 0;
+    domainY.second = 1;
 
     controlPts = QList<GraphPoint*>();
     graphPolylines = new QPolygonF();
@@ -378,8 +394,13 @@ namespace Jui
     setFocusPolicy(Qt::StrongFocus);
 
     testObj = new GraphObject(this);
+    testObj->valueX = 0.25;
+    testObj->valueY = 0.5;
+    drawPoint(0.25, 0.5);
     // GraphObject testObj(this);
-     qDebug() << "GraphObject test return maxDomainX : " << testObj->test();
+    // qDebug() << "GraphObject test return maxDomainX : " << testObj->test();
+
+    emit actDomainChanged(domainX, domainY);
   }
 
   QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
@@ -388,59 +409,58 @@ namespace Jui
     return bounds().adjusted(frameOffset * 2, 14, -14, -frameOffset);
   }
 
-  void Graph::setDomainX(double min, double max)
+  void Graph::setDomainX(float min, float max)
   {
-    minDomainX = min;
-    maxDomainX = max;
+    domainX.first = min;
+    domainX.second = max;
     update();
 
-    QPair<float, float> domX(1, 10);
-    QPair<float, float> domY(2, 20);
-    //emit actDomainChanged([ minDomainX, maxDomainX, minDomainY, maxDomainY ]);
-    emit actDomainChanged(domX, domY);
+    emit actDomainChanged(domainX, domainY);
 
-     qDebug() << "GraphObject test return maxDomainX : " << testObj->test();
+    // qDebug() << "GraphObject test return maxDomainX : " << testObj->test();
   }
-  void Graph::setDomainY(double min, double max)
+  void Graph::setDomainY(float min, float max)
   {
-    minDomainY = min;
-    maxDomainY = max;
+    domainY.first = min;
+    domainY.second = max;
     update();
+
+    emit actDomainChanged(domainX, domainY);
   }
 
   QList<double> Graph::getDomainX()
   {
     QList<double> range;
-    range.append(minDomainX);
-    range.append(maxDomainX);
+    range.append(domainX.first);
+    range.append(domainX.second);
     return range;
   }
   QList<double> Graph::getDomainY()
   {
     QList<double> range;
-    range.append(minDomainY);
-    range.append(maxDomainY);
+    range.append(domainY.first);
+    range.append(domainY.second);
     return range;
   }
 
-  double Graph::getValueX(int displayX)
+  float Graph::getValueX(int displayX)
   {
-    double perc = (displayX - boundsGraph().left()) / (double)boundsGraph().width();
-    return perc * (maxDomainX - minDomainX) + minDomainX;
+    float perc = (displayX - boundsGraph().left()) / (float)boundsGraph().width();
+    return perc * (domainX.second - domainX.first) + domainX.first;
   }
-  double Graph::getValueY(int displayY)
+  float Graph::getValueY(int displayY)
   {
-    double perc = 1 - (displayY - boundsGraph().top()) / (double)boundsGraph().height();
-    return perc * (maxDomainY - minDomainY) + minDomainY;
+    float perc = 1 - (displayY - boundsGraph().top()) / (float)boundsGraph().height();
+    return perc * (domainY.second - domainY.second) + domainY.first;
   }
-  double Graph::getPixelX(double valueX)
+  float Graph::getPixelX(float valueX)
   {
-    double perc = (valueX - minDomainX) / (double)(maxDomainX - minDomainX);
+    float perc = (valueX - domainX.first) / (float)(domainX.second - domainX.first);
     return perc * boundsGraph().width() + boundsGraph().left();
   }
-  double Graph::getPixelY(double valueY)
+  float Graph::getPixelY(float valueY)
   {
-    double perc = (valueY - minDomainY) / (double)(maxDomainY - minDomainY);
+    float perc = (valueY - domainY.first) / (float)(domainY.second - domainY.first);
     return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
   }
 
@@ -610,11 +630,11 @@ namespace Jui
     int newPixelX = pixelX;
     int newPixelY = pixelY;
 
-    if (newValX > maxDomainX) { newValX = maxDomainX - 0.01; newPixelX = getPixelX(maxDomainX - 0.01); };
-    if (newValX < minDomainX) { newValX = minDomainX; newPixelX = getPixelX(minDomainX); };
+    if (newValX > domainX.second) { newValX = domainX.second - 0.01; newPixelX = getPixelX(domainX.second - 0.01); };
+    if (newValX < domainX.first) { newValX = domainX.first; newPixelX = getPixelX(domainX.first); };
 
-    if (newValY > maxDomainY) { newValY = maxDomainY; newPixelY = getPixelY(maxDomainY); };
-    if (newValY < minDomainY) { newValY = minDomainY; newPixelY = getPixelY(minDomainY); };
+    if (newValY > domainY.second) { newValY = domainY.second; newPixelY = getPixelY(domainY.second); };
+    if (newValY < domainY.first) { newValY = domainY.first; newPixelY = getPixelY(domainY.first); };
 
     controlPts[ID]->setX(newPixelX, newValX);
     controlPts[ID]->setY(newPixelY, newValY);
@@ -690,7 +710,7 @@ namespace Jui
 
   void Graph::resizeEvent(QResizeEvent *resizeEvent)
   {
-    //qDebug() << "Graph::resizeEvent";
+   // qDebug() << "Graph::resizeEvent";
     foreach(GraphPoint *onePt, controlPts)
     {
       int pointSize = onePt->pointSize;
@@ -715,6 +735,8 @@ namespace Jui
         pointSize + 1
         );
     }
+
+    emit actResized(this->size());
   }
 
   void Graph::paintEvent(QPaintEvent *event)
@@ -743,7 +765,7 @@ namespace Jui
     for (int i = 0; i <= cntSegX; i++)
     {
       int pixelX = boundsGraph().width() / cntSegX * i + boundsGraph().left();
-      double valX = getValueX(pixelX);
+      float valX = getValueX(pixelX);
       painter.drawText(
         QRect(pixelX - 25, boundsGraph().bottom() + 5, 50, 20),
         QString::number(valX, 'f', 2),
@@ -758,7 +780,7 @@ namespace Jui
     {
       int pixelY = boundsGraph().height() / cntSegY * i + boundsGraph().top();
       //int pixelY = boundsGraph().height() / cntSegY * i + 14;
-      double valY = getValueY(pixelY);
+      float valY = getValueY(pixelY);
       painter.drawText(
         QRect(5, pixelY - 10, 40, 20),
         QString::number(valY, 'f', 2),
@@ -773,6 +795,7 @@ namespace Jui
     {
       painter.drawEllipse(getPixelX(onePoint->x()) - 3, getPixelY(onePoint->y()) - 3, 6, 6);
     };
+    painter.drawEllipse(testObj->getPixel(), 6, 6);
 
     // collDrawLines
     painter.setPen(QColor(70, 170, 70));

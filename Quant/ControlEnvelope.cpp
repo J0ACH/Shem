@@ -60,8 +60,8 @@ namespace QuantIDE
 
   void ControlEnvelope::getEnvArray(QString envCode)
   {
-    double minLevel = 0;
-    double maxLevel = 1;
+    float minLevel = 0;
+    float maxLevel = 1;
 
     levels = QList<double>();
     times = QList<double>();
@@ -84,8 +84,8 @@ namespace QuantIDE
     {
       for (int i = 0; i < answer.size(); i += 4)
       {
-        if (answer[i].toDouble() > maxLevel) { maxLevel = answer[i].toDouble(); }
-        if (answer[i].toDouble() < minLevel) { minLevel = answer[i].toDouble(); }
+        if (answer[i].toFloat() > maxLevel) { maxLevel = answer[i].toFloat(); }
+        if (answer[i].toFloat() < minLevel) { minLevel = answer[i].toFloat(); }
 
         if (i == 0)
         {
@@ -131,9 +131,9 @@ namespace QuantIDE
       }
 
       // set duration by quant
-      duration = mBridge->question(tr("%1.totalDuration").arg(envCode)).toString().toDouble();
+      duration = mBridge->question(tr("%1.totalDuration").arg(envCode)).toString().toFloat();
 
-      double restTime = durationBox->getValue() - duration;
+      float restTime = durationBox->getValue() - duration;
       // qDebug() << "duration quant reduce by " << restTime;
       if (times[times.size() - 1] + restTime >= 0)
       {

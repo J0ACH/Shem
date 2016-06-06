@@ -11,7 +11,7 @@ namespace Jui
 {
 
 
-  class GraphObject : public QObject
+  class GraphObject : public QWidget
   {
     Q_OBJECT
 
@@ -19,20 +19,26 @@ namespace Jui
     GraphObject(QWidget *graph);
     ~GraphObject();
 
+    //QRect bounds();
+
+    float valueX, valueY;
+    QPointF getPixel();
+
     public slots:
     void onDomainChanged(QPair<float, float>, QPair<float, float>);
+    void onGraphResized(QSize);
 
-    double test();
+ // protected:
+   // void paintEvent(QPaintEvent *);
 
   private:
 
     float minDomainX, maxDomainX, minDomainY, maxDomainY;
-    
-    //Graph graph;
-    //QWidget *mParent;
+    QSize size;
+    QPair<float, float> domainX, domainY;
   };
 
-  
+
 
 
   class GraphPoint : public QWidget
@@ -124,11 +130,11 @@ namespace Jui
   public:
     Graph(QWidget *parent);
     ~Graph();
-    double minDomainX, maxDomainX, minDomainY, maxDomainY;
+
     QRect bounds();
     QRect boundsGraph();
-    void setDomainX(double min, double max);
-    void setDomainY(double min, double max);
+    void setDomainX(float min, float max);
+    void setDomainY(float min, float max);
     QList<double> getDomainX();
     QList<double> getDomainY();
 
@@ -157,6 +163,7 @@ namespace Jui
   signals:
     void actEnvGraphChanged(QList<double> levels, QList<double> times, QList<QString> curves);
     void actDomainChanged(QPair<float, float>, QPair<float, float>);
+    void actResized(QSize);
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -172,10 +179,10 @@ namespace Jui
     void sortPointsByX();
 
     int frameOffset;
-    //    double minDomainX, maxDomainX, minDomainY, maxDomainY;
+    QPair<float, float> domainX, domainY;
+
     GraphObject *testObj;
-    //Jui::GraphObject2 *testObj2;
-   
+
     QList<GraphPoint*> controlPts;
     QList<GraphPoint*> curvePts;
     QList<GraphCurve*> curves;
@@ -185,14 +192,14 @@ namespace Jui
     QPolygonF *graphPolylines;
     QList<QPolygonF*> collPolylinesNEW;
 
-    double getValueX(int displayX);
-    double getValueY(int displayY);
-    double getPixelX(double valueX);
-    double getPixelY(double valueY);
+    float getValueX(int displayX);
+    float getValueY(int displayY);
+    float getPixelX(float valueX);
+    float getPixelY(float valueY);
 
   };
 
- 
+
 }
 
 

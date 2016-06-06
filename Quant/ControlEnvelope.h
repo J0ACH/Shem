@@ -52,7 +52,7 @@ namespace QuantIDE
    // QUuid objectID;
     QString nodeName, controlName;
 
-    double duration;
+    float duration;
     int cntVertex;
     bool changedCntVertex;
     QString env, previousEnv;
