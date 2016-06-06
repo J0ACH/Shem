@@ -71,6 +71,12 @@ namespace Jui
 
     QRect bounds();
 
+    void setFrom(GraphPoint *ptFrom);
+
+    public slots:
+    void onFromMoved(int ID, int pixelX, int pixelY);
+    //void onEndMoved(int ID, int pixelX, int pixelY);
+
   protected:
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -100,7 +106,9 @@ namespace Jui
     QList<double> getDomainX();
     QList<double> getDomainY();
 
+    GraphPoint *addStartPoint(QPointF newPt);
     GraphPoint *addVertexPoint(QPointF newPt);
+    GraphPoint *addEndPoint(QPointF newPt);
     void setVertexPoint(int ID, QPointF newPt);
     void setVertexType(int ID, GraphPoint::PointType newType);
     GraphPoint *getVertex(int ID);
@@ -141,6 +149,7 @@ namespace Jui
 
     QList<GraphPoint*> controlPts;
     QList<GraphPoint*> curvePts;
+    QList<GraphCurve*> curves;
 
     QList<QPointF*> collDrawPoints;
     QList<QLineF*> collDrawLines;

@@ -29,6 +29,7 @@ namespace QuantIDE
     QRect bounds();
     int busIndex;
 
+    void getEnvArray(QString env);
     QString getEnv();
     QPointF getEnvVertex(int ID);
     QPointF getEnvMidCurve(int ID);
@@ -48,11 +49,13 @@ namespace QuantIDE
 
   private:
     ScBridge *mBridge;
-    QUuid objectID;
+   // QUuid objectID;
     QString nodeName, controlName;
 
     double duration;
     int cntVertex;
+    bool changedCntVertex;
+    QString env, previousEnv;
     QList<double> levels;
     QList<double> times;
     QList<QString> curves;

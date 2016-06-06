@@ -268,19 +268,33 @@ namespace Jui
     from(pt1),
     to(pt2)
   {
-    int fromX = pt1->x() + pt1->pointSize;
+    int fromX = pt1->pixelX;
     int fromY;
-    int newWidth = pt2->x() - pt1->x();
-    int newHeight = pt2->y() - pt1->y();
+    int newWidth = pt2->pixelX - pt1->pixelX;
+    int newHeight = pt2->pixelY - pt1->pixelY;
 
-    if (pt1->y() > pt2->y()) { fromY = pt1->y(); }
-    else { fromY = pt2->y(); }
+    if (pt1->pixelY > pt2->pixelY) { fromY = pt1->pixelY; }
+    else { fromY = pt1->pixelY; }
 
-    this->setGeometry(fromX, fromY, newWidth, newHeight);
+    qDebug() << "newWidth " << newWidth;
+    //this->setGeometry(fromX, fromY, newWidth, newHeight);
+    this->setGeometry(fromX, fromY, 50, 50);
 
   }
 
   QRect GraphCurve::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+
+  void GraphCurve::setFrom(GraphPoint *fromPt)
+  {
+    from = fromPt;
+    this->setGeometry(from->pixelX, from->pixelY, 50, 50);
+  }
+  void GraphCurve::onFromMoved(int ID, int pixelX, int pixelY)
+  {
+    qDebug() << "GraphCurve::onFromMoved pX " << pixelX << " pY " << pixelY;
+    this->setGeometry(pixelX, pixelY, 50, 50);
+  }
+
 
   void GraphCurve::mousePressEvent(QMouseEvent *mouseEvent)
   {
@@ -393,12 +407,15 @@ namespace Jui
     this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
     this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
 
+    /*
     qDebug() << "GraphPoint -> valueX: " << pt->valueX
-      << " valueY: " << pt->valueY
-      << " pixelX: " << pt->pixelX
-      << " pixelY: " << pt->pixelY;
+    << " valueY: " << pt->valueY
+    << " pixelX: " << pt->pixelX
+    << " pixelY: " << pt->pixelY;
+    */
 
-    if (type == GraphPoint::PointType::vertex)
+    if (type == GraphPoint::PointType::curvePoint) { curvePts.append(pt); }
+    else
     {
       if (controlPts.size() == 0) { controlPts.append(pt); }
       else
@@ -417,21 +434,52 @@ namespace Jui
         }
       }
     }
-    else if (type == GraphPoint::PointType::curvePoint)
-    {
-      curvePts.append(pt);
-    }
+
     return pt;
   }
 
+  GraphPoint *Graph::addStartPoint(QPointF pt)
+  {
+    return this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::startPoint);
+  }
   GraphPoint *Graph::addVertexPoint(QPointF pt)
   {
-    return this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::vertex);
+    GraphPoint *to = this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::vertex);
+    GraphPoint *from = controlPts[controlPts.size() - 2];
+
+    GraphCurve *crv = new GraphCurve(this, from, to);
+    crv->show();
+
+    connect(from, SIGNAL(actMoved(int, int, int)), crv, SLOT(onFromMoved(int, int, int)));
+
+    curves.append(crv);
+
+    return to;
+  }
+  GraphPoint *Graph::addEndPoint(QPointF pt)
+  {
+    GraphPoint *to = this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::endPoint);
+    GraphPoint *from = controlPts[controlPts.size() - 2];
+
+    GraphCurve *crv = new GraphCurve(this, from, to);
+    crv->show();
+
+    connect(from, SIGNAL(actMoved(int, int, int)), crv, SLOT(onFromMoved(int, int, int)));
+
+    curves.append(crv);
+    return to;
   }
   void Graph::setVertexPoint(int ID, QPointF pt)
   {
-    controlPts[ID]->setX(getPixelX(pt.x()), pt.x());
-    controlPts[ID]->setY(getPixelY(pt.y()), pt.y());
+    int pX = getPixelX(pt.x());
+    int pY = getPixelX(pt.y());
+    controlPts[ID]->setX(pX, pt.x());
+    controlPts[ID]->setY(pY, pt.y());
+
+    if (controlPts[ID]->type != GraphPoint::PointType::startPoint)
+    {
+       curves[ID-1]->setFrom(controlPts[ID]);
+    }
   }
   void Graph::setVertexType(int ID, GraphPoint::PointType newType)
   {
@@ -480,6 +528,9 @@ namespace Jui
 
     foreach(GraphPoint *onePoint, curvePts) { onePoint->close(); }
     curvePts = QList<GraphPoint*>();
+
+    foreach(GraphCurve *oneCrv, curves) { oneCrv->close(); }
+    curves = QList<GraphCurve*>();
 
     collDrawPoints = QList<QPointF*>();
     collDrawLines = QList<QLineF*>();
@@ -549,10 +600,12 @@ namespace Jui
     QList<double> times;
     QList<QString> curves;
 
+    qDebug() << "Graph::makeEnv -> controlPts.size(): " << controlPts.size();
+
     for (int i = 0; i < controlPts.size(); i++)
     {
       levels.append(controlPts[i]->valueY);
-
+      qDebug() << "Graph::makeEnv -> i: " << i;
       if (i != 0)
       {
         double previousTime = 0;
