@@ -90,6 +90,7 @@ namespace Jui
   // GRAPH CURVE END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+  /*
   class GraphPoint : public QWidget
   {
     Q_OBJECT
@@ -137,6 +138,7 @@ namespace Jui
     QLabel *labelID;
     QLabel *labelLevel, *labelTime, *labelCurve;
   };
+  */
 
   // GRAPH POINT END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,14 +191,14 @@ namespace Jui
     QList<double> getDomainX();
     QList<double> getDomainY();
 
-    GraphPoint *addStartPoint(QPointF newPt);
-    GraphPoint *addVertexPoint(QPointF newPt);
-    GraphPoint *addEndPoint(QPointF newPt);
+   // GraphPoint *addStartPoint(QPointF newPt);
+   // GraphPoint *addVertexPoint(QPointF newPt);
+   // GraphPoint *addEndPoint(QPointF newPt);
     void setVertexPoint(int ID, QPointF newPt);
-    void setVertexType(int ID, GraphPoint::PointType newType);
-    GraphPoint *getVertex(int ID);
+   // void setVertexType(int ID, GraphPoint::PointType newType);
+   // GraphPoint *getVertex(int ID);
 
-    GraphPoint *addCurvePoint(QPointF newPt);
+   // GraphPoint *addCurvePoint(QPointF newPt);
     void setCurvePoint(int ID, QPointF newPt);
     void setCurveCurvature(int ID, QString txt);
 
@@ -224,7 +226,7 @@ namespace Jui
     void mousePressEvent(QMouseEvent *mouseEvent);
     void mouseReleaseEvent(QMouseEvent *mouseEvent);
 
-    GraphPoint *addValuePoint(double valueX, double valueY, GraphPoint::PointType type);
+   // GraphPoint *addValuePoint(double valueX, double valueY, GraphPoint::PointType type);
 
     void makeEnv();
     void sortPointsByX();
@@ -239,8 +241,8 @@ namespace Jui
     QList<GraphVertex*> controlVertexs;
     QList<GraphCurve*> controlCurves;
 
-    QList<GraphPoint*> controlPts;
-    QList<GraphPoint*> curvePts;
+   // QList<GraphPoint*> controlPts;
+  //  QList<GraphPoint*> curvePts;
     // QList<GraphCurve*> curves;
 
     QList<QPointF*> collDrawPoints;

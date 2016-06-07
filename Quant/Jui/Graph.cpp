@@ -203,7 +203,7 @@ namespace Jui
   ///////////////////////////////////////////////////////////////////////////////////////////////////
 
   // GRAPH POINT 
-
+  /*
   GraphPoint::GraphPoint(QWidget *parent, int pointID, int pX, int pY, double valX, double valY) :
     QWidget(parent),
     ID(pointID),
@@ -458,6 +458,7 @@ namespace Jui
   }
 
   GraphPoint::~GraphPoint(){}
+  */
 
   // GRAPH POINT END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -531,7 +532,7 @@ namespace Jui
     domainY.first = 0;
     domainY.second = 1;
 
-    controlPts = QList<GraphPoint*>();
+  //  controlPts = QList<GraphPoint*>();
     graphPolylines = new QPolygonF();
     collPolylinesNEW = QList<QPolygonF*>();
 
@@ -632,7 +633,7 @@ namespace Jui
     float perc = (valueY - domainY.first) / (float)(domainY.second - domainY.first);
     return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
   }
-
+  /*
   GraphPoint *Graph::addValuePoint(double valueX, double valueY, GraphPoint::PointType type = GraphPoint::PointType::vertex)
   {
     GraphPoint *pt = new GraphPoint(
@@ -647,13 +648,6 @@ namespace Jui
     pt->show();
     this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
     this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
-
-    /*
-    qDebug() << "GraphPoint -> valueX: " << pt->valueX
-    << " valueY: " << pt->valueY
-    << " pixelX: " << pt->pixelX
-    << " pixelY: " << pt->pixelY;
-    */
 
     if (type == GraphPoint::PointType::curvePoint) { curvePts.append(pt); }
     else
@@ -686,22 +680,7 @@ namespace Jui
   GraphPoint *Graph::addVertexPoint(QPointF pt)
   {
     GraphPoint *to = this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::vertex);
-    //GraphPoint *from = controlPts[controlPts.size() - 2];
-    /*
-    GraphCurve *crv = new GraphCurve(this, from, to);
-    crv->show();
-
-    connect(from, SIGNAL(actMoved(int, int, int)), crv, SLOT(onFromMoved(int, int, int)));
-
-    curves.append(crv);
-    */
-
-    /*
-    GraphVertex *vertex = new GraphVertex(this);
-    vertex->valueX = pt.x();
-    vertex->valueY = pt.y();
-    */
-
+    
     return to;
 
   }
@@ -709,28 +688,24 @@ namespace Jui
   {
     GraphPoint *to = this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::endPoint);
     GraphPoint *from = controlPts[controlPts.size() - 2];
-    /*
-    GraphCurve *crv = new GraphCurve(this, from, to);
-    crv->show();
-
-    connect(from, SIGNAL(actMoved(int, int, int)), crv, SLOT(onFromMoved(int, int, int)));
-
-    curves.append(crv);
-    */
+   
     return to;
   }
+  */
   void Graph::setVertexPoint(int ID, QPointF pt)
   {
     int pX = getPixelX(pt.x());
     int pY = getPixelX(pt.y());
-    controlPts[ID]->setX(pX, pt.x());
-    controlPts[ID]->setY(pY, pt.y());
-
+//    controlPts[ID]->setX(pX, pt.x());
+  //  controlPts[ID]->setY(pY, pt.y());
+    /*
     if (controlPts[ID]->type != GraphPoint::PointType::startPoint)
     {
       // curves[ID - 1]->setFrom(controlPts[ID]);
     }
+    */
   }
+  /*
   void Graph::setVertexType(int ID, GraphPoint::PointType newType)
   {
     controlPts[ID]->setType(newType);
@@ -741,14 +716,15 @@ namespace Jui
   {
     return this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::curvePoint);
   }
+  */
   void Graph::setCurvePoint(int ID, QPointF pt)
   {
-    curvePts[ID]->setX(getPixelX(pt.x()), pt.x());
-    curvePts[ID]->setY(getPixelY(pt.y()), pt.y());
+   // curvePts[ID]->setX(getPixelX(pt.x()), pt.x());
+   // curvePts[ID]->setY(getPixelY(pt.y()), pt.y());
   }
   void Graph::setCurveCurvature(int ID, QString txt)
   {
-    curvePts[ID]->setCurvature(txt);
+   // curvePts[ID]->setCurvature(txt);
   }
 
   void Graph::drawPoint(double valueX, double valueY)
@@ -773,11 +749,13 @@ namespace Jui
 
   void Graph::deleteGraph()
   {
+    /*
     foreach(GraphPoint *onePoint, controlPts) { onePoint->close(); }
     controlPts = QList<GraphPoint*>();
 
     foreach(GraphPoint *onePoint, curvePts) { onePoint->close(); }
     curvePts = QList<GraphPoint*>();
+    */
     /*
     foreach(GraphCurve *oneCrv, curves) { oneCrv->close(); }
     curves = QList<GraphCurve*>();
@@ -794,9 +772,9 @@ namespace Jui
   void Graph::onDeletePoint(int ID)
   {
     qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
-    controlPts.removeAt(ID);
-    curvePts[ID - 1]->close();
-    curvePts.removeAt(ID - 1);
+   // controlPts.removeAt(ID);
+   // curvePts[ID - 1]->close();
+   // curvePts.removeAt(ID - 1);
     this->makeEnv();
     update();
   }
@@ -815,8 +793,8 @@ namespace Jui
     if (newValY > domainY.second) { newValY = domainY.second; newPixelY = getPixelY(domainY.second); };
     if (newValY < domainY.first) { newValY = domainY.first; newPixelY = getPixelY(domainY.first); };
 
-    controlPts[ID]->setX(newPixelX, newValX);
-    controlPts[ID]->setY(newPixelY, newValY);
+   // controlPts[ID]->setX(newPixelX, newValX);
+   // controlPts[ID]->setY(newPixelY, newValY);
 
     this->sortPointsByX();
     this->makeEnv();
@@ -825,6 +803,7 @@ namespace Jui
   void Graph::sortPointsByX()
   {
     bool sorted = false;
+    /*
     if (controlPts.size() == 0) { sorted = true; }
 
     while (!sorted)
@@ -842,6 +821,7 @@ namespace Jui
         }
       }
     }
+    */
   }
 
   void Graph::makeEnv()
@@ -851,8 +831,8 @@ namespace Jui
     QList<double> times;
     QList<QString> curves;
 
-    qDebug() << "Graph::makeEnv -> controlPts.size(): " << controlPts.size();
-
+   // qDebug() << "Graph::makeEnv -> controlPts.size(): " << controlPts.size();
+    /*
     for (int i = 0; i < controlPts.size(); i++)
     {
       levels.append(controlPts[i]->valueY);
@@ -878,6 +858,7 @@ namespace Jui
     {
       curves.append(onePt->curvature);
     };
+    */
 
     qDebug() << "Graph::makeEnv -> "
       << "levels: " << levels
@@ -890,6 +871,7 @@ namespace Jui
   void Graph::resizeEvent(QResizeEvent *resizeEvent)
   {
     // qDebug() << "Graph::resizeEvent";
+    /*
     foreach(GraphPoint *onePt, controlPts)
     {
       int pointSize = onePt->pointSize;
@@ -915,6 +897,7 @@ namespace Jui
         pointSize + 1
         );
     }
+    */
 
 
     emit actResized(this->boundsGraph().size());

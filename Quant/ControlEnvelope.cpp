@@ -193,15 +193,15 @@ namespace QuantIDE
         QPointF vertex = this->getEnvVertex(i);
         // qDebug() << vertex << "no:" << i << "levels.size(): " << levels.size();
         // GraphPoint *pt = envGraph->addVertexPoint(vertex);
-        if (i == 0) { qDebug() << "startVertex";  envGraph->addStartPoint(vertex); }
-        else if (i == levels.size() - 1) { qDebug() << "endVertex"; envGraph->addEndPoint(vertex); }
-        else { qDebug() << "vertex"; envGraph->addVertexPoint(vertex); }
+        //if (i == 0) { qDebug() << "startVertex";  envGraph->addStartPoint(vertex); }
+       // else if (i == levels.size() - 1) { qDebug() << "endVertex"; envGraph->addEndPoint(vertex); }
+       // else { qDebug() << "vertex"; envGraph->addVertexPoint(vertex); }
 
         if (i < levels.size() - 1) // times je o cntVertex - 1
         {
-          QPointF midPoint = this->getEnvMidCurve(i);
-          GraphPoint *mid = envGraph->addCurvePoint(midPoint);
-          mid->setCurvature(curves[i]);
+      //    QPointF midPoint = this->getEnvMidCurve(i);
+        //  GraphPoint *mid = envGraph->addCurvePoint(midPoint);
+       //   mid->setCurvature(curves[i]);
         }
       }
     }
