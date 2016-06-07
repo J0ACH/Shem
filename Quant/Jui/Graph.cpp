@@ -32,10 +32,7 @@ namespace Jui
     // qDebug() << "new domain for GraphObject set to " << domX << " and " << domY;
     domainX = domX;
     domainY = domY;
-    minDomainX = domX.first;
-    maxDomainX = domX.second;
-    minDomainY = domY.first;
-    maxDomainY = domY.second;
+
   }
 
   void GraphObject::onGraphResized(QSize newSize)
@@ -56,6 +53,15 @@ namespace Jui
     return QPointF(pixelX, pixelY);
   }
 
+  void GraphObject::setValue(QPointF pixel)
+  {
+    float percX = (pixel.x() - graphOrigin.x()) / (float)graphSize.width();
+    valueX = percX * (domainX.second - domainX.first) + domainX.first;
+
+    float percY = 1 - (pixel.y() - graphOrigin.y()) / (float)graphSize.height();
+    valueY = percY * (domainY.second - domainY.first) + domainY.first;
+  }
+
   void GraphObject::draw(QPainter *painter)
   {
     painter->setPen(Qt::white);
@@ -74,6 +80,7 @@ namespace Jui
   {
     parent->installEventFilter(this);
     focus = false;
+    pressed = false;
   }
 
   bool GraphVertex::eventFilter(QObject* target, QEvent* event)
@@ -90,23 +97,25 @@ namespace Jui
     case QEvent::MouseButtonPress:
       eventMouse = static_cast<QMouseEvent*>(event);
       // qDebug() << "GraphVertex::MouseButtonPress IN";
-      if (this->isOver(eventMouse->pos()))
+      if (this->isOver(eventMouse->pos())) { focus = true; pressed = true; }
+      else { focus = false; }
+      this->redraw();
+      break;
+
+    case QEvent::MouseButtonRelease:
+      eventMouse = static_cast<QMouseEvent*>(event);
+      pressed = false;
+      break;
+
+    case QEvent::MouseMove:
+      if (focus && pressed)
       {
-        focus = true;
-        //qDebug() << "GraphVertex::MouseButtonPress IN";
-      }
-      else
-      {
-        // qDebug() << "GraphVertex::MouseButtonPress OUT";
-        focus = false;
+        eventMouse = static_cast<QMouseEvent*>(event);
+        this->setValue(eventMouse->pos());
       }
       this->redraw();
       break;
-      /*
-    case QEvent::MouseMove:
-    qDebug() << "GraphVertex::MouseMove";
-    break;
-    */
+
     case QEvent::KeyPress:
       qDebug() << "GraphVertex::KeyPress";
       break;
@@ -129,16 +138,8 @@ namespace Jui
 
   void GraphVertex::draw(QPainter *painter)
   {
-   // qDebug() << "GraphVertex::draw focus " << focus;
-
-    if (focus) {
-     // qDebug() << "GraphVertex::draw focus test1";
-      painter->setPen(QColor(180, 20, 20));
-    }
-    else {
-     // qDebug() << "GraphVertex::draw focus test2";
-      painter->setPen(QColor(80, 80, 80));
-    }
+    if (focus) { painter->setPen(QColor(180, 20, 20)); }
+    else { painter->setPen(QColor(80, 80, 80)); }
     painter->drawEllipse(this->getPixel(), 4, 4);
   }
 
@@ -571,7 +572,7 @@ namespace Jui
   float Graph::getValueY(int displayY)
   {
     float perc = 1 - (displayY - boundsGraph().top()) / (float)boundsGraph().height();
-    return perc * (domainY.second - domainY.second) + domainY.first;
+    return perc * (domainY.second - domainY.first) + domainY.first;
   }
   float Graph::getPixelX(float valueX)
   {
@@ -964,12 +965,14 @@ namespace Jui
 
     //qDebug() << "Graph::paint ";
     painterGraphObject = new QPainter(this);
+
+    testCurve->draw(painterGraphObject);
+
     foreach(GraphVertex *oneV, controlVertexs)
     {
       oneV->draw(painterGraphObject);
     }
     //testObj->draw(painterGraphObject);
-     testCurve->draw(painterGraphObject);
 
   }
 

@@ -21,7 +21,8 @@ namespace Jui
 
     float valueX, valueY;
     QPointF getPixel();
-
+    void setValue(QPointF pixel);
+    
     public slots:
     void onDomainChanged(QPair<float, float>, QPair<float, float>);
     void onGraphResized(QSize);
@@ -31,7 +32,6 @@ namespace Jui
 
   private:
     QWidget *graph;
-    float minDomainX, maxDomainX, minDomainY, maxDomainY;
     QPointF graphOrigin;
     QSize graphSize;
     QPair<float, float> domainX, domainY;
@@ -55,7 +55,7 @@ namespace Jui
 
   private:
     bool isOver(QPointF mouse);
-    bool focus;
+    bool focus, pressed;
   };
 
   // GRAPH VERTEX END
