@@ -11,13 +11,17 @@ namespace Jui
   GraphObject::GraphObject(QWidget *parent) :
     graph(parent)
   {
-    //size = parent->size();
-
     Graph *parentGraph = qobject_cast<Graph*>(parent);
     graphOrigin = parentGraph->boundsGraph().topLeft();
     graphSize = parentGraph->boundsGraph().size();
-    // qDebug() << "graphOrigin: " << graphOrigin;
-    // qDebug() << "graphSize: " << graphSize;
+
+    modifyAlpha = 0;
+    fadeTimeOut = 800;
+    fps = 25;
+    modifyTime = new QTimer(this);
+
+    connect(this, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    connect(modifyTime, SIGNAL(timeout()), this, SLOT(onModifyTick()));
 
     connect(
       parentGraph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
@@ -29,17 +33,33 @@ namespace Jui
 
   void GraphObject::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
   {
-    // qDebug() << "new domain for GraphObject set to " << domX << " and " << domY;
     domainX = domX;
     domainY = domY;
-
   }
 
-  void GraphObject::onGraphResized(QSize newSize)
+  void GraphObject::onGraphResized(QSize newSize)  { graphSize = newSize; }
+
+  void GraphObject::onObjectModify()
   {
-    graphSize = newSize;
-    // qDebug() << "new size for GraphObject is " << size;
-    // qDebug() << "test pt at PIX " << this->getPixel();
+    modify = true;
+
+    modifyAlpha = 255;
+    modifyTime->stop();
+    modifyTime->setInterval(fadeTimeOut / fps);
+    modifyTime->start();
+  }
+
+  void GraphObject::onModifyTick()
+  {
+    modifyAlpha -= 255 / fps;
+    if (modifyAlpha <= 0)
+    {
+      modifyTime->stop();
+      modifyAlpha = 0;
+      modify = false;
+    }
+    //qDebug() << "modifyAlpha " << modifyAlpha;
+    this->redraw();
   }
 
   QPointF GraphObject::getPixel()
@@ -60,6 +80,8 @@ namespace Jui
 
     float percY = 1 - (pixel.y() - graphOrigin.y()) / (float)graphSize.height();
     valueY = percY * (domainY.second - domainY.first) + domainY.first;
+    
+    emit actModify();
   }
 
   void GraphObject::draw(QPainter *painter)
@@ -81,6 +103,7 @@ namespace Jui
     parent->installEventFilter(this);
     focus = false;
     pressed = false;
+    modify = false;
   }
 
   bool GraphVertex::eventFilter(QObject* target, QEvent* event)
@@ -89,14 +112,8 @@ namespace Jui
 
     switch (event->type())
     {
-      /*
-    case QEvent::FocusIn:
-    qDebug() << "GraphVertex::FocusIn";
-    break;
-    */
     case QEvent::MouseButtonPress:
       eventMouse = static_cast<QMouseEvent*>(event);
-      // qDebug() << "GraphVertex::MouseButtonPress IN";
       if (this->isOver(eventMouse->pos())) { focus = true; pressed = true; }
       else { focus = false; }
       this->redraw();
@@ -141,6 +158,15 @@ namespace Jui
     if (focus) { painter->setPen(QColor(180, 20, 20)); }
     else { painter->setPen(QColor(80, 80, 80)); }
     painter->drawEllipse(this->getPixel(), 4, 4);
+
+    if (modify)
+    {
+      QColor modifyColor = QColor(220, 200, 20);// modifyColor;
+      modifyColor.setAlpha(modifyAlpha);
+      painter->setPen(QPen(modifyColor,2));
+      painter->drawEllipse(this->getPixel(), 4, 4);
+    }
+
   }
 
   GraphVertex::~GraphVertex(){};
@@ -155,12 +181,23 @@ namespace Jui
     to(pt2)
   {
     curvature = "lin";
+
+    connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
   }
 
   void GraphCurve::draw(QPainter *painter)
   {
     painter->setPen(Qt::green);
     painter->drawLine(from->getPixel(), to->getPixel());
+
+    if (modify)
+    {
+      QColor modifyColor = QColor(220, 200, 20);// modifyColor;
+      modifyColor.setAlpha(modifyAlpha);
+      painter->setPen(QPen(modifyColor, 2));
+      painter->drawLine(from->getPixel(), to->getPixel());
+    }
   }
 
   GraphCurve::~GraphCurve(){};
@@ -981,6 +1018,9 @@ namespace Jui
     //qDebug() << "Graph::mousePressEvent NEW POINT ADD";
     //this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
     //this->makeEnv();
+
+    //this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
+
   }
 
   void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)

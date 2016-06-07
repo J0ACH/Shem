@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QLabel>
+#include <QTimer>
 
 namespace Jui
 {
@@ -22,19 +23,32 @@ namespace Jui
     float valueX, valueY;
     QPointF getPixel();
     void setValue(QPointF pixel);
-    
-    public slots:
-    void onDomainChanged(QPair<float, float>, QPair<float, float>);
-    void onGraphResized(QSize);
+
+    bool modify;
+    int modifyAlpha;
 
     void draw(QPainter *painter);
     void redraw();
+
+    public slots:
+    void onDomainChanged(QPair<float, float>, QPair<float, float>);
+    void onGraphResized(QSize);
+    void onObjectModify();
+
+    private slots:
+    void onModifyTick();
+
+  signals:
+    void actModify();
 
   private:
     QWidget *graph;
     QPointF graphOrigin;
     QSize graphSize;
     QPair<float, float> domainX, domainY;
+
+    QTimer *modifyTime;
+    int fadeTimeOut, fps;
   };
 
 
