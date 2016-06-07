@@ -10,9 +10,13 @@ namespace Jui
 
   GraphObject::GraphObject(QWidget *parent)
   {
-    size = parent->size();
+    //size = parent->size();
 
     Graph *graph = qobject_cast<Graph*>(parent);
+    graphOrigin = graph->boundsGraph().topLeft();
+    graphSize = graph->boundsGraph().size();
+    qDebug() << "graphOrigin: " << graphOrigin;
+    qDebug() << "graphSize: " << graphSize;
 
     connect(
       graph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
@@ -37,7 +41,7 @@ namespace Jui
 
   void GraphObject::onGraphResized(QSize newSize)
   {
-    size = newSize;
+    graphSize = newSize;
  //   qDebug() << "new size for GraphObject is " << size;
   //  qDebug() << "test pt at PIX " << this->getPixel();
   }
@@ -45,10 +49,10 @@ namespace Jui
   QPointF GraphObject::getPixel()
   {
     float percX = (valueX - domainX.first) / (float)(domainX.second - domainX.first);
-    int pixelX = percX * size.width();
+    int pixelX = percX * graphSize.width() + graphOrigin.x();;
 
     float percY = (valueY - domainY.first) / (float)(domainY.second - domainY.first);
-    int pixelY = size.height() - (percY * size.height());
+    int pixelY = graphSize.height() - (percY * graphSize.height()) + graphOrigin.y();
 
     return QPointF(pixelX, pixelY);
   }
@@ -736,7 +740,7 @@ namespace Jui
         );
     }
 
-    emit actResized(this->size());
+    emit actResized(this->boundsGraph().size());
   }
 
   void Graph::paintEvent(QPaintEvent *event)

@@ -34,7 +34,8 @@ namespace Jui
   private:
 
     float minDomainX, maxDomainX, minDomainY, maxDomainY;
-    QSize size;
+    QPointF graphOrigin;
+    QSize graphSize;
     QPair<float, float> domainX, domainY;
   };
 
