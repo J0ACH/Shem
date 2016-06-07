@@ -60,6 +60,10 @@ namespace Jui
     GraphVertex(QWidget *graph);
     ~GraphVertex();
 
+    enum PointType { vertex, startPoint, endPoint };
+    PointType type;
+    void setType(GraphVertex::PointType newType);
+
     void draw(QPainter *painter);
 
   protected:
@@ -68,6 +72,7 @@ namespace Jui
   private:
     bool isOver(QPointF mouse);
     bool focus, pressed;
+
   };
 
   // GRAPH VERTEX END
