@@ -9,17 +9,15 @@
 
 namespace Jui
 {
+  // GRAPH OBJECT
 
-
-  class GraphObject : public QWidget
+  class GraphObject : public QObject
   {
     Q_OBJECT
 
   public:
     GraphObject(QWidget *graph);
     ~GraphObject();
-
-    //QRect bounds();
 
     float valueX, valueY;
     QPointF getPixel();
@@ -39,7 +37,37 @@ namespace Jui
   };
 
 
+  // GRAPH OBJECT END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH VERTEX
 
+  class GraphVertex : public GraphObject
+  {
+  public:
+    GraphVertex(QWidget *graph);
+    ~GraphVertex();
+
+    void draw(QPainter *painter);
+  };
+
+  // GRAPH VERTEX END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH CURVE
+
+  class GraphCurve : public GraphObject
+  {
+  public:
+    GraphCurve(QWidget *graph, GraphVertex *pt1, GraphVertex *pt2);
+    ~GraphCurve();
+
+    void draw(QPainter *painter);
+
+    private:
+      GraphVertex *from, *to;
+  };
+
+  // GRAPH CURVE END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
 
   class GraphPoint : public QWidget
   {
@@ -93,30 +121,32 @@ namespace Jui
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH CURVE
 
+  /*
   class GraphCurve : public QWidget
   {
-    Q_OBJECT
+  Q_OBJECT
 
   public:
-    GraphCurve(QWidget *parent, GraphPoint *ptFrom, GraphPoint *ptTo);
-    ~GraphCurve();
+  GraphCurve(QWidget *parent, GraphPoint *ptFrom, GraphPoint *ptTo);
+  ~GraphCurve();
 
-    QRect bounds();
+  QRect bounds();
 
-    void setFrom(GraphPoint *ptFrom);
+  void setFrom(GraphPoint *ptFrom);
 
-    public slots:
-    void onFromMoved(int ID, int pixelX, int pixelY);
-    //void onEndMoved(int ID, int pixelX, int pixelY);
+  public slots:
+  void onFromMoved(int ID, int pixelX, int pixelY);
+  //void onEndMoved(int ID, int pixelX, int pixelY);
 
   protected:
-    void paintEvent(QPaintEvent *event);
-    void resizeEvent(QResizeEvent *event);
-    void mousePressEvent(QMouseEvent *);
+  void paintEvent(QPaintEvent *event);
+  void resizeEvent(QResizeEvent *event);
+  void mousePressEvent(QMouseEvent *);
 
   private:
-    GraphPoint *from, *to;
+  GraphPoint *from, *to;
   };
+  */
 
   // GRAPH CURVE END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,10 +212,13 @@ namespace Jui
     QPair<float, float> domainX, domainY;
 
     GraphObject *testObj;
+    GraphVertex *testVertex1, *testVertex2;
+    GraphCurve *testCurve;
+    QList<GraphVertex*> controlVertexs;
 
     QList<GraphPoint*> controlPts;
     QList<GraphPoint*> curvePts;
-    QList<GraphCurve*> curves;
+    // QList<GraphCurve*> curves;
 
     QList<QPointF*> collDrawPoints;
     QList<QLineF*> collDrawLines;

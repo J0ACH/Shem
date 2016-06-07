@@ -26,8 +26,6 @@ namespace Jui
     connect(graph, SIGNAL(actResized(QSize)), this, SLOT(onGraphResized(QSize)));
   }
 
-  // QRect GraphObject::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
-
   void GraphObject::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
   {
    // qDebug() << "new domain for GraphObject set to " << domX << " and " << domY;
@@ -60,15 +58,53 @@ namespace Jui
   void GraphObject::draw(QPainter *painter)
   {
     //qDebug() << "GraphObject::draw";
-    painter->setPen(QColor(255, 150, 150));
-    painter->drawEllipse(this->getPixel(), 6, 6);
+    painter->setPen(Qt::white);
+    painter->drawEllipse(this->getPixel(), 2, 2);
   }
 
   GraphObject::~GraphObject(){};
 
+  // GRAPH OBJECT END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH VERTEX
 
+  GraphVertex::GraphVertex(QWidget *parent) : GraphObject(parent)
+  {
 
+  }
 
+  void GraphVertex::draw(QPainter *painter)
+  {
+    //qDebug() << "GraphObject::draw";
+    painter->setPen(Qt::red);
+    painter->drawEllipse(this->getPixel(), 4, 4);
+  }
+
+  GraphVertex::~GraphVertex(){};
+
+  // GRAPH VERTEX END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH CURVE
+  
+  GraphCurve::GraphCurve(QWidget *parent, GraphVertex *pt1, GraphVertex *pt2) : 
+    GraphObject(parent),
+    from(pt1),
+    to(pt2)
+  {
+
+  }
+
+  void GraphCurve::draw(QPainter *painter)
+  {
+    //qDebug() << "GraphObject::draw";
+    painter->setPen(Qt::green);
+    painter->drawLine(from->getPixel(), to->getPixel());
+  }
+
+  GraphCurve::~GraphCurve(){};
+
+  // GRAPH VERTEX END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
 
   // GRAPH POINT 
 
@@ -330,7 +366,7 @@ namespace Jui
   // GRAPH POINT END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH CURVE	
-
+  /*
   GraphCurve::GraphCurve(QWidget *parent, GraphPoint *pt1, GraphPoint *pt2) :
     QWidget(parent),
     from(pt1),
@@ -383,6 +419,7 @@ namespace Jui
   }
 
   GraphCurve::~GraphCurve(){}
+  */
 
   // GRAPH CURVE END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -407,7 +444,18 @@ namespace Jui
     testObj = new GraphObject(this);
     testObj->valueX = 0.25;
     testObj->valueY = 0.5;
-    drawPoint(0.25, 0.5);
+   
+    testVertex1 = new GraphVertex(this);
+    testVertex1->valueX = 0.5;
+    testVertex1->valueY = 0.5;
+    controlVertexs.append(testVertex1);
+
+    testVertex2 = new GraphVertex(this);
+    testVertex2->valueX = 0.75;
+    testVertex2->valueY = 0.25;
+    controlVertexs.append(testVertex2);
+
+    testCurve = new GraphCurve(this, testVertex1, testVertex2);
     // GraphObject testObj(this);
     // qDebug() << "GraphObject test return maxDomainX : " << testObj->test();
 
@@ -529,13 +577,14 @@ namespace Jui
   {
     GraphPoint *to = this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::vertex);
     GraphPoint *from = controlPts[controlPts.size() - 2];
-
+    /*
     GraphCurve *crv = new GraphCurve(this, from, to);
     crv->show();
 
     connect(from, SIGNAL(actMoved(int, int, int)), crv, SLOT(onFromMoved(int, int, int)));
 
     curves.append(crv);
+    */
 
     return to;
   }
@@ -543,13 +592,14 @@ namespace Jui
   {
     GraphPoint *to = this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::endPoint);
     GraphPoint *from = controlPts[controlPts.size() - 2];
-
+    /*
     GraphCurve *crv = new GraphCurve(this, from, to);
     crv->show();
 
     connect(from, SIGNAL(actMoved(int, int, int)), crv, SLOT(onFromMoved(int, int, int)));
 
     curves.append(crv);
+    */
     return to;
   }
   void Graph::setVertexPoint(int ID, QPointF pt)
@@ -561,7 +611,7 @@ namespace Jui
 
     if (controlPts[ID]->type != GraphPoint::PointType::startPoint)
     {
-      curves[ID - 1]->setFrom(controlPts[ID]);
+     // curves[ID - 1]->setFrom(controlPts[ID]);
     }
   }
   void Graph::setVertexType(int ID, GraphPoint::PointType newType)
@@ -611,9 +661,10 @@ namespace Jui
 
     foreach(GraphPoint *onePoint, curvePts) { onePoint->close(); }
     curvePts = QList<GraphPoint*>();
-
+    /*
     foreach(GraphCurve *oneCrv, curves) { oneCrv->close(); }
     curves = QList<GraphCurve*>();
+    */
 
     collDrawPoints = QList<QPointF*>();
     collDrawLines = QList<QLineF*>();
@@ -734,6 +785,7 @@ namespace Jui
         pointSize + 1
         );
     }
+    
     foreach(GraphPoint *onePt, curvePts)
     {
       int pointSize = onePt->pointSize;
@@ -746,6 +798,7 @@ namespace Jui
         pointSize + 1
         );
     }
+    
 
     emit actResized(this->boundsGraph().size());
   }
@@ -850,7 +903,13 @@ namespace Jui
 
 
     QPainter *painterGraphObject = new QPainter(this);
-    testObj->draw(painterGraphObject);
+    foreach(GraphVertex *oneV, controlVertexs)
+    {
+      oneV->draw(painterGraphObject);
+    }
+    //testObj->draw(painterGraphObject);
+    testCurve->draw(painterGraphObject);
+    
   }
 
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)
