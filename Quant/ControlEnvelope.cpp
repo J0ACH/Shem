@@ -212,7 +212,7 @@ namespace QuantIDE
     qDebug() << "ControlEnvelope::getEnv(): " << env;
 
     envelopeCode->setText(env);
-    envGraph->drawPolyline(this->getEnvPoints(50));
+   // envGraph->drawPolyline(this->getEnvPoints(50));
 
     /*
     for (int i = 0; i < curves.size(); i++)

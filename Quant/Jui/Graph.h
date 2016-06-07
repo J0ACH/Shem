@@ -21,8 +21,8 @@ namespace Jui
     ~GraphObject();
 
     float valueX, valueY;
-    QPointF getPixel();
-    void setValue(QPointF pixel);
+    QPoint getPixel();
+    void setValue(QPoint pixel);
 
     bool modify;
     int modifyAlpha;
@@ -31,11 +31,9 @@ namespace Jui
     void redraw();
 
     public slots:
+    void onObjectModify();
     void onDomainChanged(QPair<float, float>, QPair<float, float>);
     void onGraphResized(QSize);
-    void onObjectModify();
-
-    private slots:
     void onModifyTick();
 
   signals:
@@ -235,10 +233,11 @@ namespace Jui
     QPair<float, float> domainX, domainY;
 
     QPainter *painterGraphObject;
-    GraphObject *testObj;
-    GraphVertex *testVertex1, *testVertex2;
-    GraphCurve *testCurve;
+ //   GraphObject *testObj;
+    GraphVertex *testVertex1, *testVertex2, *testVertex3, *testVertex4;
+    GraphCurve *testCurve1, *testCurve2, *testCurve3;
     QList<GraphVertex*> controlVertexs;
+    QList<GraphCurve*> controlCurves;
 
     QList<GraphPoint*> controlPts;
     QList<GraphPoint*> curvePts;

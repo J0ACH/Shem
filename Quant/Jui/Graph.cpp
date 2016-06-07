@@ -3,9 +3,6 @@
 namespace Jui
 {
 
-
-
-
   // GRAPH OBJECT
 
   GraphObject::GraphObject(QWidget *parent) :
@@ -62,7 +59,7 @@ namespace Jui
     this->redraw();
   }
 
-  QPointF GraphObject::getPixel()
+  QPoint GraphObject::getPixel()
   {
     float percX = (valueX - domainX.first) / (float)(domainX.second - domainX.first);
     int pixelX = percX * graphSize.width() + graphOrigin.x();;
@@ -70,17 +67,17 @@ namespace Jui
     float percY = (valueY - domainY.first) / (float)(domainY.second - domainY.first);
     int pixelY = graphSize.height() - (percY * graphSize.height()) + graphOrigin.y();
 
-    return QPointF(pixelX, pixelY);
+    return QPoint(pixelX, pixelY);
   }
 
-  void GraphObject::setValue(QPointF pixel)
+  void GraphObject::setValue(QPoint pixel)
   {
     float percX = (pixel.x() - graphOrigin.x()) / (float)graphSize.width();
     valueX = percX * (domainX.second - domainX.first) + domainX.first;
 
     float percY = 1 - (pixel.y() - graphOrigin.y()) / (float)graphSize.height();
     valueY = percY * (domainY.second - domainY.first) + domainY.first;
-    
+
     emit actModify();
   }
 
@@ -129,6 +126,7 @@ namespace Jui
       {
         eventMouse = static_cast<QMouseEvent*>(event);
         this->setValue(eventMouse->pos());
+        event->accept();
       }
       this->redraw();
       break;
@@ -157,16 +155,15 @@ namespace Jui
   {
     if (focus) { painter->setPen(QColor(180, 20, 20)); }
     else { painter->setPen(QColor(80, 80, 80)); }
-    painter->drawEllipse(this->getPixel(), 4, 4);
+    painter->drawEllipse(this->getPixel(), 6, 6);
 
     if (modify)
     {
       QColor modifyColor = QColor(220, 200, 20);// modifyColor;
       modifyColor.setAlpha(modifyAlpha);
-      painter->setPen(QPen(modifyColor,2));
-      painter->drawEllipse(this->getPixel(), 4, 4);
+      painter->setPen(QPen(modifyColor, 2));
+      painter->drawEllipse(this->getPixel(), 5, 5);
     }
-
   }
 
   GraphVertex::~GraphVertex(){};
@@ -202,7 +199,7 @@ namespace Jui
 
   GraphCurve::~GraphCurve(){};
 
-  // GRAPH VERTEX END
+  // GRAPH CURVE END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
 
   // GRAPH POINT 
@@ -539,24 +536,38 @@ namespace Jui
     collPolylinesNEW = QList<QPolygonF*>();
 
     setFocusPolicy(Qt::StrongFocus);
-
+    /*
     testObj = new GraphObject(this);
     testObj->valueX = 0.25;
     testObj->valueY = 0.5;
+    */
 
     testVertex1 = new GraphVertex(this);
-    testVertex1->valueX = 0.5;
+    testVertex1->valueX = 0.15;
     testVertex1->valueY = 0.5;
     controlVertexs.append(testVertex1);
 
     testVertex2 = new GraphVertex(this);
-    testVertex2->valueX = 0.75;
-    testVertex2->valueY = 0.25;
+    testVertex2->valueX = 0.25;
+    testVertex2->valueY = 0.85;
     controlVertexs.append(testVertex2);
 
-    testCurve = new GraphCurve(this, testVertex1, testVertex2);
-    // GraphObject testObj(this);
-    // qDebug() << "GraphObject test return maxDomainX : " << testObj->test();
+    testVertex3 = new GraphVertex(this);
+    testVertex3->valueX = 0.5;
+    testVertex3->valueY = 0.5;
+    controlVertexs.append(testVertex3);
+
+    testVertex4 = new GraphVertex(this);
+    testVertex4->valueX = 0.75;
+    testVertex4->valueY = 0.25;
+    controlVertexs.append(testVertex4);
+
+    testCurve1 = new GraphCurve(this, testVertex1, testVertex2);
+    controlCurves.append(testCurve1);
+    testCurve2 = new GraphCurve(this, testVertex2, testVertex3);
+    controlCurves.append(testCurve2);
+    testCurve3 = new GraphCurve(this, testVertex3, testVertex4);
+    controlCurves.append(testCurve3);
 
     emit actDomainChanged(domainX, domainY);
   }
@@ -675,7 +686,7 @@ namespace Jui
   GraphPoint *Graph::addVertexPoint(QPointF pt)
   {
     GraphPoint *to = this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::vertex);
-    GraphPoint *from = controlPts[controlPts.size() - 2];
+    //GraphPoint *from = controlPts[controlPts.size() - 2];
     /*
     GraphCurve *crv = new GraphCurve(this, from, to);
     crv->show();
@@ -685,7 +696,14 @@ namespace Jui
     curves.append(crv);
     */
 
+    /*
+    GraphVertex *vertex = new GraphVertex(this);
+    vertex->valueX = pt.x();
+    vertex->valueY = pt.y();
+    */
+
     return to;
+
   }
   GraphPoint *Graph::addEndPoint(QPointF pt)
   {
@@ -1003,8 +1021,12 @@ namespace Jui
     //qDebug() << "Graph::paint ";
     painterGraphObject = new QPainter(this);
 
-    testCurve->draw(painterGraphObject);
+    //testCurve->draw(painterGraphObject);
 
+    foreach(GraphCurve *oneC, controlCurves)
+    {
+      oneC->draw(painterGraphObject);
+    }
     foreach(GraphVertex *oneV, controlVertexs)
     {
       oneV->draw(painterGraphObject);
@@ -1015,11 +1037,21 @@ namespace Jui
 
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)
   {
-    //qDebug() << "Graph::mousePressEvent NEW POINT ADD";
+    //qDebug() << "Graph::mousePressEvent NEW POINT ADD " << mouseEvent->pos();
     //this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
     //this->makeEnv();
 
-    //this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
+    QPoint mouse = mouseEvent->pos();
+
+    qDebug() << "Graph::mousePressEvent NEW POINT ADD " << mouse;
+
+    GraphVertex *vertex = new GraphVertex(this);
+    vertex->setValue(mouse);
+    //vertex->show();
+    vertex->redraw();
+    this->update();
+    controlVertexs.append(vertex);
+
 
   }
 
