@@ -28,11 +28,10 @@ namespace Jui
     void onDomainChanged(QPair<float, float>, QPair<float, float>);
     void onGraphResized(QSize);
 
- // protected:
-   // void paintEvent(QPaintEvent *);
+    void draw(QPainter *painter);
+  protected:
 
   private:
-
     float minDomainX, maxDomainX, minDomainY, maxDomainY;
     QPointF graphOrigin;
     QSize graphSize;

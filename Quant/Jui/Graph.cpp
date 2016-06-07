@@ -15,8 +15,8 @@ namespace Jui
     Graph *graph = qobject_cast<Graph*>(parent);
     graphOrigin = graph->boundsGraph().topLeft();
     graphSize = graph->boundsGraph().size();
-    qDebug() << "graphOrigin: " << graphOrigin;
-    qDebug() << "graphSize: " << graphSize;
+   // qDebug() << "graphOrigin: " << graphOrigin;
+   // qDebug() << "graphSize: " << graphSize;
 
     connect(
       graph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
@@ -26,11 +26,11 @@ namespace Jui
     connect(graph, SIGNAL(actResized(QSize)), this, SLOT(onGraphResized(QSize)));
   }
 
- // QRect GraphObject::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+  // QRect GraphObject::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
 
   void GraphObject::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
   {
-    qDebug() << "new domain for GraphObject set to " << domX << " and " << domY;
+   // qDebug() << "new domain for GraphObject set to " << domX << " and " << domY;
     domainX = domX;
     domainY = domY;
     minDomainX = domX.first;
@@ -42,8 +42,8 @@ namespace Jui
   void GraphObject::onGraphResized(QSize newSize)
   {
     graphSize = newSize;
- //   qDebug() << "new size for GraphObject is " << size;
-  //  qDebug() << "test pt at PIX " << this->getPixel();
+    // qDebug() << "new size for GraphObject is " << size;
+    // qDebug() << "test pt at PIX " << this->getPixel();
   }
 
   QPointF GraphObject::getPixel()
@@ -55,6 +55,13 @@ namespace Jui
     int pixelY = graphSize.height() - (percY * graphSize.height()) + graphOrigin.y();
 
     return QPointF(pixelX, pixelY);
+  } 
+
+  void GraphObject::draw(QPainter *painter)
+  {
+    //qDebug() << "GraphObject::draw";
+    painter->setPen(QColor(255, 150, 150));
+    painter->drawEllipse(this->getPixel(), 6, 6);
   }
 
   GraphObject::~GraphObject(){};
@@ -714,7 +721,7 @@ namespace Jui
 
   void Graph::resizeEvent(QResizeEvent *resizeEvent)
   {
-   // qDebug() << "Graph::resizeEvent";
+    // qDebug() << "Graph::resizeEvent";
     foreach(GraphPoint *onePt, controlPts)
     {
       int pointSize = onePt->pointSize;
@@ -799,7 +806,9 @@ namespace Jui
     {
       painter.drawEllipse(getPixelX(onePoint->x()) - 3, getPixelY(onePoint->y()) - 3, 6, 6);
     };
-    painter.drawEllipse(testObj->getPixel(), 6, 6);
+
+    //painter.drawEllipse(testObj->getPixel(), 6, 6);
+  
 
     // collDrawLines
     painter.setPen(QColor(70, 170, 70));
@@ -837,6 +846,11 @@ namespace Jui
       poly.append(onePt);
     }
     painter.drawPolyline(poly);
+
+
+
+    QPainter *painterGraphObject = new QPainter(this);
+    testObj->draw(painterGraphObject);
   }
 
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)
