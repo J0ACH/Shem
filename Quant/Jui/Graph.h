@@ -27,9 +27,10 @@ namespace Jui
     void onGraphResized(QSize);
 
     void draw(QPainter *painter);
-  protected:
+    void redraw();
 
   private:
+    QWidget *graph;
     float minDomainX, maxDomainX, minDomainY, maxDomainY;
     QPointF graphOrigin;
     QSize graphSize;
@@ -48,6 +49,13 @@ namespace Jui
     ~GraphVertex();
 
     void draw(QPainter *painter);
+
+  protected:
+    virtual bool eventFilter(QObject * watched, QEvent * event);
+
+  private:
+    bool isOver(QPointF mouse);
+    bool focus;
   };
 
   // GRAPH VERTEX END
@@ -62,8 +70,9 @@ namespace Jui
 
     void draw(QPainter *painter);
 
-    private:
-      GraphVertex *from, *to;
+  private:
+    GraphVertex *from, *to;
+    QString curvature;
   };
 
   // GRAPH CURVE END
@@ -211,6 +220,7 @@ namespace Jui
     int frameOffset;
     QPair<float, float> domainX, domainY;
 
+    QPainter *painterGraphObject;
     GraphObject *testObj;
     GraphVertex *testVertex1, *testVertex2;
     GraphCurve *testCurve;

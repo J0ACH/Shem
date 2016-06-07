@@ -8,27 +8,28 @@ namespace Jui
 
   // GRAPH OBJECT
 
-  GraphObject::GraphObject(QWidget *parent)
+  GraphObject::GraphObject(QWidget *parent) :
+    graph(parent)
   {
     //size = parent->size();
 
-    Graph *graph = qobject_cast<Graph*>(parent);
-    graphOrigin = graph->boundsGraph().topLeft();
-    graphSize = graph->boundsGraph().size();
-   // qDebug() << "graphOrigin: " << graphOrigin;
-   // qDebug() << "graphSize: " << graphSize;
+    Graph *parentGraph = qobject_cast<Graph*>(parent);
+    graphOrigin = parentGraph->boundsGraph().topLeft();
+    graphSize = parentGraph->boundsGraph().size();
+    // qDebug() << "graphOrigin: " << graphOrigin;
+    // qDebug() << "graphSize: " << graphSize;
 
     connect(
-      graph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
+      parentGraph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
       this, SLOT(onDomainChanged(QPair<float, float>, QPair<float, float>))
       );
 
-    connect(graph, SIGNAL(actResized(QSize)), this, SLOT(onGraphResized(QSize)));
+    connect(parentGraph, SIGNAL(actResized(QSize)), this, SLOT(onGraphResized(QSize)));
   }
 
   void GraphObject::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
   {
-   // qDebug() << "new domain for GraphObject set to " << domX << " and " << domY;
+    // qDebug() << "new domain for GraphObject set to " << domX << " and " << domY;
     domainX = domX;
     domainY = domY;
     minDomainX = domX.first;
@@ -53,14 +54,15 @@ namespace Jui
     int pixelY = graphSize.height() - (percY * graphSize.height()) + graphOrigin.y();
 
     return QPointF(pixelX, pixelY);
-  } 
+  }
 
   void GraphObject::draw(QPainter *painter)
   {
-    //qDebug() << "GraphObject::draw";
     painter->setPen(Qt::white);
     painter->drawEllipse(this->getPixel(), 2, 2);
   }
+
+  void GraphObject::redraw() { graph->update(); }
 
   GraphObject::~GraphObject(){};
 
@@ -70,13 +72,73 @@ namespace Jui
 
   GraphVertex::GraphVertex(QWidget *parent) : GraphObject(parent)
   {
+    parent->installEventFilter(this);
+    focus = false;
+  }
 
+  bool GraphVertex::eventFilter(QObject* target, QEvent* event)
+  {
+    QMouseEvent *eventMouse;
+
+    switch (event->type())
+    {
+      /*
+    case QEvent::FocusIn:
+    qDebug() << "GraphVertex::FocusIn";
+    break;
+    */
+    case QEvent::MouseButtonPress:
+      eventMouse = static_cast<QMouseEvent*>(event);
+      // qDebug() << "GraphVertex::MouseButtonPress IN";
+      if (this->isOver(eventMouse->pos()))
+      {
+        focus = true;
+        //qDebug() << "GraphVertex::MouseButtonPress IN";
+      }
+      else
+      {
+        // qDebug() << "GraphVertex::MouseButtonPress OUT";
+        focus = false;
+      }
+      this->redraw();
+      break;
+      /*
+    case QEvent::MouseMove:
+    qDebug() << "GraphVertex::MouseMove";
+    break;
+    */
+    case QEvent::KeyPress:
+      qDebug() << "GraphVertex::KeyPress";
+      break;
+    }
+
+    return QObject::eventFilter(target, event);
+  }
+
+  bool GraphVertex::isOver(QPointF mouse)
+  {
+    float tolerance = 10;
+    QPointF testPt = this->getPixel();
+
+    bool overX = abs(testPt.x() - mouse.x()) < tolerance;
+    bool overY = abs(testPt.y() - mouse.y()) < tolerance;
+
+    if (overX && overY) { return true; }
+    else { return false; }
   }
 
   void GraphVertex::draw(QPainter *painter)
   {
-    //qDebug() << "GraphObject::draw";
-    painter->setPen(Qt::red);
+   // qDebug() << "GraphVertex::draw focus " << focus;
+
+    if (focus) {
+     // qDebug() << "GraphVertex::draw focus test1";
+      painter->setPen(QColor(180, 20, 20));
+    }
+    else {
+     // qDebug() << "GraphVertex::draw focus test2";
+      painter->setPen(QColor(80, 80, 80));
+    }
     painter->drawEllipse(this->getPixel(), 4, 4);
   }
 
@@ -85,18 +147,17 @@ namespace Jui
   // GRAPH VERTEX END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH CURVE
-  
-  GraphCurve::GraphCurve(QWidget *parent, GraphVertex *pt1, GraphVertex *pt2) : 
+
+  GraphCurve::GraphCurve(QWidget *parent, GraphVertex *pt1, GraphVertex *pt2) :
     GraphObject(parent),
     from(pt1),
     to(pt2)
   {
-
+    curvature = "lin";
   }
 
   void GraphCurve::draw(QPainter *painter)
   {
-    //qDebug() << "GraphObject::draw";
     painter->setPen(Qt::green);
     painter->drawLine(from->getPixel(), to->getPixel());
   }
@@ -368,21 +429,21 @@ namespace Jui
   // GRAPH CURVE	
   /*
   GraphCurve::GraphCurve(QWidget *parent, GraphPoint *pt1, GraphPoint *pt2) :
-    QWidget(parent),
-    from(pt1),
-    to(pt2)
+  QWidget(parent),
+  from(pt1),
+  to(pt2)
   {
-    int fromX = pt1->pixelX;
-    int fromY;
-    int newWidth = pt2->pixelX - pt1->pixelX;
-    int newHeight = pt2->pixelY - pt1->pixelY;
+  int fromX = pt1->pixelX;
+  int fromY;
+  int newWidth = pt2->pixelX - pt1->pixelX;
+  int newHeight = pt2->pixelY - pt1->pixelY;
 
-    if (pt1->pixelY > pt2->pixelY) { fromY = pt1->pixelY; }
-    else { fromY = pt1->pixelY; }
+  if (pt1->pixelY > pt2->pixelY) { fromY = pt1->pixelY; }
+  else { fromY = pt1->pixelY; }
 
-    qDebug() << "newWidth " << newWidth;
-    //this->setGeometry(fromX, fromY, newWidth, newHeight);
-    this->setGeometry(fromX, fromY, 50, 50);
+  qDebug() << "newWidth " << newWidth;
+  //this->setGeometry(fromX, fromY, newWidth, newHeight);
+  this->setGeometry(fromX, fromY, 50, 50);
 
   }
 
@@ -390,32 +451,32 @@ namespace Jui
 
   void GraphCurve::setFrom(GraphPoint *fromPt)
   {
-    from = fromPt;
-    this->setGeometry(from->pixelX, from->pixelY, 50, 50);
+  from = fromPt;
+  this->setGeometry(from->pixelX, from->pixelY, 50, 50);
   }
   void GraphCurve::onFromMoved(int ID, int pixelX, int pixelY)
   {
-    qDebug() << "GraphCurve::onFromMoved pX " << pixelX << " pY " << pixelY;
-    this->setGeometry(pixelX, pixelY, 50, 50);
+  qDebug() << "GraphCurve::onFromMoved pX " << pixelX << " pY " << pixelY;
+  this->setGeometry(pixelX, pixelY, 50, 50);
   }
 
 
   void GraphCurve::mousePressEvent(QMouseEvent *mouseEvent)
   {
-    //mouseEvent->ignore();
+  //mouseEvent->ignore();
   }
 
   void GraphCurve::resizeEvent(QResizeEvent *resizeEvent)
   {
-    // this->setGeometry(from->x(), from->y(), 100, 100);
+  // this->setGeometry(from->x(), from->y(), 100, 100);
   }
 
   void GraphCurve::paintEvent(QPaintEvent *event)
   {
-    QPainter painter(this);
-    painter.setPen(QColor(120, 20, 20));
-    //painter.fillRect(this->bounds(), QColor(120, 30, 30));
-    painter.drawRect(this->bounds());
+  QPainter painter(this);
+  painter.setPen(QColor(120, 20, 20));
+  //painter.fillRect(this->bounds(), QColor(120, 30, 30));
+  painter.drawRect(this->bounds());
   }
 
   GraphCurve::~GraphCurve(){}
@@ -444,7 +505,7 @@ namespace Jui
     testObj = new GraphObject(this);
     testObj->valueX = 0.25;
     testObj->valueY = 0.5;
-   
+
     testVertex1 = new GraphVertex(this);
     testVertex1->valueX = 0.5;
     testVertex1->valueY = 0.5;
@@ -611,7 +672,7 @@ namespace Jui
 
     if (controlPts[ID]->type != GraphPoint::PointType::startPoint)
     {
-     // curves[ID - 1]->setFrom(controlPts[ID]);
+      // curves[ID - 1]->setFrom(controlPts[ID]);
     }
   }
   void Graph::setVertexType(int ID, GraphPoint::PointType newType)
@@ -785,7 +846,7 @@ namespace Jui
         pointSize + 1
         );
     }
-    
+
     foreach(GraphPoint *onePt, curvePts)
     {
       int pointSize = onePt->pointSize;
@@ -798,7 +859,7 @@ namespace Jui
         pointSize + 1
         );
     }
-    
+
 
     emit actResized(this->boundsGraph().size());
   }
@@ -861,7 +922,7 @@ namespace Jui
     };
 
     //painter.drawEllipse(testObj->getPixel(), 6, 6);
-  
+
 
     // collDrawLines
     painter.setPen(QColor(70, 170, 70));
@@ -901,22 +962,22 @@ namespace Jui
     painter.drawPolyline(poly);
 
 
-
-    QPainter *painterGraphObject = new QPainter(this);
+    //qDebug() << "Graph::paint ";
+    painterGraphObject = new QPainter(this);
     foreach(GraphVertex *oneV, controlVertexs)
     {
       oneV->draw(painterGraphObject);
     }
     //testObj->draw(painterGraphObject);
-    testCurve->draw(painterGraphObject);
-    
+     testCurve->draw(painterGraphObject);
+
   }
 
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)
   {
-    qDebug() << "Graph::mousePressEvent NEW POINT ADD";
-    this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
-    this->makeEnv();
+    //qDebug() << "Graph::mousePressEvent NEW POINT ADD";
+    //this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
+    //this->makeEnv();
   }
 
   void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)
