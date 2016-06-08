@@ -66,6 +66,9 @@ namespace Jui
 
     void draw(QPainter *painter);
 
+  signals:
+    void actSelected(int ID);
+
   protected:
     virtual bool eventFilter(QObject * watched, QEvent * event);
 
@@ -193,8 +196,8 @@ namespace Jui
     QRect boundsGraph();
     void setDomainX(float min, float max);
     void setDomainY(float min, float max);
-    QList<double> getDomainX();
-    QList<double> getDomainY();
+    QPair<float, float> getDomainX();
+    QPair<float, float> getDomainY();
 
    // GraphPoint *addStartPoint(QPointF newPt);
    // GraphPoint *addVertexPoint(QPointF newPt);
@@ -217,7 +220,7 @@ namespace Jui
     public slots:
     void onDeletePoint(int ID);
     void onMovePoint(int ID, int pixelX, int pixelY);
-
+    
   signals:
     void actEnvGraphChanged(QList<double> levels, QList<double> times, QList<QString> curves);
     void actDomainChanged(QPair<float, float>, QPair<float, float>);

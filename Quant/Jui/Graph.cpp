@@ -12,10 +12,14 @@ namespace Jui
     graphOrigin = parentGraph->boundsGraph().topLeft();
     graphSize = parentGraph->boundsGraph().size();
 
+    domainX = parentGraph->getDomainX();
+    domainY = parentGraph->getDomainY();
+
     modifyAlpha = 0;
     fadeTimeOut = 800;
     fps = 25;
     modifyTime = new QTimer(this);
+
 
     connect(this, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     connect(modifyTime, SIGNAL(timeout()), this, SLOT(onModifyTick()));
@@ -97,12 +101,16 @@ namespace Jui
 
   GraphVertex::GraphVertex(QWidget *parent) : GraphObject(parent)
   {
+    Graph *parentGraph = qobject_cast<Graph*>(parent);
+
     parent->installEventFilter(this);
     focus = false;
     pressed = false;
     modify = false;
 
     type = GraphVertex::PointType::vertex;
+
+    connect(this, SIGNAL(actSelected(int ID)), parentGraph, SLOT(onSelectVertex(int ID)));
   }
 
   void GraphVertex::setType(GraphVertex::PointType vertexType)
@@ -118,14 +126,26 @@ namespace Jui
     {
     case QEvent::MouseButtonPress:
       eventMouse = static_cast<QMouseEvent*>(event);
-      if (this->isOver(eventMouse->pos())) { focus = true; pressed = true; }
-      else { focus = false; }
-      this->redraw();
+      qDebug() << "MouseButtonPress event";
+      //focus = false;
+
+      if (this->isOver(eventMouse->pos()))
+      {
+        focus = true;
+        pressed = true;
+        //this->redraw();
+        return true;
+      }
+      else {
+        //focus = false;
+        //this->redraw();
+      }
       break;
 
     case QEvent::MouseButtonRelease:
       eventMouse = static_cast<QMouseEvent*>(event);
       pressed = false;
+      this->redraw();
       break;
 
     case QEvent::MouseMove:
@@ -141,8 +161,6 @@ namespace Jui
           QPoint px = this->getPixel();
           this->setValue(QPoint(px.x(), eventMouse->pos().y()));
         }
-
-        //event->accept();
       }
       this->redraw();
       break;
@@ -216,7 +234,7 @@ namespace Jui
 
   void GraphCurve::draw(QPainter *painter)
   {
-    painter->setPen(QColor(40,200,40));
+    painter->setPen(QColor(40, 200, 40));
     painter->drawLine(from->getPixel(), to->getPixel());
 
     if (modify)
@@ -631,20 +649,8 @@ namespace Jui
     emit actDomainChanged(domainX, domainY);
   }
 
-  QList<double> Graph::getDomainX()
-  {
-    QList<double> range;
-    range.append(domainX.first);
-    range.append(domainX.second);
-    return range;
-  }
-  QList<double> Graph::getDomainY()
-  {
-    QList<double> range;
-    range.append(domainY.first);
-    range.append(domainY.second);
-    return range;
-  }
+  QPair<float, float> Graph::getDomainX() { return domainX; }
+  QPair<float, float> Graph::getDomainY() { return domainY; }
 
   float Graph::getValueX(int displayX)
   {
@@ -832,6 +838,7 @@ namespace Jui
     this->sortPointsByX();
     this->makeEnv();
   }
+  //void Graph::onS
 
   void Graph::sortPointsByX()
   {
@@ -938,6 +945,8 @@ namespace Jui
 
   void Graph::paintEvent(QPaintEvent *event)
   {
+    qDebug() << "Graph::paintEvent";
+
     QPainter painter(this);
 
     //painter.fillRect(bounds(), QColor(10, 10, 10));
@@ -1063,12 +1072,13 @@ namespace Jui
 
     GraphVertex *vertex = new GraphVertex(this);
     vertex->setValue(mouse);
+
+    qDebug() << "Graph::newVertex valX: " << vertex->valueX << " valY: " << vertex->valueY;
+
     //vertex->show();
-    vertex->redraw();
-    this->update();
+    // vertex->redraw();
+    //this->update();
     controlVertexs.append(vertex);
-
-
   }
 
   void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)
