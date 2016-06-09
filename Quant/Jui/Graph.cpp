@@ -305,16 +305,21 @@ namespace Jui
     painter->setPen(QColor(40, 200, 140));
     painter->drawLine(pxFrom, pxTo);
 
+    QTextOption option;
+    option.setAlignment(Qt::AlignCenter);
+    QRect rect;
+
     switch (type)
     {
     case AxisType::horizontal:
-      painter->drawText(pxFrom, QString::number(from->valueY, 'f', 2));
+      rect = QRect(pxFrom.x()-50, pxFrom.y()-10, 50, 20);
+      painter->drawText(rect, QString::number(from->valueY, 'f', 2), option);
       break;
     case AxisType::vertical:
-      painter->drawText(pxTo, QString::number(from->valueX, 'f', 2));
+      rect = QRect(pxTo.x()-25, pxTo.y()-20, 50, 20);
+      painter->drawText(rect, QString::number(from->valueX, 'f', 2), option);
       break;
     }
-   
   }
 
   GraphAxis::~GraphAxis(){}
