@@ -108,15 +108,12 @@ namespace Jui
     pressed = false;
     modify = false;
 
-    type = GraphVertex::PointType::vertex;
+    type = VertexType::vertex;
 
-    connect(this, SIGNAL(actSelected(int ID)), parentGraph, SLOT(onSelectVertex(int ID)));
+    //connect(this, SIGNAL(actSelected(int ID)), parentGraph, SLOT(onSelectVertex(int ID)));
   }
 
-  void GraphVertex::setType(GraphVertex::PointType vertexType)
-  {
-    type = vertexType;
-  }
+  void GraphVertex::setType(VertexType vertexType)  { type = vertexType; }
 
   bool GraphVertex::eventFilter(QObject* target, QEvent* event)
   {
@@ -152,7 +149,7 @@ namespace Jui
       if (focus && pressed)
       {
         eventMouse = static_cast<QMouseEvent*>(event);
-        if (this->type == GraphVertex::PointType::vertex)
+        if (this->type == VertexType::vertex)
         {
           this->setValue(eventMouse->pos());
         }
@@ -250,6 +247,78 @@ namespace Jui
 
   // GRAPH CURVE END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+  GraphAxis::GraphAxis(QWidget *parent, float value, AxisType direction = AxisType::horizontal) :
+    GraphObject(parent),
+    type(direction)
+  {
+    Graph *parentGraph = qobject_cast<Graph*>(parent);
+
+    from = new GraphVertex(parent);
+    to = new GraphVertex(parent);
+
+    switch (type)
+    {
+    case AxisType::horizontal:
+      from->valueX = 0;
+      from->valueY = value;
+      to->valueX = 1;
+      to->valueY = value;
+      break;
+    case AxisType::vertical:
+      from->valueX = value;
+      from->valueY = 1;
+      to->valueX = value;
+      to->valueY = 0;
+      break;
+    }
+
+    connect(
+      parentGraph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
+      this, SLOT(onDomainChanged(QPair<float, float>, QPair<float, float>))
+      );
+
+  }
+
+  void GraphAxis::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
+  {
+    GraphObject::onDomainChanged(domX, domY);
+
+    switch (type)
+    {
+    case AxisType::horizontal:
+      from->valueX = domX.first;
+      to->valueX = domX.second;
+      break;
+    case AxisType::vertical:
+      from->valueY = domY.first;
+      to->valueY = domY.second;
+      break;
+    }
+  }
+
+  void GraphAxis::draw(QPainter *painter)
+  {
+    QPoint pxFrom = from->getPixel();
+    QPoint pxTo = to->getPixel();
+
+    painter->setPen(QColor(40, 200, 140));
+    painter->drawLine(pxFrom, pxTo);
+
+    switch (type)
+    {
+    case AxisType::horizontal:
+      painter->drawText(pxFrom, QString::number(from->valueY, 'f', 2));
+      break;
+    case AxisType::vertical:
+      painter->drawText(pxTo, QString::number(from->valueX, 'f', 2));
+      break;
+    }
+   
+  }
+
+  GraphAxis::~GraphAxis(){}
+
 
   // GRAPH POINT 
   /*
@@ -595,7 +664,7 @@ namespace Jui
     testVertex1 = new GraphVertex(this);
     testVertex1->valueX = 0.15;
     testVertex1->valueY = 0.5;
-    testVertex1->setType(GraphVertex::PointType::startPoint);
+    testVertex1->setType(VertexType::startPoint);
     controlVertexs.append(testVertex1);
 
     testVertex2 = new GraphVertex(this);
@@ -611,7 +680,7 @@ namespace Jui
     testVertex4 = new GraphVertex(this);
     testVertex4->valueX = 0.75;
     testVertex4->valueY = 0.25;
-    testVertex4->setType(GraphVertex::PointType::endPoint);
+    testVertex4->setType(VertexType::endPoint);
     controlVertexs.append(testVertex4);
 
     testCurve1 = new GraphCurve(this, testVertex1, testVertex2);
@@ -620,6 +689,11 @@ namespace Jui
     controlCurves.append(testCurve2);
     testCurve3 = new GraphCurve(this, testVertex3, testVertex4);
     controlCurves.append(testCurve3);
+
+    testAxis1 = new GraphAxis(this, 0.33, AxisType::horizontal);
+    graphAxis.append(testAxis1);
+    testAxis2 = new GraphAxis(this, 0.7, AxisType::vertical);
+    graphAxis.append(testAxis2);
 
     emit actDomainChanged(domainX, domainY);
   }
@@ -945,7 +1019,7 @@ namespace Jui
 
   void Graph::paintEvent(QPaintEvent *event)
   {
-    qDebug() << "Graph::paintEvent";
+    //qDebug() << "Graph::paintEvent";
 
     QPainter painter(this);
 
@@ -1047,7 +1121,10 @@ namespace Jui
     painterGraphObject = new QPainter(this);
 
     //testCurve->draw(painterGraphObject);
-
+    foreach(GraphAxis *oneAxis, graphAxis)
+    {
+      oneAxis->draw(painterGraphObject);
+    }
     foreach(GraphCurve *oneC, controlCurves)
     {
       oneC->draw(painterGraphObject);
