@@ -265,8 +265,31 @@ namespace Jui
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
   }
 
-  void GraphCurve::setFrom(GraphVertex *pt) { from = pt; }
-  void GraphCurve::setTo(GraphVertex *pt) { to = pt; }
+  void GraphCurve::setFrom(GraphVertex *pt) 
+  {
+    disconnect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    from = pt; 
+    connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+  }
+  void GraphCurve::setTo(GraphVertex *pt) 
+  {
+    disconnect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    to = pt;
+    connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+  }
+  void GraphCurve::flipEnds()
+  {
+    disconnect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    disconnect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+
+    GraphVertex *temp = from;
+    from = to;
+    to = temp;
+   // temp->deleteLater();
+
+    connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+  }
 
   void GraphCurve::draw(QPainter *painter)
   {
@@ -735,7 +758,7 @@ namespace Jui
     setFocusPolicy(Qt::StrongFocus);
 
     testVertex1 = new GraphVertex(this);
-    testVertex1->valueX = 0;
+    testVertex1->valueX = 0.01;
     testVertex1->valueY = 0.5;
     testVertex1->ID = 0;
     testVertex1->setType(VertexType::startPoint);
@@ -754,7 +777,7 @@ namespace Jui
     controlVertexs.append(testVertex3);
 
     testVertex4 = new GraphVertex(this);
-    testVertex4->valueX = 1;
+    testVertex4->valueX = 0.99;
     testVertex4->valueY = 0.25;
     testVertex4->ID = 3;
     testVertex4->setType(VertexType::endPoint);
@@ -1071,8 +1094,9 @@ namespace Jui
           sorted = false;
 
           controlCurves[i - 2]->setTo(controlVertexs[i]);
-          controlCurves[i - 1]->setFrom(controlVertexs[i]);
-          controlCurves[i - 1]->setTo(controlVertexs[i - 1]);
+          //controlCurves[i - 1]->setFrom(controlVertexs[i]);
+          //controlCurves[i - 1]->setTo(controlVertexs[i - 1]);
+          controlCurves[i - 1]->flipEnds();
           controlCurves[i]->setFrom(controlVertexs[i - 1]);
 
           controlVertexs[i]->ID = i - 1;
@@ -1245,22 +1269,14 @@ namespace Jui
 
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)
   {
-    //qDebug() << "Graph::mousePressEvent NEW POINT ADD " << mouseEvent->pos();
-    //this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
-    //this->makeEnv();
-
-    QPoint mouse = mouseEvent->pos();
-
     //qDebug() << "Graph::mousePressEvent NEW POINT ADD " << mouse;
+     QPoint mouse = mouseEvent->pos();
 
     GraphVertex *vertex = new GraphVertex(this);
     vertex->setValue(mouse);
-
-    //qDebug() << "Graph::newVertex valX: " << vertex->valueX << " valY: " << vertex->valueY;
-
+        
     int tempInsertPos = -1;
-
-    if (controlVertexs.size() == 0) { controlVertexs.append(vertex); }
+        if (controlVertexs.size() == 0) { controlVertexs.append(vertex); }
     else
     {
       for (int i = 0; i <= controlVertexs.size(); i++)
@@ -1275,7 +1291,6 @@ namespace Jui
           controlVertexs.insert(i, vertex);
 
           controlCurves[i - 1]->setTo(vertex);
-
           GraphCurve *insertCurve = new GraphCurve(this, vertex, controlVertexs[i + 1]);
           insertCurve->ID = i - 1;
           controlCurves.insert(i, insertCurve);
@@ -1298,8 +1313,7 @@ namespace Jui
       }
     }
 
-
-    // controlVertexs.append(vertex);
+    //this->makeEnv();
   }
 
   void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)

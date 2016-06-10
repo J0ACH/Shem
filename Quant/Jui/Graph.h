@@ -101,6 +101,7 @@ namespace Jui
 
     void setFrom(GraphVertex *pt);
     void setTo(GraphVertex *pt);
+    void flipEnds();
 
     void draw(QPainter *painter);
 
