@@ -133,6 +133,7 @@ namespace Jui
       {
         pressed = true;
         emit actSelected(ID);
+        this->redraw();
         return true;
       }
       break;
@@ -265,13 +266,13 @@ namespace Jui
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
   }
 
-  void GraphCurve::setFrom(GraphVertex *pt) 
+  void GraphCurve::setFrom(GraphVertex *pt)
   {
     disconnect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
-    from = pt; 
+    from = pt;
     connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
   }
-  void GraphCurve::setTo(GraphVertex *pt) 
+  void GraphCurve::setTo(GraphVertex *pt)
   {
     disconnect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     to = pt;
@@ -285,7 +286,6 @@ namespace Jui
     GraphVertex *temp = from;
     from = to;
     to = temp;
-   // temp->deleteLater();
 
     connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
@@ -1069,12 +1069,18 @@ namespace Jui
 
   void Graph::onVertexDeleted(int ID)
   {
-    qDebug() << "Graph::onVertexDeleted: " << ID;
+    // qDebug() << "Graph::onVertexDeleted: " << ID;
     controlVertexs.removeAt(ID);
+    controlCurves.removeAt(ID);
+    controlCurves[ID - 1]->setTo(controlVertexs[ID]);
 
     for (int i = ID; i < controlVertexs.size(); i++)
     {
       controlVertexs[i]->ID = i;
+    }
+    for (int i = ID - 1; i < controlVertexs.size() - 1; i++)
+    {
+      controlCurves[i]->ID = i;
     }
   }
 
@@ -1094,8 +1100,6 @@ namespace Jui
           sorted = false;
 
           controlCurves[i - 2]->setTo(controlVertexs[i]);
-          //controlCurves[i - 1]->setFrom(controlVertexs[i]);
-          //controlCurves[i - 1]->setTo(controlVertexs[i - 1]);
           controlCurves[i - 1]->flipEnds();
           controlCurves[i]->setFrom(controlVertexs[i - 1]);
 
@@ -1270,13 +1274,13 @@ namespace Jui
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)
   {
     //qDebug() << "Graph::mousePressEvent NEW POINT ADD " << mouse;
-     QPoint mouse = mouseEvent->pos();
+    QPoint mouse = mouseEvent->pos();
 
     GraphVertex *vertex = new GraphVertex(this);
     vertex->setValue(mouse);
-        
+
     int tempInsertPos = -1;
-        if (controlVertexs.size() == 0) { controlVertexs.append(vertex); }
+    if (controlVertexs.size() == 0) { controlVertexs.append(vertex); }
     else
     {
       for (int i = 0; i <= controlVertexs.size(); i++)
