@@ -107,15 +107,17 @@ namespace Jui
     focus = false;
     pressed = false;
     modify = false;
+    ID = -1;
 
     type = VertexType::vertex;
 
+    connect(this, SIGNAL(actModify()), parentGraph, SLOT(onVertexMoved()));
     //connect(this, SIGNAL(actSelected(int ID)), parentGraph, SLOT(onSelectVertex(int ID)));
   }
 
   void GraphVertex::setType(VertexType vertexType)  { type = vertexType; }
 
-  //void GraphVertex::setID(int newID) { ID = newID; }
+  void GraphVertex::setID(int newID) { ID = newID; }
 
   bool GraphVertex::eventFilter(QObject* target, QEvent* event)
   {
@@ -186,11 +188,17 @@ namespace Jui
 
   void GraphVertex::draw(QPainter *painter)
   {
-    if (focus) { painter->setPen(QColor(180, 20, 20)); }
-    else { painter->setPen(QColor(180, 180, 180)); }
-
     QPoint center = this->getPixel();
     QRect rect(center.x() - 8, center.y() - 8, 16, 16);
+    QRect rectID(center.x() + 8, center.y() + 8, 30, 20);
+
+    QTextOption option;
+    option.setAlignment(Qt::AlignCenter);
+    painter->setPen(QColor(180, 180, 180));
+    painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
+
+    if (focus) { painter->setPen(QColor(180, 20, 20)); }
+    else { painter->setPen(QColor(180, 180, 180)); }
 
     switch (type)
     {
@@ -285,16 +293,12 @@ namespace Jui
     switch (type)
     {
     case AxisType::horizontal:
-      //from->valueX = this->getDomainX().first;
       from->valueY = newValue;
-      //to->valueX = 1;
       to->valueY = newValue;
       break;
     case AxisType::vertical:
       from->valueX = newValue;
-      // from->valueY = 1;
       to->valueX = newValue;
-      // to->valueY = 0;
       break;
     }
   }
@@ -326,8 +330,8 @@ namespace Jui
 
     QTextOption option;
     option.setAlignment(Qt::AlignCenter);
-    QRect rect;
 
+    QRect rect;
     switch (type)
     {
     case AxisType::horizontal:
@@ -680,34 +684,33 @@ namespace Jui
 
     //  controlPts = QList<GraphPoint*>();
     graphPolylines = new QPolygonF();
-    collPolylinesNEW = QList<QPolygonF*>();
+    //    collPolylinesNEW = QList<QPolygonF*>();
 
     setFocusPolicy(Qt::StrongFocus);
-    /*
-    testObj = new GraphObject(this);
-    testObj->valueX = 0.25;
-    testObj->valueY = 0.5;
-    */
 
     testVertex1 = new GraphVertex(this);
     testVertex1->valueX = 0.15;
     testVertex1->valueY = 0.5;
+    testVertex1->setID(0);
     testVertex1->setType(VertexType::startPoint);
     controlVertexs.append(testVertex1);
 
     testVertex2 = new GraphVertex(this);
     testVertex2->valueX = 0.25;
     testVertex2->valueY = 0.85;
+    testVertex2->setID(1);
     controlVertexs.append(testVertex2);
 
     testVertex3 = new GraphVertex(this);
     testVertex3->valueX = 0.5;
     testVertex3->valueY = 0.5;
+    testVertex3->setID(2);
     controlVertexs.append(testVertex3);
 
     testVertex4 = new GraphVertex(this);
     testVertex4->valueX = 0.75;
     testVertex4->valueY = 0.25;
+    testVertex4->setID(3);
     testVertex4->setType(VertexType::endPoint);
     controlVertexs.append(testVertex4);
 
@@ -728,6 +731,8 @@ namespace Jui
       GraphAxis *hAxis = new GraphAxis(this, i, AxisType::horizontal);
       graphHorizontalAxis.append(hAxis);
     }
+
+    this->sortVertexByX();
 
     emit actDomainChanged(domainX, domainY);
   }
@@ -855,19 +860,21 @@ namespace Jui
   return to;
   }
   */
+  /*
   void Graph::setVertexPoint(int ID, QPointF pt)
   {
-    int pX = getPixelX(pt.x());
-    int pY = getPixelX(pt.y());
-    //    controlPts[ID]->setX(pX, pt.x());
-    //  controlPts[ID]->setY(pY, pt.y());
-    /*
-    if (controlPts[ID]->type != GraphPoint::PointType::startPoint)
-    {
-    // curves[ID - 1]->setFrom(controlPts[ID]);
-    }
-    */
+  int pX = getPixelX(pt.x());
+  int pY = getPixelX(pt.y());
+  //    controlPts[ID]->setX(pX, pt.x());
+  //  controlPts[ID]->setY(pY, pt.y());
+
+  //if (controlPts[ID]->type != GraphPoint::PointType::startPoint)
+  //{
+  // curves[ID - 1]->setFrom(controlPts[ID]);
+  //}
+
   }
+  */
   /*
   void Graph::setVertexType(int ID, GraphPoint::PointType newType)
   {
@@ -880,34 +887,39 @@ namespace Jui
   return this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::curvePoint);
   }
   */
+  /*
   void Graph::setCurvePoint(int ID, QPointF pt)
   {
-    // curvePts[ID]->setX(getPixelX(pt.x()), pt.x());
-    // curvePts[ID]->setY(getPixelY(pt.y()), pt.y());
+  // curvePts[ID]->setX(getPixelX(pt.x()), pt.x());
+  // curvePts[ID]->setY(getPixelY(pt.y()), pt.y());
   }
   void Graph::setCurveCurvature(int ID, QString txt)
   {
-    // curvePts[ID]->setCurvature(txt);
+  // curvePts[ID]->setCurvature(txt);
   }
+  */
 
+  /*
   void Graph::drawPoint(double valueX, double valueY)
   {
-    collDrawPoints.append(new QPointF(valueX, valueY));
-    update();
+  collDrawPoints.append(new QPointF(valueX, valueY));
+  update();
   }
   void Graph::drawLine(double valueX1, double valueY1, double valueX2, double valueY2)
   {
-    collDrawLines.append(new QLineF(valueX1, valueY1, valueX2, valueY2));
-    update();
+  collDrawLines.append(new QLineF(valueX1, valueY1, valueX2, valueY2));
+  update();
   }
+
+  void Graph::addPolyline(QVector<QPointF> collPoints)
+  {
+  collPolylinesNEW.append(new QPolygonF(collPoints));
+  }
+  */
   void Graph::drawPolyline(QVector<QPointF> collPoints)
   {
     graphPolylines = new QPolygonF(collPoints);
     update();
-  }
-  void Graph::addPolyline(QVector<QPointF> collPoints)
-  {
-    collPolylinesNEW.append(new QPolygonF(collPoints));
   }
 
   void Graph::deleteGraph()
@@ -924,10 +936,10 @@ namespace Jui
     curves = QList<GraphCurve*>();
     */
 
-    collDrawPoints = QList<QPointF*>();
-    collDrawLines = QList<QLineF*>();
+    //collDrawPoints = QList<QPointF*>();
+    //collDrawLines = QList<QLineF*>();
     graphPolylines = new QPolygonF();
-    collPolylinesNEW = QList<QPolygonF*>();
+    // collPolylinesNEW = QList<QPolygonF*>();
 
     update();
   }
@@ -959,33 +971,37 @@ namespace Jui
     // controlPts[ID]->setX(newPixelX, newValX);
     // controlPts[ID]->setY(newPixelY, newValY);
 
-    this->sortPointsByX();
+    // this->sortPointsByX();
     this->makeEnv();
   }
-  //void Graph::onS
 
-  void Graph::sortPointsByX()
+  void Graph::onVertexMoved()
+  {
+    //qDebug() << "Graph::onVertexMoved";
+    this->sortVertexByX();
+  }
+
+  void Graph::sortVertexByX()
   {
     bool sorted = false;
-    /*
-    if (controlPts.size() == 0) { sorted = true; }
+
+    if (controlVertexs.size() == 0) { sorted = true; }
 
     while (!sorted)
     {
-    sorted = true;
-    for (int i = 1; i < controlPts.size(); i++)
-    {
-    if (controlPts[i]->valueX < controlPts[i - 1]->valueX)
-    {
-    sorted = false;
-    controlPts[i]->setID(i - 1);
-    controlPts[i - 1]->setID(i);
-    controlPts.swap(i, i - 1);
-    break;
+      sorted = true;
+      for (int i = 1; i < controlVertexs.size(); i++)
+      {
+        if (controlVertexs[i]->valueX < controlVertexs[i - 1]->valueX)
+        {
+          sorted = false;
+          controlVertexs[i]->setID(i - 1);
+          controlVertexs[i - 1]->setID(i);
+          controlVertexs.swap(i, i - 1);
+          break;
+        }
+      }
     }
-    }
-    }
-    */
   }
 
   void Graph::makeEnv()
@@ -1073,50 +1089,44 @@ namespace Jui
 
     QPainter painter(this);
 
-    //painter.fillRect(bounds(), QColor(10, 10, 10));
     if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
     else { painter.setPen(QColor(60, 60, 60)); }
     painter.drawLine(0, 0, width(), 0);
     painter.drawLine(0, height() - 1, width(), height() - 1);
 
-    painter.setPen(QPen(Qt::white, 1));
-
-   // painter.drawRect(this->boundsGraph());
-
+    /*
+    // painter.setPen(QPen(Qt::white, 1));
+    // painter.drawRect(this->boundsGraph());
     //collDrawPoints
     painter.setPen(QColor(150, 150, 150));
     foreach(QPointF *onePoint, collDrawPoints)
     {
-      painter.drawEllipse(getPixelX(onePoint->x()) - 3, getPixelY(onePoint->y()) - 3, 6, 6);
+    painter.drawEllipse(getPixelX(onePoint->x()) - 3, getPixelY(onePoint->y()) - 3, 6, 6);
     };
-
-    //painter.drawEllipse(testObj->getPixel(), 6, 6);
-
 
     // collDrawLines
     painter.setPen(QColor(70, 170, 70));
     foreach(QLineF *oneLine, collDrawLines)
     {
-      QPointF pt1 = QPoint(getPixelX(oneLine->p1().x()), getPixelY(oneLine->p1().y()));
-      QPointF pt2 = QPoint(getPixelX(oneLine->p2().x()), getPixelY(oneLine->p2().y()));
-      painter.drawLine(pt1, pt2);
+    QPointF pt1 = QPoint(getPixelX(oneLine->p1().x()), getPixelY(oneLine->p1().y()));
+    QPointF pt2 = QPoint(getPixelX(oneLine->p2().x()), getPixelY(oneLine->p2().y()));
+    painter.drawLine(pt1, pt2);
     };
 
     // collPolylines
-
     painter.setPen(QColor(40, 240, 40));
     foreach(QPolygonF *onePoly, collPolylinesNEW)
     {
-      QPolygonF poly;
-      foreach(QPointF onePt, onePoly->toList())
-      {
-        //onePt.setX(getPixelX(onePt.x()));
-        //onePt.setY(getPixelY(onePt.y()));
-        poly.append(onePt);
-      }
-      painter.drawPolyline(poly);
+    QPolygonF poly;
+    foreach(QPointF onePt, onePoly->toList())
+    {
+    //onePt.setX(getPixelX(onePt.x()));
+    //onePt.setY(getPixelY(onePt.y()));
+    poly.append(onePt);
     }
-
+    painter.drawPolyline(poly);
+    }
+    */
 
     //graphPolylines
     painter.setPen(QColor(240, 70, 70));
@@ -1130,8 +1140,7 @@ namespace Jui
     }
     painter.drawPolyline(poly);
 
-
-    //qDebug() << "Graph::paint ";
+    //qDebug() << "Graph::paintEvent NEW";
     painterGraphObject = new QPainter(this);
     foreach(GraphAxis *oneAxis, graphVerticalAxis)
     {
@@ -1161,17 +1170,44 @@ namespace Jui
 
     QPoint mouse = mouseEvent->pos();
 
-    qDebug() << "Graph::mousePressEvent NEW POINT ADD " << mouse;
+    //qDebug() << "Graph::mousePressEvent NEW POINT ADD " << mouse;
 
     GraphVertex *vertex = new GraphVertex(this);
     vertex->setValue(mouse);
 
-    qDebug() << "Graph::newVertex valX: " << vertex->valueX << " valY: " << vertex->valueY;
+    //qDebug() << "Graph::newVertex valX: " << vertex->valueX << " valY: " << vertex->valueY;
 
-    //vertex->show();
-    // vertex->redraw();
-    //this->update();
-    controlVertexs.append(vertex);
+    int tempInsertPos = -1;
+
+    if (controlVertexs.size() == 0) { controlVertexs.append(vertex); }
+    else
+    {
+      for (int i = 0; i <= controlVertexs.size(); i++)
+      {
+        if (i == controlVertexs.size()) {
+          controlVertexs.append(vertex);
+          break;
+        }
+        if (controlVertexs[i]->valueX > vertex->valueX)
+        {
+          vertex->setID(i);
+          controlVertexs.insert(i, vertex);
+          tempInsertPos = i+1;
+          break;
+        }
+      }
+    }
+
+    if (tempInsertPos != -1)
+    {
+      for (int i = tempInsertPos; i < controlVertexs.size(); i++)
+      {
+        controlVertexs[i]->setID(i);
+      }
+    }
+
+
+    // controlVertexs.append(vertex);
   }
 
   void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)

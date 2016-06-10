@@ -22,8 +22,6 @@ namespace Jui
 
     float valueX, valueY;
     QPoint getPixel();
-   // QPair<float, float> getDomainX();
-   // QPair<float, float> getDomainY();
     void setValue(QPoint pixel);
 
     bool modify;
@@ -67,7 +65,7 @@ namespace Jui
 
     VertexType type;
     void setType(VertexType newType);
-    //void setID(int newID);
+    void setID(int newID);
 
     void draw(QPainter *painter);
 
@@ -80,7 +78,7 @@ namespace Jui
   private:
     bool isOver(QPointF mouse);
     bool focus, pressed;
-    //int ID;
+    int ID;
 
   };
 
@@ -232,24 +230,26 @@ namespace Jui
     // GraphPoint *addStartPoint(QPointF newPt);
     // GraphPoint *addVertexPoint(QPointF newPt);
     // GraphPoint *addEndPoint(QPointF newPt);
-    void setVertexPoint(int ID, QPointF newPt);
+   // void setVertexPoint(int ID, QPointF newPt);
     // void setVertexType(int ID, GraphPoint::PointType newType);
     // GraphPoint *getVertex(int ID);
 
     // GraphPoint *addCurvePoint(QPointF newPt);
-    void setCurvePoint(int ID, QPointF newPt);
-    void setCurveCurvature(int ID, QString txt);
+    //void setCurvePoint(int ID, QPointF newPt);
+    //void setCurveCurvature(int ID, QString txt);
 
-    void drawPoint(double valueX, double valueY);
-    void drawLine(double valueX1, double valueY1, double valueX2, double valueY2);
+    //void drawPoint(double valueX, double valueY);
+    //void drawLine(double valueX1, double valueY1, double valueX2, double valueY2);
     void drawPolyline(QVector<QPointF> collPoints);
-    void addPolyline(QVector<QPointF> collPoints);
+    //void addPolyline(QVector<QPointF> collPoints);
 
     void deleteGraph();
 
     public slots:
     void onDeletePoint(int ID);
-    void onMovePoint(int ID, int pixelX, int pixelY);
+    void onMovePoint(int ID, int pixelX, int pixelY); //old - new onVertexMoved
+    
+    void onVertexMoved();
 
   signals:
     void actEnvGraphChanged(QList<double> levels, QList<double> times, QList<QString> curves);
@@ -267,7 +267,7 @@ namespace Jui
     // GraphPoint *addValuePoint(double valueX, double valueY, GraphPoint::PointType type);
 
     void makeEnv();
-    void sortPointsByX();
+    void sortVertexByX();
 
     int frameOffset;
     QPair<float, float> domainX, domainY;
@@ -287,10 +287,10 @@ namespace Jui
     //  QList<GraphPoint*> curvePts;
     // QList<GraphCurve*> curves;
 
-    QList<QPointF*> collDrawPoints;
-    QList<QLineF*> collDrawLines;
+    //QList<QPointF*> collDrawPoints;
+    //QList<QLineF*> collDrawLines;
     QPolygonF *graphPolylines;
-    QList<QPolygonF*> collPolylinesNEW;
+    //QList<QPolygonF*> collPolylinesNEW;
 
     float getValueX(int displayX);
     float getValueY(int displayY);

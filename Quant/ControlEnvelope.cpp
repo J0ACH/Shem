@@ -171,16 +171,17 @@ namespace QuantIDE
       {
         QPointF vertex = this->getEnvVertex(i);
         // qDebug() << vertex << "no:" << i << "levels.size(): " << levels.size();
-        envGraph->setVertexPoint(i, vertex);
-       // envGraph->setVertexType(i, GraphPoint::PointType::vertex);
+        //envGraph->setVertexPoint(i, vertex);
+
+        // envGraph->setVertexType(i, GraphPoint::PointType::vertex);
        // if (i == 0) { envGraph->setVertexType(i, GraphPoint::PointType::startPoint); }
        // if (i == levels.size() - 1) { envGraph->setVertexType(i, GraphPoint::PointType::endPoint); }
 
         if (i < levels.size() - 1) // times je o cntVertex - 1
         {
           QPointF midPoint = this->getEnvMidCurve(i);
-          envGraph->setCurvePoint(i, midPoint);
-          envGraph->setCurveCurvature(i, curves[i]);
+          //envGraph->setCurvePoint(i, midPoint);
+          //envGraph->setCurveCurvature(i, curves[i]);
         }
       }
     }
