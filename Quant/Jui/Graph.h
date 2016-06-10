@@ -72,14 +72,16 @@ namespace Jui
     void draw(QPainter *painter);
 
   signals:
+    void actMoved(int ID);
     void actSelected(int ID);
+    void actDeleted(int ID);
 
   protected:
     virtual bool eventFilter(QObject * watched, QEvent * event);
 
   private:
     bool isOver(QPointF mouse);
-    bool focus, pressed;
+    bool isSelcted, pressed;
 
   };
 
@@ -94,6 +96,11 @@ namespace Jui
   public:
     GraphCurve(QWidget *graph, GraphVertex *pt1, GraphVertex *pt2);
     ~GraphCurve();
+    
+    int ID;
+
+    void setFrom(GraphVertex *pt);
+    void setTo(GraphVertex *pt);
 
     void draw(QPainter *painter);
 
@@ -247,11 +254,12 @@ namespace Jui
     void deleteGraph();
 
     public slots:
-    void onDeletePoint(int ID);
+    //void onDeletePoint(int ID);
     //void onMovePoint(int ID, int pixelX, int pixelY); //old - new onVertexMoved
     
     void onVertexSelected(int ID);
-    void onVertexMoved();
+    void onVertexMoved(int ID);
+    void onVertexDeleted(int ID);
 
   signals:
     void actEnvGraphChanged(QList<double> levels, QList<double> times, QList<QString> curves);

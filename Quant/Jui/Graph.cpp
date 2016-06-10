@@ -104,22 +104,21 @@ namespace Jui
     Graph *parentGraph = qobject_cast<Graph*>(parent);
 
     parent->installEventFilter(this);
-    focus = false;
+    isSelcted = false;
     pressed = false;
     modify = false;
     ID = -1;
 
     type = VertexType::vertex;
 
-    connect(this, SIGNAL(actModify()), parentGraph, SLOT(onVertexMoved()));
+    connect(this, SIGNAL(actMoved(int)), parentGraph, SLOT(onVertexMoved(int)));
     connect(this, SIGNAL(actSelected(int)), parentGraph, SLOT(onVertexSelected(int)));
+    connect(this, SIGNAL(actDeleted(int)), parentGraph, SLOT(onVertexDeleted(int)));
   }
 
   void GraphVertex::setType(VertexType vertexType)  { type = vertexType; }
 
-  //void GraphVertex::setID(int newID) { ID = newID; }
-
-  void GraphVertex::setSelected(bool select)  { focus = select; }
+  void GraphVertex::setSelected(bool select)  { isSelcted = select; }
 
   bool GraphVertex::eventFilter(QObject* target, QEvent* event)
   {
@@ -129,31 +128,22 @@ namespace Jui
     {
     case QEvent::MouseButtonPress:
       eventMouse = static_cast<QMouseEvent*>(event);
-      // qDebug() << "MouseButtonPress event";
-      //focus = false;
 
       if (this->isOver(eventMouse->pos()))
       {
-        focus = true;
         pressed = true;
-        //this->redraw();
         emit actSelected(ID);
         return true;
-      }
-      else {
-        //focus = false;
-        //this->redraw();
       }
       break;
 
     case QEvent::MouseButtonRelease:
       eventMouse = static_cast<QMouseEvent*>(event);
       pressed = false;
-      this->redraw();
       break;
 
     case QEvent::MouseMove:
-      if (focus && pressed)
+      if (isSelcted && pressed)
       {
         eventMouse = static_cast<QMouseEvent*>(event);
         if (this->type == VertexType::vertex)
@@ -165,12 +155,41 @@ namespace Jui
           QPoint px = this->getPixel();
           this->setValue(QPoint(px.x(), eventMouse->pos().y()));
         }
+        emit actMoved(ID);
       }
       this->redraw();
       break;
 
     case QEvent::KeyPress:
-      qDebug() << "GraphVertex::KeyPress";
+      if (isSelcted)
+      {
+        qDebug() << "GraphVertex::KeyPress" << ID;
+
+        if (event->type() == QEvent::KeyPress)
+        {
+          QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
+          quint32 modifers = eventKey->nativeModifiers();
+
+          switch (eventKey->key())
+          {
+          case Qt::Key::Key_Delete:
+
+            if (type == VertexType::vertex)
+            {
+              emit actDeleted(ID);
+              this->redraw();
+              this->deleteLater();
+              return true;
+            }
+            break;
+
+          case Qt::Key::Key_Escape:
+            qDebug() << "KeyEvent: Escape PRESSED";
+            return true;
+            break;
+          }
+        }
+      }
       break;
     }
 
@@ -200,7 +219,7 @@ namespace Jui
     painter->setPen(QColor(180, 180, 180));
     painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
 
-    if (focus) { painter->setPen(QColor(180, 20, 20)); }
+    if (isSelcted) { painter->setPen(QColor(180, 20, 20)); }
     else { painter->setPen(QColor(180, 180, 180)); }
 
     switch (type)
@@ -225,7 +244,10 @@ namespace Jui
     }
   }
 
-  GraphVertex::~GraphVertex(){};
+  GraphVertex::~GraphVertex()
+  {
+    qDebug() << "Vertex ~DELETED" << ID;
+  };
 
   // GRAPH VERTEX END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,13 +259,31 @@ namespace Jui
     to(pt2)
   {
     curvature = "lin";
+    ID = -1;
 
     connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
   }
 
+  void GraphCurve::setFrom(GraphVertex *pt) { from = pt; }
+  void GraphCurve::setTo(GraphVertex *pt) { to = pt; }
+
   void GraphCurve::draw(QPainter *painter)
   {
+    QPoint fromPt = from->getPixel();
+    QPoint toPt = to->getPixel();
+    QPoint center;
+    center.setX((toPt.x() + fromPt.x()) / 2);
+    center.setY((toPt.y() + fromPt.y()) / 2);
+
+    QRect rectID(center.x(), center.y(), 30, 20);
+
+    QTextOption option;
+    option.setAlignment(Qt::AlignCenter);
+    painter->setPen(QColor(180, 180, 180));
+    painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
+
+
     painter->setPen(QColor(40, 200, 40));
     painter->drawLine(from->getPixel(), to->getPixel());
 
@@ -260,6 +300,7 @@ namespace Jui
 
   // GRAPH CURVE END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH AXIS
 
   GraphAxis::GraphAxis(QWidget *parent, float value, AxisType direction = AxisType::horizontal) :
     GraphObject(parent),
@@ -350,6 +391,8 @@ namespace Jui
 
   GraphAxis::~GraphAxis(){}
 
+  // GRAPH AXIS END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
 
   // GRAPH POINT 
   /*
@@ -692,7 +735,7 @@ namespace Jui
     setFocusPolicy(Qt::StrongFocus);
 
     testVertex1 = new GraphVertex(this);
-    testVertex1->valueX = 0.15;
+    testVertex1->valueX = 0;
     testVertex1->valueY = 0.5;
     testVertex1->ID = 0;
     testVertex1->setType(VertexType::startPoint);
@@ -711,17 +754,20 @@ namespace Jui
     controlVertexs.append(testVertex3);
 
     testVertex4 = new GraphVertex(this);
-    testVertex4->valueX = 0.75;
+    testVertex4->valueX = 1;
     testVertex4->valueY = 0.25;
     testVertex4->ID = 3;
     testVertex4->setType(VertexType::endPoint);
     controlVertexs.append(testVertex4);
 
     testCurve1 = new GraphCurve(this, testVertex1, testVertex2);
+    testCurve1->ID = 0;
     controlCurves.append(testCurve1);
     testCurve2 = new GraphCurve(this, testVertex2, testVertex3);
+    testCurve2->ID = 1;
     controlCurves.append(testCurve2);
     testCurve3 = new GraphCurve(this, testVertex3, testVertex4);
+    testCurve3->ID = 2;
     controlCurves.append(testCurve3);
 
     for (double i = 0; i <= 1; i += 0.25)
@@ -947,39 +993,41 @@ namespace Jui
     update();
   }
 
+  /*
   void Graph::onDeletePoint(int ID)
   {
-    qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
-    // controlPts.removeAt(ID);
-    // curvePts[ID - 1]->close();
-    // curvePts.removeAt(ID - 1);
-    this->makeEnv();
-    update();
+  qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
+  // controlPts.removeAt(ID);
+  // curvePts[ID - 1]->close();
+  // curvePts.removeAt(ID - 1);
+  // this->makeEnv();
+  // update();
   }
+  */
   /*
   void Graph::onMovePoint(int ID, int pixelX, int pixelY)
   {
-    qDebug() << "Graph::onMovePoint: " << QString::number(ID);
+  qDebug() << "Graph::onMovePoint: " << QString::number(ID);
 
-    double newValX = getValueX(pixelX);
-    double newValY = getValueY(pixelY);
-    int newPixelX = pixelX;
-    int newPixelY = pixelY;
+  double newValX = getValueX(pixelX);
+  double newValY = getValueY(pixelY);
+  int newPixelX = pixelX;
+  int newPixelY = pixelY;
 
-    if (newValX > domainX.second) { newValX = domainX.second - 0.01; newPixelX = getPixelX(domainX.second - 0.01); };
-    if (newValX < domainX.first) { newValX = domainX.first; newPixelX = getPixelX(domainX.first); };
+  if (newValX > domainX.second) { newValX = domainX.second - 0.01; newPixelX = getPixelX(domainX.second - 0.01); };
+  if (newValX < domainX.first) { newValX = domainX.first; newPixelX = getPixelX(domainX.first); };
 
-    if (newValY > domainY.second) { newValY = domainY.second; newPixelY = getPixelY(domainY.second); };
-    if (newValY < domainY.first) { newValY = domainY.first; newPixelY = getPixelY(domainY.first); };
+  if (newValY > domainY.second) { newValY = domainY.second; newPixelY = getPixelY(domainY.second); };
+  if (newValY < domainY.first) { newValY = domainY.first; newPixelY = getPixelY(domainY.first); };
 
-    // controlPts[ID]->setX(newPixelX, newValX);
-    // controlPts[ID]->setY(newPixelY, newValY);
+  // controlPts[ID]->setX(newPixelX, newValX);
+  // controlPts[ID]->setY(newPixelY, newValY);
 
-    // this->sortPointsByX();
-    this->makeEnv();
+  // this->sortPointsByX();
+  this->makeEnv();
   }
   */
-  
+
   void Graph::onVertexSelected(int ID)
   {
     // qDebug() << "Graph::onVertexSelected" << ID;
@@ -990,10 +1038,21 @@ namespace Jui
     }
   }
 
-  void Graph::onVertexMoved()
+  void Graph::onVertexMoved(int ID)
   {
-    //qDebug() << "Graph::onVertexMoved";
+    // qDebug() << "Graph::onVertexMoved: "<< ID;
     this->sortVertexByX();
+  }
+
+  void Graph::onVertexDeleted(int ID)
+  {
+    qDebug() << "Graph::onVertexDeleted: " << ID;
+    controlVertexs.removeAt(ID);
+
+    for (int i = ID; i < controlVertexs.size(); i++)
+    {
+      controlVertexs[i]->ID = i;
+    }
   }
 
   void Graph::sortVertexByX()
@@ -1010,9 +1069,16 @@ namespace Jui
         if (controlVertexs[i]->valueX < controlVertexs[i - 1]->valueX)
         {
           sorted = false;
+
+          controlCurves[i - 2]->setTo(controlVertexs[i]);
+          controlCurves[i - 1]->setFrom(controlVertexs[i]);
+          controlCurves[i - 1]->setTo(controlVertexs[i - 1]);
+          controlCurves[i]->setFrom(controlVertexs[i - 1]);
+
           controlVertexs[i]->ID = i - 1;
           controlVertexs[i - 1]->ID = i;
           controlVertexs.swap(i, i - 1);
+
           break;
         }
       }
@@ -1207,6 +1273,13 @@ namespace Jui
         {
           vertex->ID = i;
           controlVertexs.insert(i, vertex);
+
+          controlCurves[i - 1]->setTo(vertex);
+
+          GraphCurve *insertCurve = new GraphCurve(this, vertex, controlVertexs[i + 1]);
+          insertCurve->ID = i - 1;
+          controlCurves.insert(i, insertCurve);
+
           tempInsertPos = i + 1;
           break;
         }
@@ -1218,6 +1291,10 @@ namespace Jui
       for (int i = tempInsertPos; i < controlVertexs.size(); i++)
       {
         controlVertexs[i]->ID = i;
+      }
+      for (int i = tempInsertPos - 2; i < controlVertexs.size() - 1; i++)
+      {
+        controlCurves[i]->ID = i;
       }
     }
 
