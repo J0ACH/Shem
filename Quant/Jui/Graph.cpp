@@ -115,6 +115,8 @@ namespace Jui
 
   void GraphVertex::setType(VertexType vertexType)  { type = vertexType; }
 
+  //void GraphVertex::setID(int newID) { ID = newID; }
+
   bool GraphVertex::eventFilter(QObject* target, QEvent* event)
   {
     QMouseEvent *eventMouse;
@@ -123,7 +125,7 @@ namespace Jui
     {
     case QEvent::MouseButtonPress:
       eventMouse = static_cast<QMouseEvent*>(event);
-      qDebug() << "MouseButtonPress event";
+      // qDebug() << "MouseButtonPress event";
       //focus = false;
 
       if (this->isOver(eventMouse->pos()))
@@ -277,7 +279,24 @@ namespace Jui
       parentGraph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
       this, SLOT(onDomainChanged(QPair<float, float>, QPair<float, float>))
       );
-
+  }
+  void GraphAxis::setValue(float newValue)
+  {
+    switch (type)
+    {
+    case AxisType::horizontal:
+      //from->valueX = this->getDomainX().first;
+      from->valueY = newValue;
+      //to->valueX = 1;
+      to->valueY = newValue;
+      break;
+    case AxisType::vertical:
+      from->valueX = newValue;
+      // from->valueY = 1;
+      to->valueX = newValue;
+      // to->valueY = 0;
+      break;
+    }
   }
 
   void GraphAxis::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
@@ -291,8 +310,8 @@ namespace Jui
       to->valueX = domX.second;
       break;
     case AxisType::vertical:
-      from->valueY = domY.first;
-      to->valueY = domY.second;
+      from->valueY = domY.second;
+      to->valueY = domY.first;
       break;
     }
   }
@@ -302,7 +321,7 @@ namespace Jui
     QPoint pxFrom = from->getPixel();
     QPoint pxTo = to->getPixel();
 
-    painter->setPen(QColor(40, 200, 140));
+    painter->setPen(QColor(70, 70, 70));
     painter->drawLine(pxFrom, pxTo);
 
     QTextOption option;
@@ -312,11 +331,11 @@ namespace Jui
     switch (type)
     {
     case AxisType::horizontal:
-      rect = QRect(pxFrom.x()-50, pxFrom.y()-10, 50, 20);
+      rect = QRect(pxFrom.x() - 50, pxFrom.y() - 10, 50, 20);
       painter->drawText(rect, QString::number(from->valueY, 'f', 2), option);
       break;
     case AxisType::vertical:
-      rect = QRect(pxTo.x()-25, pxTo.y()-20, 50, 20);
+      rect = QRect(pxTo.x() - 25, pxTo.y(), 50, 20);
       painter->drawText(rect, QString::number(from->valueX, 'f', 2), option);
       break;
     }
@@ -650,10 +669,14 @@ namespace Jui
   {
     this->setMouseTracking(true);
     frameOffset = 25;
+
     domainX.first = 0;
     domainX.second = 1;
     domainY.first = 0;
     domainY.second = 1;
+
+    numGraphAxisX = 4;
+    numGraphAxisY = 4;
 
     //  controlPts = QList<GraphPoint*>();
     graphPolylines = new QPolygonF();
@@ -695,10 +718,16 @@ namespace Jui
     testCurve3 = new GraphCurve(this, testVertex3, testVertex4);
     controlCurves.append(testCurve3);
 
-    testAxis1 = new GraphAxis(this, 0.33, AxisType::horizontal);
-    graphAxis.append(testAxis1);
-    testAxis2 = new GraphAxis(this, 0.7, AxisType::vertical);
-    graphAxis.append(testAxis2);
+    for (double i = 0; i <= 1; i += 0.25)
+    {
+      GraphAxis *vAxis = new GraphAxis(this, i, AxisType::vertical);
+      graphVerticalAxis.append(vAxis);
+    }
+    for (double i = 0; i <= 1; i += 0.25)
+    {
+      GraphAxis *hAxis = new GraphAxis(this, i, AxisType::horizontal);
+      graphHorizontalAxis.append(hAxis);
+    }
 
     emit actDomainChanged(domainX, domainY);
   }
@@ -713,6 +742,14 @@ namespace Jui
   {
     domainX.first = min;
     domainX.second = max;
+
+    float tempAxisVal = min;
+    foreach(GraphAxis *oneAxis, graphVerticalAxis)
+    {
+      oneAxis->setValue(tempAxisVal);
+      tempAxisVal += (max - min) / (float)numGraphAxisX;
+    }
+
     update();
 
     emit actDomainChanged(domainX, domainY);
@@ -723,6 +760,14 @@ namespace Jui
   {
     domainY.first = min;
     domainY.second = max;
+
+    float tempAxisVal = min;
+    foreach(GraphAxis *oneAxis, graphHorizontalAxis)
+    {
+      oneAxis->setValue(tempAxisVal);
+      tempAxisVal += (max - min) / (float)numGraphAxisY;
+    }
+
     update();
 
     emit actDomainChanged(domainX, domainY);
@@ -1036,43 +1081,7 @@ namespace Jui
 
     painter.setPen(QPen(Qt::white, 1));
 
-    painter.drawRect(this->boundsGraph());
-
-    QTextOption option;
-    option.setAlignment(Qt::AlignCenter);
-
-    //painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(controlPts.size()), option);
-
-    painter.setPen(QPen(QColor(70, 70, 70), 1));
-
-    // verticals
-    int cntSegX = 4;
-    for (int i = 0; i <= cntSegX; i++)
-    {
-      int pixelX = boundsGraph().width() / cntSegX * i + boundsGraph().left();
-      float valX = getValueX(pixelX);
-      painter.drawText(
-        QRect(pixelX - 25, boundsGraph().bottom() + 5, 50, 20),
-        QString::number(valX, 'f', 2),
-        option
-        );
-      painter.drawLine(pixelX, boundsGraph().top(), pixelX, boundsGraph().height() + boundsGraph().top());
-    };
-
-    // horizontals
-    int cntSegY = 4;
-    for (int i = 0; i <= cntSegY; i++)
-    {
-      int pixelY = boundsGraph().height() / cntSegY * i + boundsGraph().top();
-      //int pixelY = boundsGraph().height() / cntSegY * i + 14;
-      float valY = getValueY(pixelY);
-      painter.drawText(
-        QRect(5, pixelY - 10, 40, 20),
-        QString::number(valY, 'f', 2),
-        option
-        );
-      painter.drawLine(boundsGraph().left(), pixelY, boundsGraph().right(), pixelY);
-    };
+   // painter.drawRect(this->boundsGraph());
 
     //collDrawPoints
     painter.setPen(QColor(150, 150, 150));
@@ -1124,9 +1133,11 @@ namespace Jui
 
     //qDebug() << "Graph::paint ";
     painterGraphObject = new QPainter(this);
-
-    //testCurve->draw(painterGraphObject);
-    foreach(GraphAxis *oneAxis, graphAxis)
+    foreach(GraphAxis *oneAxis, graphVerticalAxis)
+    {
+      oneAxis->draw(painterGraphObject);
+    }
+    foreach(GraphAxis *oneAxis, graphHorizontalAxis)
     {
       oneAxis->draw(painterGraphObject);
     }

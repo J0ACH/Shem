@@ -22,6 +22,8 @@ namespace Jui
 
     float valueX, valueY;
     QPoint getPixel();
+   // QPair<float, float> getDomainX();
+   // QPair<float, float> getDomainY();
     void setValue(QPoint pixel);
 
     bool modify;
@@ -65,11 +67,12 @@ namespace Jui
 
     VertexType type;
     void setType(VertexType newType);
+    //void setID(int newID);
 
     void draw(QPainter *painter);
 
   signals:
-    void actSelected(int ID);
+   // void actSelected(int ID);
 
   protected:
     virtual bool eventFilter(QObject * watched, QEvent * event);
@@ -77,6 +80,7 @@ namespace Jui
   private:
     bool isOver(QPointF mouse);
     bool focus, pressed;
+    //int ID;
 
   };
 
@@ -113,7 +117,8 @@ namespace Jui
     ~GraphAxis();
     
     void draw(QPainter *painter);
-    
+    void setValue(float newValue);
+
     public slots:
     void onDomainChanged(QPair<float, float>, QPair<float, float>);
   
@@ -266,6 +271,7 @@ namespace Jui
 
     int frameOffset;
     QPair<float, float> domainX, domainY;
+    int numGraphAxisX, numGraphAxisY;
 
     QPainter *painterGraphObject;
     //   GraphObject *testObj;
@@ -274,7 +280,8 @@ namespace Jui
     GraphAxis *testAxis1, *testAxis2;
     QList<GraphVertex*> controlVertexs;
     QList<GraphCurve*> controlCurves;
-    QList<GraphAxis*> graphAxis;
+    QList<GraphAxis*> graphVerticalAxis;
+    QList<GraphAxis*> graphHorizontalAxis;
 
     // QList<GraphPoint*> controlPts;
     //  QList<GraphPoint*> curvePts;
