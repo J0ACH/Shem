@@ -36,9 +36,14 @@ namespace Jui
   {
     domainX = domX;
     domainY = domY;
+    emit actModify();
   }
 
-  void GraphObject::onGraphResized(QSize newSize)  { graphSize = newSize; }
+  void GraphObject::onGraphResized(QSize newSize)
+  {
+    graphSize = newSize;
+    emit actModify();
+  }
 
   void GraphObject::onObjectModify()
   {
@@ -261,6 +266,7 @@ namespace Jui
   {
     curvature = "lin";
     ID = -1;
+    pixelWidth = to->getPixel().x() - from->getPixel().x();
 
     connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
@@ -291,6 +297,12 @@ namespace Jui
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
   }
 
+  void GraphCurve::onObjectModify()
+  {
+    GraphObject::onObjectModify();
+    pixelWidth = to->getPixel().x() - from->getPixel().x();
+  }
+
   void GraphCurve::draw(QPainter *painter)
   {
     QPoint fromPt = from->getPixel();
@@ -300,11 +312,13 @@ namespace Jui
     center.setY((toPt.y() + fromPt.y()) / 2);
 
     QRect rectID(center.x(), center.y(), 30, 20);
+    QRect rectWidth(center.x(), center.y() + 15, 50, 20);
 
     QTextOption option;
-    option.setAlignment(Qt::AlignCenter);
+    option.setAlignment(Qt::AlignLeft);
     painter->setPen(QColor(180, 180, 180));
     painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
+    painter->drawText(rectWidth, tr("px: %1").arg(QString::number(pixelWidth)), option);
 
 
     painter->setPen(QColor(40, 200, 40));
@@ -1073,6 +1087,7 @@ namespace Jui
     controlVertexs.removeAt(ID);
     controlCurves.removeAt(ID);
     controlCurves[ID - 1]->setTo(controlVertexs[ID]);
+    controlCurves[ID - 1]->onObjectModify();
 
     for (int i = ID; i < controlVertexs.size(); i++)
     {

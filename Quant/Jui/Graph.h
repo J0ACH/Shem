@@ -105,9 +105,13 @@ namespace Jui
 
     void draw(QPainter *painter);
 
+    public slots:
+    void onObjectModify();
+
   private:
     GraphVertex *from, *to;
     QString curvature;
+    int pixelWidth;
   };
 
   // GRAPH CURVE END
