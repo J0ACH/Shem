@@ -23,7 +23,7 @@ namespace Jui
     float valueX, valueY;
     QPoint getPixel();
     void setValue(QPoint pixel);
-
+    
     bool modify;
     int modifyAlpha;
 
@@ -63,14 +63,16 @@ namespace Jui
     GraphVertex(QWidget *graph);
     ~GraphVertex();
 
+    int ID;
     VertexType type;
+    
     void setType(VertexType newType);
-    void setID(int newID);
-
+    void setSelected(bool);
+    
     void draw(QPainter *painter);
 
   signals:
-   // void actSelected(int ID);
+    void actSelected(int ID);
 
   protected:
     virtual bool eventFilter(QObject * watched, QEvent * event);
@@ -78,7 +80,6 @@ namespace Jui
   private:
     bool isOver(QPointF mouse);
     bool focus, pressed;
-    int ID;
 
   };
 
@@ -247,8 +248,9 @@ namespace Jui
 
     public slots:
     void onDeletePoint(int ID);
-    void onMovePoint(int ID, int pixelX, int pixelY); //old - new onVertexMoved
+    //void onMovePoint(int ID, int pixelX, int pixelY); //old - new onVertexMoved
     
+    void onVertexSelected(int ID);
     void onVertexMoved();
 
   signals:

@@ -112,12 +112,14 @@ namespace Jui
     type = VertexType::vertex;
 
     connect(this, SIGNAL(actModify()), parentGraph, SLOT(onVertexMoved()));
-    //connect(this, SIGNAL(actSelected(int ID)), parentGraph, SLOT(onSelectVertex(int ID)));
+    connect(this, SIGNAL(actSelected(int)), parentGraph, SLOT(onVertexSelected(int)));
   }
 
   void GraphVertex::setType(VertexType vertexType)  { type = vertexType; }
 
-  void GraphVertex::setID(int newID) { ID = newID; }
+  //void GraphVertex::setID(int newID) { ID = newID; }
+
+  void GraphVertex::setSelected(bool select)  { focus = select; }
 
   bool GraphVertex::eventFilter(QObject* target, QEvent* event)
   {
@@ -135,6 +137,7 @@ namespace Jui
         focus = true;
         pressed = true;
         //this->redraw();
+        emit actSelected(ID);
         return true;
       }
       else {
@@ -691,26 +694,26 @@ namespace Jui
     testVertex1 = new GraphVertex(this);
     testVertex1->valueX = 0.15;
     testVertex1->valueY = 0.5;
-    testVertex1->setID(0);
+    testVertex1->ID = 0;
     testVertex1->setType(VertexType::startPoint);
     controlVertexs.append(testVertex1);
 
     testVertex2 = new GraphVertex(this);
     testVertex2->valueX = 0.25;
     testVertex2->valueY = 0.85;
-    testVertex2->setID(1);
+    testVertex2->ID = 1;
     controlVertexs.append(testVertex2);
 
     testVertex3 = new GraphVertex(this);
     testVertex3->valueX = 0.5;
     testVertex3->valueY = 0.5;
-    testVertex3->setID(2);
+    testVertex3->ID = 2;
     controlVertexs.append(testVertex3);
 
     testVertex4 = new GraphVertex(this);
     testVertex4->valueX = 0.75;
     testVertex4->valueY = 0.25;
-    testVertex4->setID(3);
+    testVertex4->ID = 3;
     testVertex4->setType(VertexType::endPoint);
     controlVertexs.append(testVertex4);
 
@@ -953,6 +956,7 @@ namespace Jui
     this->makeEnv();
     update();
   }
+  /*
   void Graph::onMovePoint(int ID, int pixelX, int pixelY)
   {
     qDebug() << "Graph::onMovePoint: " << QString::number(ID);
@@ -973,6 +977,17 @@ namespace Jui
 
     // this->sortPointsByX();
     this->makeEnv();
+  }
+  */
+  
+  void Graph::onVertexSelected(int ID)
+  {
+    // qDebug() << "Graph::onVertexSelected" << ID;
+    foreach(GraphVertex *oneV, controlVertexs)
+    {
+      if (oneV->ID == ID) { oneV->setSelected(true); }
+      else { oneV->setSelected(false); }
+    }
   }
 
   void Graph::onVertexMoved()
@@ -995,8 +1010,8 @@ namespace Jui
         if (controlVertexs[i]->valueX < controlVertexs[i - 1]->valueX)
         {
           sorted = false;
-          controlVertexs[i]->setID(i - 1);
-          controlVertexs[i - 1]->setID(i);
+          controlVertexs[i]->ID = i - 1;
+          controlVertexs[i - 1]->ID = i;
           controlVertexs.swap(i, i - 1);
           break;
         }
@@ -1190,9 +1205,9 @@ namespace Jui
         }
         if (controlVertexs[i]->valueX > vertex->valueX)
         {
-          vertex->setID(i);
+          vertex->ID = i;
           controlVertexs.insert(i, vertex);
-          tempInsertPos = i+1;
+          tempInsertPos = i + 1;
           break;
         }
       }
@@ -1202,7 +1217,7 @@ namespace Jui
     {
       for (int i = tempInsertPos; i < controlVertexs.size(); i++)
       {
-        controlVertexs[i]->setID(i);
+        controlVertexs[i]->ID = i;
       }
     }
 
