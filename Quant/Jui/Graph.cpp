@@ -264,14 +264,18 @@ namespace Jui
     from(pt1),
     to(pt2)
   {
-    curvature = "lin";
+    type = CurveType::lin;
     ID = -1;
     pixelWidth = to->getPixel().x() - from->getPixel().x();
 
     connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
   }
-
+  void GraphCurve::setType(CurveType newType)
+  {
+    type = newType;
+    emit actModify();
+  }
   void GraphCurve::setFrom(GraphVertex *pt)
   {
     disconnect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
@@ -301,6 +305,39 @@ namespace Jui
   {
     GraphObject::onObjectModify();
     pixelWidth = to->getPixel().x() - from->getPixel().x();
+
+    QPoint fromPt = from->getPixel();
+    QPoint toPt = to->getPixel();
+    polygon = QPolygon();
+    switch (type)
+    {
+    default:
+    case lin:
+      polygon.append(from->getPixel());
+      polygon.append(to->getPixel());
+      break;
+
+    case step:
+      polygon.append(fromPt);
+      polygon.append(QPoint(fromPt.x(), toPt.y()));
+      polygon.append(toPt);
+      break;
+
+    case hold:
+      polygon.append(fromPt);
+      polygon.append(QPoint(toPt.x(), fromPt.y()));
+      polygon.append(toPt);
+      break;
+    }
+
+    //float step = (to->valueX - from->valueX) / (float)pixelWidth;
+    qreal step = (to->valueX - from->valueX) / (qreal)10;
+    for (qreal i = from->valueX; i < to->valueX; i += step)
+    {
+      //qDebug() << "step i: " << i;
+      qreal y = qPow(i, 2);
+      // qDebug() << "step i: " << i << " is " << y;
+    }
   }
 
   void GraphCurve::draw(QPainter *painter)
@@ -320,16 +357,16 @@ namespace Jui
     painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
     painter->drawText(rectWidth, tr("px: %1").arg(QString::number(pixelWidth)), option);
 
-
     painter->setPen(QColor(40, 200, 40));
-    painter->drawLine(from->getPixel(), to->getPixel());
+    
+    painter->drawPolyline(polygon);
 
     if (modify)
     {
       QColor modifyColor = QColor(220, 200, 20);// modifyColor;
       modifyColor.setAlpha(modifyAlpha);
       painter->setPen(QPen(modifyColor, 2));
-      painter->drawLine(from->getPixel(), to->getPixel());
+      painter->drawPolyline(polygon);
     }
   }
 
@@ -802,6 +839,7 @@ namespace Jui
     controlCurves.append(testCurve1);
     testCurve2 = new GraphCurve(this, testVertex2, testVertex3);
     testCurve2->ID = 1;
+    testCurve2->setType(CurveType::hold);
     controlCurves.append(testCurve2);
     testCurve3 = new GraphCurve(this, testVertex3, testVertex4);
     testCurve3->ID = 2;
@@ -1117,6 +1155,8 @@ namespace Jui
           controlCurves[i - 2]->setTo(controlVertexs[i]);
           controlCurves[i - 1]->flipEnds();
           controlCurves[i]->setFrom(controlVertexs[i - 1]);
+          controlCurves[i - 2]->onObjectModify();
+          controlCurves[i]->onObjectModify();
 
           controlVertexs[i]->ID = i - 1;
           controlVertexs[i - 1]->ID = i;
@@ -1313,6 +1353,9 @@ namespace Jui
           GraphCurve *insertCurve = new GraphCurve(this, vertex, controlVertexs[i + 1]);
           insertCurve->ID = i - 1;
           controlCurves.insert(i, insertCurve);
+
+          controlCurves[i - 1]->onObjectModify();
+          controlCurves[i]->onObjectModify();
 
           tempInsertPos = i + 1;
           break;

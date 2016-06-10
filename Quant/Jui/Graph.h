@@ -3,10 +3,12 @@
 
 #include <QWidget>
 #include <QPainter>
+#include <QPainterPath>
 #include <QDebug>
 #include <QMouseEvent>
 #include <QLabel>
 #include <QTimer>
+#include <QtCore/qmath.h> 
 
 namespace Jui
 {
@@ -23,7 +25,7 @@ namespace Jui
     float valueX, valueY;
     QPoint getPixel();
     void setValue(QPoint pixel);
-    
+
     bool modify;
     int modifyAlpha;
 
@@ -65,10 +67,10 @@ namespace Jui
 
     int ID;
     VertexType type;
-    
+
     void setType(VertexType newType);
     void setSelected(bool);
-    
+
     void draw(QPainter *painter);
 
   signals:
@@ -89,6 +91,8 @@ namespace Jui
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH CURVE
 
+  enum CurveType { step, lin, nil, hold };
+
   class GraphCurve : public GraphObject
   {
     Q_OBJECT
@@ -96,9 +100,11 @@ namespace Jui
   public:
     GraphCurve(QWidget *graph, GraphVertex *pt1, GraphVertex *pt2);
     ~GraphCurve();
-    
-    int ID;
 
+    int ID;
+    CurveType type;
+
+    void setType(CurveType newType);
     void setFrom(GraphVertex *pt);
     void setTo(GraphVertex *pt);
     void flipEnds();
@@ -110,8 +116,9 @@ namespace Jui
 
   private:
     GraphVertex *from, *to;
-    QString curvature;
+
     int pixelWidth;
+    QPolygon polygon;
   };
 
   // GRAPH CURVE END
@@ -126,13 +133,13 @@ namespace Jui
   public:
     GraphAxis(QWidget *graph, float value, AxisType direction);
     ~GraphAxis();
-    
+
     void draw(QPainter *painter);
     void setValue(float newValue);
 
     public slots:
     void onDomainChanged(QPair<float, float>, QPair<float, float>);
-  
+
   private:
     GraphVertex *from, *to;
     AxisType type;
@@ -243,7 +250,7 @@ namespace Jui
     // GraphPoint *addStartPoint(QPointF newPt);
     // GraphPoint *addVertexPoint(QPointF newPt);
     // GraphPoint *addEndPoint(QPointF newPt);
-   // void setVertexPoint(int ID, QPointF newPt);
+    // void setVertexPoint(int ID, QPointF newPt);
     // void setVertexType(int ID, GraphPoint::PointType newType);
     // GraphPoint *getVertex(int ID);
 
@@ -261,7 +268,7 @@ namespace Jui
     public slots:
     //void onDeletePoint(int ID);
     //void onMovePoint(int ID, int pixelX, int pixelY); //old - new onVertexMoved
-    
+
     void onVertexSelected(int ID);
     void onVertexMoved(int ID);
     void onVertexDeleted(int ID);
