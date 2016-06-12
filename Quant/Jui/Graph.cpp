@@ -304,23 +304,51 @@ namespace Jui
   void GraphCurve::onObjectModify()
   {
     GraphObject::onObjectModify();
-    pixelWidth = to->getPixel().x() - from->getPixel().x();
 
     QPoint fromPt = from->getPixel();
     QPoint toPt = to->getPixel();
+    pixelWidth = toPt.x() - fromPt.x();
+    int cntSeg = 20;
+    qreal segStep = (to->valueX - from->valueX) / cntSeg;//  pixelWidth;
+
+
     polygon = QPolygon();
     switch (type)
     {
-    default:
-    case lin:
-      polygon.append(from->getPixel());
-      polygon.append(to->getPixel());
-      break;
-
     case step:
       polygon.append(fromPt);
       polygon.append(QPoint(fromPt.x(), toPt.y()));
       polygon.append(toPt);
+      break;
+
+    default:
+    case lin:
+      polygon.append(fromPt);
+      polygon.append(toPt);
+      break;
+
+    case exp:
+      qreal domFrom, domTo;
+      qreal pX, pY;
+
+      if (fromPt.y() < toPt.y()) { domFrom = -1; domTo = 0; }
+      else { domFrom = 0; domTo = 1; }
+
+      for (qreal percX = domFrom; percX <= domTo; percX += 1 / (qreal)cntSeg)
+      {
+        qreal percY = qPow(percX, 2);
+        if (fromPt.y() < toPt.y())
+        {
+          pX = (toPt.x() - fromPt.x())*(1 + percX) + fromPt.x();
+          pY = (fromPt.y() - toPt.y())*percY + toPt.y();
+        }
+        else
+        {
+          pX = (toPt.x() - fromPt.x())*percX + fromPt.x();
+          pY = (fromPt.y() - toPt.y())*(1 - percY) + toPt.y();
+        }
+        polygon.append(QPoint(pX, pY));
+      }
       break;
 
     case hold:
@@ -330,14 +358,7 @@ namespace Jui
       break;
     }
 
-    //float step = (to->valueX - from->valueX) / (float)pixelWidth;
-    qreal step = (to->valueX - from->valueX) / (qreal)10;
-    for (qreal i = from->valueX; i < to->valueX; i += step)
-    {
-      //qDebug() << "step i: " << i;
-      qreal y = qPow(i, 2);
-      // qDebug() << "step i: " << i << " is " << y;
-    }
+
   }
 
   void GraphCurve::draw(QPainter *painter)
@@ -358,7 +379,7 @@ namespace Jui
     painter->drawText(rectWidth, tr("px: %1").arg(QString::number(pixelWidth)), option);
 
     painter->setPen(QColor(40, 200, 40));
-    
+
     painter->drawPolyline(polygon);
 
     if (modify)
@@ -839,7 +860,7 @@ namespace Jui
     controlCurves.append(testCurve1);
     testCurve2 = new GraphCurve(this, testVertex2, testVertex3);
     testCurve2->ID = 1;
-    testCurve2->setType(CurveType::hold);
+    testCurve2->setType(CurveType::exp);
     controlCurves.append(testCurve2);
     testCurve3 = new GraphCurve(this, testVertex3, testVertex4);
     testCurve3->ID = 2;

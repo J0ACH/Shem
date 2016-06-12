@@ -91,7 +91,7 @@ namespace Jui
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH CURVE
 
-  enum CurveType { step, lin, nil, hold };
+  enum CurveType { step, lin, exp, hold };
 
   class GraphCurve : public GraphObject
   {
@@ -116,7 +116,7 @@ namespace Jui
 
   private:
     GraphVertex *from, *to;
-
+    
     int pixelWidth;
     QPolygon polygon;
   };
