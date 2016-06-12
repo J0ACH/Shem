@@ -310,7 +310,9 @@ namespace Jui
     pixelWidth = toPt.x() - fromPt.x();
     int cntSeg = 20;
     qreal segStep = (to->valueX - from->valueX) / cntSeg;//  pixelWidth;
-
+    qreal domFrom, domTo;
+    qreal pX, pY;
+    qreal percY;
 
     polygon = QPolygon();
     switch (type)
@@ -328,15 +330,15 @@ namespace Jui
       break;
 
     case exp:
-      qreal domFrom, domTo;
-      qreal pX, pY;
 
       if (fromPt.y() < toPt.y()) { domFrom = -1; domTo = 0; }
       else { domFrom = 0; domTo = 1; }
 
-      for (qreal percX = domFrom; percX <= domTo; percX += 1 / (qreal)cntSeg)
+      polygon.append(fromPt);
+
+      for (qreal percX = domFrom + 1 / (qreal)cntSeg; percX < domTo; percX += 1 / (qreal)cntSeg)
       {
-        qreal percY = qPow(percX, 2);
+        percY = qPow(percX, 2);
         if (fromPt.y() < toPt.y())
         {
           pX = (toPt.x() - fromPt.x())*(1 + percX) + fromPt.x();
@@ -349,6 +351,29 @@ namespace Jui
         }
         polygon.append(QPoint(pX, pY));
       }
+      polygon.append(toPt);
+      break;
+
+    case sin:
+      if (fromPt.y() < toPt.y()) { domFrom = M_PI_2 * 3; domTo = M_PI_2 * 5; }
+      else { domFrom = M_PI_2; domTo = M_PI_2 * 3; }
+
+      for (qreal percX = domFrom; percX < domTo; percX += (domTo - domFrom) / (qreal)cntSeg)
+      {
+        percY = qSin(percX);
+        if (fromPt.y() < toPt.y())
+        {
+          pX = (toPt.x() - fromPt.x())*(percX - domFrom) / M_PI + fromPt.x();
+          pY = (fromPt.y() - toPt.y())*(1 - percY) / 2 + toPt.y();
+        }
+        else
+        {
+          pX = (toPt.x() - fromPt.x())*(percX - domFrom) / M_PI + fromPt.x();
+          pY = (toPt.y() - fromPt.y())*(1 - percY) / 2 + fromPt.y();
+        }
+        polygon.append(QPoint(pX, pY));
+      }
+      polygon.append(toPt);
       break;
 
     case hold:
@@ -860,7 +885,7 @@ namespace Jui
     controlCurves.append(testCurve1);
     testCurve2 = new GraphCurve(this, testVertex2, testVertex3);
     testCurve2->ID = 1;
-    testCurve2->setType(CurveType::exp);
+    testCurve2->setType(CurveType::sin);
     controlCurves.append(testCurve2);
     testCurve3 = new GraphCurve(this, testVertex3, testVertex4);
     testCurve3->ID = 2;

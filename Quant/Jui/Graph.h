@@ -91,7 +91,7 @@ namespace Jui
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH CURVE
 
-  enum CurveType { step, lin, exp, hold };
+  enum CurveType { step, lin, exp, sin, hold };
 
   class GraphCurve : public GraphObject
   {
