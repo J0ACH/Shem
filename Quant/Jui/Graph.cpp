@@ -20,7 +20,6 @@ namespace Jui
     fps = 25;
     modifyTime = new QTimer(this);
 
-
     connect(this, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     connect(modifyTime, SIGNAL(timeout()), this, SLOT(onModifyTick()));
 
@@ -258,7 +257,7 @@ namespace Jui
   {
     QPoint center = this->getPixel();
     QRect rect(center.x() - 8, center.y() - 8, 16, 16);
-       
+
     /*
     QRect rectID(center.x() + 8, center.y(), 30, 20);
     QTextOption option;
@@ -562,6 +561,56 @@ namespace Jui
 
   // GRAPH AXIS END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH MOUSE 
+
+  GraphMouse::GraphMouse(QWidget *parent) : GraphObject(parent)
+  {
+    //parent->setMouseTracking(true);
+    //    mCoor = new Graph
+
+    parent->installEventFilter(this);
+
+    axisX = new GraphAxis(parent, 0.2, horizontal);
+    axisY = new GraphAxis(parent, 0.2, vertical);
+
+
+  }
+
+  bool GraphMouse::eventFilter(QObject* target, QEvent* event)
+  {
+    QMouseEvent *eventMouse;
+
+    switch (event->type())
+    {
+    case QEvent::MouseMove:
+
+      eventMouse = static_cast<QMouseEvent*>(event);
+      this->setValue(eventMouse->pos());
+
+      qDebug() << "mouseVal x: " << this->valueX << " y: " << this->valueY;
+      axisX->setValue(this->valueY);
+      axisY->setValue(this->valueX);
+
+     // this->redraw();
+
+      return true;
+      break;
+    }
+
+    return QObject::eventFilter(target, event);
+
+  }
+
+  void GraphMouse::draw(QPainter *painter)
+  {
+    axisX->draw(painter);
+    axisY->draw(painter);
+  }
+  GraphMouse::~GraphMouse(){}
+
+  // GRAPH MOUSE END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   // GRAPH POINT 
   /*
@@ -897,11 +946,11 @@ namespace Jui
     numGraphAxisX = 4;
     numGraphAxisY = 4;
 
-    //  controlPts = QList<GraphPoint*>();
     graphPolylines = new QPolygonF();
-    //    collPolylinesNEW = QList<QPolygonF*>();
 
     setFocusPolicy(Qt::StrongFocus);
+    
+    graphMouse = new GraphMouse(this); // musi byt zadan pred vertexema
 
     testVertex1 = new GraphVertex(this);
     testVertex1->valueX = 0.01;
@@ -950,6 +999,8 @@ namespace Jui
       GraphAxis *hAxis = new GraphAxis(this, i, AxisType::horizontal);
       graphHorizontalAxis.append(hAxis);
     }
+
+    
 
     this->sortVertexByX();
 
@@ -1419,6 +1470,7 @@ namespace Jui
     }
     //testObj->draw(painterGraphObject);
 
+    graphMouse->draw(painterGraphObject);
   }
 
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)

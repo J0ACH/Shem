@@ -124,7 +124,7 @@ namespace Jui
 
   private:
     GraphVertex *from, *to;
-    
+
     int pixelWidth;
     QPolygon polygon;
   };
@@ -153,6 +153,23 @@ namespace Jui
     AxisType type;
   };
 
+  class GraphMouse : public GraphObject
+  {
+    Q_OBJECT
+  
+  public:
+    GraphMouse(QWidget *graph);
+    ~GraphMouse();
+
+    void draw(QPainter *painter);
+
+  protected:
+    virtual bool eventFilter(QObject *watched, QEvent * event);
+
+  private:
+   // GraphObject *mCoor;
+    GraphAxis *axisX, *axisY;
+  };
 
   /*
   class GraphPoint : public QWidget
@@ -312,6 +329,7 @@ namespace Jui
     QList<GraphCurve*> controlCurves;
     QList<GraphAxis*> graphVerticalAxis;
     QList<GraphAxis*> graphHorizontalAxis;
+    GraphMouse *graphMouse;
 
     // QList<GraphPoint*> controlPts;
     //  QList<GraphPoint*> curvePts;
