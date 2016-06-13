@@ -10,6 +10,8 @@
 #include <QTimer>
 #include <QtCore/qmath.h> 
 
+#include "ControlBox.h"
+
 namespace Jui
 {
   // GRAPH OBJECT
@@ -73,6 +75,10 @@ namespace Jui
 
     void draw(QPainter *painter);
 
+    public slots:
+    void onCBoxValXChanged(QString);
+    void onCBoxValYChanged(QString);
+
   signals:
     void actMoved(int ID);
     void actSelected(int ID);
@@ -84,6 +90,8 @@ namespace Jui
   private:
     bool isOver(QPointF mouse);
     bool isSelcted, pressed;
+
+    ControlBox *cBoxX, *cBoxY;
 
   };
 

@@ -116,14 +116,50 @@ namespace Jui
 
     type = VertexType::vertex;
 
+    cBoxX = new ControlBox(parent);
+    cBoxX->setLabelSize(8);
+    cBoxX->setLabel("x");
+    cBoxX->hide();
+    cBoxY = new ControlBox(parent);
+    cBoxY->setLabel("y");
+    cBoxY->setLabelSize(8);
+    cBoxY->hide();
+
     connect(this, SIGNAL(actMoved(int)), parentGraph, SLOT(onVertexMoved(int)));
     connect(this, SIGNAL(actSelected(int)), parentGraph, SLOT(onVertexSelected(int)));
     connect(this, SIGNAL(actDeleted(int)), parentGraph, SLOT(onVertexDeleted(int)));
+
+    connect(cBoxX, SIGNAL(actValueChanged(QString)), this, SLOT(onCBoxValXChanged(QString)));
+    connect(cBoxY, SIGNAL(actValueChanged(QString)), this, SLOT(onCBoxValYChanged(QString)));
   }
 
   void GraphVertex::setType(VertexType vertexType)  { type = vertexType; }
 
-  void GraphVertex::setSelected(bool select)  { isSelcted = select; }
+  void GraphVertex::onCBoxValXChanged(QString txtVal)
+  {
+    valueX = txtVal.toFloat();
+    emit actModify();
+  }
+  void GraphVertex::onCBoxValYChanged(QString txtVal)
+  {
+    valueY = txtVal.toFloat();
+    emit actModify();
+  }
+
+  void GraphVertex::setSelected(bool select)
+  {
+    isSelcted = select;
+    if (isSelcted)
+    {
+      cBoxX->show();
+      cBoxY->show();
+    }
+    else
+    {
+      cBoxX->hide();
+      cBoxY->hide();
+    }
+  }
 
   bool GraphVertex::eventFilter(QObject* target, QEvent* event)
   {
@@ -137,6 +173,8 @@ namespace Jui
       if (this->isOver(eventMouse->pos()))
       {
         pressed = true;
+        cBoxX->setValue(QString::number(valueX, 'f', 2));
+        cBoxY->setValue(QString::number(valueY, 'f', 2));
         emit actSelected(ID);
         this->redraw();
         return true;
@@ -161,6 +199,9 @@ namespace Jui
           QPoint px = this->getPixel();
           this->setValue(QPoint(px.x(), eventMouse->pos().y()));
         }
+        cBoxX->setValue(QString::number(valueX, 'f', 2));
+        cBoxY->setValue(QString::number(valueY, 'f', 2));
+
         emit actMoved(ID);
       }
       this->redraw();
@@ -169,7 +210,7 @@ namespace Jui
     case QEvent::KeyPress:
       if (isSelcted)
       {
-        qDebug() << "GraphVertex::KeyPress" << ID;
+        // qDebug() << "GraphVertex::KeyPress" << ID;
 
         if (event->type() == QEvent::KeyPress)
         {
@@ -179,7 +220,6 @@ namespace Jui
           switch (eventKey->key())
           {
           case Qt::Key::Key_Delete:
-
             if (type == VertexType::vertex)
             {
               emit actDeleted(ID);
@@ -218,12 +258,19 @@ namespace Jui
   {
     QPoint center = this->getPixel();
     QRect rect(center.x() - 8, center.y() - 8, 16, 16);
-    QRect rectID(center.x() + 8, center.y() + 8, 30, 20);
-
+       
+    /*
+    QRect rectID(center.x() + 8, center.y(), 30, 20);
     QTextOption option;
     option.setAlignment(Qt::AlignCenter);
     painter->setPen(QColor(180, 180, 180));
     painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
+    */
+
+    QRect rectBoxX(center.x() + 8, center.y() + 8, 40, 17);
+    QRect rectBoxY(center.x() + 8, center.y() + 28, 40, 17);
+    cBoxX->setGeometry(rectBoxX);
+    cBoxY->setGeometry(rectBoxY);
 
     if (isSelcted) { painter->setPen(QColor(180, 20, 20)); }
     else { painter->setPen(QColor(180, 180, 180)); }
@@ -253,6 +300,8 @@ namespace Jui
   GraphVertex::~GraphVertex()
   {
     qDebug() << "Vertex ~DELETED" << ID;
+    cBoxX->close();
+    cBoxY->close();
   };
 
   // GRAPH VERTEX END
