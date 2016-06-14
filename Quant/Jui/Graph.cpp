@@ -315,6 +315,7 @@ namespace Jui
     type = CurveType::lin;
     ID = -1;
     pixelWidth = to->getPixel().x() - from->getPixel().x();
+    isMouseInDomain = false;
 
     connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
@@ -347,6 +348,19 @@ namespace Jui
 
     connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+  }
+
+  bool GraphCurve::isOverCurveDomain(float valX)
+  {
+    isMouseInDomain = true;
+    if (from->valueX > valX) { isMouseInDomain = false; return false; }
+    if (to->valueX < valX) { isMouseInDomain = false; return false; }
+    return true;
+  }
+
+  float GraphCurve::at(float valX)
+  {
+    return 0;
   }
 
   void GraphCurve::onObjectModify()
@@ -451,7 +465,8 @@ namespace Jui
     painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
     painter->drawText(rectWidth, tr("px: %1").arg(QString::number(pixelWidth)), option);
 
-    painter->setPen(QColor(40, 200, 40));
+    if (isMouseInDomain) { painter->setPen(QColor(180, 20, 20)); }
+    else { painter->setPen(QColor(40, 200, 40)); }
 
     painter->drawPolyline(polygon);
 
@@ -565,20 +580,23 @@ namespace Jui
 
   GraphMouse::GraphMouse(QWidget *parent) : GraphObject(parent)
   {
-    //parent->setMouseTracking(true);
-    //    mCoor = new Graph
+    Graph *parentGraph = qobject_cast<Graph*>(parent);
 
     parent->installEventFilter(this);
 
-    axisX = new GraphAxis(parent, 0.2, horizontal);
-    axisY = new GraphAxis(parent, 0.2, vertical);
+    axisX = new GraphAxis(parent, 0, horizontal);
+    axisY = new GraphAxis(parent, 0, vertical);
 
-
+    connect(
+      this, SIGNAL(actPositionChanged(QPair<float, float>)),
+      parentGraph, SLOT(onMouseMoved(QPair<float, float>))
+      );
   }
 
   bool GraphMouse::eventFilter(QObject* target, QEvent* event)
   {
     QMouseEvent *eventMouse;
+    QPair<float, float> mouseVal;
 
     switch (event->type())
     {
@@ -587,18 +605,20 @@ namespace Jui
       eventMouse = static_cast<QMouseEvent*>(event);
       this->setValue(eventMouse->pos());
 
-      qDebug() << "mouseVal x: " << this->valueX << " y: " << this->valueY;
+      mouseVal.first = this->valueX;
+      mouseVal.second = this->valueY;
+
+      // qDebug() << "mouseVal: " << mouseVal;
+      emit actPositionChanged(mouseVal);
+
       axisX->setValue(this->valueY);
       axisY->setValue(this->valueX);
-
-     // this->redraw();
 
       return true;
       break;
     }
 
     return QObject::eventFilter(target, event);
-
   }
 
   void GraphMouse::draw(QPainter *painter)
@@ -949,7 +969,7 @@ namespace Jui
     graphPolylines = new QPolygonF();
 
     setFocusPolicy(Qt::StrongFocus);
-    
+
     graphMouse = new GraphMouse(this); // musi byt zadan pred vertexema
 
     testVertex1 = new GraphVertex(this);
@@ -1000,7 +1020,7 @@ namespace Jui
       graphHorizontalAxis.append(hAxis);
     }
 
-    
+
 
     this->sortVertexByX();
 
@@ -1248,6 +1268,16 @@ namespace Jui
   this->makeEnv();
   }
   */
+
+  void Graph::onMouseMoved(QPair<float, float> mouseValue)
+  {
+    //qDebug() << "Graph::onMouseMoved x: " << mouseValue.first << " y: " << mouseValue.second;
+    foreach(GraphCurve *oneC, controlCurves)
+    {
+      oneC->isOverCurveDomain(mouseValue.first);
+    }
+   // this->update();
+  }
 
   void Graph::onVertexSelected(int ID)
   {

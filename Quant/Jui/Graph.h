@@ -117,6 +117,9 @@ namespace Jui
     void setTo(GraphVertex *pt);
     void flipEnds();
 
+    bool isOverCurveDomain(float valX);
+    float at(float valX);
+
     void draw(QPainter *painter);
 
     public slots:
@@ -127,6 +130,8 @@ namespace Jui
 
     int pixelWidth;
     QPolygon polygon;
+
+    bool isMouseInDomain;
   };
 
   // GRAPH CURVE END
@@ -156,18 +161,21 @@ namespace Jui
   class GraphMouse : public GraphObject
   {
     Q_OBJECT
-  
+
   public:
     GraphMouse(QWidget *graph);
     ~GraphMouse();
 
     void draw(QPainter *painter);
 
+  signals:
+    void actPositionChanged(QPair<float, float>);
+
   protected:
     virtual bool eventFilter(QObject *watched, QEvent * event);
 
   private:
-   // GraphObject *mCoor;
+    // GraphObject *mCoor;
     GraphAxis *axisX, *axisY;
   };
 
@@ -294,6 +302,7 @@ namespace Jui
     //void onDeletePoint(int ID);
     //void onMovePoint(int ID, int pixelX, int pixelY); //old - new onVertexMoved
 
+    void onMouseMoved(QPair<float, float>);
     void onVertexSelected(int ID);
     void onVertexMoved(int ID);
     void onVertexDeleted(int ID);
