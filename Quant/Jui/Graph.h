@@ -124,6 +124,7 @@ namespace Jui
 
     public slots:
     void onObjectModify();
+    void onCBoxTypeChanged(QString);
 
   private:
     GraphVertex *from, *to;
@@ -132,6 +133,8 @@ namespace Jui
     QPolygon polygon;
 
     bool isMouseInDomain;
+
+    ControlBox *cBoxType;
   };
 
   // GRAPH CURVE END
@@ -169,7 +172,7 @@ namespace Jui
     float crvVal;
 
     void draw(QPainter *painter);
-    
+
   signals:
     void actPositionChanged(QPair<float, float>);
 

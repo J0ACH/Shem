@@ -317,12 +317,40 @@ namespace Jui
     pixelWidth = to->getPixel().x() - from->getPixel().x();
     isMouseInDomain = false;
 
+    cBoxType = new ControlBox(parent);
+    cBoxType->setLabelSize(15);
+    cBoxType->setLabel("crv");
+    cBoxType->setValue("lin");
+    cBoxType->show();
+    //cBoxType->hide();
+
     connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
     connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    connect(cBoxType, SIGNAL(actValueChanged(QString)), this, SLOT(onCBoxTypeChanged(QString)));
   }
   void GraphCurve::setType(CurveType newType)
   {
     type = newType;
+    switch (type)
+    {
+    case CurveType::step:
+      cBoxType->setValue("step");
+      break;
+    default:
+    case CurveType::lin:
+      cBoxType->setValue("lin");
+      break;
+    case CurveType::exp:
+      cBoxType->setValue("exp");
+      break;
+    case CurveType::sin:
+      cBoxType->setValue("sin");
+      break;
+    case CurveType::hold:
+      cBoxType->setValue("hold");
+      break;
+    }
+
     emit actModify();
   }
   void GraphCurve::setFrom(GraphVertex *pt)
@@ -365,17 +393,21 @@ namespace Jui
 
     switch (type)
     {
-    case step:
+    case CurveType::step:
       valAt = to->valueY;
       break;
 
     default:
-    case lin:
+    case CurveType::lin:
       valAt = (to->valueY - from->valueY)*percX + from->valueY;
+      break;
+
+    case CurveType::hold:
+      valAt = from->valueY;
       break;
     }
 
-   // qDebug() << "valX " << valX << " AT: " << valAt;
+    // qDebug() << "valX " << valX << " AT: " << valAt;
     return valAt;
   }
 
@@ -464,6 +496,17 @@ namespace Jui
 
   }
 
+  void GraphCurve::onCBoxTypeChanged(QString txtType)
+  {
+    if (txtType == "step") { this->setType(CurveType::step); }
+    else if (txtType == "exp") { this->setType(CurveType::exp); }
+    else if (txtType == "sin") { this->setType(CurveType::sin); }
+    else if (txtType == "hold") { this->setType(CurveType::hold); }
+    else { this->setType(CurveType::lin); /*cBoxType->setValue("lin");*/ }
+
+    this->onObjectModify();
+  }
+
   void GraphCurve::draw(QPainter *painter)
   {
     QPoint fromPt = from->getPixel();
@@ -472,14 +515,17 @@ namespace Jui
     center.setX((toPt.x() + fromPt.x()) / 2);
     center.setY((toPt.y() + fromPt.y()) / 2);
 
+    QRect rectBoxType(center.x() - 20, center.y() - 8, 40, 16);
+    cBoxType->setGeometry(rectBoxType);
+
     QRect rectID(center.x(), center.y(), 30, 20);
     QRect rectWidth(center.x(), center.y() + 15, 50, 20);
 
     QTextOption option;
     option.setAlignment(Qt::AlignLeft);
     painter->setPen(QColor(180, 180, 180));
-    painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
-    painter->drawText(rectWidth, tr("px: %1").arg(QString::number(pixelWidth)), option);
+    //painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
+    //painter->drawText(rectWidth, tr("px: %1").arg(QString::number(pixelWidth)), option);
 
     if (isMouseInDomain) { painter->setPen(QColor(180, 20, 20)); }
     else { painter->setPen(QColor(40, 200, 40)); }
@@ -633,7 +679,6 @@ namespace Jui
       return true;
       break;
     }
-
     return QObject::eventFilter(target, event);
   }
 
@@ -645,9 +690,13 @@ namespace Jui
     curvePt->valueX = this->valueX;
     curvePt->valueY = this->crvVal;
     QPoint centerPt = curvePt->getPixel();
+    QRect rectVal(centerPt.x() - 15, centerPt.y() - 20, 30, 20);
 
+    QTextOption option;
+    option.setAlignment(Qt::AlignCenter);
     painter->setPen(QColor(230, 230, 230));
     painter->drawEllipse(centerPt, 2, 2);
+    painter->drawText(rectVal, QString::number(crvVal, 'f', 2), option);
   }
   GraphMouse::~GraphMouse(){}
 
@@ -1297,7 +1346,7 @@ namespace Jui
     {
       if (oneC->isOverCurveDomain(mouseValue.first))
       {
-       // qDebug() << "Graph::onMouseMoved ID " << oneC->ID << " -> at: " << oneC->at(mouseValue.first);
+        // qDebug() << "Graph::onMouseMoved ID " << oneC->ID << " -> at: " << oneC->at(mouseValue.first);
         graphMouse->crvVal = oneC->at(mouseValue.first);
       }
     }
