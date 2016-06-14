@@ -389,6 +389,7 @@ namespace Jui
   float GraphCurve::at(float valX)
   {
     float percX = (valX - from->valueX) / (to->valueX - from->valueX);
+    qreal domFrom, domTo;
     float valAt;
 
     switch (type)
@@ -400,6 +401,24 @@ namespace Jui
     default:
     case CurveType::lin:
       valAt = (to->valueY - from->valueY)*percX + from->valueY;
+      break;
+
+    case CurveType::exp:
+      if (from->valueY < to->valueY)
+      {
+        valAt = (to->valueY - from->valueY)*qPow(percX, 2) + from->valueY;
+      }
+      else
+      {
+        valAt = (to->valueY - from->valueY)*qPow(-percX, 2) + from->valueY;
+      }
+      /*
+{ domFrom = -1; domTo = 0; }
+else { domFrom = 0; domTo = 1; }
+
+
+valAt = (to->valueY - from->valueY)*qPow(percX, 2) + from->valueY;
+*/
       break;
 
     case CurveType::hold:
@@ -502,7 +521,7 @@ namespace Jui
     else if (txtType == "exp") { this->setType(CurveType::exp); }
     else if (txtType == "sin") { this->setType(CurveType::sin); }
     else if (txtType == "hold") { this->setType(CurveType::hold); }
-    else { this->setType(CurveType::lin); /*cBoxType->setValue("lin");*/ }
+    else { this->setType(CurveType::lin); }
 
     this->onObjectModify();
   }
