@@ -360,7 +360,23 @@ namespace Jui
 
   float GraphCurve::at(float valX)
   {
-    return 0;
+    float percX = (valX - from->valueX) / (to->valueX - from->valueX);
+    float valAt;
+
+    switch (type)
+    {
+    case step:
+      valAt = to->valueY;
+      break;
+
+    default:
+    case lin:
+      valAt = (to->valueY - from->valueY)*percX + from->valueY;
+      break;
+    }
+
+   // qDebug() << "valX " << valX << " AT: " << valAt;
+    return valAt;
   }
 
   void GraphCurve::onObjectModify()
@@ -586,6 +602,7 @@ namespace Jui
 
     axisX = new GraphAxis(parent, 0, horizontal);
     axisY = new GraphAxis(parent, 0, vertical);
+    curvePt = new GraphObject(parent);
 
     connect(
       this, SIGNAL(actPositionChanged(QPair<float, float>)),
@@ -608,7 +625,6 @@ namespace Jui
       mouseVal.first = this->valueX;
       mouseVal.second = this->valueY;
 
-      // qDebug() << "mouseVal: " << mouseVal;
       emit actPositionChanged(mouseVal);
 
       axisX->setValue(this->valueY);
@@ -625,6 +641,13 @@ namespace Jui
   {
     axisX->draw(painter);
     axisY->draw(painter);
+
+    curvePt->valueX = this->valueX;
+    curvePt->valueY = this->crvVal;
+    QPoint centerPt = curvePt->getPixel();
+
+    painter->setPen(QColor(230, 230, 230));
+    painter->drawEllipse(centerPt, 2, 2);
   }
   GraphMouse::~GraphMouse(){}
 
@@ -1020,8 +1043,6 @@ namespace Jui
       graphHorizontalAxis.append(hAxis);
     }
 
-
-
     this->sortVertexByX();
 
     emit actDomainChanged(domainX, domainY);
@@ -1274,9 +1295,13 @@ namespace Jui
     //qDebug() << "Graph::onMouseMoved x: " << mouseValue.first << " y: " << mouseValue.second;
     foreach(GraphCurve *oneC, controlCurves)
     {
-      oneC->isOverCurveDomain(mouseValue.first);
+      if (oneC->isOverCurveDomain(mouseValue.first))
+      {
+       // qDebug() << "Graph::onMouseMoved ID " << oneC->ID << " -> at: " << oneC->at(mouseValue.first);
+        graphMouse->crvVal = oneC->at(mouseValue.first);
+      }
     }
-   // this->update();
+    // this->update();
   }
 
   void Graph::onVertexSelected(int ID)

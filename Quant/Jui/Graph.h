@@ -166,8 +166,10 @@ namespace Jui
     GraphMouse(QWidget *graph);
     ~GraphMouse();
 
-    void draw(QPainter *painter);
+    float crvVal;
 
+    void draw(QPainter *painter);
+    
   signals:
     void actPositionChanged(QPair<float, float>);
 
@@ -177,6 +179,7 @@ namespace Jui
   private:
     // GraphObject *mCoor;
     GraphAxis *axisX, *axisY;
+    GraphObject *curvePt;
   };
 
   /*
