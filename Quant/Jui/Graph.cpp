@@ -410,15 +410,20 @@ namespace Jui
       }
       else
       {
-        valAt = (to->valueY - from->valueY)*qPow(-percX, 2) + from->valueY;
+        valAt = (from->valueY - to->valueY)*qPow((1 - percX), 2) + to->valueY;
       }
-      /*
-{ domFrom = -1; domTo = 0; }
-else { domFrom = 0; domTo = 1; }
+      break;
 
+    case CurveType::sin:
+      percX = M_1_PI*percX;
+      if (from->valueY < to->valueY)
+      {
+        valAt = (to->valueY - from->valueY)*qSin(percX) + from->valueY;
+      }
+      else
+      {
 
-valAt = (to->valueY - from->valueY)*qPow(percX, 2) + from->valueY;
-*/
+      }
       break;
 
     case CurveType::hold:
@@ -489,7 +494,7 @@ valAt = (to->valueY - from->valueY)*qPow(percX, 2) + from->valueY;
 
       for (qreal percX = domFrom; percX < domTo; percX += (domTo - domFrom) / (qreal)cntSeg)
       {
-        percY = qSin(percX);
+        percY = qSin(percX); // qCos - moznost
         if (fromPt.y() < toPt.y())
         {
           pX = (toPt.x() - fromPt.x())*(percX - domFrom) / M_PI + fromPt.x();
@@ -1065,20 +1070,20 @@ valAt = (to->valueY - from->valueY)*qPow(percX, 2) + from->valueY;
 
     testVertex1 = new GraphVertex(this);
     testVertex1->valueX = 0.01;
-    testVertex1->valueY = 0.5;
+    testVertex1->valueY = 0.75;
     testVertex1->ID = 0;
     testVertex1->setType(VertexType::startPoint);
     controlVertexs.append(testVertex1);
 
     testVertex2 = new GraphVertex(this);
-    testVertex2->valueX = 0.25;
-    testVertex2->valueY = 0.85;
+    testVertex2->valueX = 0.15;
+    testVertex2->valueY = 0.15;
     testVertex2->ID = 1;
     controlVertexs.append(testVertex2);
 
     testVertex3 = new GraphVertex(this);
-    testVertex3->valueX = 0.5;
-    testVertex3->valueY = 0.5;
+    testVertex3->valueX = 0.75;
+    testVertex3->valueY = 0.85;
     testVertex3->ID = 2;
     controlVertexs.append(testVertex3);
 
@@ -1091,6 +1096,7 @@ valAt = (to->valueY - from->valueY)*qPow(percX, 2) + from->valueY;
 
     testCurve1 = new GraphCurve(this, testVertex1, testVertex2);
     testCurve1->ID = 0;
+    testCurve1->setType(CurveType::sin);
     controlCurves.append(testCurve1);
     testCurve2 = new GraphCurve(this, testVertex2, testVertex3);
     testCurve2->ID = 1;
