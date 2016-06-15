@@ -415,14 +415,30 @@ namespace Jui
       break;
 
     case CurveType::sin:
-      percX = M_1_PI*percX;
+      //percX = M_1_PI * percX + ;
+      
       if (from->valueY < to->valueY)
       {
-        valAt = (to->valueY - from->valueY)*qSin(percX) + from->valueY;
+        domFrom = 3 * M_PI_2;
+        domTo = 5 * M_PI_2;
+        
+        //qDebug() << "percX" << percX;
+        //qDebug() << "(domTo-domFrom) * percX + domFrom" << (domTo - domFrom) * percX + domFrom;
+        percX = (domTo - domFrom) * percX + domFrom;
+        //qDebug() << "percX2" << percX;
+        valAt = ((to->valueY - from->valueY)*qSin(percX) + (to->valueY - from->valueY)) / 2 + from->valueY;
       }
       else
       {
+        domFrom = M_PI_2;
+        domTo = 3 * M_PI_2;
 
+        qDebug() << "percX" << percX;
+       // qDebug() << "(domTo-domFrom) * percX + domFrom" << (domTo - domFrom) * percX + domFrom;
+        percX = (domTo - domFrom) * percX + domFrom;
+        qDebug() << "percX2" << percX;
+        //valAt = ((from->valueY - to->valueY)*qSin(percX) + to->valueY) / 2;
+        valAt = ((from->valueY - to->valueY)*qSin(percX) + (from->valueY - to->valueY)) / 2 + to->valueY;
       }
       break;
 
@@ -1076,7 +1092,7 @@ namespace Jui
     controlVertexs.append(testVertex1);
 
     testVertex2 = new GraphVertex(this);
-    testVertex2->valueX = 0.15;
+    testVertex2->valueX = 0.55;
     testVertex2->valueY = 0.15;
     testVertex2->ID = 1;
     controlVertexs.append(testVertex2);
