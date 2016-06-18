@@ -26,6 +26,7 @@ namespace Jui
 
     float valueX, valueY;
     QPoint getPixel();
+    QPoint getPixel(QPointF valuePoint);
     void setValue(QPoint pixel);
 
     bool modify;
@@ -99,7 +100,7 @@ namespace Jui
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH CURVE
 
-  enum CurveType { step, lin, exp, sin, hold };
+  enum CurveType { step, lin, exp, sin, welch, hold };
 
   class GraphCurve : public GraphObject
   {
