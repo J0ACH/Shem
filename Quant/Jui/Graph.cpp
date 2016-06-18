@@ -33,7 +33,7 @@ namespace Jui
 
   void GraphObject::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
   {
-    qDebug() << "GraphObject::onDomainChanged domX" << domX << "domY" << domY;
+    //  qDebug() << "GraphObject::onDomainChanged domX" << domX << "domY" << domY;
     domainX = domX;
     domainY = domY;
     emit actModify();
@@ -41,7 +41,7 @@ namespace Jui
 
   void GraphObject::onGraphResized(QSize newSize)
   {
-    qDebug() << "GraphObject::onGraphResized newSize" << newSize;
+    //  qDebug() << "GraphObject::onGraphResized newSize" << newSize;
     graphSize = newSize;
     emit actModify();
   }
@@ -569,8 +569,7 @@ namespace Jui
 
   GraphCurve::~GraphCurve()
   {
-    from->deleteLater();
-    to->deleteLater();
+    qDebug() << "Curve ~DELETED" << ID;
     cBoxType->close();
   };
 
@@ -1050,17 +1049,17 @@ namespace Jui
 
   void Graph::onVertexDeleted(int ID)
   {
-    // qDebug() << "Graph::onVertexDeleted: " << ID;
+    //     qDebug() << "Graph::onVertexDeleted: " << ID;
     controlVertexs.removeAt(ID);
-    //controlCurves[ID]->deleteLater();
-    controlCurves.removeAt(ID);
-    controlCurves[ID - 1]->setTo(controlVertexs[ID]);
-    controlCurves[ID - 1]->onObjectModify();
-
     for (int i = ID; i < controlVertexs.size(); i++)
     {
       controlVertexs[i]->ID = i;
     }
+
+    controlCurves[ID - 1]->setTo(controlVertexs[ID]);
+    controlCurves[ID - 1]->onObjectModify();
+    controlCurves[ID]->deleteLater();
+    controlCurves.removeAt(ID);
     for (int i = ID - 1; i < controlVertexs.size() - 1; i++)
     {
       controlCurves[i]->ID = i;
