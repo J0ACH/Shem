@@ -28,6 +28,8 @@ namespace Jui
     QPoint getPixel();
     QPoint getPixel(QPointF valuePoint);
     void setValue(QPoint pixel);
+    void setValueX(float valX);
+    void setValueY(float valY);
 
     float getDomainX_min(), getDomainX_max(), getDomainY_min(), getDomainY_max();
 
@@ -163,7 +165,7 @@ namespace Jui
     void onDomainChanged(QPair<float, float>, QPair<float, float>);
 
   private:
-    GraphVertex *from, *to;
+    GraphObject *from, *to;
     AxisType type;
   };
 
@@ -236,9 +238,6 @@ namespace Jui
     int numGraphAxisX, numGraphAxisY;
 
     QPainter *painterGraphObject;
-    GraphVertex *testVertex1, *testVertex2, *testVertex3, *testVertex4;
-    GraphCurve *testCurve1, *testCurve2, *testCurve3;
-
     QList<GraphVertex*> controlVertexs;
     QList<GraphCurve*> controlCurves;
     QList<GraphAxis*> graphVerticalAxis;

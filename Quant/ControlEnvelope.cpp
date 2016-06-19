@@ -148,7 +148,7 @@ namespace QuantIDE
       }
 
       envGraph->setDomainX(0, duration);
-      envGraph->setDomainY(minLevel, maxLevel);
+      envGraph->setDomainY(minLevel, maxLevel); 
     }
   }
 
@@ -158,21 +158,21 @@ namespace QuantIDE
 
     //stane se jen pri prvnim nastaveni env
     if (env.isEmpty()) { envelopeCode->setText(envCode); }
-   
+
 
     qDebug() << "Graph::setEnv ENV TEST -> " << env;
 
     changedCntVertex = false;
     this->getEnvArray(envCode);
-    
+    /*
+qDebug() << "Graph::setEnv [string] -> "
+<< "levels: " << levels
+<< "times: " << times
+<< "curves: " << curves;
+*/
+
     previousEnv = env;
     env = this->getEnv();
-
-    qDebug() << "Graph::setEnv [string] -> "
-      << "levels: " << levels
-      << "times: " << times
-      << "curves: " << curves;
-
 
     emit actEnvChanged(levels, times, curves);
 
@@ -268,7 +268,6 @@ namespace QuantIDE
 
 
 
-    update();
     this->makeTask(env);
     envelopeCode->setText(env);
   }

@@ -102,6 +102,17 @@ namespace Jui
     emit actModify();
   }
 
+  void GraphObject::setValueX(float valX)
+  {
+    valueX = valX;
+    emit actModify();
+  }
+  void GraphObject::setValueY(float valY)
+  {
+    valueY = valY;
+    emit actModify();
+  }
+
   void GraphObject::draw(QPainter *painter)
   {
     painter->setPen(Qt::white);
@@ -269,10 +280,10 @@ namespace Jui
   void GraphVertex::draw(QPainter *painter)
   {
     QPoint center = this->getPixel();
-    QRect rect(center.x() - 8, center.y() - 8, 16, 16);
+    QRect rect(center.x() - 6, center.y() - 6, 13, 13);
 
     /*
-    QRect rectID(center.x() + 8, center.y(), 30, 20);
+    QRect rectID(center.x() + 8, center.y() - 20, 30, 20);
     QTextOption option;
     option.setAlignment(Qt::AlignCenter);
     painter->setPen(QColor(180, 180, 180));
@@ -289,12 +300,15 @@ namespace Jui
 
     switch (type)
     {
+      //case startPoint:
     case vertex:
-      painter->drawEllipse(this->getPixel(), 6, 6);
+      painter->drawEllipse(center, 4, 4);
       break;
+
     case startPoint:
       painter->drawChord(rect, 16 * 270, 16 * 180);
       break;
+
     case endPoint:
       painter->drawChord(rect, 16 * 90, 16 * 180);
       break;
@@ -601,8 +615,8 @@ namespace Jui
   {
     Graph *parentGraph = qobject_cast<Graph*>(parent);
 
-    from = new GraphVertex(parent);
-    to = new GraphVertex(parent);
+    from = new GraphObject(parent);
+    to = new GraphObject(parent);
 
     switch (type)
     {
@@ -769,50 +783,29 @@ namespace Jui
     numGraphAxisX = 4;
     numGraphAxisY = 4;
 
-    //  graphPolylines = new QPolygonF();
-
     setFocusPolicy(Qt::StrongFocus);
 
     graphMouse = new GraphMouse(this); // musi byt zadan pred vertexema
 
-    testVertex1 = new GraphVertex(this);
-    testVertex1->valueX = 0.0;
-    testVertex1->valueY = 0.75;
-    testVertex1->ID = 0;
-    testVertex1->setType(VertexType::startPoint);
-    controlVertexs.append(testVertex1);
+    GraphVertex *startVertex = new GraphVertex(this);
+    startVertex->valueX = 0.0;
+    startVertex->valueY = 0.0;
+    startVertex->ID = 0;
+    startVertex->setType(VertexType::startPoint);
+    controlVertexs.append(startVertex);
 
-    testVertex2 = new GraphVertex(this);
-    testVertex2->valueX = 0.55;
-    testVertex2->valueY = 0.15;
-    testVertex2->ID = 1;
-    controlVertexs.append(testVertex2);
+    GraphVertex *endVertex = new GraphVertex(this);
+    endVertex->valueX = 1.0;
+    endVertex->valueY = 0.0;
+    endVertex->ID = 1;
+    endVertex->setType(VertexType::endPoint);
+    controlVertexs.append(endVertex);
 
-    testVertex3 = new GraphVertex(this);
-    testVertex3->valueX = 0.75;
-    testVertex3->valueY = 0.85;
-    testVertex3->ID = 2;
-    controlVertexs.append(testVertex3);
+    GraphCurve *baseCurve = new GraphCurve(this, startVertex, endVertex);
+    baseCurve->ID = 0;
+    baseCurve->setType(CurveType::sin);
+    controlCurves.append(baseCurve);
 
-    testVertex4 = new GraphVertex(this);
-    testVertex4->valueX = 0.99;
-    testVertex4->valueY = 0.25;
-    testVertex4->ID = 3;
-    testVertex4->setType(VertexType::endPoint);
-    controlVertexs.append(testVertex4);
-
-    testCurve1 = new GraphCurve(this, testVertex1, testVertex2);
-    testCurve1->ID = 0;
-    testCurve1->setType(CurveType::exp);
-    controlCurves.append(testCurve1);
-    testCurve2 = new GraphCurve(this, testVertex2, testVertex3);
-    testCurve2->ID = 1;
-    testCurve2->setType(CurveType::sin);
-    controlCurves.append(testCurve2);
-    testCurve3 = new GraphCurve(this, testVertex3, testVertex4);
-    testCurve3->ID = 2;
-    testCurve3->setType(CurveType::welch);
-    controlCurves.append(testCurve3);
 
     for (double i = 0; i <= 1; i += 0.25)
     {
@@ -838,37 +831,45 @@ namespace Jui
 
   void Graph::setDomainX(float min, float max)
   {
-    domainX.first = min;
-    domainX.second = max;
+    bool isModify = false;
+    if (domainX.first != min) { domainX.first = min; isModify = true; }
+    if (domainX.second != max) { domainX.second = max; isModify = true; }
 
-    float tempAxisVal = min;
-    foreach(GraphAxis *oneAxis, graphVerticalAxis)
+    if (isModify)
     {
-      oneAxis->setValue(tempAxisVal);
-      tempAxisVal += (max - min) / (float)numGraphAxisX;
+      float tempAxisVal = min;
+      foreach(GraphAxis *oneAxis, graphVerticalAxis)
+      {
+        oneAxis->setValue(tempAxisVal);
+        tempAxisVal += (max - min) / (float)numGraphAxisX;
+      }
+      
+      // roztahuje posledni bod podle domenyX
+      controlVertexs[controlVertexs.size()-1]->setValueX(max);
+      controlCurves[controlCurves.size()-1]->onObjectModify();
+      // nic moc setup, dodelat
+
+      update();
+      emit actDomainChanged(domainX, domainY);
     }
-
-    update();
-
-    emit actDomainChanged(domainX, domainY);
-
-    // qDebug() << "GraphObject test return maxDomainX : " << testObj->test();
   }
   void Graph::setDomainY(float min, float max)
   {
-    domainY.first = min;
-    domainY.second = max;
+    bool isModify = false;
+    if (domainY.first != min) { domainY.first = min; isModify = true; }
+    if (domainY.second != max) { domainY.second = max; isModify = true; }
 
-    float tempAxisVal = min;
-    foreach(GraphAxis *oneAxis, graphHorizontalAxis)
+    if (isModify)
     {
-      oneAxis->setValue(tempAxisVal);
-      tempAxisVal += (max - min) / (float)numGraphAxisY;
+      float tempAxisVal = min;
+      foreach(GraphAxis *oneAxis, graphHorizontalAxis)
+      {
+        oneAxis->setValue(tempAxisVal);
+        tempAxisVal += (max - min) / (float)numGraphAxisY;
+      }
+      update();
+      emit actDomainChanged(domainX, domainY);
     }
-
-    update();
-
-    emit actDomainChanged(domainX, domainY);
   }
 
   QPair<float, float> Graph::getDomainX() { return domainX; }
@@ -928,9 +929,9 @@ namespace Jui
 
   void Graph::onCurveTypeChanged(int ID)
   {
-    this->makeEnv();    
-   // graphMouse->event(new QEvent(QEvent::MouseMove));    
-   // graphMouse->eventFilter(this, new QEvent(QEvent::MouseMove));
+    this->makeEnv();
+    // graphMouse->event(new QEvent(QEvent::MouseMove));    
+    // graphMouse->eventFilter(this, new QEvent(QEvent::MouseMove));
   }
 
   void Graph::sortVertexByX()
@@ -1034,10 +1035,11 @@ namespace Jui
       << "times: " << times
       << "curves: " << curves;
 
+    QList<double> timePosition;
     double previousTime = 0.0;
     foreach(double oneT, times)
     {
-      oneT += previousTime;
+      timePosition.append(oneT + previousTime);
       previousTime = oneT;
       qDebug() << "Graph::oneT " << oneT << "previousTime" << previousTime;
     }
@@ -1048,11 +1050,59 @@ namespace Jui
     {
       if (i < controlVertexs.size())
       {
-        qDebug() << "Graph::onEnvChanged -> set ID " << i;
+        //  qDebug() << "Graph::abs(controlVertexs[i]->valueY - levels[i]) > 0.01 -> " << abs(controlVertexs[i]->valueY - levels[i]);
+        if (abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
+        {
+          //  qDebug() << "Graph::onEnvChanged -> set level for ID " << i;
+          controlVertexs[i]->setValueY(levels[i]);
+        }
+        else
+        {
+          //  qDebug() << "Graph::onEnvChanged -> no CHANGE ID " << i;
+        }
       }
       else
       {
-        qDebug() << "Graph::onEnvChanged -> add ID " << i;
+        // qDebug() << "Graph::onEnvChanged -> add ID " << i;
+      }
+    }
+
+    for (int i = 1; i < timePosition.size(); i++)
+    {
+      if (i < controlVertexs.size() - 1)
+      {
+        //qDebug() << "Graph::abs(controlVertexs[i]->valueX - times[i]) > 0.01 -> " << abs(controlVertexs[i]->valueX - positionX[i - 1]);
+        if (abs(controlVertexs[i]->valueX - timePosition[i - 1]) > 0.01)
+        {
+          qDebug() << "Graph::onEnvChanged -> set time for ID " << i;
+          controlVertexs[i]->setValueX(timePosition[i - 1]);
+        }
+        else
+        {
+          //qDebug() << "Graph::onEnvChanged -> no CHANGE ID " << i;
+        }
+      }
+      else
+      {
+        // qDebug() << "Graph::onEnvChanged -> add ID " << i;
+      }
+    }
+
+    for (int i = 1; i < curves.size(); i++)
+    {
+      if (i < controlCurves.size())
+      {
+        //if (curves[i] != controlCurves[i]->type)
+        // controlCurves[i]->onCBoxTypeChanged(curves[i]);
+
+        if (curves[i] == "'step'") { controlCurves[i]->setType(CurveType::step); }
+        else if (curves[i] == "'exp'") { controlCurves[i]->setType(CurveType::exp); }
+        else if (curves[i] == "'sin'") { controlCurves[i]->setType(CurveType::sin); }
+        else if (curves[i] == "'welch'") { controlCurves[i]->setType(CurveType::welch); }
+        else if (curves[i] == "'hold'") { controlCurves[i]->setType(CurveType::hold); }
+        else { controlCurves[i]->setType(CurveType::lin); }
+
+        controlCurves[i]->onObjectModify();
       }
     }
   }
