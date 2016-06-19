@@ -31,8 +31,9 @@ namespace QuantIDE
 
     void getEnvArray(QString env);
     QString getEnv();
-    QPointF getEnvVertex(int ID);
-    QPointF getEnvMidCurve(int ID);
+   // GraphVertex getEnvVertex(int ID);
+    // QPointF getEnvVertex(int ID);
+   // QPointF getEnvMidCurve(int ID);
     QVector<QPointF> getEnvPoints(int segments);
 
     void freeControlBusIndex();
@@ -41,7 +42,10 @@ namespace QuantIDE
     void setEnv(QString envCode);
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
     void setDuration(QString);
-    
+
+  signals:
+    void actEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves);
+
   protected:
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -49,7 +53,6 @@ namespace QuantIDE
 
   private:
     ScBridge *mBridge;
-   // QUuid objectID;
     QString nodeName, controlName;
 
     float duration;
@@ -60,12 +63,9 @@ namespace QuantIDE
     QList<double> times;
     QList<QString> curves;
 
-    QList<double> midCurvePointX;
-    QList<double> midCurvePointY;
-
     QLabel *nameLabel, *busLabel;
     ControlBox *durationBox;
-    
+
     CodeEditor *envelopeCode;
     Graph *envGraph;
 

@@ -29,6 +29,8 @@ namespace Jui
     QPoint getPixel(QPointF valuePoint);
     void setValue(QPoint pixel);
 
+    float getDomainX_min(), getDomainX_max(), getDomainY_min(), getDomainY_max();
+
     bool modify;
     int modifyAlpha;
 
@@ -127,6 +129,9 @@ namespace Jui
     void onObjectModify();
     void onCBoxTypeChanged(QString);
 
+  signals:
+    void actTypeChanged(int);
+
   private:
     GraphVertex *from, *to;
 
@@ -176,101 +181,15 @@ namespace Jui
 
   signals:
     void actPositionChanged(QPair<float, float>);
+    // void actLeaveGraph();
 
   protected:
     virtual bool eventFilter(QObject *watched, QEvent * event);
 
   private:
-    // GraphObject *mCoor;
     GraphAxis *axisX, *axisY;
     GraphObject *curvePt;
   };
-
-  /*
-  class GraphPoint : public QWidget
-  {
-  Q_OBJECT
-
-  public:
-  GraphPoint(QWidget *parent, int ptID, int pX, int pY, double valX, double valY);
-  ~GraphPoint();
-
-  QRect bounds();
-  int ID;
-  int pixelX, pixelY;
-  double valueX, valueY;
-  int pointSize;
-  QString curvature;
-
-  enum PointType { vertex, startPoint, endPoint, curvePoint };
-  PointType type;
-
-  void setID(int newID);
-  void setX(int pX, double valX);
-  void setY(int pY, double valY);
-  void setType(PointType newType);
-  void setCurvature(QString txt);
-
-  signals:
-  void actDelete(int ID);
-  void actMoved(int ID, int pixelX, int pixelY);
-
-  protected:
-  void paintEvent(QPaintEvent *);
-  void mousePressEvent(QMouseEvent *);
-  void mouseMoveEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *mouseEvent);
-  void closeEvent(QCloseEvent *);
-  void focusInEvent(QFocusEvent*);
-  void focusOutEvent(QFocusEvent*);
-  void moveEvent(QMoveEvent * event);
-
-  virtual bool eventFilter(QObject * watched, QEvent * event);
-
-  private:
-  QPoint mousePressCoor;
-  QPoint mouseGlobalCoor;
-
-  QLabel *labelID;
-  QLabel *labelLevel, *labelTime, *labelCurve;
-  };
-  */
-
-  // GRAPH POINT END
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-  // GRAPH CURVE
-
-  /*
-  class GraphCurve : public QWidget
-  {
-  Q_OBJECT
-
-  public:
-  GraphCurve(QWidget *parent, GraphPoint *ptFrom, GraphPoint *ptTo);
-  ~GraphCurve();
-
-  QRect bounds();
-
-  void setFrom(GraphPoint *ptFrom);
-
-  public slots:
-  void onFromMoved(int ID, int pixelX, int pixelY);
-  //void onEndMoved(int ID, int pixelX, int pixelY);
-
-  protected:
-  void paintEvent(QPaintEvent *event);
-  void resizeEvent(QResizeEvent *event);
-  void mousePressEvent(QMouseEvent *);
-
-  private:
-  GraphPoint *from, *to;
-  };
-  */
-
-  // GRAPH CURVE END
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-  // GRAPH 
-
 
   class Graph : public QWidget
   {
@@ -287,32 +206,14 @@ namespace Jui
     QPair<float, float> getDomainX();
     QPair<float, float> getDomainY();
 
-    // GraphPoint *addStartPoint(QPointF newPt);
-    // GraphPoint *addVertexPoint(QPointF newPt);
-    // GraphPoint *addEndPoint(QPointF newPt);
-    // void setVertexPoint(int ID, QPointF newPt);
-    // void setVertexType(int ID, GraphPoint::PointType newType);
-    // GraphPoint *getVertex(int ID);
-
-    // GraphPoint *addCurvePoint(QPointF newPt);
-    //void setCurvePoint(int ID, QPointF newPt);
-    //void setCurveCurvature(int ID, QString txt);
-
-    //void drawPoint(double valueX, double valueY);
-    //void drawLine(double valueX1, double valueY1, double valueX2, double valueY2);
-    void drawPolyline(QVector<QPointF> collPoints);
-    //void addPolyline(QVector<QPointF> collPoints);
-
-    void deleteGraph();
-
     public slots:
-    //void onDeletePoint(int ID);
-    //void onMovePoint(int ID, int pixelX, int pixelY); //old - new onVertexMoved
-
     void onMouseMoved(QPair<float, float>);
     void onVertexSelected(int ID);
     void onVertexMoved(int ID);
     void onVertexDeleted(int ID);
+    void onCurveTypeChanged(int ID);
+
+    void onEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves);
 
   signals:
     void actEnvGraphChanged(QList<double> levels, QList<double> times, QList<QString> curves);
@@ -327,8 +228,6 @@ namespace Jui
     void mousePressEvent(QMouseEvent *mouseEvent);
     void mouseReleaseEvent(QMouseEvent *mouseEvent);
 
-    // GraphPoint *addValuePoint(double valueX, double valueY, GraphPoint::PointType type);
-
     void makeEnv();
     void sortVertexByX();
 
@@ -337,29 +236,14 @@ namespace Jui
     int numGraphAxisX, numGraphAxisY;
 
     QPainter *painterGraphObject;
-    //   GraphObject *testObj;
     GraphVertex *testVertex1, *testVertex2, *testVertex3, *testVertex4;
     GraphCurve *testCurve1, *testCurve2, *testCurve3;
-    GraphAxis *testAxis1, *testAxis2;
+
     QList<GraphVertex*> controlVertexs;
     QList<GraphCurve*> controlCurves;
     QList<GraphAxis*> graphVerticalAxis;
     QList<GraphAxis*> graphHorizontalAxis;
     GraphMouse *graphMouse;
-
-    // QList<GraphPoint*> controlPts;
-    //  QList<GraphPoint*> curvePts;
-    // QList<GraphCurve*> curves;
-
-    //QList<QPointF*> collDrawPoints;
-    //QList<QLineF*> collDrawLines;
-    QPolygonF *graphPolylines;
-    //QList<QPolygonF*> collPolylinesNEW;
-
-    float getValueX(int displayX);
-    float getValueY(int displayY);
-    float getPixelX(float valueX);
-    float getPixelY(float valueY);
 
   };
 
