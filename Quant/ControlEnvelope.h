@@ -37,6 +37,7 @@ namespace QuantIDE
     QVector<QPointF> getEnvPoints(int segments);
 
     void freeControlBusIndex();
+    void timeToNextBeat();
 
     public slots:
     void setEnv(QString envCode);

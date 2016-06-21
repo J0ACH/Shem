@@ -69,6 +69,7 @@ namespace Jui
     this->redraw();
   }
 
+  QPointF GraphObject::getValuePt()  { return QPointF(valueX, valueY); }
   QPoint GraphObject::getPixel()
   {
     float percX = (valueX - domainX.first) / (float)(domainX.second - domainX.first);
@@ -785,6 +786,12 @@ namespace Jui
 
     setFocusPolicy(Qt::StrongFocus);
 
+    currentTime = 0;
+    beatTime = 0;
+    currentTime_step = 40;
+    durationTimer = new QTimer(this);
+    durationTimer->setInterval(currentTime_step);
+
     graphMouse = new GraphMouse(this); // musi byt zadan pred vertexema
 
     GraphVertex *startVertex = new GraphVertex(this);
@@ -806,6 +813,7 @@ namespace Jui
     baseCurve->setType(CurveType::sin);
     controlCurves.append(baseCurve);
 
+    timeAxis = new GraphAxis(this, 0, AxisType::vertical);
 
     for (double i = 0; i <= 1; i += 0.25)
     {
@@ -821,6 +829,8 @@ namespace Jui
     this->sortVertexByX();
 
     emit actDomainChanged(domainX, domainY);
+
+    connect(durationTimer, SIGNAL(timeout()), this, SLOT(onDurationTimerTick()));
   }
 
   QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
@@ -843,10 +853,10 @@ namespace Jui
         oneAxis->setValue(tempAxisVal);
         tempAxisVal += (max - min) / (float)numGraphAxisX;
       }
-      
+
       // roztahuje posledni bod podle domenyX
-      controlVertexs[controlVertexs.size()-1]->setValueX(max);
-      controlCurves[controlCurves.size()-1]->onObjectModify();
+      controlVertexs[controlVertexs.size() - 1]->setValueX(max);
+      controlCurves[controlCurves.size() - 1]->onObjectModify();
       // nic moc setup, dodelat
 
       update();
@@ -874,6 +884,55 @@ namespace Jui
 
   QPair<float, float> Graph::getDomainX() { return domainX; }
   QPair<float, float> Graph::getDomainY() { return domainY; }
+
+  void Graph::addVertex(QPointF valuePt)
+  {
+    GraphVertex *vertex = new GraphVertex(this);
+    vertex->setValueX(valuePt.x());
+    vertex->setValueY(valuePt.y());
+
+    int tempInsertPos = -1;
+    if (controlVertexs.size() == 0) { controlVertexs.append(vertex); }
+    else
+    {
+      for (int i = 0; i <= controlVertexs.size(); i++)
+      {
+        if (i == controlVertexs.size()) {
+          controlVertexs.append(vertex);
+          break;
+        }
+        if (controlVertexs[i]->valueX > vertex->valueX)
+        {
+          vertex->ID = i;
+          controlVertexs.insert(i, vertex);
+
+          controlCurves[i - 1]->setTo(vertex);
+          GraphCurve *insertCurve = new GraphCurve(this, vertex, controlVertexs[i + 1]);
+          insertCurve->ID = i - 1;
+          insertCurve->setType(controlCurves[i - 1]->type);
+          controlCurves.insert(i, insertCurve);
+
+          controlCurves[i - 1]->onObjectModify();
+          controlCurves[i]->onObjectModify();
+
+          tempInsertPos = i + 1;
+          break;
+        }
+      }
+    }
+
+    if (tempInsertPos != -1)
+    {
+      for (int i = tempInsertPos; i < controlVertexs.size(); i++)
+      {
+        controlVertexs[i]->ID = i;
+      }
+      for (int i = tempInsertPos - 2; i < controlVertexs.size() - 1; i++)
+      {
+        controlCurves[i]->ID = i;
+      }
+    }
+  }
 
   void Graph::onMouseMoved(QPair<float, float> mouseValue)
   {
@@ -934,6 +993,14 @@ namespace Jui
     // graphMouse->eventFilter(this, new QEvent(QEvent::MouseMove));
   }
 
+  void Graph::onDurationTimerTick()
+  {
+    currentTime += currentTime_step / (float)1000;
+    timeAxis->setValue(currentTime);
+    this->update();
+    if (currentTime >= domainX.second) { currentTime = 0.0; }
+  }
+  
   void Graph::sortVertexByX()
   {
     bool sorted = false;
@@ -967,7 +1034,6 @@ namespace Jui
 
   void Graph::makeEnv()
   {
-
     QList<double> levels;
     QList<double> times;
     QList<QString> curves;
@@ -1026,6 +1092,8 @@ namespace Jui
       << "curves: " << curves;
 
     emit actEnvGraphChanged(levels, times, curves);
+
+    durationTimer->start();
   }
 
   void Graph::onEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves)
@@ -1041,10 +1109,37 @@ namespace Jui
     {
       timePosition.append(oneT + previousTime);
       previousTime = oneT;
-      qDebug() << "Graph::oneT " << oneT << "previousTime" << previousTime;
+      //  qDebug() << "Graph::oneT " << oneT << "previousTime" << previousTime;
     }
-    qDebug() << "Graph::times " << times;
+    // qDebug() << "Graph::times " << times;
 
+    if (levels.size() != controlVertexs.size())
+    {
+      int difference = levels.size() - controlVertexs.size();
+      if (difference > 0)
+      {
+        for (int i = 0; i < controlVertexs.size(); i++)
+        {
+          if (abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
+          {
+            // qDebug() << "Graph::add VERTEX ID" << i;
+            // otazka jestli nenapsat lip, problem s vkladacim casem
+            this->addVertex(QPointF(timePosition[i], levels[i])); 
+          }
+        }
+      }
+      else
+      {
+        for (int i = 0; i < controlVertexs.size(); i++)
+        {
+          if (abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
+          {
+            //  qDebug() << "Graph::remove VERTEX ID" << i;
+            this->onVertexDeleted(i);
+          }
+        }
+      }
+    }
 
     for (int i = 0; i < levels.size(); i++)
     {
@@ -1074,7 +1169,7 @@ namespace Jui
         //qDebug() << "Graph::abs(controlVertexs[i]->valueX - times[i]) > 0.01 -> " << abs(controlVertexs[i]->valueX - positionX[i - 1]);
         if (abs(controlVertexs[i]->valueX - timePosition[i - 1]) > 0.01)
         {
-          qDebug() << "Graph::onEnvChanged -> set time for ID " << i;
+          // qDebug() << "Graph::onEnvChanged -> set time for ID " << i << "from:" << controlVertexs[i]->valueX << "to:" << timePosition[i - 1];
           controlVertexs[i]->setValueX(timePosition[i - 1]);
         }
         else
@@ -1088,7 +1183,7 @@ namespace Jui
       }
     }
 
-    for (int i = 1; i < curves.size(); i++)
+    for (int i = 0; i < curves.size(); i++)
     {
       if (i < controlCurves.size())
       {
@@ -1128,6 +1223,10 @@ namespace Jui
     painter.drawLine(0, 0, width(), 0);
     painter.drawLine(0, height() - 1, width(), height() - 1);
 
+    painter.setPen(QColor(160, 160, 160));
+    painter.drawText(55, 30, tr("currentTime: %1").arg(QString::number(currentTime, 'f', 2)));
+    painter.drawText(55, 42, tr("beatTime: %1").arg(QString::number(beatTime, 'f', 2)));
+
     //qDebug() << "Graph::paintEvent NEW";
     painterGraphObject = new QPainter(this);
     foreach(GraphAxis *oneAxis, graphVerticalAxis)
@@ -1149,57 +1248,12 @@ namespace Jui
     //testObj->draw(painterGraphObject);
 
     graphMouse->draw(painterGraphObject);
+    timeAxis->draw(painterGraphObject);
   }
 
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)
   {
-    //qDebug() << "Graph::mousePressEvent NEW POINT ADD " << mouse;
-    QPoint mouse = mouseEvent->pos();
-
-    GraphVertex *vertex = new GraphVertex(this);
-    vertex->setValue(mouse);
-
-    int tempInsertPos = -1;
-    if (controlVertexs.size() == 0) { controlVertexs.append(vertex); }
-    else
-    {
-      for (int i = 0; i <= controlVertexs.size(); i++)
-      {
-        if (i == controlVertexs.size()) {
-          controlVertexs.append(vertex);
-          break;
-        }
-        if (controlVertexs[i]->valueX > vertex->valueX)
-        {
-          vertex->ID = i;
-          controlVertexs.insert(i, vertex);
-
-          controlCurves[i - 1]->setTo(vertex);
-          GraphCurve *insertCurve = new GraphCurve(this, vertex, controlVertexs[i + 1]);
-          insertCurve->ID = i - 1;
-          insertCurve->setType(controlCurves[i - 1]->type);
-          controlCurves.insert(i, insertCurve);
-
-          controlCurves[i - 1]->onObjectModify();
-          controlCurves[i]->onObjectModify();
-
-          tempInsertPos = i + 1;
-          break;
-        }
-      }
-    }
-
-    if (tempInsertPos != -1)
-    {
-      for (int i = tempInsertPos; i < controlVertexs.size(); i++)
-      {
-        controlVertexs[i]->ID = i;
-      }
-      for (int i = tempInsertPos - 2; i < controlVertexs.size() - 1; i++)
-      {
-        controlCurves[i]->ID = i;
-      }
-    }
+    this->addVertex(graphMouse->getValuePt());
   }
 
   void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)
@@ -1208,5 +1262,4 @@ namespace Jui
   }
 
   Graph::~Graph() { }
-
 }

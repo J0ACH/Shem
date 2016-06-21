@@ -176,98 +176,6 @@ qDebug() << "Graph::setEnv [string] -> "
 
     emit actEnvChanged(levels, times, curves);
 
-    /*
-    // nastaveni vertexu
-    if (!changedCntVertex)
-    {
-    qDebug() << "pocet controlnich bodu nezmenen";
-    for (int i = 0; i < levels.size(); i++)
-    {
-    // QPointF vertex = this->getEnvVertex(i);
-    qDebug() << vertex << "no:" << i << "levels.size(): " << levels.size();
-    //envGraph->setVertexPoint(i, vertex);
-
-    // envGraph->setVertexType(i, GraphPoint::PointType::vertex);
-    // if (i == 0) { envGraph->setVertexType(i, GraphPoint::PointType::startPoint); }
-    // if (i == levels.size() - 1) { envGraph->setVertexType(i, GraphPoint::PointType::endPoint); }
-
-    if (i < levels.size() - 1) // times je o cntVertex - 1
-    {
-    //  QPointF midPoint = this->getEnvMidCurve(i);
-    //envGraph->setCurvePoint(i, midPoint);
-    //envGraph->setCurveCurvature(i, curves[i]);
-    }
-    }
-    }
-    else
-    {
-    //envGraph->deleteGraph();
-    qDebug() << "pocet controlnich bodu ZMENEN";
-    for (int i = 0; i < levels.size(); i++)
-    {
-    //  QPointF vertex = this->getEnvVertex(i);
-    // qDebug() << vertex << "no:" << i << "levels.size(): " << levels.size();
-    //        GraphVertex *pt = envGraph->addVertexPoint(vertex);
-    //if (i == 0) { qDebug() << "startVertex";  envGraph->addStartPoint(vertex); }
-    // else if (i == levels.size() - 1) { qDebug() << "endVertex"; envGraph->addEndPoint(vertex); }
-    // else { qDebug() << "vertex"; envGraph->addVertexPoint(vertex); }
-
-    if (i < levels.size() - 1) // times je o cntVertex - 1
-    {
-    //    QPointF midPoint = this->getEnvMidCurve(i);
-    //  GraphPoint *mid = envGraph->addCurvePoint(midPoint);
-    //   mid->setCurvature(curves[i]);
-    }
-    }
-    }
-    // QString env = this->getEnv();
-    //qDebug() << "ControlEnvelope::levels: " << levels;
-    //qDebug() << "ControlEnvelope::timse: " << times;
-    //qDebug() << "ControlEnvelope::curve: " << curves;
-    qDebug() << "ControlEnvelope::getEnv(): " << env;
-
-    envelopeCode->setText(env);
-    // envGraph->drawPolyline(this->getEnvPoints(50));
-    */
-
-    /*
-    for (int i = 0; i < curves.size(); i++)
-    {
-    qDebug() << "curves: " << curves[i];
-    QVector<QPointF> pts;
-    GraphPoint *from = envGraph->getVertex(i);
-    GraphPoint *to = envGraph->getVertex(i + 1);
-    pts.append(QPointF(from->pixelX, from->pixelY));
-
-
-
-    //switch (curves[i])
-    //{
-    //case "'lin'":
-    // qDebug() << "curves LIN found at " << curves[i];
-    //break;
-    //default:
-    // break;
-    //}
-
-    pts.append(QPointF(to->pixelX, to->pixelY));
-
-    if (changedCntVertex)
-    {
-    GraphCurve *crv = new GraphCurve(this, from, to);
-    crv->show();
-
-    envGraph->addPolyline(pts);
-    }
-    else
-    {
-
-    }
-    }
-    */
-
-
-
     this->makeTask(env);
     envelopeCode->setText(env);
   }
@@ -293,6 +201,7 @@ qDebug() << "Graph::setEnv [string] -> "
     previousEnv = env;
     env = codeEnv;
 
+    this->timeToNextBeat();
     this->makeTask(env);
   }
 
@@ -367,50 +276,6 @@ qDebug() << "Graph::setEnv [string] -> "
     return codeEnv;
   }
 
-  /*
-  GraphVertex ControlEnvelope::getEnvVertex(int ID)
-  {
-  double vertexTime = 0;
-  for (int i = 0; i < levels.size(); i++)
-  {
-  //qDebug() << "getEnvVertex ID: " << ID << "i: " << i << "times.size(): " << times.size();
-  if (ID == i) { break; }
-  else { vertexTime += times[i]; }
-  }
-  //return  envGraph->contr
-  }
-  */
-
-  /*
-  QPointF ControlEnvelope::getEnvVertex(int ID)
-  {
-  double vertexTime = 0;
-  for (int i = 0; i < levels.size(); i++)
-  {
-  //qDebug() << "getEnvVertex ID: " << ID << "i: " << i << "times.size(): " << times.size();
-  if (ID == i) { break; }
-  else { vertexTime += times[i]; }
-  }
-  return QPointF(vertexTime, levels[ID]);
-  }
-  QPointF ControlEnvelope::getEnvMidCurve(int ID)
-  {
-  double midPtTime = 0;
-  for (int i = 0; i < times.size(); i++)
-  {
-  if (ID == i)
-  {
-  midPtTime += times[i] / 2;
-  break;
-  }
-  else { midPtTime += times[i]; }
-  }
-  QString env = this->getEnv();
-  QString txtVal = mBridge->question(tr("%1.at(%2)").arg(env, QString::number(midPtTime))).toString();
-  return QPointF(midPtTime, txtVal.toDouble());
-  }
-  */
-
   QVector<QPointF> ControlEnvelope::getEnvPoints(int segments)
   {
     QVector<QPointF> points;
@@ -424,6 +289,13 @@ qDebug() << "Graph::setEnv [string] -> "
       points.append(QPointF(xVal, txtVal.toDouble()));
     }
     return points;
+  }
+
+  void ControlEnvelope::timeToNextBeat()
+  {
+    float time = mBridge->question(tr("TempoClock.default.timeToNextBeat(%1)").arg(
+      QString::number(duration)
+      ), true).toString().toFloat();    
   }
 
   void ControlEnvelope::freeControlBusIndex()

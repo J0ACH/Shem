@@ -25,6 +25,7 @@ namespace Jui
     ~GraphObject();
 
     float valueX, valueY;
+    QPointF getValuePt();
     QPoint getPixel();
     QPoint getPixel(QPointF valuePoint);
     void setValue(QPoint pixel);
@@ -208,12 +209,15 @@ namespace Jui
     QPair<float, float> getDomainX();
     QPair<float, float> getDomainY();
 
+    void addVertex(QPointF valuePt);
+
     public slots:
     void onMouseMoved(QPair<float, float>);
     void onVertexSelected(int ID);
     void onVertexMoved(int ID);
     void onVertexDeleted(int ID);
     void onCurveTypeChanged(int ID);
+    void onDurationTimerTick();
 
     void onEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves);
 
@@ -243,6 +247,10 @@ namespace Jui
     QList<GraphAxis*> graphVerticalAxis;
     QList<GraphAxis*> graphHorizontalAxis;
     GraphMouse *graphMouse;
+
+    QTimer *durationTimer, *startTimer;
+    float currentTime, beatTime, currentTime_step;
+    GraphAxis *timeAxis;
 
   };
 
