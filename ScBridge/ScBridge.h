@@ -35,6 +35,7 @@ namespace SupercolliderBridge
 
     QString nextID();
     float tempo;
+    int beat;
     bool evaluate(QString code, bool print = false, bool silent = false);
     void evaluateAtQuant(QString code, float quant, bool print = false);
     QVariant question(QString code, bool print = false);
@@ -73,7 +74,7 @@ namespace SupercolliderBridge
     //void answerAct(QUuid id, int selector, QStringList answer);
     void actSynced();
     void actAnswered();
-    void actNextBeat();
+    void actNextBeat(int beat);
 
     void killBridgeDoneAct();
 

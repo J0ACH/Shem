@@ -44,7 +44,7 @@ namespace QuantIDE
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
     void setDuration(QString);
 
-    void onNextBeat();
+    void onNextBeat(int beat);
     void onDurationTimerTick();
 
   signals:
@@ -59,8 +59,9 @@ namespace QuantIDE
     ScBridge *mBridge;
     QString nodeName, controlName;
 
+    int quant;
     float duration;
-    int currentBeat;
+    //int currentBeat;
     int cntVertex;
     bool changedCntVertex;
     QString env, previousEnv;

@@ -992,7 +992,6 @@ namespace Jui
     timeAxis->setValue(time);
     this->update();    
   }
-
   
   void Graph::sortVertexByX()
   {

@@ -18,6 +18,7 @@ namespace SupercolliderBridge
 
     lateFlagBreakTime = 500;
     tempo = 1;
+    beat = 0;
 
     connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
@@ -432,7 +433,8 @@ namespace SupercolliderBridge
     {
      // emit msgStatusAct("beat");
      // this->evaluate("p['tempo'].clock.beats", true);
-      emit actNextBeat();
+      emit actNextBeat(beat);
+      beat++;
     }
     else {
       //qDebug() << msg;
