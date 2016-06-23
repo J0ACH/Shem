@@ -210,6 +210,7 @@ namespace Jui
     QPair<float, float> getDomainY();
 
     void addVertex(QPointF valuePt);
+    void resetTime();
 
     public slots:
     void onMouseMoved(QPair<float, float>);
@@ -218,7 +219,7 @@ namespace Jui
     void onVertexDeleted(int ID);
     void onCurveTypeChanged(int ID);
     void onDurationTimerTick();
-
+    
     void onEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves);
 
   signals:

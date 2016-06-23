@@ -14,6 +14,7 @@ namespace QuantIDE
     setFocusPolicy(Qt::StrongFocus);
 
     this->initControl();
+    currentBeat = 0;
     cntVertex = 0;
     levels = QList<double>();
     times = QList<double>();
@@ -31,6 +32,7 @@ namespace QuantIDE
       envGraph, SLOT(onEnvChanged(QList<double>, QList<double>, QList<QString>))
       );
     connect(durationBox, SIGNAL(actValueChanged(QString)), this, SLOT(setDuration(QString)));
+    connect(mBridge, SIGNAL(actNextBeat()), this, SLOT(onNextBeat()));
 
     mBridge->evaluate(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
   }
@@ -148,19 +150,21 @@ namespace QuantIDE
       }
 
       envGraph->setDomainX(0, duration);
-      envGraph->setDomainY(minLevel, maxLevel); 
+      envGraph->setDomainY(minLevel, maxLevel);
     }
   }
 
   void ControlEnvelope::setEnv(QString envCode)
   {
-    qDebug() << "ControlEnvelope::setEnv: " << envCode;
+    //qDebug() << "ControlEnvelope::setEnv: " << envCode;
+
+    //bool startSetup = env.isEmpty();
 
     //stane se jen pri prvnim nastaveni env
+    //if (startSetup) { envelopeCode->setText(envCode); }
     if (env.isEmpty()) { envelopeCode->setText(envCode); }
 
-
-    qDebug() << "Graph::setEnv ENV TEST -> " << env;
+    //qDebug() << "Graph::setEnv ENV TEST -> " << env;
 
     changedCntVertex = false;
     this->getEnvArray(envCode);
@@ -176,7 +180,11 @@ qDebug() << "Graph::setEnv [string] -> "
 
     emit actEnvChanged(levels, times, curves);
 
-    this->makeTask(env);
+    // if (!startSetup)
+    //  {
+    float startTime = this->timeToNextQuant();
+    this->makeTask(env, startTime);
+    //  }
     envelopeCode->setText(env);
   }
 
@@ -201,8 +209,8 @@ qDebug() << "Graph::setEnv [string] -> "
     previousEnv = env;
     env = codeEnv;
 
-    this->timeToNextBeat();
-    this->makeTask(env);
+    float startTime = this->timeToNextQuant();
+    this->makeTask(env, startTime);
   }
 
   void ControlEnvelope::setDuration(QString val)
@@ -291,12 +299,21 @@ qDebug() << "Graph::setEnv [string] -> "
     return points;
   }
 
-  void ControlEnvelope::timeToNextBeat()
+  float ControlEnvelope::timeToNextQuant()
   {
-    float time = mBridge->question(tr("TempoClock.default.timeToNextBeat(%1)").arg(
+    mBridge->question("p['tempo'].clock.beats", true);
+
+    float time = mBridge->question(tr("p[\\tempo].clock.timeToNextBeat(%1)").arg(
       QString::number(duration)
-      ), true).toString().toFloat();    
+      ), true).toString().toFloat();
+    /*
+    float time = mBridge->question(tr("TempoClock.default.timeToNextBeat(%1)").arg(
+    QString::number(duration)
+    ), true).toString().toFloat();
+    */
+    return time;
   }
+
 
   void ControlEnvelope::freeControlBusIndex()
   {
@@ -308,8 +325,13 @@ qDebug() << "Graph::setEnv [string] -> "
     // emit actCodeEvaluated(code);
   }
 
-  void ControlEnvelope::makeTask(QString env)
+  void ControlEnvelope::makeTask(QString env, float startTime)
   {
+    /*
+    QString code = tr("p[\\tempo].clock.sched( %5, { ~%1[%2] = Pbind(\\instrument, \\envControl, \\bus, %2, \\dur, %3, \\env, [%4])})").arg(
+
+    */
+
     // pozor na index, bude treba doresit
     QString code = tr("~%1[%2] = Pbind(\\instrument, \\envControl, \\bus, %2, \\dur, %3, \\env, [%4])").arg(
       nodeName,
@@ -318,7 +340,8 @@ qDebug() << "Graph::setEnv [string] -> "
       env
       );
     // pridat s.makeBundle(time2Quant, code) pro synchronizaci
-    mBridge->evaluate(code);
+
+    mBridge->evaluateAtQuant(code, duration, true);
   }
 
   void ControlEnvelope::mouseReleaseEvent(QMouseEvent *mouseEvent)
@@ -355,6 +378,17 @@ qDebug() << "Graph::setEnv [string] -> "
     painter.drawLine(0, 0, width(), 0);
     painter.drawLine(0, height() - 1, width(), height() - 1);
 
+  }
+
+  void ControlEnvelope::onNextBeat()
+  {
+    currentBeat++;
+    if (currentBeat >= duration)
+    {
+      envGraph->resetTime();
+      mBridge->msgStatusAct("tickReset");
+      currentBeat = 0;
+    }
   }
 
   ControlEnvelope::~ControlEnvelope()  {  }

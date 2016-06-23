@@ -788,7 +788,7 @@ namespace Jui
 
     currentTime = 0;
     beatTime = 0;
-    currentTime_step = 40;
+    currentTime_step = 10;
     durationTimer = new QTimer(this);
     durationTimer->setInterval(currentTime_step);
 
@@ -998,9 +998,11 @@ namespace Jui
     currentTime += currentTime_step / (float)1000;
     timeAxis->setValue(currentTime);
     this->update();
-    if (currentTime >= domainX.second) { currentTime = 0.0; }
+    // if (currentTime >= domainX.second) { currentTime = 0.0; }
   }
-  
+
+  void Graph::resetTime()  { currentTime = 0.0; }
+
   void Graph::sortVertexByX()
   {
     bool sorted = false;
@@ -1124,7 +1126,7 @@ namespace Jui
           {
             // qDebug() << "Graph::add VERTEX ID" << i;
             // otazka jestli nenapsat lip, problem s vkladacim casem
-            this->addVertex(QPointF(timePosition[i], levels[i])); 
+            this->addVertex(QPointF(timePosition[i], levels[i]));
           }
         }
       }

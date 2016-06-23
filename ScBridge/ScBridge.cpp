@@ -130,6 +130,29 @@ namespace SupercolliderBridge
 
     return true;
   }
+  void ScBridge::evaluateAtQuant(QString code, int quant, bool print)
+  {
+    /*
+    float time2Evaluation = this->question(tr("p[\\tempo].clock.timeToNextBeat(%1)").arg(
+      QString::number(quant)
+      ), true).toString().toFloat();
+
+    QString evalCode = tr("p[\\tempo].clock.sched( %1, {'quantEval'.postln; %2 })").arg(
+      QString::number(time2Evaluation),
+      code
+      );
+    */
+    float time2Evaluation = this->question(tr("TempoClock.default.timeToNextBeat(%1)").arg(
+      QString::number(quant)
+      ), true).toString().toFloat();
+
+    QString evalCode = tr("TempoClock.default.sched( %1, {'quantEval'.postln; %2 })").arg(
+      QString::number(time2Evaluation),
+      code
+      );
+    
+    this->evaluate(evalCode, print);
+  }
 
   QVariant ScBridge::question(QString code, bool print)
   {
@@ -289,65 +312,68 @@ namespace SupercolliderBridge
     else if (msg.contains("***")) { emit msgStatusAct(msg); }
     else if (msg.contains("->"))
     {
+      /*
       //////////////////////////////////////////////
       //////// bude odsraneno
+
       if (msg.contains("ANSWER_MARKER"))
       {
-        //qDebug() << "msg [ANSWER_MARKER]: " << msg;
+      //qDebug() << "msg [ANSWER_MARKER]: " << msg;
 
-        QStringList incomingMSG = msg.split("->");
-        foreach(QString oneMSG, incomingMSG)
-        {
-          if (oneMSG.contains("ANSWER_MARKER"))
-          {
-            oneMSG = oneMSG.replace("\r", "");
-            oneMSG = oneMSG.replace("\n", "");
-            //qDebug() << "oneMSG: " << oneMSG;
+      QStringList incomingMSG = msg.split("->");
+      foreach(QString oneMSG, incomingMSG)
+      {
+      if (oneMSG.contains("ANSWER_MARKER"))
+      {
+      oneMSG = oneMSG.replace("\r", "");
+      oneMSG = oneMSG.replace("\n", "");
+      //qDebug() << "oneMSG: " << oneMSG;
 
-            QStringList msgParts = oneMSG.split(",");
-            //qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
+      QStringList msgParts = oneMSG.split(",");
+      //qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
 
-            QUuid id;
-            QStringList oneAnswer;
-            int selector, printAnswer;
+      QUuid id;
+      QStringList oneAnswer;
+      int selector, printAnswer;
 
-            for (int i = 0; i < msgParts.size(); i = i + 1)
-            {
-              QString onePart = msgParts.at(i);
-              onePart = onePart.replace(" ", "");
-              onePart = onePart.replace("[", "");
-              onePart = onePart.replace("]", "");
+      for (int i = 0; i < msgParts.size(); i = i + 1)
+      {
+      QString onePart = msgParts.at(i);
+      onePart = onePart.replace(" ", "");
+      onePart = onePart.replace("[", "");
+      onePart = onePart.replace("]", "");
 
-              //qDebug() << "i: " << i;
-              if (i == 0) { /* skiping marker */ }
-              else if (i == 1) { id = QUuid(onePart); }
-              else if (i == 2) { selector = onePart.toInt(); }
-              else if (i != msgParts.size() - 1) { oneAnswer.append(onePart); }
-              else if (i == msgParts.size() - 1) { printAnswer = onePart.toInt(); }
-            }
+      //qDebug() << "i: " << i;
+      if (i == 0) {}
+      else if (i == 1) { id = QUuid(onePart); }
+      else if (i == 2) { selector = onePart.toInt(); }
+      else if (i != msgParts.size() - 1) { oneAnswer.append(onePart); }
+      else if (i == msgParts.size() - 1) { printAnswer = onePart.toInt(); }
+      }
 
-            if (printAnswer) {
-              qDebug() << "msgAnswer: "
-                //<< " pattern " << id
-                << " pattern " << QString::number(selector)
-                << " answer " << oneAnswer;
-              //<< " print " << printAnswer;
+      if (printAnswer) {
+      qDebug() << "msgAnswer: "
+      //<< " pattern " << id
+      << " pattern " << QString::number(selector)
+      << " answer " << oneAnswer;
+      //<< " print " << printAnswer;
 
-              QString txt;
-              foreach(QString oneAnsw, oneAnswer)
-              {
-                txt += tr("%1; ").arg(oneAnsw);
-              }
-              //emit msgResultAct(txt);
-            }
-            emit answerAct(id, selector, oneAnswer);
-          }
-        }
+      QString txt;
+      foreach(QString oneAnsw, oneAnswer)
+      {
+      txt += tr("%1; ").arg(oneAnsw);
+      }
+      //emit msgResultAct(txt);
+      }
+      emit answerAct(id, selector, oneAnswer);
+      }
+      }
       }
       //////// bude odsraneno
       //////////////////////////////////////////////
+      */
 
-      else if (msg.contains("syncFlag"))	{ emit actSynced(); }
+      if (msg.contains("syncFlag"))	{ emit actSynced(); }
 
       else if (msg.contains("answerFlag"))
       {
@@ -400,6 +426,12 @@ namespace SupercolliderBridge
       }
     }
     else if (msg.contains("bundle")) { emit msgBundleAct(msg); }
+    else if (msg.contains("beatFlag"))
+    {
+     // emit msgStatusAct("beat");
+     // this->evaluate("p['tempo'].clock.beats", true);
+      emit actNextBeat();
+    }
     else {
       //qDebug() << msg;
       if (msg.startsWith("\r\n"))	{ msg = msg.replace("\r\n", ""); }

@@ -87,6 +87,10 @@ namespace QuantIDE
 
     QMap<QString, ControlEnvelope*> conteinerControlsGraph;
     QStringList getControlKeys();
+    /*
+    int quant;
+    float timeToNextQuant();
+    */
   };
 }
 

@@ -37,12 +37,14 @@ namespace QuantIDE
     QVector<QPointF> getEnvPoints(int segments);
 
     void freeControlBusIndex();
-    void timeToNextBeat();
+    
 
     public slots:
     void setEnv(QString envCode);
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
     void setDuration(QString);
+
+    void onNextBeat();
 
   signals:
     void actEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves);
@@ -57,6 +59,7 @@ namespace QuantIDE
     QString nodeName, controlName;
 
     float duration;
+    int currentBeat;
     int cntVertex;
     bool changedCntVertex;
     QString env, previousEnv;
@@ -71,7 +74,8 @@ namespace QuantIDE
     Graph *envGraph;
 
     void initControl();
-    void makeTask(QString env);
+    void makeTask(QString env, float startTime);
+    float timeToNextQuant();
   };
 }
 

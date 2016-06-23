@@ -35,6 +35,7 @@ namespace SupercolliderBridge
 
     QString nextID();
     bool evaluate(QString code, bool print = false, bool silent = false);
+    void evaluateAtQuant(QString code, int quant, bool print = false);
     QVariant question(QString code, bool print = false);
 
     private slots:
@@ -66,9 +67,10 @@ namespace SupercolliderBridge
     void msgResultAct(QString const &);
     void msgBundleAct(QString const &);
 
-    void answerAct(QUuid id, int selector, QStringList answer);
+    //void answerAct(QUuid id, int selector, QStringList answer);
     void actSynced();
     void actAnswered();
+    void actNextBeat();
 
     void killBridgeDoneAct();
 
