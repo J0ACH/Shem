@@ -17,6 +17,7 @@ namespace SupercolliderBridge
     stateServer = StateServer::OFF;
 
     lateFlagBreakTime = 500;
+    tempo = 1;
 
     connect(this, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
@@ -130,18 +131,18 @@ namespace SupercolliderBridge
 
     return true;
   }
-  void ScBridge::evaluateAtQuant(QString code, int quant, bool print)
+  void ScBridge::evaluateAtQuant(QString code, float quant, bool print)
   {
-    /*
+    
     float time2Evaluation = this->question(tr("p[\\tempo].clock.timeToNextBeat(%1)").arg(
       QString::number(quant)
       ), true).toString().toFloat();
 
-    QString evalCode = tr("p[\\tempo].clock.sched( %1, {'quantEval'.postln; %2 })").arg(
-      QString::number(time2Evaluation),
+    QString evalCode = tr("p[\\tempo].clock.sched( %1, { %2 })").arg(
+      QString::number(time2Evaluation, 'f', 6),
       code
       );
-    */
+    /*
     float time2Evaluation = this->question(tr("TempoClock.default.timeToNextBeat(%1)").arg(
       QString::number(quant)
       ), true).toString().toFloat();
@@ -150,6 +151,7 @@ namespace SupercolliderBridge
       QString::number(time2Evaluation),
       code
       );
+    */
     
     this->evaluate(evalCode, print);
   }
@@ -540,6 +542,12 @@ namespace SupercolliderBridge
     {
       //emit msgStatusAct(tr("IPC message: %1").arg(data));
     }
+  }
+
+  void ScBridge::onChangeTempo(QString BPM)
+  {
+    this->evaluate(tr("p[\\tempo].clock.tempo_(%1/60)").arg(BPM), true);
+    tempo = this->question("p[\\tempo].clock.tempo", true).toString().toFloat();
   }
 
   ScBridge::~ScBridge() {	}

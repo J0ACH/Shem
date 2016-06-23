@@ -99,7 +99,7 @@ namespace QuantIDE
     fTime = "0";
 
     mBridge->evaluate(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-     mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(4);").arg(nodeName, volume, fTime), true);
+     mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(1);").arg(nodeName, volume, fTime), true);
     //mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3);").arg(nodeName, volume, fTime), true);
     mBridge->evaluate(tr("~%1.pause()").arg(nodeName), true);
     // mBridge->evaluate(tr("~%1.stop()").arg(nodeName), true);
@@ -224,8 +224,8 @@ namespace QuantIDE
       stateNodePlay = StateNodePlay::STOP;
       break;
     case QuantIDE::StateNodePlay::STOP:
-      mBridge->evaluateAtQuant(tr("~%1.resume()").arg(nodeName),4, true);
-      mBridge->evaluateAtQuant(tr("~%1.play(vol: %2, fadeTime: %3)").arg(nodeName, volume, fTime),4, true);
+      mBridge->evaluate(tr("~%1.resume()").arg(nodeName), true);
+      mBridge->evaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(nodeName, volume, fTime), true);
       stateNodePlay = StateNodePlay::PLAY;
       break;
     case QuantIDE::StateNodePlay::FREE:

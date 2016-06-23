@@ -786,12 +786,6 @@ namespace Jui
 
     setFocusPolicy(Qt::StrongFocus);
 
-    currentTime = 0;
-    beatTime = 0;
-    currentTime_step = 10;
-    durationTimer = new QTimer(this);
-    durationTimer->setInterval(currentTime_step);
-
     graphMouse = new GraphMouse(this); // musi byt zadan pred vertexema
 
     GraphVertex *startVertex = new GraphVertex(this);
@@ -830,7 +824,7 @@ namespace Jui
 
     emit actDomainChanged(domainX, domainY);
 
-    connect(durationTimer, SIGNAL(timeout()), this, SLOT(onDurationTimerTick()));
+    
   }
 
   QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
@@ -993,16 +987,13 @@ namespace Jui
     // graphMouse->eventFilter(this, new QEvent(QEvent::MouseMove));
   }
 
-  void Graph::onDurationTimerTick()
+  void Graph::setTime(float time)
   {
-    currentTime += currentTime_step / (float)1000;
-    timeAxis->setValue(currentTime);
-    this->update();
-    // if (currentTime >= domainX.second) { currentTime = 0.0; }
+    timeAxis->setValue(time);
+    this->update();    
   }
 
-  void Graph::resetTime()  { currentTime = 0.0; }
-
+  
   void Graph::sortVertexByX()
   {
     bool sorted = false;
@@ -1095,7 +1086,7 @@ namespace Jui
 
     emit actEnvGraphChanged(levels, times, curves);
 
-    durationTimer->start();
+    
   }
 
   void Graph::onEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves)
@@ -1225,9 +1216,9 @@ namespace Jui
     painter.drawLine(0, 0, width(), 0);
     painter.drawLine(0, height() - 1, width(), height() - 1);
 
-    painter.setPen(QColor(160, 160, 160));
-    painter.drawText(55, 30, tr("currentTime: %1").arg(QString::number(currentTime, 'f', 2)));
-    painter.drawText(55, 42, tr("beatTime: %1").arg(QString::number(beatTime, 'f', 2)));
+  //  painter.setPen(QColor(160, 160, 160));
+//    painter.drawText(55, 30, tr("currentTime: %1").arg(QString::number(currentTime, 'f', 2)));
+ //   painter.drawText(55, 42, tr("beatTime: %1").arg(QString::number(beatTime, 'f', 2)));
 
     //qDebug() << "Graph::paintEvent NEW";
     painterGraphObject = new QPainter(this);

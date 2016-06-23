@@ -34,8 +34,9 @@ namespace SupercolliderBridge
     StateServer stateServer;
 
     QString nextID();
+    float tempo;
     bool evaluate(QString code, bool print = false, bool silent = false);
-    void evaluateAtQuant(QString code, int quant, bool print = false);
+    void evaluateAtQuant(QString code, float quant, bool print = false);
     QVariant question(QString code, bool print = false);
 
     private slots:
@@ -47,6 +48,8 @@ namespace SupercolliderBridge
     void killBridge();
     void changeInterpretState();
     void changeServerState();
+
+    void onChangeTempo(QString BPM);
 
     signals:
     void interpretBootInitAct();

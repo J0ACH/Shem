@@ -31,13 +31,13 @@ namespace QuantIDE
 
     void getEnvArray(QString env);
     QString getEnv();
-   // GraphVertex getEnvVertex(int ID);
+    // GraphVertex getEnvVertex(int ID);
     // QPointF getEnvVertex(int ID);
-   // QPointF getEnvMidCurve(int ID);
+    // QPointF getEnvMidCurve(int ID);
     QVector<QPointF> getEnvPoints(int segments);
 
     void freeControlBusIndex();
-    
+    void resetTime();
 
     public slots:
     void setEnv(QString envCode);
@@ -45,6 +45,7 @@ namespace QuantIDE
     void setDuration(QString);
 
     void onNextBeat();
+    void onDurationTimerTick();
 
   signals:
     void actEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves);
@@ -73,9 +74,11 @@ namespace QuantIDE
     CodeEditor *envelopeCode;
     Graph *envGraph;
 
+    QTimer *durationTimer;
+    float currentTime, currentTime_step;
+
     void initControl();
-    void makeTask(QString env, float startTime);
-    float timeToNextQuant();
+    void makeTask(QString env);
   };
 }
 

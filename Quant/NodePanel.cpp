@@ -12,6 +12,7 @@ namespace QuantIDE
     numOfNode = 0;
     
     connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
+    connect(tempoBox, SIGNAL(actValueChanged(QString)), mBridge, SLOT(onChangeTempo(QString)));
   }
 
   QRect NodePanel::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
@@ -21,6 +22,12 @@ namespace QuantIDE
     buttAddNode = new Button(this);
     buttAddNode->setText("AddNode");
     buttAddNode->setGeometry(200, 10, 50, 20);
+
+    tempoBox = new ControlBox(this);
+    tempoBox->setLabel("BPM");
+    tempoBox->setValue("60");
+    tempoBox->setLabelSize(20);
+    tempoBox->setGeometry(260, 10, 80, 20);
 
     scrollArea = new QScrollArea(this);
     scrollArea->setFrameStyle(QFrame::NoFrame);

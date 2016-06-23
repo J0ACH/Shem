@@ -6,6 +6,7 @@
 #include "Node.h"
 #include "Canvan.h"
 #include "ScBridge.h"
+#include "ControlBox.h"
 
 #include <QWidget>
 #include <QPushButton>
@@ -56,6 +57,7 @@ namespace QuantIDE
     QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QFont fontTextSmall;
     Button *buttAddNode;
+    ControlBox *tempoBox;
     QScrollArea *scrollArea;
     QWidget *scrollWidget;
     QMap<QString, Node*> dictNode;
