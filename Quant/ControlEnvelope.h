@@ -31,10 +31,6 @@ namespace QuantIDE
 
     void getEnvArray(QString env);
     QString getEnv();
-    // GraphVertex getEnvVertex(int ID);
-    // QPointF getEnvVertex(int ID);
-    // QPointF getEnvMidCurve(int ID);
-    QVector<QPointF> getEnvPoints(int segments);
 
     void freeControlBusIndex();
     void resetTime();

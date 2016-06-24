@@ -175,15 +175,18 @@ namespace QuantIDE
 
     changedCntVertex = false;
     this->getEnvArray(envCode);
+
     /*
-qDebug() << "Graph::setEnv [string] -> "
-<< "levels: " << levels
-<< "times: " << times
-<< "curves: " << curves;
-*/
+    qDebug() << "Graph::setEnv [string] -> "
+    << "levels: " << levels
+    << "times: " << times
+    << "curves: " << curves;
+    */
+
 
     previousEnv = env;
     env = this->getEnv();
+    qDebug() << "Graph::setEnv [getEnv] -> " << env;
 
     emit actEnvChanged(levels, times, curves);
 
@@ -207,42 +210,12 @@ qDebug() << "Graph::setEnv [string] -> "
       txtCurves.join(", ")
       );
     qDebug() << "setEnv [arrays]: " << codeEnv;
-    envelopeCode->setText(codeEnv);
-
+    this->getEnvArray(codeEnv);
+    env = this->getEnv();
     previousEnv = env;
-    env = codeEnv;
 
+    envelopeCode->setText(env);
     this->makeTask(env);
-  }
-
-  void ControlEnvelope::setDuration(QString val)
-  {
-    quant = val.toInt();
-    double newDuration = val.toDouble();
-    // qDebug() << "newDuration set to " << newDuration;
-    double restTime = newDuration - duration;
-    if (restTime > 0)
-    {
-      times[times.size() - 1] += restTime;
-      envGraph->setDomainX(0, newDuration);
-      // qDebug() << "restTime set to " << restTime;
-      this->setEnv(this->getEnv());
-    }
-    else
-    {
-      if (times[times.size() - 1] + restTime >= 0)
-      {
-        times[times.size() - 1] += restTime;
-        envGraph->setDomainX(0, newDuration);
-        //  qDebug() << "restTime reduce by " << restTime;
-        this->setEnv(this->getEnv());
-      }
-      else
-      {
-        durationBox->setValue(QString::number(duration));
-        mBridge->msgWarningAct(tr("Set of duration is lower than the penultimate vertex time. Quant is set back to %1").arg(QString::number(duration)));
-      }
-    }
   }
 
   QString ControlEnvelope::getEnv()
@@ -250,6 +223,11 @@ qDebug() << "Graph::setEnv [string] -> "
     QStringList txtLevels;
     QStringList txtTime;
     QStringList txtCurves;
+
+    qDebug() << "Graph::getEnv -> "
+      << "levels: " << levels
+      << "times: " << times
+      << "curves: " << curves;
 
     foreach(double oneLevel, levels) {
       QString txt = QString::number(oneLevel, 'f', 2);
@@ -284,22 +262,46 @@ qDebug() << "Graph::setEnv [string] -> "
       txtCurves.join(", ")
       );
 
+
     return codeEnv;
   }
 
-  QVector<QPointF> ControlEnvelope::getEnvPoints(int segments)
+  void ControlEnvelope::setDuration(QString val)
   {
-    QVector<QPointF> points;
-    QString env = this->getEnv();
-    // qDebug() << "graph pixelX: " << envGraph->boundsGraph().width();
-    // segments = envGraph->boundsGraph().width()/4;
-    for (int i = 0; i <= segments; i++)
+    quant = val.toInt();
+    double newDuration = val.toDouble();
+    qDebug() << "newDuration set to " << newDuration;
+    double restTime = newDuration - duration;
+    if (restTime > 0)
     {
-      double xVal = (duration / (double)segments * i);
-      QString txtVal = mBridge->question(tr("%1.at(%2)").arg(env, QString::number(xVal))).toString();
-      points.append(QPointF(xVal, txtVal.toDouble()));
+      times[times.size() - 1] += restTime;
+      envGraph->setDomainX(0, newDuration);
+
+      qDebug() << "restTime set to " << restTime;
     }
-    return points;
+    else
+    {
+      if (times[times.size() - 1] + restTime >= 0)
+      {
+        times[times.size() - 1] += restTime;
+        envGraph->setDomainX(0, newDuration);
+        //  qDebug() << "restTime reduce by " << restTime;
+      }
+      else
+      {
+        durationBox->setValue(QString::number(duration));
+        mBridge->msgWarningAct(tr("Set of duration is lower than the penultimate vertex time. Quant is set back to %1").arg(QString::number(duration)));
+      }
+    }
+
+    QString newEnv = this->getEnv();
+    previousEnv = env;
+    env = newEnv;
+    this->getEnvArray(env);
+    envelopeCode->setText(env);
+
+    emit actEnvChanged(levels, times, curves);
+    this->makeTask(env);
   }
 
   void ControlEnvelope::freeControlBusIndex()
@@ -317,11 +319,11 @@ qDebug() << "Graph::setEnv [string] -> "
     // pozor na index, bude treba doresit
     /*
     QString code = tr("~%1[%2] = Pbind(\\instrument, \\envControl, \\bus, %2, \\dur, %3, \\env, [%4])").arg(
-      nodeName,
-      QString::number(busIndex),
-      QString::number(duration, 'f', 6),
-      env
-      );
+    nodeName,
+    QString::number(busIndex),
+    QString::number(duration, 'f', 6),
+    env
+    );
 
     mBridge->evaluateAtQuant(code, duration, true);
     */
@@ -329,28 +331,27 @@ qDebug() << "Graph::setEnv [string] -> "
     durationTimer->start();
 
 
-    
+
     QString pbind = tr("Pbind(\\instrument, \\envControl, \\group, ~%1.nodeID, \\bus, %2, \\dur, %3, \\env, [%4])").arg(
-    nodeName,
-    QString::number(busIndex),
-    QString::number(duration),
-    env
-    );
+      nodeName,
+      QString::number(busIndex),
+      QString::number(duration),
+      env
+      );
 
     //QString evalCode = tr("~%1[%2] = %3").arg(
     QString evalCode = tr("Pdef(\\%1_%2, %3)").arg(
-    nodeName,
-    QString::number(busIndex),
-    pbind,
-    QString::number(4)
-    );
+      nodeName,
+      QString::number(busIndex),
+      pbind
+      );
 
     mBridge->evaluate(evalCode, true);
     mBridge->evaluateAtQuant(tr("Pdef(\\%1_%2).play(quant:1)").arg(
-    nodeName,
-    QString::number(busIndex)
-    ), duration, true);
-    
+      nodeName,
+      QString::number(busIndex)
+      ), duration, true);
+
 
   }
 
@@ -360,7 +361,7 @@ qDebug() << "Graph::setEnv [string] -> "
     mBridge->question(tr("~%1.source.def.sourceCode").arg(nodeName), true);
     mBridge->question(tr("~%1.isPlaying").arg(nodeName), true);
 
-    this->setEnv(this->getEnv());
+    //this->setEnv(this->getEnv());
   }
 
   void ControlEnvelope::resizeEvent(QResizeEvent *event)
@@ -391,7 +392,7 @@ qDebug() << "Graph::setEnv [string] -> "
   void ControlEnvelope::onNextBeat(int beat)
   {
     //  int quant = int::qCeil (duration);
-   // qDebug() << "mod:" << beat % quant;
+    // qDebug() << "mod:" << beat % quant;
     if (beat % quant == 0)
     {
       qDebug() << "beat:" << beat;
@@ -405,14 +406,14 @@ qDebug() << "Graph::setEnv [string] -> "
     }
     else
     {
-     // currentBeat++;
+      // currentBeat++;
     }
 
   }
 
   void ControlEnvelope::onDurationTimerTick()
   {
-    currentTime += currentTime_step * mBridge->tempo / (float)1000; 
+    currentTime += currentTime_step * mBridge->tempo / (float)1000;
     envGraph->setTime(currentTime);
     this->update();
     // if (currentTime >= domainX.second) { currentTime = 0.0; }

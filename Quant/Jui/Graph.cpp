@@ -498,7 +498,7 @@ namespace Jui
 
   void GraphCurve::onObjectModify()
   {
-    //qDebug() << "GraphCurve::onObjectModify type: " << type;
+    qDebug() << "GraphCurve::onObjectModify type: " << type;
 
     GraphObject::onObjectModify();
 
@@ -850,11 +850,11 @@ namespace Jui
 
       // roztahuje posledni bod podle domenyX
       controlVertexs[controlVertexs.size() - 1]->setValueX(max);
-      controlCurves[controlCurves.size() - 1]->onObjectModify();
+     // controlCurves[controlCurves.size() - 1]->onObjectModify();
       // nic moc setup, dodelat
 
-      update();
       emit actDomainChanged(domainX, domainY);
+     // update();
     }
   }
   void Graph::setDomainY(float min, float max)
@@ -1083,9 +1083,7 @@ namespace Jui
       << "times: " << times
       << "curves: " << curves;
 
-    emit actEnvGraphChanged(levels, times, curves);
-
-    
+    emit actEnvGraphChanged(levels, times, curves);    
   }
 
   void Graph::onEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves)
