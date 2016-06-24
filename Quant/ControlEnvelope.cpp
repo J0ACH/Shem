@@ -270,14 +270,14 @@ namespace QuantIDE
   {
     quant = val.toInt();
     double newDuration = val.toDouble();
-    qDebug() << "newDuration set to " << newDuration;
+    //qDebug() << "newDuration set to " << newDuration;
     double restTime = newDuration - duration;
     if (restTime > 0)
     {
       times[times.size() - 1] += restTime;
       envGraph->setDomainX(0, newDuration);
 
-      qDebug() << "restTime set to " << restTime;
+      //qDebug() << "restTime set to " << restTime;
     }
     else
     {
@@ -317,21 +317,19 @@ namespace QuantIDE
   void ControlEnvelope::makeTask(QString env)
   {
     // pozor na index, bude treba doresit
-    /*
-    QString code = tr("~%1[%2] = Pbind(\\instrument, \\envControl, \\bus, %2, \\dur, %3, \\env, [%4])").arg(
+    
+    QString code = tr("~%1[%2] = Pbind(\\instrument, \\envControl, \\bus, %2, \\dur, %3, \\env, [%4]).clock_(p[\\tempo])").arg(
     nodeName,
     QString::number(busIndex),
     QString::number(duration, 'f', 6),
     env
     );
 
-    mBridge->evaluateAtQuant(code, duration, true);
-    */
+    mBridge->evaluate(code, duration, true);
+    
 
     durationTimer->start();
-
-
-
+    /*
     QString pbind = tr("Pbind(\\instrument, \\envControl, \\group, ~%1.nodeID, \\bus, %2, \\dur, %3, \\env, [%4])").arg(
       nodeName,
       QString::number(busIndex),
@@ -351,6 +349,7 @@ namespace QuantIDE
       nodeName,
       QString::number(busIndex)
       ), duration, true);
+    */
 
 
   }
