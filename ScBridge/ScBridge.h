@@ -70,10 +70,10 @@ namespace SupercolliderBridge
     void msgResultAct(QString const &);
     void msgBundleAct(QString const &);
 
-    //void answerAct(QUuid id, int selector, QStringList answer);
     void actSynced();
     void actAnswered();
     void actNextBeat(int beat);
+    void actTempoChanged();
 
     void killBridgeDoneAct();
 

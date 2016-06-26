@@ -407,8 +407,7 @@ namespace SupercolliderBridge
     else if (msg.contains("bundle")) { emit msgBundleAct(msg); }
     else if (msg.contains("beatFlag"))
     {
-     // emit msgStatusAct("beat");
-     // this->evaluate("p['tempo'].clock.beats", true);
+      // int beat2 = this->question("p.clock.beats").toString().toInt();
       emit actNextBeat(beat);
       beat++;
     }
@@ -524,8 +523,9 @@ namespace SupercolliderBridge
 
   void ScBridge::onChangeTempo(QString BPM)
   {
-    this->evaluate(tr("p[\\tempo].clock.tempo_(%1/60)").arg(BPM), true);
-    tempo = this->question("p[\\tempo].clock.tempo", true).toString().toFloat();
+    this->evaluate(tr("p.clock.tempo_(%1/60)").arg(BPM), true);
+    tempo = this->question("p.clock.tempo", true).toString().toFloat();
+    emit actTempoChanged();
   }
 
   ScBridge::~ScBridge() {	}

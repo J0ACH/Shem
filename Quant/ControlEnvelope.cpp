@@ -38,12 +38,14 @@ namespace QuantIDE
       this, SIGNAL(actEnvChanged(QList<double>, QList<double>, QList<QString>)),
       envGraph, SLOT(onEnvChanged(QList<double>, QList<double>, QList<QString>))
       );
-    connect(durationBox, SIGNAL(actValueChanged(QString)), this, SLOT(setDuration(QString)));
     connect(mBridge, SIGNAL(actNextBeat(int)), this, SLOT(onNextBeat(int)));
+    connect(mBridge, SIGNAL(actTempoChanged()), this, SLOT(onTempoChanged()));
 
+    connect(durationBox, SIGNAL(actValueChanged(QString)), this, SLOT(setDuration(QString)));
     connect(durationTimer, SIGNAL(timeout()), this, SLOT(onDurationTimerTick()));
 
     mBridge->evaluate(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
+    durationTimer->start();
   }
 
   QRect ControlEnvelope::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
@@ -68,6 +70,7 @@ namespace QuantIDE
     durationBox->setLabelSize(45);
     durationBox->setColorBackground(QColor(60, 30, 30));
     durationBox->setColorText(QColor(120, 120, 120));
+
   }
 
   void ControlEnvelope::getEnvArray(QString envCode)
@@ -321,11 +324,11 @@ namespace QuantIDE
     taskCode = tr("~%1[%2] = Task { p.clock.timeToNextBeat(%3).wait;	loop { Synth(\\envControl, [\\bus: %2, \\tempo: p.clock.tempo, \\env: [%4]]); %3.wait; }}").arg(
       nodeName,
       QString::number(busIndex),
-      QString::number(duration),
+      QString::number(duration / mBridge->tempo),
       env
       );
-    mBridge->evaluate(taskCode, true);
-    durationTimer->start();
+    mBridge->evaluate(taskCode);
+    
   }
 
   void ControlEnvelope::mouseReleaseEvent(QMouseEvent *mouseEvent)
@@ -364,24 +367,32 @@ namespace QuantIDE
 
   void ControlEnvelope::onNextBeat(int beat)
   {
-    //  int quant = int::qCeil (duration);
-    // qDebug() << "mod:" << beat % quant;
-    if (beat % quant == 0)
-    {
-      qDebug() << "beat:" << beat;
-      //}
-      //qDebug() << "currentBeat:" << currentBeat;
-      //if (currentBeat >= duration - 1)
-      //{
-      this->resetTime();
-      //mBridge->msgStatusAct("tickReset");
-      //
-    }
-    else
-    {
-      // currentBeat++;
-    }
+    // problem s quantem a tempem
+    // spravne if (beat % quant/mBridge->tempo == 0) ale neni int
+     qDebug() << "beat:" << beat;    
+    currentTime = beat % quant;
+    //if (beat % quant == 0)
+    //{
+      // qDebug() << "beat:" << beat;    
+      //this->resetTime();
+    //}
 
+    /*
+    qDebug() << "\nControlEnvelope::onNextBeat beat" << beat;
+
+    float divide = beat / (float)duration;
+    qDebug() << "divide" << divide;
+
+    int floor = qFloor(divide); 
+    qDebug() << "floor" << floor;
+
+    qDebug() << "beat - floor*duration" << beat - floor*duration ;
+    if (beat - floor*duration >= duration-1)
+    {
+      this->resetTime();
+    }
+    */
+    
   }
 
   void ControlEnvelope::onDurationTimerTick()
@@ -392,6 +403,7 @@ namespace QuantIDE
     // if (currentTime >= domainX.second) { currentTime = 0.0; }
   }
 
+  void ControlEnvelope::onTempoChanged()  { this->makeTask(env); durationTimer->start(); }
   void ControlEnvelope::resetTime()  { currentTime = 0.0; }
 
   ControlEnvelope::~ControlEnvelope()  {  }

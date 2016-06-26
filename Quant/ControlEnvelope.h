@@ -40,6 +40,7 @@ namespace QuantIDE
     void setEnv(QList<double> listLevels, QList<double> listTimes, QList<QString> listCurves);
     void setDuration(QString);
 
+    void onTempoChanged();
     void onNextBeat(int beat);
     void onDurationTimerTick();
 
@@ -57,7 +58,6 @@ namespace QuantIDE
 
     int quant;
     float duration;
-    //int currentBeat;
     int cntVertex;
     bool changedCntVertex;
     QString env, previousEnv;
