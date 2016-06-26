@@ -317,41 +317,15 @@ namespace QuantIDE
   void ControlEnvelope::makeTask(QString env)
   {
     // pozor na index, bude treba doresit
-    
-    QString code = tr("~%1[%2] = Pbind(\\instrument, \\envControl, \\bus, %2, \\dur, %3, \\env, [%4]).clock_(p[\\tempo])").arg(
-    nodeName,
-    QString::number(busIndex),
-    QString::number(duration, 'f', 6),
-    env
-    );
-
-    mBridge->evaluate(code, duration, true);
-    
-
-    durationTimer->start();
-    /*
-    QString pbind = tr("Pbind(\\instrument, \\envControl, \\group, ~%1.nodeID, \\bus, %2, \\dur, %3, \\env, [%4])").arg(
+    QString taskCode;
+    taskCode = tr("~%1[%2] = Task { p.clock.timeToNextBeat(%3).wait;	loop { Synth(\\envControl, [\\bus: %2, \\tempo: p.clock.tempo, \\env: [%4]]); %3.wait; }}").arg(
       nodeName,
       QString::number(busIndex),
       QString::number(duration),
       env
       );
-
-    //QString evalCode = tr("~%1[%2] = %3").arg(
-    QString evalCode = tr("Pdef(\\%1_%2, %3)").arg(
-      nodeName,
-      QString::number(busIndex),
-      pbind
-      );
-
-    mBridge->evaluate(evalCode, true);
-    mBridge->evaluateAtQuant(tr("Pdef(\\%1_%2).play(quant:1)").arg(
-      nodeName,
-      QString::number(busIndex)
-      ), duration, true);
-    */
-
-
+    mBridge->evaluate(taskCode, true);
+    durationTimer->start();
   }
 
   void ControlEnvelope::mouseReleaseEvent(QMouseEvent *mouseEvent)

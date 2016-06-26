@@ -37,7 +37,6 @@ namespace SupercolliderBridge
     float tempo;
     int beat;
     bool evaluate(QString code, bool print = false, bool silent = false);
-    void evaluateAtQuant(QString code, float quant, bool print = false);
     QVariant question(QString code, bool print = false);
 
     private slots:
@@ -52,7 +51,7 @@ namespace SupercolliderBridge
 
     void onChangeTempo(QString BPM);
 
-    signals:
+  signals:
     void interpretBootInitAct();
     void interpretBootDoneAct();
     void interpretKillInitAct();

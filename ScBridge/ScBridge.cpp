@@ -132,30 +132,6 @@ namespace SupercolliderBridge
 
     return true;
   }
-  void ScBridge::evaluateAtQuant(QString code, float quant, bool print)
-  {
-    
-    float time2Evaluation = this->question(tr("p[\\tempo].clock.timeToNextBeat(%1)").arg(
-      QString::number(quant)
-      ), true).toString().toFloat();
-
-    QString evalCode = tr("p[\\tempo].clock.sched( %1, { %2 })").arg(
-      QString::number(time2Evaluation, 'f', 6),
-      code
-      );
-    /*
-    float time2Evaluation = this->question(tr("TempoClock.default.timeToNextBeat(%1)").arg(
-      QString::number(quant)
-      ), true).toString().toFloat();
-
-    QString evalCode = tr("TempoClock.default.sched( %1, {'quantEval'.postln; %2 })").arg(
-      QString::number(time2Evaluation),
-      code
-      );
-    */
-    
-    this->evaluate(evalCode, print);
-  }
 
   QVariant ScBridge::question(QString code, bool print)
   {
