@@ -99,9 +99,10 @@ namespace QuantIDE
     fTime = "0";
 
     mBridge->evaluate(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-    mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(1);").arg(nodeName, volume, fTime), true);
+     mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(1);").arg(nodeName, volume, fTime), true);
+    //mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3);").arg(nodeName, volume, fTime), true);
     mBridge->evaluate(tr("~%1.pause()").arg(nodeName), true);
-   // mBridge->evaluate(tr("~%1.stop()").arg(nodeName), true);
+    // mBridge->evaluate(tr("~%1.stop()").arg(nodeName), true);
     stateNodePlay = StateNodePlay::STOP;
 
     labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
@@ -203,7 +204,7 @@ namespace QuantIDE
         }
       }
       if (!indexFound) {
-       // qDebug() << "Node::nextEmptyBusIndex(): " << i;
+        // qDebug() << "Node::nextEmptyBusIndex(): " << i;
         return i;
       };
     }
@@ -321,4 +322,14 @@ namespace QuantIDE
   {
 
   }
+  /*
+  float Node::timeToNextQuant()
+  {
+    float time = mBridge->question(tr("p[\\tempo].clock.timeToNextBeat(%1)").arg(
+      QString::number(quant)
+      ), true).toString().toFloat();
+
+    return time;
+  }
+  */
 }

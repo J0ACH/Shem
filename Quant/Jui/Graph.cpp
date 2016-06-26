@@ -3,264 +3,770 @@
 namespace Jui
 {
 
-  // GRAPH POINT	
-  GraphPoint::GraphPoint(QWidget *parent, int pointID, int pX, int pY, double valX, double valY) :
-    QWidget(parent),
-    ID(pointID),
-    pixelX(pX),
-    pixelY(pY),
-    valueX(valX),
-    valueY(valY)
+  // GRAPH OBJECT
+
+  GraphObject::GraphObject(QWidget *parent) :
+    graph(parent)
   {
-    parent->installEventFilter(this);
-    pointSize = 10;
-    curvature = "'lin'";
-    this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
+    Graph *parentGraph = qobject_cast<Graph*>(parent);
+    graphOrigin = parentGraph->boundsGraph().topLeft();
+    graphSize = parentGraph->boundsGraph().size();
 
-    setFocusPolicy(Qt::StrongFocus);
-    type = PointType::vertex;
+    domainX = parentGraph->getDomainX();
+    domainY = parentGraph->getDomainY();
 
-    labelID = new QLabel(parentWidget());
-    labelID->setAttribute(Qt::WA_NoMousePropagation);
-    labelID->setText(tr("ID: %1").arg(QString::number(ID)));
-    labelID->setGeometry(pixelX, pixelY, 80, 25);
+    modifyAlpha = 0;
+    fadeTimeOut = 800;
+    fps = 25;
+    modifyTime = new QTimer(this);
 
-    labelTime = new QLabel(parentWidget());
-    labelTime->setAttribute(Qt::WA_NoMousePropagation);
-    labelTime->setText(tr("x: %1").arg(QString::number(valX)));
-    labelTime->setGeometry(pixelX, pixelY + 15, 80, 25);
+    connect(this, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    connect(modifyTime, SIGNAL(timeout()), this, SLOT(onModifyTick()));
 
-    labelLevel = new QLabel(parentWidget());
-    labelLevel->setAttribute(Qt::WA_NoMousePropagation);
-    labelLevel->setText(tr("y: %1").arg(QString::number(valY)));
-    labelLevel->setGeometry(pixelX, pixelY + 30, 80, 25);
+    connect(
+      parentGraph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
+      this, SLOT(onDomainChanged(QPair<float, float>, QPair<float, float>))
+      );
 
-    labelCurve = new QLabel(parentWidget());
-    labelCurve->setAttribute(Qt::WA_NoMousePropagation);
-    labelCurve->setText(tr("crv: %1").arg(curvature));
-    labelCurve->setGeometry(pixelX, pixelY + 15, 80, 25);
-
-    labelID->hide();
-    labelTime->hide();
-    labelLevel->hide();
-    labelCurve->hide();
+    connect(parentGraph, SIGNAL(actResized(QSize)), this, SLOT(onGraphResized(QSize)));
   }
 
-  QRect GraphPoint::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
-
-  void GraphPoint::setID(int newID)
+  void GraphObject::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
   {
-    ID = newID;
-    labelID->setText(tr("ID: %1").arg(QString::number(ID)));
+    //  qDebug() << "GraphObject::onDomainChanged domX" << domX << "domY" << domY;
+    domainX = domX;
+    domainY = domY;
+    emit actModify();
   }
-  void GraphPoint::setX(int pX, double valX)
+
+  void GraphObject::onGraphResized(QSize newSize)
   {
-    pixelX = pX;
+    //  qDebug() << "GraphObject::onGraphResized newSize" << newSize;
+    graphSize = newSize;
+    emit actModify();
+  }
+
+  void GraphObject::onObjectModify()
+  {
+    modify = true;
+
+    modifyAlpha = 255;
+    modifyTime->stop();
+    modifyTime->setInterval(fadeTimeOut / fps);
+    modifyTime->start();
+  }
+
+  void GraphObject::onModifyTick()
+  {
+    modifyAlpha -= 255 / fps;
+    if (modifyAlpha <= 0)
+    {
+      modifyTime->stop();
+      modifyAlpha = 0;
+      modify = false;
+    }
+    //qDebug() << "modifyAlpha " << modifyAlpha;
+    this->redraw();
+  }
+
+  QPointF GraphObject::getValuePt()  { return QPointF(valueX, valueY); }
+  QPoint GraphObject::getPixel()
+  {
+    float percX = (valueX - domainX.first) / (float)(domainX.second - domainX.first);
+    int pixelX = percX * graphSize.width() + graphOrigin.x();;
+
+    float percY = (valueY - domainY.first) / (float)(domainY.second - domainY.first);
+    int pixelY = graphSize.height() - (percY * graphSize.height()) + graphOrigin.y();
+
+    return QPoint(pixelX, pixelY);
+  }
+  QPoint GraphObject::getPixel(QPointF valuePoint)
+  {
+    valueX = valuePoint.x();
+    valueY = valuePoint.y();
+    return this->getPixel();
+  }
+
+  float GraphObject::getDomainX_min()  { return this->domainX.first; }
+  float GraphObject::getDomainX_max()  { return this->domainX.second; }
+  float GraphObject::getDomainY_min()  { return this->domainY.first; }
+  float GraphObject::getDomainY_max()  { return this->domainY.second; }
+
+  void GraphObject::setValue(QPoint pixel)
+  {
+    float percX = (pixel.x() - graphOrigin.x()) / (float)graphSize.width();
+    valueX = percX * (domainX.second - domainX.first) + domainX.first;
+
+    float percY = 1 - (pixel.y() - graphOrigin.y()) / (float)graphSize.height();
+    valueY = percY * (domainY.second - domainY.first) + domainY.first;
+
+    emit actModify();
+  }
+
+  void GraphObject::setValueX(float valX)
+  {
     valueX = valX;
-    this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
-    labelTime->setText(tr("x: %1").arg(QString::number(valX)));
+    emit actModify();
   }
-  void GraphPoint::setY(int pY, double valY)
+  void GraphObject::setValueY(float valY)
   {
-    pixelY = pY;
     valueY = valY;
-    this->setGeometry(pixelX - pointSize / 2, pixelY - pointSize / 2, pointSize + 1, pointSize + 1);
-    labelLevel->setText(tr("y: %1").arg(QString::number(valY)));
-  }
-  void GraphPoint::setType(GraphPoint::PointType newType)
-  {
-    type = newType;
-    // update();
-  }
-  void GraphPoint::setCurvature(QString newCurvature)
-  {
-    curvature = newCurvature;
-    labelCurve->setText(tr("crv: %1").arg(curvature));
+    emit actModify();
   }
 
-  void GraphPoint::mousePressEvent(QMouseEvent *mouseEvent)
+  void GraphObject::draw(QPainter *painter)
   {
-    mousePressCoor = mouseEvent->pos();
-    mouseGlobalCoor = mouseEvent->globalPos();
+    painter->setPen(Qt::white);
+    painter->drawEllipse(this->getPixel(), 2, 2);
   }
 
-  void GraphPoint::mouseMoveEvent(QMouseEvent *mouseEvent)
-  {
-    QPoint pos = this->parentWidget()->mapFromGlobal(mouseEvent->globalPos());
+  void GraphObject::redraw() { graph->update(); }
 
-    switch (type)
+  GraphObject::~GraphObject(){};
+
+  // GRAPH OBJECT END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH VERTEX
+
+  GraphVertex::GraphVertex(QWidget *parent) : GraphObject(parent)
+  {
+    Graph *parentGraph = qobject_cast<Graph*>(parent);
+
+    parent->installEventFilter(this);
+    isSelcted = false;
+    pressed = false;
+    modify = false;
+    ID = -1;
+
+    type = VertexType::vertex;
+
+    cBoxX = new ControlBox(parent);
+    cBoxX->setLabelSize(8);
+    cBoxX->setLabel("x");
+    cBoxX->hide();
+    cBoxY = new ControlBox(parent);
+    cBoxY->setLabel("y");
+    cBoxY->setLabelSize(8);
+    cBoxY->hide();
+
+    connect(this, SIGNAL(actMoved(int)), parentGraph, SLOT(onVertexMoved(int)));
+    connect(this, SIGNAL(actSelected(int)), parentGraph, SLOT(onVertexSelected(int)));
+    connect(this, SIGNAL(actDeleted(int)), parentGraph, SLOT(onVertexDeleted(int)));
+
+    connect(cBoxX, SIGNAL(actValueChanged(QString)), this, SLOT(onCBoxValXChanged(QString)));
+    connect(cBoxY, SIGNAL(actValueChanged(QString)), this, SLOT(onCBoxValYChanged(QString)));
+  }
+
+  void GraphVertex::setType(VertexType vertexType)  { type = vertexType; }
+
+  void GraphVertex::onCBoxValXChanged(QString txtVal)
+  {
+    valueX = txtVal.toFloat();
+    emit actModify();
+  }
+  void GraphVertex::onCBoxValYChanged(QString txtVal)
+  {
+    valueY = txtVal.toFloat();
+    emit actModify();
+  }
+
+  void GraphVertex::setSelected(bool select)
+  {
+    isSelcted = select;
+    if (isSelcted)
     {
-    case vertex:
-      this->setGeometry(
-        pos.x() - mousePressCoor.x(),
-        pos.y() - mousePressCoor.y(),
-        this->width(),
-        this->height()
-        );
-      break;
-    case startPoint:
-    case endPoint:
-      this->setGeometry(
-        pixelX - pointSize / 2,
-        pos.y() - mousePressCoor.y(),
-        this->width(),
-        this->height()
-        );
-      break;
-
-    default:
-      break;
+      cBoxX->show();
+      cBoxY->show();
     }
-
-    int tempX = this->pos().x() + pointSize / 2;
-    int tempY = this->pos().y() + pointSize / 2;
-
-    labelID->setGeometry(tempX, tempY, 80, 25);
-    labelTime->setGeometry(tempX, tempY + 15, 80, 25);
-    labelLevel->setGeometry(tempX, tempY + 30, 80, 25);
-    labelCurve->setGeometry(tempX, tempY + 15, 80, 25);
-    //update();
-
-  }
-
-  void GraphPoint::mouseReleaseEvent(QMouseEvent *mouseEvent)
-  {
-    int deltaX, deltaY;
-    bool moved = false;
-
-    switch (type)
+    else
     {
-    case vertex:
-      deltaX = mouseEvent->globalPos().x() - mouseGlobalCoor.x();
-      deltaY = mouseEvent->globalPos().y() - mouseGlobalCoor.y();
-      pixelX += deltaX;
-      pixelY += deltaY;
-      if (deltaX != 0 || deltaY != 0) { moved = true; }
-      break;
-
-    case startPoint:
-    case endPoint:
-      deltaY = mouseEvent->globalPos().y() - mouseGlobalCoor.y();
-      pixelY += deltaY;
-      if (deltaY != 0) { moved = true; }
-      break;
+      cBoxX->hide();
+      cBoxY->hide();
     }
-
-    if (moved) { emit actMoved(ID, pixelX, pixelY); }
   }
 
-  bool GraphPoint::eventFilter(QObject* target, QEvent* event)
+  bool GraphVertex::eventFilter(QObject* target, QEvent* event)
   {
-    if (hasFocus())
+    QMouseEvent *eventMouse;
+
+    switch (event->type())
     {
-      if (event->type() == QEvent::KeyPress)
+    case QEvent::MouseButtonPress:
+      eventMouse = static_cast<QMouseEvent*>(event);
+
+      if (this->isOver(eventMouse->pos()))
       {
-        QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
-        quint32 modifers = eventKey->nativeModifiers();
+        pressed = true;
+        cBoxX->setValue(QString::number(valueX, 'f', 2));
+        cBoxY->setValue(QString::number(valueY, 'f', 2));
+        emit actSelected(ID);
+        this->redraw();
+        return true;
+      }
+      break;
 
-        switch (eventKey->key())
+    case QEvent::MouseButtonRelease:
+      eventMouse = static_cast<QMouseEvent*>(event);
+      pressed = false;
+      break;
+
+    case QEvent::MouseMove:
+      if (isSelcted && pressed)
+      {
+        eventMouse = static_cast<QMouseEvent*>(event);
+        if (this->type == VertexType::vertex)
         {
-        case Qt::Key::Key_Delete:
+          this->setValue(eventMouse->pos());
+        }
+        else
+        {
+          QPoint px = this->getPixel();
+          this->setValue(QPoint(px.x(), eventMouse->pos().y()));
+        }
+        cBoxX->setValue(QString::number(valueX, 'f', 2));
+        cBoxY->setValue(QString::number(valueY, 'f', 2));
 
-          if (type == PointType::vertex)
+        emit actMoved(ID);
+      }
+      this->redraw();
+      break;
+
+    case QEvent::KeyPress:
+      if (isSelcted)
+      {
+        // qDebug() << "GraphVertex::KeyPress" << ID;
+
+        if (event->type() == QEvent::KeyPress)
+        {
+          QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
+          quint32 modifers = eventKey->nativeModifiers();
+
+          switch (eventKey->key())
           {
-            emit actDelete(ID);
-            this->close();
-            event->accept();
-            return true;
-          }
-          break;
+          case Qt::Key::Key_Delete:
+            if (type == VertexType::vertex)
+            {
+              emit actDeleted(ID);
+              this->redraw();
+              this->deleteLater();
+              return true;
+            }
+            break;
 
-        case Qt::Key::Key_Escape:
-          qDebug() << "KeyEvent: Escape PRESSED";
-          event->accept();
-          return true;
-          break;
+          case Qt::Key::Key_Escape:
+            qDebug() << "KeyEvent: Escape PRESSED";
+            return true;
+            break;
+          }
         }
       }
+      break;
     }
 
     return QObject::eventFilter(target, event);
   }
 
-  void GraphPoint::paintEvent(QPaintEvent *event)
+  bool GraphVertex::isOver(QPointF mouse)
   {
-    QPainter painter(this);
+    float tolerance = 10;
+    QPointF testPt = this->getPixel();
 
-    if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
-    else { painter.setPen(QColor(Qt::white)); }
+    bool overX = abs(testPt.x() - mouse.x()) < tolerance;
+    bool overY = abs(testPt.y() - mouse.y()) < tolerance;
+
+    if (overX && overY) { return true; }
+    else { return false; }
+  }
+
+  void GraphVertex::draw(QPainter *painter)
+  {
+    QPoint center = this->getPixel();
+    QRect rect(center.x() - 6, center.y() - 6, 13, 13);
+
+    /*
+    QRect rectID(center.x() + 8, center.y() - 20, 30, 20);
+    QTextOption option;
+    option.setAlignment(Qt::AlignCenter);
+    painter->setPen(QColor(180, 180, 180));
+    painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
+    */
+
+    QRect rectBoxX(center.x() + 8, center.y() + 8, 40, 17);
+    QRect rectBoxY(center.x() + 8, center.y() + 28, 40, 17);
+    cBoxX->setGeometry(rectBoxX);
+    cBoxY->setGeometry(rectBoxY);
+
+    if (isSelcted) { painter->setPen(QColor(180, 20, 20)); }
+    else { painter->setPen(QColor(180, 180, 180)); }
 
     switch (type)
     {
-    case Jui::GraphPoint::vertex:
-      painter.drawEllipse(bounds());
+      //case startPoint:
+    case vertex:
+      painter->drawEllipse(center, 4, 4);
       break;
-    case Jui::GraphPoint::startPoint:
-      //painter.drawRect(bounds());
-      painter.drawChord(bounds(), 16 * 270, 16 * 180);
+
+    case startPoint:
+      painter->drawChord(rect, 16 * 270, 16 * 180);
       break;
-    case Jui::GraphPoint::endPoint:
-      //painter.drawRect(bounds());
-      painter.drawChord(bounds(), 16 * 90, 16 * 180);
-      break;
-    case Jui::GraphPoint::curvePoint:
-      painter.drawRect(bounds());
+
+    case endPoint:
+      painter->drawChord(rect, 16 * 90, 16 * 180);
       break;
     }
 
-  }
-  void GraphPoint::closeEvent(QCloseEvent *event)
-  {
-    labelID->close();
-    labelTime->close();
-    labelLevel->close();
-    labelCurve->close();
+    if (modify)
+    {
+      QColor modifyColor = QColor(220, 200, 20);// modifyColor;
+      modifyColor.setAlpha(modifyAlpha);
+      painter->setPen(QPen(modifyColor, 2));
+      painter->drawEllipse(this->getPixel(), 5, 5);
+    }
   }
 
-  void GraphPoint::focusInEvent(QFocusEvent* event)
+  GraphVertex::~GraphVertex()
+  {
+    qDebug() << "Vertex ~DELETED" << ID;
+    cBoxX->close();
+    cBoxY->close();
+  };
+
+  // GRAPH VERTEX END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH CURVE
+
+  GraphCurve::GraphCurve(QWidget *parent, GraphVertex *pt1, GraphVertex *pt2) :
+    GraphObject(parent),
+    from(pt1),
+    to(pt2)
+  {
+    Graph *parentGraph = qobject_cast<Graph*>(parent);
+
+    type = CurveType::lin;
+    ID = -1;
+    pixelWidth = to->getPixel().x() - from->getPixel().x();
+    isMouseInDomain = false;
+
+    cBoxType = new ControlBox(parent);
+    cBoxType->setLabelSize(15);
+    cBoxType->setLabel("crv");
+    cBoxType->setValue("lin");
+    cBoxType->hide();
+
+    connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    connect(cBoxType, SIGNAL(actValueChanged(QString)), this, SLOT(onCBoxTypeChanged(QString)));
+    connect(this, SIGNAL(actTypeChanged(int)), parentGraph, SLOT(onCurveTypeChanged(int)));
+  }
+  void GraphCurve::setType(CurveType newType)
+  {
+    type = newType;
+    switch (type)
+    {
+    case CurveType::step:
+      cBoxType->setValue("step");
+      break;
+    default:
+    case CurveType::lin:
+      cBoxType->setValue("lin");
+      break;
+    case CurveType::exp:
+      cBoxType->setValue("exp");
+      break;
+    case CurveType::sin:
+      cBoxType->setValue("sin");
+      break;
+    case CurveType::welch:
+      cBoxType->setValue("welch");
+      break;
+    case CurveType::hold:
+      cBoxType->setValue("hold");
+      break;
+    }
+
+    emit actModify();
+  }
+  void GraphCurve::setFrom(GraphVertex *pt)
+  {
+    disconnect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    from = pt;
+    connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+  }
+  void GraphCurve::setTo(GraphVertex *pt)
+  {
+    disconnect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    to = pt;
+    connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+  }
+  void GraphCurve::flipEnds()
+  {
+    disconnect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    disconnect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+
+    GraphVertex *temp = from;
+    from = to;
+    to = temp;
+
+    connect(from, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+    connect(to, SIGNAL(actModify()), this, SLOT(onObjectModify()));
+  }
+
+  bool GraphCurve::isOverCurveDomain(float valX)
+  {
+    isMouseInDomain = true;
+    if (from->valueX > valX) {
+      isMouseInDomain = false;
+      cBoxType->hide();
+      return false;
+    }
+    if (to->valueX < valX) {
+      isMouseInDomain = false;
+      cBoxType->hide();
+      return false;
+    }
+    cBoxType->show();
+    return true;
+  }
+
+  float GraphCurve::at(float valX)
+  {
+    float percX = (valX - from->valueX) / (to->valueX - from->valueX);
+    qreal domFrom, domTo;
+    float valAt;
+
+    switch (type)
+    {
+    case CurveType::step:
+      valAt = to->valueY;
+      break;
+
+    default:
+    case CurveType::lin:
+      valAt = (to->valueY - from->valueY)*percX + from->valueY;
+      break;
+
+    case CurveType::exp:
+      if (from->valueY < to->valueY)
+      {
+        valAt = (to->valueY - from->valueY)*qPow(percX, 2) + from->valueY;
+      }
+      else
+      {
+        valAt = (from->valueY - to->valueY)*qPow((1 - percX), 2) + to->valueY;
+      }
+      break;
+
+    case CurveType::sin:
+      if (from->valueY < to->valueY)
+      {
+        domFrom = 3 * M_PI_2;
+        domTo = 5 * M_PI_2;
+        percX = (domTo - domFrom) * percX + domFrom;
+        valAt = ((to->valueY - from->valueY)*qSin(percX) + (to->valueY - from->valueY)) / 2 + from->valueY;
+      }
+      else
+      {
+        domFrom = M_PI_2;
+        domTo = 3 * M_PI_2;
+        percX = (domTo - domFrom) * percX + domFrom;
+        valAt = ((from->valueY - to->valueY)*qSin(percX) + (from->valueY - to->valueY)) / 2 + to->valueY;
+      }
+      break;
+
+    case CurveType::welch:
+
+      if (from->valueY < to->valueY)
+      {
+        valAt = (from->valueY - to->valueY)*qPow((1 - percX), 2) + to->valueY;
+      }
+      else
+      {
+        valAt = (to->valueY - from->valueY)*qPow(percX, 2) + from->valueY;
+      }
+
+      break;
+
+
+    case CurveType::hold:
+      valAt = from->valueY;
+      break;
+    }
+
+    // qDebug() << "valX " << valX << " AT: " << valAt;
+    return valAt;
+  }
+
+  void GraphCurve::onObjectModify()
+  {
+    qDebug() << "GraphCurve::onObjectModify type: " << type;
+
+    GraphObject::onObjectModify();
+
+    QPoint fromPt = from->getPixel();
+    QPoint toPt = to->getPixel();
+    pixelWidth = toPt.x() - fromPt.x();
+    int cntSeg = 20;
+    qreal segStep = (to->valueX - from->valueX) / cntSeg;//  pixelWidth;
+
+    polygon = QPolygon();
+    polygon.append(fromPt);
+    switch (type)
+    {
+    case step:
+      polygon.append(QPoint(fromPt.x(), toPt.y()));
+      break;
+
+    default:
+    case lin:
+      break;
+
+    case exp:
+      for (float xCoor = from->valueX + segStep; xCoor < to->valueX; xCoor += segStep)
+      {
+        float yCoor = this->at(xCoor);
+        polygon.append(this->getPixel(QPointF(xCoor, yCoor)));
+      }
+      break;
+
+    case sin:
+      for (float xCoor = from->valueX + segStep; xCoor < to->valueX; xCoor += segStep)
+      {
+        float yCoor = this->at(xCoor);
+        polygon.append(this->getPixel(QPointF(xCoor, yCoor)));
+      }
+      break;
+
+    case welch:
+      for (float xCoor = from->valueX + segStep; xCoor < to->valueX; xCoor += segStep)
+      {
+        float yCoor = this->at(xCoor);
+        polygon.append(this->getPixel(QPointF(xCoor, yCoor)));
+      }
+      break;
+
+    case hold:
+      polygon.append(QPoint(toPt.x(), fromPt.y()));
+      break;
+    }
+
+    polygon.append(toPt);
+  }
+
+  void GraphCurve::onCBoxTypeChanged(QString txtType)
+  {
+    if (txtType == "step") { this->setType(CurveType::step); }
+    else if (txtType == "exp") { this->setType(CurveType::exp); }
+    else if (txtType == "sin") { this->setType(CurveType::sin); }
+    else if (txtType == "welch") { this->setType(CurveType::welch); }
+    else if (txtType == "hold") { this->setType(CurveType::hold); }
+    else { this->setType(CurveType::lin); }
+
+    this->onObjectModify();
+
+    emit actTypeChanged(ID);
+  }
+
+  void GraphCurve::draw(QPainter *painter)
+  {
+    QPoint fromPt = from->getPixel();
+    QPoint toPt = to->getPixel();
+    QPoint center;
+    center.setX((toPt.x() + fromPt.x()) / 2);
+    center.setY((toPt.y() + fromPt.y()) / 2);
+
+    QRect rectBoxType(center.x() - 20, center.y() - 8, 50, 16);
+    cBoxType->setGeometry(rectBoxType);
+
+    QRect rectID(center.x(), center.y(), 30, 20);
+    QRect rectWidth(center.x(), center.y() + 15, 50, 20);
+
+    QTextOption option;
+    option.setAlignment(Qt::AlignLeft);
+    painter->setPen(QColor(180, 180, 180));
+    //painter->drawText(rectID, tr("ID: %1").arg(QString::number(ID)), option);
+    //painter->drawText(rectWidth, tr("px: %1").arg(QString::number(pixelWidth)), option);
+
+    if (isMouseInDomain) { painter->setPen(QColor(180, 20, 20)); }
+    else { painter->setPen(QColor(40, 200, 40)); }
+
+    painter->drawPolyline(polygon);
+
+    if (modify)
+    {
+      QColor modifyColor = QColor(220, 200, 20);// modifyColor;
+      modifyColor.setAlpha(modifyAlpha);
+      painter->setPen(QPen(modifyColor, 2));
+      painter->drawPolyline(polygon);
+    }
+  }
+
+  GraphCurve::~GraphCurve()
+  {
+    qDebug() << "Curve ~DELETED" << ID;
+    cBoxType->close();
+  };
+
+  // GRAPH CURVE END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH AXIS
+
+  GraphAxis::GraphAxis(QWidget *parent, float value, AxisType direction = AxisType::horizontal) :
+    GraphObject(parent),
+    type(direction)
+  {
+    Graph *parentGraph = qobject_cast<Graph*>(parent);
+
+    from = new GraphObject(parent);
+    to = new GraphObject(parent);
+
+    switch (type)
+    {
+    case AxisType::horizontal:
+      from->valueX = 0;
+      from->valueY = value;
+      to->valueX = 1;
+      to->valueY = value;
+      break;
+    case AxisType::vertical:
+      from->valueX = value;
+      from->valueY = 1;
+      to->valueX = value;
+      to->valueY = 0;
+      break;
+    }
+
+    connect(
+      parentGraph, SIGNAL(actDomainChanged(QPair<float, float>, QPair<float, float>)),
+      this, SLOT(onDomainChanged(QPair<float, float>, QPair<float, float>))
+      );
+  }
+  void GraphAxis::setValue(float newValue)
   {
     switch (type)
     {
-    case Jui::GraphPoint::vertex:
-    case Jui::GraphPoint::startPoint:
-    case Jui::GraphPoint::endPoint:
-      labelID->show();
-      labelTime->show();
-      labelLevel->show();
-      labelCurve->hide();
+    case AxisType::horizontal:
+      from->valueY = newValue;
+      to->valueY = newValue;
       break;
-    case Jui::GraphPoint::curvePoint:
-      labelID->show();
-      labelTime->hide();
-      labelLevel->hide();
-      labelCurve->show();
+    case AxisType::vertical:
+      from->valueX = newValue;
+      to->valueX = newValue;
       break;
     }
-    update();
   }
 
-  void GraphPoint::focusOutEvent(QFocusEvent* event)
+  void GraphAxis::onDomainChanged(QPair<float, float> domX, QPair<float, float> domY)
   {
-    labelID->hide();
-    labelTime->hide();
-    labelLevel->hide();
-    labelCurve->hide();
-    update();
+    GraphObject::onDomainChanged(domX, domY);
+
+    switch (type)
+    {
+    case AxisType::horizontal:
+      from->valueX = domX.first;
+      to->valueX = domX.second;
+      break;
+    case AxisType::vertical:
+      from->valueY = domY.second;
+      to->valueY = domY.first;
+      break;
+    }
   }
 
-  void GraphPoint::moveEvent(QMoveEvent * event)
+  void GraphAxis::draw(QPainter *painter)
   {
-    labelID->setGeometry(pixelX, pixelY, 80, 25);
-    labelTime->setGeometry(pixelX, pixelY + 15, 80, 25);
-    labelLevel->setGeometry(pixelX, pixelY + 30, 80, 25);
-    labelCurve->setGeometry(pixelX, pixelY + 15, 80, 25);
-    update();
+    QPoint pxFrom = from->getPixel();
+    QPoint pxTo = to->getPixel();
+
+    painter->setPen(QColor(70, 70, 70));
+    painter->drawLine(pxFrom, pxTo);
+
+    QTextOption option;
+    option.setAlignment(Qt::AlignCenter);
+
+    QRect rect;
+    switch (type)
+    {
+    case AxisType::horizontal:
+      rect = QRect(pxFrom.x() - 50, pxFrom.y() - 10, 50, 20);
+      painter->drawText(rect, QString::number(from->valueY, 'f', 2), option);
+      break;
+    case AxisType::vertical:
+      rect = QRect(pxTo.x() - 25, pxTo.y(), 50, 20);
+      painter->drawText(rect, QString::number(from->valueX, 'f', 2), option);
+      break;
+    }
   }
 
-  GraphPoint::~GraphPoint(){}
+  GraphAxis::~GraphAxis(){}
 
+  // GRAPH AXIS END
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // GRAPH MOUSE 
 
-  // GRAPH POINT END
+  GraphMouse::GraphMouse(QWidget *parent) : GraphObject(parent)
+  {
+    Graph *parentGraph = qobject_cast<Graph*>(parent);
+
+    parent->installEventFilter(this);
+
+    axisX = new GraphAxis(parent, 0, horizontal);
+    axisY = new GraphAxis(parent, 0, vertical);
+    curvePt = new GraphObject(parent);
+
+    connect(
+      this, SIGNAL(actPositionChanged(QPair<float, float>)),
+      parentGraph, SLOT(onMouseMoved(QPair<float, float>))
+      );
+  }
+
+  bool GraphMouse::eventFilter(QObject* target, QEvent* event)
+  {
+    QMouseEvent *eventMouse;
+    QPair<float, float> mouseVal;
+
+    switch (event->type())
+    {
+    case QEvent::MouseMove:
+
+      eventMouse = static_cast<QMouseEvent*>(event);
+      this->setValue(eventMouse->pos());
+
+      mouseVal.first = this->valueX;
+      mouseVal.second = this->valueY;
+
+      emit actPositionChanged(mouseVal);
+
+      axisX->setValue(this->valueY);
+      axisY->setValue(this->valueX);
+
+      //}
+      return true;
+      break;
+    }
+    return QObject::eventFilter(target, event);
+  }
+
+  void GraphMouse::draw(QPainter *painter)
+  {
+    if (valueY < this->getDomainY_max() && valueY > this->getDomainY_min()) {
+      axisX->draw(painter);
+      axisY->draw(painter);
+
+      curvePt->valueX = this->valueX;
+      curvePt->valueY = this->crvVal;
+      QPoint centerPt = curvePt->getPixel();
+      QRect rectVal(centerPt.x() - 15, centerPt.y() - 20, 30, 20);
+
+      QTextOption option;
+      option.setAlignment(Qt::AlignCenter);
+      painter->setPen(QColor(230, 230, 230));
+      painter->drawEllipse(centerPt, 2, 2);
+      painter->drawText(rectVal, QString::number(crvVal, 'f', 2), option);
+    }
+  }
+  GraphMouse::~GraphMouse(){}
+
+  // GRAPH MOUSE END
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   // GRAPH 
 
@@ -269,19 +775,56 @@ namespace Jui
   {
     this->setMouseTracking(true);
     frameOffset = 25;
-    minDomainX = 0;
-    maxDomainX = 1;
-    minDomainY = 0;
-    maxDomainY = 1;
-    //cursorPos = QPoint();
-    controlPts = QList<GraphPoint*>();
-    graphPolylines = new QPolygonF();
-    //graphValues = QList<double>();
 
-    //newPointID = 0;
+    domainX.first = 0;
+    domainX.second = 1;
+    domainY.first = 0;
+    domainY.second = 1;
+
+    numGraphAxisX = 4;
+    numGraphAxisY = 4;
 
     setFocusPolicy(Qt::StrongFocus);
 
+    graphMouse = new GraphMouse(this); // musi byt zadan pred vertexema
+
+    GraphVertex *startVertex = new GraphVertex(this);
+    startVertex->valueX = 0.0;
+    startVertex->valueY = 0.0;
+    startVertex->ID = 0;
+    startVertex->setType(VertexType::startPoint);
+    controlVertexs.append(startVertex);
+
+    GraphVertex *endVertex = new GraphVertex(this);
+    endVertex->valueX = 1.0;
+    endVertex->valueY = 0.0;
+    endVertex->ID = 1;
+    endVertex->setType(VertexType::endPoint);
+    controlVertexs.append(endVertex);
+
+    GraphCurve *baseCurve = new GraphCurve(this, startVertex, endVertex);
+    baseCurve->ID = 0;
+    baseCurve->setType(CurveType::sin);
+    controlCurves.append(baseCurve);
+
+    timeAxis = new GraphAxis(this, 0, AxisType::vertical);
+
+    for (double i = 0; i <= 1; i += 0.25)
+    {
+      GraphAxis *vAxis = new GraphAxis(this, i, AxisType::vertical);
+      graphVerticalAxis.append(vAxis);
+    }
+    for (double i = 0; i <= 1; i += 0.25)
+    {
+      GraphAxis *hAxis = new GraphAxis(this, i, AxisType::horizontal);
+      graphHorizontalAxis.append(hAxis);
+    }
+
+    this->sortVertexByX();
+
+    emit actDomainChanged(domainX, domainY);
+
+    
   }
 
   QRect Graph::bounds() { return QRect(0, 0, width(), height()); }
@@ -290,207 +833,191 @@ namespace Jui
     return bounds().adjusted(frameOffset * 2, 14, -14, -frameOffset);
   }
 
-  void Graph::setDomainX(double min, double max)
+  void Graph::setDomainX(float min, float max)
   {
-    minDomainX = min;
-    maxDomainX = max;
-    update();
-  }
-  void Graph::setDomainY(double min, double max)
-  {
-    minDomainY = min;
-    maxDomainY = max;
-    update();
-  }
+    bool isModify = false;
+    if (domainX.first != min) { domainX.first = min; isModify = true; }
+    if (domainX.second != max) { domainX.second = max; isModify = true; }
 
-  QList<double> Graph::getDomainX()
-  {
-    QList<double> range;
-    range.append(minDomainX);
-    range.append(maxDomainX);
-    return range;
-  }
-  QList<double> Graph::getDomainY()
-  {
-    QList<double> range;
-    range.append(minDomainY);
-    range.append(maxDomainY);
-    return range;
-  }
-
-  double Graph::getValueX(int displayX)
-  {
-    double perc = (displayX - boundsGraph().left()) / (double)boundsGraph().width();
-    return perc * (maxDomainX - minDomainX) + minDomainX;
-  }
-  double Graph::getValueY(int displayY)
-  {
-    double perc = 1 - (displayY - boundsGraph().top()) / (double)boundsGraph().height();
-    return perc * (maxDomainY - minDomainY) + minDomainY;
-  }
-  double Graph::getPixelX(double valueX)
-  {
-    double perc = (valueX - minDomainX) / (double)(maxDomainX - minDomainX);
-    return perc * boundsGraph().width() + boundsGraph().left();
-  }
-  double Graph::getPixelY(double valueY)
-  {
-    double perc = (valueY - minDomainY) / (double)(maxDomainY - minDomainY);
-    return boundsGraph().height() - (perc * boundsGraph().height()) + boundsGraph().top();
-  }
-
-  GraphPoint *Graph::addValuePoint(double valueX, double valueY, GraphPoint::PointType type = GraphPoint::PointType::vertex)
-  {
-    GraphPoint *pt = new GraphPoint(
-      this,
-      controlPts.size(),
-      getPixelX(valueX),
-      getPixelY(valueY),
-      valueX,
-      valueY
-      );
-    pt->type = type;
-    pt->show();
-    this->connect(pt, SIGNAL(actDelete(int)), this, SLOT(onDeletePoint(int)));
-    this->connect(pt, SIGNAL(actMoved(int, int, int)), this, SLOT(onMovePoint(int, int, int)));
-
-    qDebug() << "GraphPoint -> valueX: " << pt->valueX
-      << " valueY: " << pt->valueY
-      << " pixelX: " << pt->pixelX
-      << " pixelY: " << pt->pixelY;
-
-    if (type == GraphPoint::PointType::vertex)
+    if (isModify)
     {
-      if (controlPts.size() == 0) { controlPts.append(pt); }
-      else
+      float tempAxisVal = min;
+      foreach(GraphAxis *oneAxis, graphVerticalAxis)
       {
-        for (int i = 0; i <= controlPts.size(); i++)
+        oneAxis->setValue(tempAxisVal);
+        tempAxisVal += (max - min) / (float)numGraphAxisX;
+      }
+
+      // roztahuje posledni bod podle domenyX
+      controlVertexs[controlVertexs.size() - 1]->setValueX(max);
+     // controlCurves[controlCurves.size() - 1]->onObjectModify();
+      // nic moc setup, dodelat
+
+      emit actDomainChanged(domainX, domainY);
+     // update();
+    }
+  }
+  void Graph::setDomainY(float min, float max)
+  {
+    bool isModify = false;
+    if (domainY.first != min) { domainY.first = min; isModify = true; }
+    if (domainY.second != max) { domainY.second = max; isModify = true; }
+
+    if (isModify)
+    {
+      float tempAxisVal = min;
+      foreach(GraphAxis *oneAxis, graphHorizontalAxis)
+      {
+        oneAxis->setValue(tempAxisVal);
+        tempAxisVal += (max - min) / (float)numGraphAxisY;
+      }
+      update();
+      emit actDomainChanged(domainX, domainY);
+    }
+  }
+
+  QPair<float, float> Graph::getDomainX() { return domainX; }
+  QPair<float, float> Graph::getDomainY() { return domainY; }
+
+  void Graph::addVertex(QPointF valuePt)
+  {
+    GraphVertex *vertex = new GraphVertex(this);
+    vertex->setValueX(valuePt.x());
+    vertex->setValueY(valuePt.y());
+
+    int tempInsertPos = -1;
+    if (controlVertexs.size() == 0) { controlVertexs.append(vertex); }
+    else
+    {
+      for (int i = 0; i <= controlVertexs.size(); i++)
+      {
+        if (i == controlVertexs.size()) {
+          controlVertexs.append(vertex);
+          break;
+        }
+        if (controlVertexs[i]->valueX > vertex->valueX)
         {
-          if (i == controlPts.size()) {
-            controlPts.append(pt);
-            break;
-          }
-          if (controlPts[i]->valueX > pt->valueX)
-          {
-            controlPts.insert(i, pt);
-            break;
-          }
+          vertex->ID = i;
+          controlVertexs.insert(i, vertex);
+
+          controlCurves[i - 1]->setTo(vertex);
+          GraphCurve *insertCurve = new GraphCurve(this, vertex, controlVertexs[i + 1]);
+          insertCurve->ID = i - 1;
+          insertCurve->setType(controlCurves[i - 1]->type);
+          controlCurves.insert(i, insertCurve);
+
+          controlCurves[i - 1]->onObjectModify();
+          controlCurves[i]->onObjectModify();
+
+          tempInsertPos = i + 1;
+          break;
         }
       }
     }
-    else if (type == GraphPoint::PointType::curvePoint)
+
+    if (tempInsertPos != -1)
     {
-      curvePts.append(pt);
+      for (int i = tempInsertPos; i < controlVertexs.size(); i++)
+      {
+        controlVertexs[i]->ID = i;
+      }
+      for (int i = tempInsertPos - 2; i < controlVertexs.size() - 1; i++)
+      {
+        controlCurves[i]->ID = i;
+      }
     }
-    return pt;
   }
 
-  GraphPoint *Graph::addVertexPoint(QPointF pt)
+  void Graph::onMouseMoved(QPair<float, float> mouseValue)
   {
-    return this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::vertex);
-  }
-  void Graph::setVertexPoint(int ID, QPointF pt)
-  {
-    controlPts[ID]->setX(getPixelX(pt.x()), pt.x());
-    controlPts[ID]->setY(getPixelY(pt.y()), pt.y());
-  }
-  void Graph::setVertexType(int ID, GraphPoint::PointType newType)
-  {
-    controlPts[ID]->setType(newType);
-  }
+    //qDebug() << "Graph::onMouseMoved x: " << mouseValue.first << " y: " << mouseValue.second;
 
-  GraphPoint *Graph::addCurvePoint(QPointF pt)
-  {
-    return this->addValuePoint(pt.x(), pt.y(), GraphPoint::PointType::curvePoint);
-  }
-  void Graph::setCurvePoint(int ID, QPointF pt)
-  {
-    curvePts[ID]->setX(getPixelX(pt.x()), pt.x());
-    curvePts[ID]->setY(getPixelY(pt.y()), pt.y());
-  }
-  void Graph::setCurveCurvature(int ID, QString txt)
-  {
-    curvePts[ID]->setCurvature(txt);
+    foreach(GraphCurve *oneC, controlCurves)
+    {
+      if (oneC->isOverCurveDomain(mouseValue.first))
+      {
+        // qDebug() << "Graph::onMouseMoved ID " << oneC->ID << " -> at: " << oneC->at(mouseValue.first);
+        graphMouse->crvVal = oneC->at(mouseValue.first);
+      }
+    }
   }
 
-  void Graph::drawPoint(double valueX, double valueY)
+  void Graph::onVertexSelected(int ID)
   {
-    collDrawPoints.append(new QPointF(valueX, valueY));
-    update();
-  }
-  void Graph::drawLine(double valueX1, double valueY1, double valueX2, double valueY2)
-  {
-    collDrawLines.append(new QLineF(valueX1, valueY1, valueX2, valueY2));
-    update();
-  }
-  void Graph::drawPolyline(QVector<QPointF> collPoints)
-  {
-    graphPolylines = new QPolygonF(collPoints);
-    update();
+    // qDebug() << "Graph::onVertexSelected" << ID;
+    foreach(GraphVertex *oneV, controlVertexs)
+    {
+      if (oneV->ID == ID) { oneV->setSelected(true); }
+      else { oneV->setSelected(false); }
+    }
   }
 
-  void Graph::deleteGraph()
+  void Graph::onVertexMoved(int ID)
   {
-    foreach(GraphPoint *onePoint, controlPts) { onePoint->close(); }
-    controlPts = QList<GraphPoint*>();
-
-    foreach(GraphPoint *onePoint, curvePts) { onePoint->close(); }
-    curvePts = QList<GraphPoint*>();
-
-    collDrawPoints = QList<QPointF*>();
-    collDrawLines = QList<QLineF*>();
-    graphPolylines = new QPolygonF();
-
-    update();
+    if (controlVertexs[ID]->valueY < domainY.first) { controlVertexs[ID]->valueY = domainY.first; }
+    if (controlVertexs[ID]->valueY > domainY.second) { controlVertexs[ID]->valueY = domainY.second; }
+    // qDebug() << "Graph::onVertexMoved: "<< ID;
+    this->sortVertexByX();
   }
 
-  void Graph::onDeletePoint(int ID)
+  void Graph::onVertexDeleted(int ID)
   {
-    qDebug() << "Graph::onDeletePoint: " << QString::number(ID);
-    controlPts.removeAt(ID);
-    curvePts[ID - 1]->close();
-    curvePts.removeAt(ID - 1);
-    this->makeEnv();
-    update();
-  }
-  void Graph::onMovePoint(int ID, int pixelX, int pixelY)
-  {
-    qDebug() << "Graph::onMovePoint: " << QString::number(ID);
+    //     qDebug() << "Graph::onVertexDeleted: " << ID;
+    controlVertexs.removeAt(ID);
+    for (int i = ID; i < controlVertexs.size(); i++)
+    {
+      controlVertexs[i]->ID = i;
+    }
 
-    double newValX = getValueX(pixelX);
-    double newValY = getValueY(pixelY);
-    int newPixelX = pixelX;
-    int newPixelY = pixelY;
-
-    if (newValX > maxDomainX) { newValX = maxDomainX - 0.01; newPixelX = getPixelX(maxDomainX - 0.01); };
-    if (newValX < minDomainX) { newValX = minDomainX; newPixelX = getPixelX(minDomainX); };
-
-    if (newValY > maxDomainY) { newValY = maxDomainY; newPixelY = getPixelY(maxDomainY); };
-    if (newValY < minDomainY) { newValY = minDomainY; newPixelY = getPixelY(minDomainY); };
-
-    controlPts[ID]->setX(newPixelX, newValX);
-    controlPts[ID]->setY(newPixelY, newValY);
-
-    this->sortPointsByX();
+    controlCurves[ID - 1]->setTo(controlVertexs[ID]);
+    controlCurves[ID - 1]->onObjectModify();
+    controlCurves[ID]->deleteLater();
+    controlCurves.removeAt(ID);
+    for (int i = ID - 1; i < controlVertexs.size() - 1; i++)
+    {
+      controlCurves[i]->ID = i;
+    }
     this->makeEnv();
   }
 
-  void Graph::sortPointsByX()
+  void Graph::onCurveTypeChanged(int ID)
+  {
+    this->makeEnv();
+    // graphMouse->event(new QEvent(QEvent::MouseMove));    
+    // graphMouse->eventFilter(this, new QEvent(QEvent::MouseMove));
+  }
+
+  void Graph::setTime(float time)
+  {
+    timeAxis->setValue(time);
+    this->update();    
+  }
+  
+  void Graph::sortVertexByX()
   {
     bool sorted = false;
-    if (controlPts.size() == 0) { sorted = true; }
+
+    if (controlVertexs.size() == 0) { sorted = true; }
 
     while (!sorted)
     {
       sorted = true;
-      for (int i = 1; i < controlPts.size(); i++)
+      for (int i = 1; i < controlVertexs.size(); i++)
       {
-        if (controlPts[i]->valueX < controlPts[i - 1]->valueX)
+        if (controlVertexs[i]->valueX < controlVertexs[i - 1]->valueX)
         {
           sorted = false;
-          controlPts[i]->setID(i - 1);
-          controlPts[i - 1]->setID(i);
-          controlPts.swap(i, i - 1);
+
+          controlCurves[i - 2]->setTo(controlVertexs[i]);
+          controlCurves[i - 1]->flipEnds();
+          controlCurves[i]->setFrom(controlVertexs[i - 1]);
+          controlCurves[i - 2]->onObjectModify();
+          controlCurves[i]->onObjectModify();
+
+          controlVertexs[i]->ID = i - 1;
+          controlVertexs[i - 1]->ID = i;
+          controlVertexs.swap(i, i - 1);
+
           break;
         }
       }
@@ -499,21 +1026,22 @@ namespace Jui
 
   void Graph::makeEnv()
   {
-
     QList<double> levels;
     QList<double> times;
     QList<QString> curves;
 
-    for (int i = 0; i < controlPts.size(); i++)
-    {
-      levels.append(controlPts[i]->valueY);
+    // qDebug() << "Graph::makeEnv -> controlPts.size(): " << controlPts.size();
 
+    for (int i = 0; i < controlVertexs.size(); i++)
+    {
+      levels.append(controlVertexs[i]->valueY);
+      //qDebug() << "Graph::makeEnv -> i: " << i;
       if (i != 0)
       {
         double previousTime = 0;
-        foreach(GraphPoint *onePt, controlPts)
+        foreach(GraphVertex *onePt, controlVertexs)
         {
-          if (onePt->valueX < controlPts[i]->valueX)
+          if (onePt->valueX < controlVertexs[i]->valueX)
           {
             if (onePt->valueX > previousTime)
             {
@@ -521,13 +1049,33 @@ namespace Jui
             }
           }
         }
-        times.append(controlPts[i]->valueX - previousTime);
+        times.append(controlVertexs[i]->valueX - previousTime);
       }
     };
 
-    foreach(GraphPoint *onePt, curvePts)
+    foreach(GraphCurve *oneCrv, controlCurves)
     {
-      curves.append(onePt->curvature);
+      switch (oneCrv->type)
+      {
+      case step:
+        curves.append("'step'");
+        break;
+      case lin:
+        curves.append("'lin'");
+        break;
+      case exp:
+        curves.append("'exp'");
+        break;
+      case sin:
+        curves.append("'sin'");
+        break;
+      case welch:
+        curves.append("'welch'");
+        break;
+      case hold:
+        curves.append("'hold'");
+        break;
+      }
     };
 
     qDebug() << "Graph::makeEnv -> "
@@ -535,128 +1083,172 @@ namespace Jui
       << "times: " << times
       << "curves: " << curves;
 
-    emit actEnvGraphChanged(levels, times, curves);
+    emit actEnvGraphChanged(levels, times, curves);    
+  }
+
+  void Graph::onEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves)
+  {
+    qDebug() << "Graph::onEnvChanged -> "
+      << "levels: " << levels
+      << "times: " << times
+      << "curves: " << curves;
+
+    QList<double> timePosition;
+    double previousTime = 0.0;
+    foreach(double oneT, times)
+    {
+      timePosition.append(oneT + previousTime);
+      previousTime = oneT;
+      //  qDebug() << "Graph::oneT " << oneT << "previousTime" << previousTime;
+    }
+    // qDebug() << "Graph::times " << times;
+
+    if (levels.size() != controlVertexs.size())
+    {
+      int difference = levels.size() - controlVertexs.size();
+      if (difference > 0)
+      {
+        for (int i = 0; i < controlVertexs.size(); i++)
+        {
+          if (abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
+          {
+            // qDebug() << "Graph::add VERTEX ID" << i;
+            // otazka jestli nenapsat lip, problem s vkladacim casem
+            this->addVertex(QPointF(timePosition[i], levels[i]));
+          }
+        }
+      }
+      else
+      {
+        for (int i = 0; i < controlVertexs.size(); i++)
+        {
+          if (abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
+          {
+            //  qDebug() << "Graph::remove VERTEX ID" << i;
+            this->onVertexDeleted(i);
+          }
+        }
+      }
+    }
+
+    for (int i = 0; i < levels.size(); i++)
+    {
+      if (i < controlVertexs.size())
+      {
+        //  qDebug() << "Graph::abs(controlVertexs[i]->valueY - levels[i]) > 0.01 -> " << abs(controlVertexs[i]->valueY - levels[i]);
+        if (abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
+        {
+          //  qDebug() << "Graph::onEnvChanged -> set level for ID " << i;
+          controlVertexs[i]->setValueY(levels[i]);
+        }
+        else
+        {
+          //  qDebug() << "Graph::onEnvChanged -> no CHANGE ID " << i;
+        }
+      }
+      else
+      {
+        // qDebug() << "Graph::onEnvChanged -> add ID " << i;
+      }
+    }
+
+    for (int i = 1; i < timePosition.size(); i++)
+    {
+      if (i < controlVertexs.size() - 1)
+      {
+        //qDebug() << "Graph::abs(controlVertexs[i]->valueX - times[i]) > 0.01 -> " << abs(controlVertexs[i]->valueX - positionX[i - 1]);
+        if (abs(controlVertexs[i]->valueX - timePosition[i - 1]) > 0.01)
+        {
+          // qDebug() << "Graph::onEnvChanged -> set time for ID " << i << "from:" << controlVertexs[i]->valueX << "to:" << timePosition[i - 1];
+          controlVertexs[i]->setValueX(timePosition[i - 1]);
+        }
+        else
+        {
+          //qDebug() << "Graph::onEnvChanged -> no CHANGE ID " << i;
+        }
+      }
+      else
+      {
+        // qDebug() << "Graph::onEnvChanged -> add ID " << i;
+      }
+    }
+
+    for (int i = 0; i < curves.size(); i++)
+    {
+      if (i < controlCurves.size())
+      {
+        //if (curves[i] != controlCurves[i]->type)
+        // controlCurves[i]->onCBoxTypeChanged(curves[i]);
+
+        if (curves[i] == "'step'") { controlCurves[i]->setType(CurveType::step); }
+        else if (curves[i] == "'exp'") { controlCurves[i]->setType(CurveType::exp); }
+        else if (curves[i] == "'sin'") { controlCurves[i]->setType(CurveType::sin); }
+        else if (curves[i] == "'welch'") { controlCurves[i]->setType(CurveType::welch); }
+        else if (curves[i] == "'hold'") { controlCurves[i]->setType(CurveType::hold); }
+        else { controlCurves[i]->setType(CurveType::lin); }
+
+        controlCurves[i]->onObjectModify();
+      }
+    }
   }
 
   void Graph::resizeEvent(QResizeEvent *resizeEvent)
   {
-    //qDebug() << "Graph::resizeEvent";
-    foreach(GraphPoint *onePt, controlPts)
+    emit actResized(this->boundsGraph().size());
+
+    foreach(GraphCurve *oneC, controlCurves)
     {
-      int pointSize = onePt->pointSize;
-      onePt->pixelX = getPixelX(onePt->valueX);
-      onePt->pixelY = getPixelY(onePt->valueY);
-      onePt->setGeometry(
-        onePt->pixelX - pointSize / 2,
-        onePt->pixelY - pointSize / 2,
-        pointSize + 1,
-        pointSize + 1
-        );
-    }
-    foreach(GraphPoint *onePt, curvePts)
-    {
-      int pointSize = onePt->pointSize;
-      onePt->pixelX = getPixelX(onePt->valueX);
-      onePt->pixelY = getPixelY(onePt->valueY);
-      onePt->setGeometry(
-        onePt->pixelX - pointSize / 2,
-        onePt->pixelY - pointSize / 2,
-        pointSize + 1,
-        pointSize + 1
-        );
+      oneC->onObjectModify();
     }
   }
 
   void Graph::paintEvent(QPaintEvent *event)
   {
+    //qDebug() << "Graph::paintEvent";
+
     QPainter painter(this);
 
-    //painter.fillRect(bounds(), QColor(10, 10, 10));
     if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
     else { painter.setPen(QColor(60, 60, 60)); }
     painter.drawLine(0, 0, width(), 0);
     painter.drawLine(0, height() - 1, width(), height() - 1);
 
-    painter.setPen(QPen(Qt::white, 1));
+  //  painter.setPen(QColor(160, 160, 160));
+//    painter.drawText(55, 30, tr("currentTime: %1").arg(QString::number(currentTime, 'f', 2)));
+ //   painter.drawText(55, 42, tr("beatTime: %1").arg(QString::number(beatTime, 'f', 2)));
 
-    painter.drawRect(this->boundsGraph());
-
-    QTextOption option;
-    option.setAlignment(Qt::AlignCenter);
-
-    //painter.drawText(QRect(10, 10, 50, 30), tr("numPts: %1").arg(controlPts.size()), option);
-
-    painter.setPen(QPen(QColor(70, 70, 70), 1));
-
-    // verticals
-    int cntSegX = 4;
-    for (int i = 0; i <= cntSegX; i++)
+    //qDebug() << "Graph::paintEvent NEW";
+    painterGraphObject = new QPainter(this);
+    foreach(GraphAxis *oneAxis, graphVerticalAxis)
     {
-      int pixelX = boundsGraph().width() / cntSegX * i + boundsGraph().left();
-      double valX = getValueX(pixelX);
-      painter.drawText(
-        QRect(pixelX - 25, boundsGraph().bottom() + 5, 50, 20),
-        QString::number(valX, 'f', 2),
-        option
-        );
-      painter.drawLine(pixelX, boundsGraph().top(), pixelX, boundsGraph().height() + boundsGraph().top());
-    };
-
-    // horizontals
-    int cntSegY = 4;
-    for (int i = 0; i <= cntSegY; i++)
-    {
-      int pixelY = boundsGraph().height() / cntSegY * i + boundsGraph().top();
-      //int pixelY = boundsGraph().height() / cntSegY * i + 14;
-      double valY = getValueY(pixelY);
-      painter.drawText(
-        QRect(5, pixelY - 10, 40, 20),
-        QString::number(valY, 'f', 2),
-        option
-        );
-      painter.drawLine(boundsGraph().left(), pixelY, boundsGraph().right(), pixelY);
-    };
-
-    //collDrawPoints
-    painter.setPen(QColor(150, 150, 150));
-    foreach(QPointF *onePoint, collDrawPoints)
-    {
-      painter.drawEllipse(getPixelX(onePoint->x()) - 3, getPixelY(onePoint->y()) - 3, 6, 6);
-    };
-
-    // collDrawLines
-    painter.setPen(QColor(70, 170, 70));
-    foreach(QLineF *oneLine, collDrawLines)
-    {
-      QPointF pt1 = QPoint(getPixelX(oneLine->p1().x()), getPixelY(oneLine->p1().y()));
-      QPointF pt2 = QPoint(getPixelX(oneLine->p2().x()), getPixelY(oneLine->p2().y()));
-      painter.drawLine(pt1, pt2);
-    };
-
-    //collPolygons
-    painter.setPen(QColor(240, 70, 70));
-    QPolygonF poly;
-    foreach(QPointF onePt, graphPolylines->toList())
-    {
-      onePt.setX(getPixelX(onePt.x()));
-      onePt.setY(getPixelY(onePt.y()));
-      //qDebug() << "DrawonePt " << onePt;
-      poly.append(onePt);
+      oneAxis->draw(painterGraphObject);
     }
-    painter.drawPolyline(poly);
+    foreach(GraphAxis *oneAxis, graphHorizontalAxis)
+    {
+      oneAxis->draw(painterGraphObject);
+    }
+    foreach(GraphCurve *oneC, controlCurves)
+    {
+      oneC->draw(painterGraphObject);
+    }
+    foreach(GraphVertex *oneV, controlVertexs)
+    {
+      oneV->draw(painterGraphObject);
+    }
+    //testObj->draw(painterGraphObject);
+
+    graphMouse->draw(painterGraphObject);
+    timeAxis->draw(painterGraphObject);
   }
 
   void Graph::mousePressEvent(QMouseEvent *mouseEvent)
   {
-    qDebug() << "Graph::mousePressEvent NEW POINT ADD";
-    this->addValuePoint(getValueX(mouseEvent->pos().x()), getValueY(mouseEvent->pos().y()));
-    this->makeEnv();
+    this->addVertex(graphMouse->getValuePt());
   }
 
   void Graph::mouseReleaseEvent(QMouseEvent *mouseEvent)
   {
-    //update();
-    //mouseEvent->accept();
+    this->makeEnv();
   }
 
   Graph::~Graph() { }

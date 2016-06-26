@@ -34,6 +34,8 @@ namespace SupercolliderBridge
     StateServer stateServer;
 
     QString nextID();
+    float tempo;
+    int beat;
     bool evaluate(QString code, bool print = false, bool silent = false);
     QVariant question(QString code, bool print = false);
 
@@ -47,7 +49,9 @@ namespace SupercolliderBridge
     void changeInterpretState();
     void changeServerState();
 
-    signals:
+    void onChangeTempo(QString BPM);
+
+  signals:
     void interpretBootInitAct();
     void interpretBootDoneAct();
     void interpretKillInitAct();
@@ -66,9 +70,10 @@ namespace SupercolliderBridge
     void msgResultAct(QString const &);
     void msgBundleAct(QString const &);
 
-    void answerAct(QUuid id, int selector, QStringList answer);
     void actSynced();
     void actAnswered();
+    void actNextBeat(int beat);
+    void actTempoChanged();
 
     void killBridgeDoneAct();
 
