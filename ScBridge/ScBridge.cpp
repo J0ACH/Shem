@@ -26,8 +26,14 @@ namespace SupercolliderBridge
 
   void ScBridge::killBridge()
   {
+    this->evaluate("Server.killAll", true);
+    this->killInterpreter();
+    emit killBridgeDoneAct();
+
+    /*
     if (stateServer == StateServer::RUNNING)
     {
+      qDebug("Quant closed");
       connect(this, SIGNAL(serverKillDoneAct()), this, SLOT(killBridge())); // second loop for interpreter
       emit changeServerState();
       emit msgStatusAct("1st round killing");
@@ -46,6 +52,7 @@ namespace SupercolliderBridge
       emit msgStatusAct("3rd round killing");
       emit killBridgeDoneAct();
     };
+    */
   }
 
   void ScBridge::changeInterpretState()

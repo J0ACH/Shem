@@ -42,7 +42,7 @@ namespace QuantIDE
     //connect(this, SIGNAL(evaulateAct(QString)), bridge, SLOT(evaluateCode(QString)));
     connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
     connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
-    connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(close()));
+    connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(onCloseQuant()));
     connect(globalCode, SIGNAL(sendText(QString)), this, SLOT(onRecivedGlobalCode(QString)));
 
     // CONFIG
@@ -131,6 +131,12 @@ namespace QuantIDE
 
     labelServerMeter->setGeometry(canvan->tail->width() - 200, 5, 40, 25);
     labelServerSynths->setGeometry(canvan->tail->width() - 155, 5, 30, 25);
+  }
+
+  void Quant::onCloseQuant()
+  {
+    qDebug("Quant closed");
+    this->close();
   }
 
   // MSG

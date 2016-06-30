@@ -27,15 +27,7 @@ namespace QuantIDE
 
   public:
     Quant(QWidget *parent = 0);
-    ~Quant();
-
-  signals:
-    void bootInterpretAct();
-    void bootServerAct();
-    void actConfigDone();
-    void actConfigData(QMap<QString, QVariant*> config);
-    void print(QString, QColor);
-    void println(QString, QColor);
+    ~Quant();  
 
     public slots :
     void onMsgNormal(QString);
@@ -63,6 +55,16 @@ namespace QuantIDE
     void onServerTask();
 
     void onRecivedGlobalCode(QString);
+
+    void onCloseQuant();
+
+  signals:
+    void bootInterpretAct();
+    void bootServerAct();
+    void actConfigDone();
+    void actConfigData(QMap<QString, QVariant*> config);
+    void print(QString, QColor);
+    void println(QString, QColor);
 
   protected:
     void closeEvent(QCloseEvent *event);
