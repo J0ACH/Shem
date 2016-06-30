@@ -102,6 +102,7 @@ namespace QuantIDE
     buttCustomize = new Button(canvan->tail);
     buttCustomize->setText("Customize");
     buttCustomize->setStateKeeping(Button::StateKeeping::TOUCH);
+    buttCustomize->setIcon(QImage(":/customize_16px.png"), 0);
     buttCustomize->setToolTip("Customize");
 
     globalCode = new CodeEditor(nodePanel);
