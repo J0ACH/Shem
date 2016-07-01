@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QDebug>
+//#include <QList>
 
 #include "ScBridge.h"
 #include "Customize.h"
@@ -78,12 +79,13 @@ namespace QuantIDE
     UDPServer *udpServer;
     Canvan *canvan;
     NodePanel *nodePanel;
+    Panel *customizePanel, *networkPanel;
 
     QColor colorAppBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgResult, colorMsgError, colorMsgWarning, colorMsgBundle;
     QFont fontTextSmall, fontTextCode;
 
-    Button *buttLang, *buttServer, *buttConsol, *buttNodes, *buttCustomize;
+    Button *buttLang, *buttServer, *buttConsole, *buttCustomize, *buttNetwork;
     CodeEditor *globalCode;
   
     QLabel *labelServerMeter, *labelServerSynths;

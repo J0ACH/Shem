@@ -12,73 +12,76 @@
 namespace Jui
 {
 
-	class Button : public QWidget
-	{
-		Q_OBJECT
+  class Button : public QWidget
+  {
+    Q_OBJECT
 
-	public:
-		Button(QWidget *parent);
-		~Button();
+  public:
+    Button(QWidget *parent);
+    ~Button();
 
-		enum State { OFF, ON };
-		enum StateDisplay { NORMAL, OVER, PRESSED };
-		enum StateKeeping {	TOUCH, HOLD };
+    enum State { OFF, ON };
+    enum StateDisplay { NORMAL, OVER, PRESSED };
+    enum StateKeeping { TOUCH, HOLD, SWITCH };
 
-		QRect bounds();
+    QRect bounds();
 
-		void setState(State);
-		void setStateKeeping(StateKeeping);
-		void setIcon(QImage, int);
-		void setText(QString name);
-		void setFont(QFont);
-		void setColorNormal(QColor);
-		void setColorOver(QColor);
-		void setColorActive(QColor);
-		
-	signals:
-		void pressAct();
-		//void enterAct(QString name);
-		//void leaveAct(QString name);
+    void setState(State);
+    void setStateKeeping(StateKeeping);
+    void setIcon(QImage, int);
+    void setText(QString name);
+    void setFont(QFont);
+    void setColorNormal(QColor);
+    void setColorOver(QColor);
+    void setColorActive(QColor);
+    void setButtonGroup(QList<Button *> other);
 
-	public slots:
-		void fadeRatio();
+  signals:
+    void pressAct();
+    void actPressed(Button::State);
+    //void enterAct(QString name);
+    //void leaveAct(QString name);
 
-	protected:
-		void paintEvent(QPaintEvent *);
+    public slots:
+    void fadeRatio();
+    void onSwitchOFF();
 
-	private:
-		State buttonState;
-		StateDisplay buttonDisplay;
-		StateKeeping buttonKeeping;
+  protected:
+    void paintEvent(QPaintEvent *);
 
-		bool isPressed, isOver;
+  private:
+    State buttonState;
+    StateDisplay buttonDisplay;
+    StateKeeping buttonKeeping;
 
-		QString name;
-		QFont fontText;
-		QImage icon;
-		QColor normalColor, overColor, activeColor;
-		QColor blendColor(QColor, QColor, qreal);
-		QColor penColor, fillColor;
-		int iconOffset;
-		
-		void mousePressEvent(QMouseEvent *mouseEvent);
-		void mouseReleaseEvent(QMouseEvent *mouseEvent);
-		void enterEvent(QEvent *event);
-		void leaveEvent(QEvent *event);
+    bool isPressed, isOver;
 
-		//void addAction();
-		int fadeTimeIn;
-		int fadeTimeOut;
-		int fps;
-		//int backgroundAlpha;
-		double ratio;
+    QString name;
+    QFont fontText;
+    QImage icon;
+    QColor normalColor, overColor, activeColor;
+    QColor blendColor(QColor, QColor, qreal);
+    QColor penColor, fillColor;
+    int iconOffset;
 
-		QTimer *timer;
+    void mousePressEvent(QMouseEvent *mouseEvent);
+    void mouseReleaseEvent(QMouseEvent *mouseEvent);
+    void enterEvent(QEvent *event);
+    void leaveEvent(QEvent *event);
 
-	
+    //void addAction();
+    int fadeTimeIn;
+    int fadeTimeOut;
+    int fps;
+    //int backgroundAlpha;
+    double ratio;
+
+    QTimer *timer;
 
 
-	};
+
+
+  };
 
 }
 #endif // BUTTON_H

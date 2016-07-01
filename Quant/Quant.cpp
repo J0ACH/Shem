@@ -39,13 +39,12 @@ namespace QuantIDE
 
     // CONTROLS
     connect(this, SIGNAL(bootInterpretAct()), bridge, SLOT(changeInterpretState()));
-    //connect(this, SIGNAL(evaulateAct(QString)), bridge, SLOT(evaluateCode(QString)));
     connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
     connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
     connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(onCloseQuant()));
     connect(globalCode, SIGNAL(sendText(QString)), this, SLOT(onRecivedGlobalCode(QString)));
 
-    // CONFIG
+     // CONFIG
     connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
       this, SLOT(onConfigData(QMap<QString, QVariant*>)));
     connect(this, SIGNAL(actConfigDone()), this, SLOT(onConfigDataDone()));
@@ -77,6 +76,9 @@ namespace QuantIDE
     nodePanel = new NodePanel(canvan->screen, bridge);
     nodePanel->setTitle("NodePanel");
 
+    customizePanel = new Panel(canvan->screen);
+    customizePanel->setTitle("Customize");
+
     buttLang = new Button(canvan->tail);
     buttLang->setText("Lang");
     buttLang->setStateKeeping(Button::StateKeeping::HOLD);
@@ -89,21 +91,33 @@ namespace QuantIDE
     buttServer->setIcon(QImage(":/server_16px.png"), 0);
     buttServer->setToolTip("Server");
 
-    buttConsol = new Button(canvan->tail);
-    buttConsol->setText("Console");
-    buttConsol->setStateKeeping(Button::StateKeeping::TOUCH);
-    buttConsol->setToolTip("Display console panel");
-
-    buttNodes = new Button(canvan->tail);
-    buttNodes->setText("Nodes");
-    buttNodes->setStateKeeping(Button::StateKeeping::TOUCH);
-    buttNodes->setToolTip("Display node panel");
+    buttConsole = new Button(canvan->tail);
+    buttConsole->setText("Console");
+    buttConsole->setStateKeeping(Button::StateKeeping::SWITCH);
+    buttConsole->setIcon(QImage(":/console_16px.png"), 0);
+    buttConsole->setToolTip("Display console panel");
+    buttConsole->setState(Button::ON);
 
     buttCustomize = new Button(canvan->tail);
     buttCustomize->setText("Customize");
-    buttCustomize->setStateKeeping(Button::StateKeeping::TOUCH);
+    buttCustomize->setStateKeeping(Button::StateKeeping::SWITCH);
     buttCustomize->setIcon(QImage(":/customize_16px.png"), 0);
-    buttCustomize->setToolTip("Customize");
+    buttCustomize->setToolTip("Display customize panel");
+    
+    buttNetwork = new Button(canvan->tail);
+    buttNetwork->setText("Network");
+    buttNetwork->setStateKeeping(Button::StateKeeping::SWITCH);
+    buttNetwork->setIcon(QImage(":/network_16px.png"), 0);
+    buttNetwork->setToolTip("Display network panel");
+
+    QList<Button*> panelButtons = QList<Button*>();
+    panelButtons.append(buttConsole);
+    panelButtons.append(buttCustomize);
+    panelButtons.append(buttNetwork);
+    
+    buttConsole->setButtonGroup(panelButtons);
+    buttCustomize->setButtonGroup(panelButtons);
+    buttNetwork->setButtonGroup(panelButtons);
 
     globalCode = new CodeEditor(nodePanel);
     globalCode->setText("s.plotTree");
@@ -123,10 +137,10 @@ namespace QuantIDE
     nodePanel->setGeometry(1, 0, screenRect.width(), screenRect.height());
 
     buttLang->setGeometry(5, 5, 24, 24);
-    buttServer->setGeometry(34, 5, 24, 24);
-    buttConsol->setGeometry(60, 5, 60, 24);
-    buttNodes->setGeometry(125, 5, 60, 24);
-    buttCustomize->setGeometry(190, 5, 60, 24);
+    buttServer->setGeometry(35, 5, 24, 24);
+    buttConsole->setGeometry(95, 5, 24, 24);
+    buttCustomize->setGeometry(125, 5, 24, 24);
+    buttNetwork->setGeometry(155, 5, 24, 24);
 
     globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
 
@@ -178,34 +192,34 @@ namespace QuantIDE
 
     buttLang->setColorNormal(colorNormal);
     buttServer->setColorNormal(colorNormal);
-    buttConsol->setColorNormal(colorNormal);
-    buttNodes->setColorNormal(colorNormal);
+    buttConsole->setColorNormal(colorNormal);
     buttCustomize->setColorNormal(colorNormal);
+    buttNetwork->setColorNormal(colorNormal);
 
     buttLang->setColorOver(colorOver);
     buttServer->setColorOver(colorOver);
-    buttConsol->setColorOver(colorOver);
-    buttNodes->setColorOver(colorOver);
+    buttConsole->setColorOver(colorOver);
     buttCustomize->setColorOver(colorOver);
+    buttNetwork->setColorOver(colorOver);
 
     buttLang->setColorActive(colorActive);
     buttServer->setColorActive(colorActive);
-    buttConsol->setColorActive(colorActive);
-    buttNodes->setColorActive(colorActive);
+    buttConsole->setColorActive(colorActive);
     buttCustomize->setColorActive(colorActive);
+    buttNetwork->setColorActive(colorActive);
 
     buttLang->setFont(fontTextSmall);
     buttServer->setFont(fontTextSmall);
-    buttConsol->setFont(fontTextSmall);
-    buttNodes->setFont(fontTextSmall);
+    buttConsole->setFont(fontTextSmall);
     buttCustomize->setFont(fontTextSmall);
+    buttNetwork->setFont(fontTextSmall);
 
     globalCode->setFontCode(fontTextCode);
 
     labelServerMeter->setFont(fontTextSmall);
     labelServerSynths->setFont(fontTextSmall);
 
-        emit actConfigData(config);
+    emit actConfigData(config);
     onMsgStatus("Cutomization done...");
 
     update();
