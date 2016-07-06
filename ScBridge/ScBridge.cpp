@@ -24,35 +24,36 @@ namespace SupercolliderBridge
     connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
   }
 
+  void ScBridge::OSCtest()
+  {
+    qDebug("OSCtest start");
+    QString oscFunc = "(";
+
+    oscFunc += "OSCdef.newMatching(\\SC_status,";
+    oscFunc += "{ | msg, time, addr, recvPort |";
+    oscFunc += "(\"statusFlag,\" ++ msg).postln; ";
+    oscFunc += "}, '/status.reply', Server.default.addr );";
+
+    oscFunc += "OSCdef.newMatching(\\SC_nodeGo,";
+    oscFunc += "{ | msg, time, addr, recvPort |";
+    oscFunc += "(\"nodeFlag_GO,\" ++ msg).postln; ";
+    oscFunc += "}, '/n_go', Server.default.addr );";
+
+    oscFunc += "OSCdef.newMatching(\\SC_nodeEnd,";
+    oscFunc += "{ | msg, time, addr, recvPort |";
+    oscFunc += "(\"nodeFlag_END,\" ++ msg).postln; ";
+    oscFunc += "}, '/n_end', Server.default.addr );";
+
+    oscFunc += ")";
+
+    this->evaluate(oscFunc, true);
+  }
+
   void ScBridge::killBridge()
   {
     this->evaluate("Server.killAll", true);
     this->killInterpreter();
     emit killBridgeDoneAct();
-
-    /*
-    if (stateServer == StateServer::RUNNING)
-    {
-      qDebug("Quant closed");
-      connect(this, SIGNAL(serverKillDoneAct()), this, SLOT(killBridge())); // second loop for interpreter
-      emit changeServerState();
-      emit msgStatusAct("1st round killing");
-      return;
-    };
-
-    if (stateInterpret == StateInterpret::RUNNING)
-    {
-      connect(this, SIGNAL(interpretrKillDoneAct()), this, SLOT(killBridge())); // third loop for emit signal
-      emit changeInterpretState();
-      emit msgStatusAct("2nd round killing");
-    };
-
-    if (stateInterpret == StateInterpret::OFF)
-    {
-      emit msgStatusAct("3rd round killing");
-      emit killBridgeDoneAct();
-    };
-    */
   }
 
   void ScBridge::changeInterpretState()
@@ -139,7 +140,6 @@ namespace SupercolliderBridge
 
     return true;
   }
-
   QVariant ScBridge::question(QString code, bool print)
   {
     answer = QStringList();
@@ -267,6 +267,7 @@ namespace SupercolliderBridge
     QByteArray out = QProcess::readAll();
     QString postString = QString::fromUtf8(out);
 
+    //qDebug() << "onReadyRead" << postString;
     this->msgFilter(postString);
   }
 
@@ -298,66 +299,6 @@ namespace SupercolliderBridge
     else if (msg.contains("***")) { emit msgStatusAct(msg); }
     else if (msg.contains("->"))
     {
-      /*
-      //////////////////////////////////////////////
-      //////// bude odsraneno
-
-      if (msg.contains("ANSWER_MARKER"))
-      {
-      //qDebug() << "msg [ANSWER_MARKER]: " << msg;
-
-      QStringList incomingMSG = msg.split("->");
-      foreach(QString oneMSG, incomingMSG)
-      {
-      if (oneMSG.contains("ANSWER_MARKER"))
-      {
-      oneMSG = oneMSG.replace("\r", "");
-      oneMSG = oneMSG.replace("\n", "");
-      //qDebug() << "oneMSG: " << oneMSG;
-
-      QStringList msgParts = oneMSG.split(",");
-      //qDebug() << QString("msgParts.size: %1 ").arg(msgParts.size());
-
-      QUuid id;
-      QStringList oneAnswer;
-      int selector, printAnswer;
-
-      for (int i = 0; i < msgParts.size(); i = i + 1)
-      {
-      QString onePart = msgParts.at(i);
-      onePart = onePart.replace(" ", "");
-      onePart = onePart.replace("[", "");
-      onePart = onePart.replace("]", "");
-
-      //qDebug() << "i: " << i;
-      if (i == 0) {}
-      else if (i == 1) { id = QUuid(onePart); }
-      else if (i == 2) { selector = onePart.toInt(); }
-      else if (i != msgParts.size() - 1) { oneAnswer.append(onePart); }
-      else if (i == msgParts.size() - 1) { printAnswer = onePart.toInt(); }
-      }
-
-      if (printAnswer) {
-      qDebug() << "msgAnswer: "
-      //<< " pattern " << id
-      << " pattern " << QString::number(selector)
-      << " answer " << oneAnswer;
-      //<< " print " << printAnswer;
-
-      QString txt;
-      foreach(QString oneAnsw, oneAnswer)
-      {
-      txt += tr("%1; ").arg(oneAnsw);
-      }
-      //emit msgResultAct(txt);
-      }
-      emit answerAct(id, selector, oneAnswer);
-      }
-      }
-      }
-      //////// bude odsraneno
-      //////////////////////////////////////////////
-      */
 
       if (msg.contains("syncFlag"))	{ emit actSynced(); }
 
@@ -417,6 +358,53 @@ namespace SupercolliderBridge
       // int beat2 = this->question("p.clock.beats").toString().toInt();
       emit actNextBeat(beat);
       beat++;
+    }
+    else if (msg.contains("statusFlag"))
+    {
+      // qDebug() << "statusMSG" << msg;
+      QStringList statusMSG = msg.split(",");
+      QStringList statusData;
+      statusData.append(statusMSG[8]); // serverPeak
+      statusData.append(statusMSG[4]); // cntSynths
+      statusData.append(statusMSG[5]); // cntGroups
+
+      emit actServerStatus(statusData);
+    }
+    else if (msg.contains("nodeFlag_GO"))
+    {
+      //qDebug() << "nodeFlag_GO" << msg;
+
+      QStringList nodeMSG = msg.split(",");
+      int nodeID = nodeMSG[2].toInt();
+
+      if (nodeMSG[6].toInt() == 0)
+      {
+        emit actSynthAdd(nodeMSG[2].toInt());
+        emit msgBundleAct(tr("synth [ %1 ] started").arg(QString::number(nodeID)));
+      }
+      else if (nodeMSG[6].toInt() == 1)
+      {
+        emit actGroupAdd(nodeMSG[2].toInt());
+        emit msgBundleAct(tr("group [ %1 ] started").arg(QString::number(nodeID)));
+      }
+    }
+    else if (msg.contains("nodeFlag_END"))
+    {
+      //qDebug() << "nodeFlag_END" << msg;
+
+      QStringList nodeMSG = msg.split(",");
+      int nodeID = nodeMSG[2].toInt();
+
+      if (nodeMSG[6].toInt() == 0)
+      {
+        emit actSynthFree(nodeMSG[2].toInt());
+        emit msgBundleAct(tr("synth [ %1 ] end").arg(QString::number(nodeID)));
+      }
+      else if (nodeMSG[6].toInt() == 1)
+      {
+        emit actGroupFree(nodeMSG[2].toInt());
+        emit msgBundleAct(tr("group [ %1 ] end").arg(QString::number(nodeID)));
+      }
     }
     else {
       //qDebug() << msg;
@@ -519,6 +507,7 @@ namespace SupercolliderBridge
     }
     else if (selector == introspectionSelector)
     {
+      qDebug() << "INTROSPECTION" << data;
       // DATA O VSECH CLASS PRO SUPERCOLIDER!!!!!!
       //emit msgStatusAct(tr("INTROSPECTION message: %1").arg(data));
     }

@@ -66,6 +66,7 @@ namespace QuantIDE
     connect(bridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
     connect(bridge, SIGNAL(serverKillInitAct()), this, SLOT(onServerKillInit()));
     connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
+    connect(bridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
 
     emit bootInterpretAct();
     onMsgStatus("Quant init...");
@@ -75,9 +76,10 @@ namespace QuantIDE
   {
     nodePanel = new NodePanel(canvan->screen, bridge);
     nodePanel->setTitle("NodePanel");
-
+    /*
     customizePanel = new Panel(canvan->screen);
     customizePanel->setTitle("Customize");
+    */
 
     buttLang = new Button(canvan->tail);
     buttLang->setText("Lang");
@@ -129,6 +131,10 @@ namespace QuantIDE
     labelServerSynths = new QLabel(canvan->tail);
     labelServerSynths->setText("0");
     labelServerSynths->setToolTip("numSynths");
+
+    labelServerGroups = new QLabel(canvan->tail);
+    labelServerGroups->setText("0");
+    labelServerGroups->setToolTip("numGroups");
   }
 
   void Quant::fitGeometry()
@@ -144,8 +150,9 @@ namespace QuantIDE
 
     globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
 
-    labelServerMeter->setGeometry(canvan->tail->width() - 200, 5, 40, 25);
-    labelServerSynths->setGeometry(canvan->tail->width() - 155, 5, 30, 25);
+    labelServerMeter->setGeometry(canvan->tail->width() - 270, 5, 40, 25);
+    labelServerSynths->setGeometry(canvan->tail->width() - 220, 5, 15, 25);
+    labelServerGroups->setGeometry(canvan->tail->width() - 200, 5, 15, 25);
   }
 
   void Quant::onCloseQuant()
@@ -218,6 +225,7 @@ namespace QuantIDE
 
     labelServerMeter->setFont(fontTextSmall);
     labelServerSynths->setFont(fontTextSmall);
+    labelServerGroups->setFont(fontTextSmall);
 
     emit actConfigData(config);
     onMsgStatus("Cutomization done...");
@@ -239,7 +247,7 @@ namespace QuantIDE
 
     connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
 
-    connect(&serverTask, SIGNAL(timeout()), this, SLOT(onServerTask()));
+    //connect(&serverTask, SIGNAL(timeout()), this, SLOT(onServerTask()));
 
     emit bootServerAct();
   }
@@ -256,6 +264,7 @@ namespace QuantIDE
     buttLang->setState(Jui::Button::State::ON);
     buttServer->setStateKeeping(Button::StateKeeping::HOLD);
 
+    bridge->OSCtest();
     //this->closeProcessDialog();
   }
   void Quant::onInterpretKillInit()
@@ -292,14 +301,13 @@ namespace QuantIDE
     onMsgStatus("SynthDefs send done...");
 
     buttServer->setState(Jui::Button::State::ON);
-
-    serverTask.start(1000);
   }
   void Quant::onServerKillInit()
   {
     onMsgStatus("ScServer kill init...\r\n");
-    serverTask.stop();
     labelServerMeter->setText("NaN");
+    labelServerSynths->setText("0");
+    labelServerGroups->setText("0");
   }
   void Quant::onServerKillDone()
   {
@@ -314,21 +322,15 @@ namespace QuantIDE
   }
   void Quant::closeEvent(QCloseEvent *event)	{ canvan->close(); }
 
-  void Quant::onServerTask()
+  void Quant::onServerStatus(QStringList data)
   {
+    float peakCPU = data[0].toFloat();
 
-    QString txtCPU = bridge->question("s.peakCPU").toString();
-    if (txtCPU != NULL)
-    {
-      double serverCPU = txtCPU.toDouble();
-      labelServerMeter->setText(tr("%1 %").arg(QString::number(serverCPU, 'f', 2)));
-    }
-
-    QString numSynths = bridge->question("s.numSynths").toString();
-    if (numSynths != NULL)	{ labelServerSynths->setText(numSynths); }
-
+    labelServerMeter->setText(tr("%1 %").arg(QString::number(peakCPU, 'f', 2)));
+    labelServerSynths->setText(data[1]);
+    labelServerGroups->setText(data[2]);
   }
-
+ 
   // GLOBAL CODE
 
   void Quant::onRecivedGlobalCode(QString code) { bridge->question(code, true); }
