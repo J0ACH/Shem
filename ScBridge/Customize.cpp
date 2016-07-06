@@ -4,7 +4,7 @@ namespace SupercolliderBridge
 {
   Customize::Customize(QObject *parent) : QObject(parent)  {  }
 
-  void Customize::initConfig() 
+  void Customize::initConfig()
   {
     QString path = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
     this->initConfigFile(path);
@@ -240,14 +240,14 @@ namespace SupercolliderBridge
         //qDebug() << "ConfigDataTyp: bool";
         QString value = args[0].remove(" ");
 
-        if (value == "true" || value == "1") 
+        if (value == "true" || value == "1")
         {
-          oldConfigData.insert(key, new QVariant(true)); 
+          oldConfigData.insert(key, new QVariant(true));
           this->setProperty(key.toStdString().c_str(), true);
         }
-        else 
+        else
         {
-          oldConfigData.insert(key, new QVariant(false)); 
+          oldConfigData.insert(key, new QVariant(false));
           this->setProperty(key.toStdString().c_str(), false);
         };
       }
@@ -259,11 +259,10 @@ namespace SupercolliderBridge
     return oldConfigData;
   }
 
-  void Customize::copyProperty(QWidget *target)
-  {    
+  void Customize::copyProperty(QObject *target)
+  {
     foreach(QString oneProp, this->dynamicPropertyNames())
     {
-     // qDebug() << " Customize::copyProperty: this->property" << oneProp;
       target->setProperty(
         oneProp.toStdString().c_str(),
         this->property(oneProp.toStdString().c_str())
