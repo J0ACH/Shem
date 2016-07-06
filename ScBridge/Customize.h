@@ -24,6 +24,7 @@ namespace SupercolliderBridge
     ~Customize();
 
     void initConfig();
+    void copyProperty(QWidget*);
 
   signals:
     void actConfigData(QMap<QString, QVariant*> config);

@@ -55,6 +55,14 @@ namespace QuantIDE
     connect(this, SIGNAL(print(QString, QColor)), canvan, SLOT(print(QString, QColor)));
     connect(this, SIGNAL(println(QString, QColor)), canvan, SLOT(println(QString, QColor)));
 
+    connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
+    connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
+    connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
+    connect(bridge, SIGNAL(msgResultAct(QString)), this, SLOT(onMsgResult(QString)));
+    connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
+    connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
+    connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
+
     // INTERPRET actions
     connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(changeInterpretState()));
     connect(bridge, SIGNAL(interpretBootInitAct()), this, SLOT(onInterpretBootInit()));
@@ -181,8 +189,12 @@ namespace QuantIDE
     connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
       nodePanel, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
-    colorAppBackground = QColor(config.value("color_shem_AppBackground")->value<QColor>());
-    colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
+    customize->copyProperty(this);
+
+    colorAppBackground = this->property("color_shem_AppBackground").value<QColor>();
+    //colorAppBackground = QColor(config.value("color_shem_AppBackground")->value<QColor>());
+    colorAppBackground = this->property("color_shem_PanelBackground").value<QColor>();
+    //colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
     colorNormal = config.value("color_shem_Normal")->value<QColor>();
     colorOver = config.value("color_shem_Over")->value<QColor>();
     colorActive = config.value("color_shem_Active")->value<QColor>();
@@ -239,6 +251,7 @@ namespace QuantIDE
 
   void Quant::onConfigDataDone()
   {
+    /*
     connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
     connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
     connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
@@ -246,6 +259,7 @@ namespace QuantIDE
     connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
     connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
     connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
+    */
 
 
 

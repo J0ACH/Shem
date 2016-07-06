@@ -74,6 +74,10 @@ namespace SupercolliderBridge
       font = data["font_shem_TextCode"]->value<QFont>();
       font.setStyleStrategy(QFont::PreferAntialias);
       data.insert("font_shem_TextCode", new QVariant(font));
+
+      font = data["font_shem_TextCode"]->value<QFont>();
+      font.setStyleStrategy(QFont::PreferAntialias);
+      data.insert("font_shem_TextConsole", new QVariant(font));
     }
     else
     {
@@ -88,6 +92,10 @@ namespace SupercolliderBridge
       font = data["font_shem_TextCode"]->value<QFont>();
       font.setStyleStrategy(QFont::NoAntialias);
       data.insert("font_shem_TextCode", new QVariant(font));
+
+      font = data["font_shem_TextCode"]->value<QFont>();
+      font.setStyleStrategy(QFont::NoAntialias);
+      data.insert("font_shem_TextConsole", new QVariant(font));
     }
 
     return data;
@@ -181,6 +189,7 @@ namespace SupercolliderBridge
       */
 
       QString key = lineParts[0].remove(" ");
+      //char keyChar = key.toStdString().c_str(); // toStdString().c_str();
       QStringList args = lineParts[1].split(",");
       QVariant *value;
 
@@ -198,8 +207,10 @@ namespace SupercolliderBridge
         }
 
         if (isColor) {
-          value = new QVariant(QColor(rgb[0], rgb[1], rgb[2]));
+          QColor color = QColor(rgb[0], rgb[1], rgb[2]);
+          value = new QVariant(color);
           oldConfigData.insert(key, value);
+          this->setProperty(key.toStdString().c_str(), color);
           continue;
         }
       }
@@ -220,6 +231,7 @@ namespace SupercolliderBridge
           font.setStretch(QFont::Unstretched);
           value = new QVariant(font);
           oldConfigData.insert(key, value);
+          this->setProperty(key.toStdString().c_str(), font);
           continue;
         }
       }
@@ -228,8 +240,16 @@ namespace SupercolliderBridge
         //qDebug() << "ConfigDataTyp: bool";
         QString value = args[0].remove(" ");
 
-        if (value == "true" || value == "1") { oldConfigData.insert(key, new QVariant(true)); }
-        else { oldConfigData.insert(key, new QVariant(false)); };
+        if (value == "true" || value == "1") 
+        {
+          oldConfigData.insert(key, new QVariant(true)); 
+          this->setProperty(key.toStdString().c_str(), true);
+        }
+        else 
+        {
+          oldConfigData.insert(key, new QVariant(false)); 
+          this->setProperty(key.toStdString().c_str(), false);
+        };
       }
     }
 
@@ -237,6 +257,18 @@ namespace SupercolliderBridge
     configFile->close();
 
     return oldConfigData;
+  }
+
+  void Customize::copyProperty(QWidget *target)
+  {    
+    foreach(QString oneProp, this->dynamicPropertyNames())
+    {
+     // qDebug() << " Customize::copyProperty: this->property" << oneProp;
+      target->setProperty(
+        oneProp.toStdString().c_str(),
+        this->property(oneProp.toStdString().c_str())
+        );
+    }
   }
 
   Customize::~Customize() { }
