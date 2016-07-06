@@ -369,7 +369,7 @@ namespace QuantIDE
   {
     // problem s quantem a tempem
     // spravne if (beat % quant/mBridge->tempo == 0) ale neni int
-     qDebug() << "beat:" << beat;    
+    // qDebug() << "beat:" << beat;    
     currentTime = beat % quant;
     //if (beat % quant == 0)
     //{

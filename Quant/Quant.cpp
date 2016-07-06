@@ -21,10 +21,12 @@ namespace QuantIDE
 {
   Quant::Quant(QWidget *parent) : QWidget(parent)
   {
+
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
-    customize = new Customize(this, bridge);
+    customize = new Customize(this);
     udpServer = new UDPServer(this);
+
 
     canvan->setHeaderHeight(42);
     canvan->setTailHeight(34);
@@ -32,19 +34,19 @@ namespace QuantIDE
     canvan->setTitle("Quant");
     canvan->setVersion(tr("v%1").arg(Quant_VERSION));
 
-
     //this->initProcessDialog();
     this->initControl();
     this->fitGeometry();
 
     // CONTROLS
     connect(this, SIGNAL(bootInterpretAct()), bridge, SLOT(changeInterpretState()));
+    connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
     connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
     connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
     connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(onCloseQuant()));
     connect(globalCode, SIGNAL(sendText(QString)), this, SLOT(onRecivedGlobalCode(QString)));
 
-     // CONFIG
+    // CONFIG
     connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
       this, SLOT(onConfigData(QMap<QString, QVariant*>)));
     connect(this, SIGNAL(actConfigDone()), this, SLOT(onConfigDataDone()));
@@ -68,8 +70,8 @@ namespace QuantIDE
     connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
     connect(bridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
 
+    customize->initConfig();
     emit bootInterpretAct();
-    onMsgStatus("Quant init...");
   }
 
   void Quant::initControl()
@@ -105,7 +107,7 @@ namespace QuantIDE
     buttCustomize->setStateKeeping(Button::StateKeeping::SWITCH);
     buttCustomize->setIcon(QImage(":/customize_16px.png"), 0);
     buttCustomize->setToolTip("Display customize panel");
-    
+
     buttNetwork = new Button(canvan->tail);
     buttNetwork->setText("Network");
     buttNetwork->setStateKeeping(Button::StateKeeping::SWITCH);
@@ -116,7 +118,7 @@ namespace QuantIDE
     panelButtons.append(buttConsole);
     panelButtons.append(buttCustomize);
     panelButtons.append(buttNetwork);
-    
+
     buttConsole->setButtonGroup(panelButtons);
     buttCustomize->setButtonGroup(panelButtons);
     buttNetwork->setButtonGroup(panelButtons);
@@ -245,11 +247,11 @@ namespace QuantIDE
     connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
     connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
 
-    connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
+
 
     //connect(&serverTask, SIGNAL(timeout()), this, SLOT(onServerTask()));
 
-    emit bootServerAct();
+
   }
 
   // INTERPRET
@@ -264,7 +266,8 @@ namespace QuantIDE
     buttLang->setState(Jui::Button::State::ON);
     buttServer->setStateKeeping(Button::StateKeeping::HOLD);
 
-    bridge->OSCtest();
+    bridge->initOSC();
+    emit bootServerAct();
     //this->closeProcessDialog();
   }
   void Quant::onInterpretKillInit()
@@ -301,6 +304,8 @@ namespace QuantIDE
     onMsgStatus("SynthDefs send done...");
 
     buttServer->setState(Jui::Button::State::ON);
+
+    onMsgStatus("Quant init done...");
   }
   void Quant::onServerKillInit()
   {
@@ -330,7 +335,7 @@ namespace QuantIDE
     labelServerSynths->setText(data[1]);
     labelServerGroups->setText(data[2]);
   }
- 
+
   // GLOBAL CODE
 
   void Quant::onRecivedGlobalCode(QString code) { bridge->question(code, true); }

@@ -28,7 +28,7 @@ namespace QuantIDE
 
   public:
     Quant(QWidget *parent = 0);
-    ~Quant();  
+    ~Quant();
 
     public slots :
     void onMsgNormal(QString);
@@ -53,7 +53,7 @@ namespace QuantIDE
 
     void fitGeometry();
     void onConfigData(QMap<QString, QVariant*> config);
-    
+
     void onServerStatus(QStringList);
 
     void onRecivedGlobalCode(QString);
@@ -67,7 +67,7 @@ namespace QuantIDE
     void actConfigData(QMap<QString, QVariant*> config);
     void print(QString, QColor);
     void println(QString, QColor);
-       
+
   protected:
     void closeEvent(QCloseEvent *event);
     void paintEvent(QPaintEvent *event);
@@ -88,9 +88,9 @@ namespace QuantIDE
 
     Button *buttLang, *buttServer, *buttConsole, *buttCustomize, *buttNetwork;
     CodeEditor *globalCode;
-  
+
     QLabel *labelServerMeter, *labelServerSynths, *labelServerGroups;
-      };
+  };
 }
 #endif // QUANT
 

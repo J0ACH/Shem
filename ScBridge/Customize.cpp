@@ -2,15 +2,11 @@
 
 namespace SupercolliderBridge
 {
-  Customize::Customize(QObject *parent, ScBridge *bridge) :
-    QObject(parent),
-    mBridge(bridge)
-  {
-    connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onInterpretStart()));
-  }
+  Customize::Customize(QObject *parent) : QObject(parent)  {  }
 
-  void Customize::onInterpretStart() {
-    QString path = mBridge->question("Platform.systemExtensionDir").toString();
+  void Customize::initConfig() 
+  {
+    QString path = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
     this->initConfigFile(path);
     this->mergeConfigData();
   }
@@ -159,7 +155,8 @@ namespace SupercolliderBridge
     defaultConfig.insert("bool_shem_TextAntialias", new QVariant(true));
     defaultConfig.insert("font_shem_TextBig", new QVariant(QFont("Univers Condensed", 13)));
     defaultConfig.insert("font_shem_TextSmall", new QVariant(QFont("Univers Condensed", 10)));
-    defaultConfig.insert("font_shem_TextCode", new QVariant(QFont("Univers 57 Condensed", 9)));
+    defaultConfig.insert("font_shem_TextCode", new QVariant(QFont("Consolas", 8)));
+    defaultConfig.insert("font_shem_TextConsole", new QVariant(QFont("Univers 57 Condensed", 9)));
 
     return defaultConfig;
   }
@@ -236,7 +233,7 @@ namespace SupercolliderBridge
       }
     }
 
-    mBridge->msgNormalAct(tr("\ncustomization config file: %1\r").arg(configFile->fileName()));
+    // mBridge->msgNormalAct(tr("\ncustomization config file: %1\r").arg(configFile->fileName()));
     configFile->close();
 
     return oldConfigData;

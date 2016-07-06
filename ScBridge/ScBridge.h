@@ -39,7 +39,7 @@ namespace SupercolliderBridge
     bool evaluate(QString code, bool print = false, bool silent = false);
     QVariant question(QString code, bool print = false);
 
-    void OSCtest();
+    void initOSC();
 
     private slots:
     void onReadyRead(void);

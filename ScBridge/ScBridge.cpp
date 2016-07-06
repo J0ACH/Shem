@@ -24,9 +24,9 @@ namespace SupercolliderBridge
     connect(mIpcServer, SIGNAL(newConnection()), this, SLOT(onNewIpcConnection()));
   }
 
-  void ScBridge::OSCtest()
+  void ScBridge::initOSC()
   {
-    qDebug("OSCtest start");
+    //qDebug("OSCtest start");
     QString oscFunc = "(";
 
     oscFunc += "OSCdef.newMatching(\\SC_status,";
@@ -46,7 +46,7 @@ namespace SupercolliderBridge
 
     oscFunc += ")";
 
-    this->evaluate(oscFunc, true);
+    this->evaluate(oscFunc);
   }
 
   void ScBridge::killBridge()

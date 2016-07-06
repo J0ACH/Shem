@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QMap>
 #include <QDebug>
+#include <QStandardPaths> 
 
 
 namespace SupercolliderBridge
@@ -18,17 +19,17 @@ namespace SupercolliderBridge
     Q_OBJECT
 
   public:
-    Customize(QObject *parent, ScBridge *bridge);
+    //Customize(QObject *parent, ScBridge *bridge);
+    Customize(QObject *parent);
     ~Customize();
 
-    public slots:
-    void onInterpretStart();
+    void initConfig();
 
   signals:
     void actConfigData(QMap<QString, QVariant*> config);
 
   private:
-    ScBridge *mBridge;
+   // ScBridge *mBridge;
     QFile *configFile;
 
     void initConfigFile(QString systemExtensionDir);
