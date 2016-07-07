@@ -25,9 +25,11 @@ namespace SupercolliderBridge
 
     void initConfig();
     void copyProperty(QObject*);
+    void copyProperty(QObject*, QObject*);
 
   signals:
     void actConfigData(QMap<QString, QVariant*> config);
+    void actCustomizeChanged();
 
   private:
    // ScBridge *mBridge;
@@ -43,6 +45,8 @@ namespace SupercolliderBridge
     void writeConfigFile(QMap<QString, QVariant*>);
 
   };
+
+  
 }
 
 #endif // CUSTOMIZE

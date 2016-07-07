@@ -10,7 +10,7 @@ namespace QuantIDE
 
     this->initControl();
     numOfNode = 0;
-    
+
     connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
     connect(tempoBox, SIGNAL(actValueChanged(QString)), mBridge, SLOT(onChangeTempo(QString)));
   }
@@ -64,6 +64,19 @@ namespace QuantIDE
     update();
   }
 
+  void NodePanel::onCustomize()
+  {
+    qDebug("NodePanel::onCustomize");
+    Panel::onCustomize();
+      //update();
+
+    //Customize::copyProperty(customize, canvan);
+    //Customize::copyProperty(customize, nodePanel);
+    //Customize::copyProperty(customize, canvan->mConsole);
+
+    //Customize::copyProperty(customize, buttLang);    
+  }
+
   void NodePanel::addNode()
   {
     QString newName = this->nextNodeName("temp");
@@ -72,7 +85,7 @@ namespace QuantIDE
     newNode->setSourceCode("SinOsc.ar(140!2, mul:\\amp.kr())");
     newNode->setFixedWidth(scrollArea->width() - 10);
     newNode->show();
-    
+
     connect(newNode, SIGNAL(killAct(QString)), this, SLOT(deleteNode(QString)));
     connect(newNode, SIGNAL(actChangedHeight()), this, SLOT(fitNodesPosition()));
     connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),

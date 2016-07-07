@@ -27,7 +27,6 @@ namespace QuantIDE
     customize = new Customize(this);
     udpServer = new UDPServer(this);
 
-
     canvan->setHeaderHeight(42);
     canvan->setTailHeight(34);
     canvan->setLogo(QImage(":/logo32.png"));
@@ -50,6 +49,7 @@ namespace QuantIDE
     connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
       this, SLOT(onConfigData(QMap<QString, QVariant*>)));
     connect(this, SIGNAL(actConfigDone()), this, SLOT(onConfigDataDone()));
+    connect(customize, SIGNAL(actCustomizeChanged()), this, SLOT(onCustomize()));
 
     // MSG actions
     connect(this, SIGNAL(print(QString, QColor)), canvan, SLOT(print(QString, QColor)));
@@ -86,6 +86,7 @@ namespace QuantIDE
   {
     nodePanel = new NodePanel(canvan->screen, bridge);
     nodePanel->setTitle("NodePanel");
+    customize->copyProperty(nodePanel);
     /*
     customizePanel = new Panel(canvan->screen);
     customizePanel->setTitle("Customize");
@@ -182,6 +183,19 @@ namespace QuantIDE
 
   // CONFIG
 
+  void Quant::onCustomize()
+  {
+    qDebug("Quant::onCustomize");
+
+   
+
+    //Customize::copyProperty(customize, canvan);
+    //Customize::copyProperty(customize, nodePanel);
+    //Customize::copyProperty(customize, canvan->mConsole);
+
+    //Customize::copyProperty(customize, buttLang);    
+  }
+
   void Quant::onConfigData(QMap<QString, QVariant*> config)
   {
     connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
@@ -193,7 +207,7 @@ namespace QuantIDE
 
     colorAppBackground = this->property("color_shem_AppBackground").value<QColor>();
     //colorAppBackground = QColor(config.value("color_shem_AppBackground")->value<QColor>());
-    colorAppBackground = this->property("color_shem_PanelBackground").value<QColor>();
+    colorPanelBackground = this->property("color_shem_PanelBackground").value<QColor>();
     //colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
     colorNormal = config.value("color_shem_Normal")->value<QColor>();
     colorOver = config.value("color_shem_Over")->value<QColor>();
@@ -340,6 +354,11 @@ namespace QuantIDE
     painter.fillRect(QRect(0, 0, width() - 1, height() - 1), colorAppBackground);
   }
   void Quant::closeEvent(QCloseEvent *event)	{ canvan->close(); }
+
+  void Quant::customizeEvent(QDynamicPropertyChangeEvent *event)
+  {
+    qDebug("Quant::customizeEvent");
+  }
 
   void Quant::onServerStatus(QStringList data)
   {

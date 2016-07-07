@@ -50,6 +50,7 @@ namespace QuantIDE
     void onServerKillDone();
 
     void onConfigDataDone();
+    void onCustomize();
 
     void fitGeometry();
     void onConfigData(QMap<QString, QVariant*> config);
@@ -71,6 +72,7 @@ namespace QuantIDE
   protected:
     void closeEvent(QCloseEvent *event);
     void paintEvent(QPaintEvent *event);
+    void customizeEvent(QDynamicPropertyChangeEvent *event);
 
   private:
     void initControl();

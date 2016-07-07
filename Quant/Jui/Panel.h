@@ -31,6 +31,7 @@ namespace Jui
 
 		public slots:
 		void onConfigData(QMap<QString, QVariant*> config);
+  void onCustomize();
 
 	signals:
 		void resizeAct();

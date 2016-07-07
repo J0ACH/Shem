@@ -50,10 +50,17 @@ namespace SupercolliderBridge
 
     foreach(QString key, mergeConfig.keys())
     {
-      qDebug() << "configKey [" << key << "] ->" << mergeConfig[key]->toString();
+      // qDebug() << "configKey [" << key << "] ->" << mergeConfig[key]->toString();
+      this->setProperty(key.toStdString().c_str(), *mergeConfig[key]);
     };
 
-    emit actConfigData(mergeConfig);
+    foreach(QString oneProp, this->dynamicPropertyNames())
+    {
+      qDebug() << "configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
+    }
+
+    //emit actConfigData(mergeConfig);
+    emit actCustomizeChanged();
   }
 
   QMap<QString, QVariant*> Customize::processingConfigData(QMap<QString, QVariant*> data)
@@ -189,7 +196,6 @@ namespace SupercolliderBridge
       */
 
       QString key = lineParts[0].remove(" ");
-      //char keyChar = key.toStdString().c_str(); // toStdString().c_str();
       QStringList args = lineParts[1].split(",");
       QVariant *value;
 
@@ -210,7 +216,6 @@ namespace SupercolliderBridge
           QColor color = QColor(rgb[0], rgb[1], rgb[2]);
           value = new QVariant(color);
           oldConfigData.insert(key, value);
-          this->setProperty(key.toStdString().c_str(), color);
           continue;
         }
       }
@@ -231,7 +236,6 @@ namespace SupercolliderBridge
           font.setStretch(QFont::Unstretched);
           value = new QVariant(font);
           oldConfigData.insert(key, value);
-          this->setProperty(key.toStdString().c_str(), font);
           continue;
         }
       }
@@ -243,12 +247,10 @@ namespace SupercolliderBridge
         if (value == "true" || value == "1")
         {
           oldConfigData.insert(key, new QVariant(true));
-          this->setProperty(key.toStdString().c_str(), true);
         }
         else
         {
           oldConfigData.insert(key, new QVariant(false));
-          this->setProperty(key.toStdString().c_str(), false);
         };
       }
     }
@@ -268,6 +270,21 @@ namespace SupercolliderBridge
         this->property(oneProp.toStdString().c_str())
         );
     }
+    connect(this, SIGNAL(actCustomizeChanged()), target, SLOT(onCustomize()));
+  }
+
+  void Customize::copyProperty(QObject *source, QObject *target)
+  {
+    foreach(QString oneProp, source->dynamicPropertyNames())
+    {
+      target->setProperty(
+        oneProp.toStdString().c_str(),
+        source->property(oneProp.toStdString().c_str())
+        );
+    }
+
+    connect(this, SIGNAL(actCustomizeChanged()), target, SLOT(onCustomize()));
+    //emit actCustomizeChanged();
   }
 
   Customize::~Customize() { }

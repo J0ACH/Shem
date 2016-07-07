@@ -49,6 +49,11 @@ namespace Jui
     update();
   }
 
+  void Panel::onCustomize()
+  {
+    colorPanelBackground = this->property("color_shem_PanelBackground").value<QColor>();
+  }
+
   void Panel::setTitle(QString name) { title = name; }
 
   void Panel::setColorBackground(QColor color) { colorPanelBackground = color; update(); }
@@ -92,6 +97,7 @@ namespace Jui
     QPainter painter(this);
     painter.setFont(fontTextBig);
 
+    QColor colorBackground = this->property("color_shem_PanelBackground").value<QColor>();
     painter.fillRect(bounds(), colorPanelBackground);
 
     painter.setPen(QPen(colorText, 1));

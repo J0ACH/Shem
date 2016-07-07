@@ -214,9 +214,11 @@ namespace Jui
     QPainter painter(this);
     painter.setFont(QFont("Univers Condensed", 10, QFont::Normal));
 
+    QColor colorHeader = this->property("color_shem_AppHeaderBackground").value<QColor>();
+
     painter.setPen(Qt::NoPen);
-    painter.fillRect(header->geometry(), colorAppHeaderBackground);
-    painter.fillRect(tail->geometry(), colorAppHeaderBackground);
+    painter.fillRect(header->geometry(), colorHeader);
+    painter.fillRect(tail->geometry(), colorHeader);
 
     painter.setPen(QPen(colorNormal, 1));
     painter.setBrush(Qt::NoBrush);
@@ -333,6 +335,12 @@ if (patch < 10) { strPatch.prepend(QString::number(0)); }
       edges->show();
     }
   }
+  /*
+  void Canvan::customizeEvent(QDynamicPropertyChangeEvent *event)
+  {
+    qDebug("Canvan::customizeEvent");
+  }
+  */
 
   Canvan::~Canvan() {	}
 }

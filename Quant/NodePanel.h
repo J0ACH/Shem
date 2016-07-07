@@ -36,6 +36,7 @@ namespace QuantIDE
     public slots:
     void fitNodesPosition();
     void onConfigData(QMap<QString, QVariant*> config);
+    void onCustomize();
 
     void addNode();
     void deleteNode(QString name);
