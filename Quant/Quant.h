@@ -28,7 +28,7 @@ namespace QuantIDE
 
   public:
     Quant(QWidget *parent = 0);
-    ~Quant();  
+    ~Quant();
 
     public slots :
     void onMsgNormal(QString);
@@ -49,11 +49,13 @@ namespace QuantIDE
     void onServerKillInit();
     void onServerKillDone();
 
-    void onConfigDataDone();
+    //void onConfigDataDone();
+    void onCustomize();
 
     void fitGeometry();
-    void onConfigData(QMap<QString, QVariant*> config);
-    void onServerTask();
+    //void onConfigData(QMap<QString, QVariant*> config);
+
+    void onServerStatus(QStringList);
 
     void onRecivedGlobalCode(QString);
 
@@ -70,9 +72,11 @@ namespace QuantIDE
   protected:
     void closeEvent(QCloseEvent *event);
     void paintEvent(QPaintEvent *event);
+    void customizeEvent(QDynamicPropertyChangeEvent *event);
 
   private:
     void initControl();
+    void initStyleSheet(); // ???? snad bude odstraneno
 
     ScBridge *bridge;
     Customize *customize;
@@ -83,13 +87,12 @@ namespace QuantIDE
 
     QColor colorAppBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgResult, colorMsgError, colorMsgWarning, colorMsgBundle;
-    QFont fontTextSmall, fontTextCode;
+    QFont fontTextBig, fontTextSmall, fontTextCode;
 
     Button *buttLang, *buttServer, *buttConsole, *buttCustomize, *buttNetwork;
     CodeEditor *globalCode;
-  
-    QLabel *labelServerMeter, *labelServerSynths;
-    QTimer serverTask;
+
+    QLabel *labelServerMeter, *labelServerSynths, *labelServerGroups;
   };
 }
 #endif // QUANT

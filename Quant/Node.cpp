@@ -2,9 +2,10 @@
 
 namespace QuantIDE
 {
-  Node::Node(QWidget *parent, ScBridge *bridge, QString name, int nodeNum) :
+  Node::Node(QWidget *parent, ScBridge *bridge, Customize *customize, QString name, int nodeNum) :
     QWidget(parent),
     mBridge(bridge),
+    mCustomize(customize),
     nodeName(name),
     nodeNumber(nodeNum)
   {
@@ -15,6 +16,8 @@ namespace QuantIDE
     nodeBusIndexReserve = 30;
     stateNodePlay = StateNodePlay::FREE;
 
+    connect(mCustomize, SIGNAL(actCustomizeChanged()), this, SLOT(onCustomize()));
+
     connect(playButton, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
     connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
     connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(sendSourceCode(QString)));
@@ -22,6 +25,7 @@ namespace QuantIDE
     connect(fTimeBox, SIGNAL(actValueChanged(QString)), this, SLOT(setNodeFadeTime(QString)));
 
     this->initNode();
+    this->onCustomize();
   }
 
   void Node::initControl()
@@ -52,6 +56,50 @@ namespace QuantIDE
     fTimeBox->setLabel("fTime");
     fTimeBox->setLabelSize(45);
   }
+  void Node::onCustomize()
+  {
+    qDebug("Node::onCustomize");
+
+    colorPanelBackground = mCustomize->getColor("color_shem_PanelBackground");
+    colorNormal = mCustomize->getColor("color_shem_Normal");
+    colorOver = mCustomize->getColor("color_shem_Over");
+    colorActive = mCustomize->getColor("color_shem_Active");
+    fontTextBig = mCustomize->getFont("font_shem_TextBig");
+    fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
+    fontTextCode = mCustomize->getFont("font_shem_TextCode");
+    colorText = mCustomize->getColor("color_shem_Text");
+
+    sourceCode->setFontCode(fontTextCode);
+
+    closeButton->setColorNormal(colorNormal);
+    closeButton->setColorOver(colorOver);
+    closeButton->setColorActive(colorActive);
+
+    playButton->setColorNormal(colorNormal);
+    playButton->setColorOver(colorOver);
+    playButton->setColorActive(colorActive);
+    playButton->setFont(fontTextSmall);
+
+    nameLabel->setFont(fontTextBig);
+    labelNodeID->setFont(fontTextSmall);
+    labelNamedControls->setFont(fontTextSmall);
+
+    QPalette palete = this->palette();
+    palete.setColor(this->foregroundRole(), colorText);
+    nameLabel->setPalette(palete);
+    labelNodeID->setPalette(palete);
+    labelNamedControls->setPalette(palete);
+
+    volumeBox->setFont(fontTextSmall);
+    volumeBox->setColorBackground(colorPanelBackground);
+    volumeBox->setColorText(colorText);
+
+    fTimeBox->setFont(fontTextSmall);
+    fTimeBox->setColorBackground(colorPanelBackground);
+    fTimeBox->setColorText(colorText);
+
+  }
+  /*
   void Node::onConfigData(QMap<QString, QVariant*> config)
   {
     colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
@@ -88,6 +136,7 @@ namespace QuantIDE
     configData = config;
     update();
   }
+  */
 
   QRect Node::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
   void Node::setName(QString name) { nameLabel->setText(name); }
@@ -99,10 +148,8 @@ namespace QuantIDE
     fTime = "0";
 
     mBridge->evaluate(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
-     mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(1);").arg(nodeName, volume, fTime), true);
-    //mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3);").arg(nodeName, volume, fTime), true);
+    mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(1);").arg(nodeName, volume, fTime), true);
     mBridge->evaluate(tr("~%1.pause()").arg(nodeName), true);
-    // mBridge->evaluate(tr("~%1.stop()").arg(nodeName), true);
     stateNodePlay = StateNodePlay::STOP;
 
     labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
@@ -168,6 +215,7 @@ namespace QuantIDE
     ControlEnvelope *newGraph = new ControlEnvelope(
       this,
       mBridge,
+      mCustomize,
       nameLabel->text(),
       controlName,
       this->nextEmptyBusIndex()
@@ -325,11 +373,11 @@ namespace QuantIDE
   /*
   float Node::timeToNextQuant()
   {
-    float time = mBridge->question(tr("p[\\tempo].clock.timeToNextBeat(%1)").arg(
-      QString::number(quant)
-      ), true).toString().toFloat();
+  float time = mBridge->question(tr("p[\\tempo].clock.timeToNextBeat(%1)").arg(
+  QString::number(quant)
+  ), true).toString().toFloat();
 
-    return time;
+  return time;
   }
   */
 }

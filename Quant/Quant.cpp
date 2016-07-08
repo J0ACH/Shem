@@ -21,10 +21,16 @@ namespace QuantIDE
 {
   Quant::Quant(QWidget *parent) : QWidget(parent)
   {
+
+    customize = new Customize(this);
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
-    customize = new Customize(this, bridge);
     udpServer = new UDPServer(this);
+
+    customize->initConfig();
+
+    QFontDatabase::addApplicationFont(":/fontText.ttf");
+    QFontDatabase::addApplicationFont(":/fontConsole.ttf");
 
     canvan->setHeaderHeight(42);
     canvan->setTailHeight(34);
@@ -32,26 +38,32 @@ namespace QuantIDE
     canvan->setTitle("Quant");
     canvan->setVersion(tr("v%1").arg(Quant_VERSION));
 
-
     //this->initProcessDialog();
     this->initControl();
     this->fitGeometry();
 
     // CONTROLS
     connect(this, SIGNAL(bootInterpretAct()), bridge, SLOT(changeInterpretState()));
+    connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
     connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
     connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
     connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(onCloseQuant()));
     connect(globalCode, SIGNAL(sendText(QString)), this, SLOT(onRecivedGlobalCode(QString)));
 
-     // CONFIG
-    connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-      this, SLOT(onConfigData(QMap<QString, QVariant*>)));
-    connect(this, SIGNAL(actConfigDone()), this, SLOT(onConfigDataDone()));
+    // CONFIG
+    connect(customize, SIGNAL(actCustomizeChanged()), this, SLOT(onCustomize()));
 
     // MSG actions
     connect(this, SIGNAL(print(QString, QColor)), canvan, SLOT(print(QString, QColor)));
     connect(this, SIGNAL(println(QString, QColor)), canvan, SLOT(println(QString, QColor)));
+
+    connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
+    connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
+    connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
+    connect(bridge, SIGNAL(msgResultAct(QString)), this, SLOT(onMsgResult(QString)));
+    connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
+    connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
+    connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
 
     // INTERPRET actions
     connect(buttLang, SIGNAL(pressAct()), bridge, SLOT(changeInterpretState()));
@@ -66,19 +78,19 @@ namespace QuantIDE
     connect(bridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
     connect(bridge, SIGNAL(serverKillInitAct()), this, SLOT(onServerKillInit()));
     connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
+    connect(bridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
 
+    emit customize->actCustomizeChanged();
     emit bootInterpretAct();
-    onMsgStatus("Quant init...");
+
+    this->initStyleSheet();
   }
 
   void Quant::initControl()
   {
-    nodePanel = new NodePanel(canvan->screen, bridge);
+      nodePanel = new NodePanel(canvan->screen, bridge, customize);
     nodePanel->setTitle("NodePanel");
-
-    customizePanel = new Panel(canvan->screen);
-    customizePanel->setTitle("Customize");
-
+   
     buttLang = new Button(canvan->tail);
     buttLang->setText("Lang");
     buttLang->setStateKeeping(Button::StateKeeping::HOLD);
@@ -103,7 +115,7 @@ namespace QuantIDE
     buttCustomize->setStateKeeping(Button::StateKeeping::SWITCH);
     buttCustomize->setIcon(QImage(":/customize_16px.png"), 0);
     buttCustomize->setToolTip("Display customize panel");
-    
+
     buttNetwork = new Button(canvan->tail);
     buttNetwork->setText("Network");
     buttNetwork->setStateKeeping(Button::StateKeeping::SWITCH);
@@ -114,7 +126,7 @@ namespace QuantIDE
     panelButtons.append(buttConsole);
     panelButtons.append(buttCustomize);
     panelButtons.append(buttNetwork);
-    
+
     buttConsole->setButtonGroup(panelButtons);
     buttCustomize->setButtonGroup(panelButtons);
     buttNetwork->setButtonGroup(panelButtons);
@@ -129,12 +141,16 @@ namespace QuantIDE
     labelServerSynths = new QLabel(canvan->tail);
     labelServerSynths->setText("0");
     labelServerSynths->setToolTip("numSynths");
+
+    labelServerGroups = new QLabel(canvan->tail);
+    labelServerGroups->setText("0");
+    labelServerGroups->setToolTip("numGroups");
   }
 
   void Quant::fitGeometry()
   {
     QRect screenRect = canvan->screen->rect();
-    nodePanel->setGeometry(1, 0, screenRect.width(), screenRect.height());
+    nodePanel->setGeometry(1, 1, screenRect.width(), screenRect.height()-1);
 
     buttLang->setGeometry(5, 5, 24, 24);
     buttServer->setGeometry(35, 5, 24, 24);
@@ -144,8 +160,9 @@ namespace QuantIDE
 
     globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
 
-    labelServerMeter->setGeometry(canvan->tail->width() - 200, 5, 40, 25);
-    labelServerSynths->setGeometry(canvan->tail->width() - 155, 5, 30, 25);
+    labelServerMeter->setGeometry(canvan->tail->width() - 270, 5, 40, 25);
+    labelServerSynths->setGeometry(canvan->tail->width() - 220, 5, 15, 25);
+    labelServerGroups->setGeometry(canvan->tail->width() - 200, 5, 15, 25);
   }
 
   void Quant::onCloseQuant()
@@ -165,15 +182,125 @@ namespace QuantIDE
 
   // CONFIG
 
-  void Quant::onConfigData(QMap<QString, QVariant*> config)
+  void Quant::onCustomize()
   {
-    connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-      canvan, SLOT(onConfigData(QMap<QString, QVariant*>)));
-    connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-      nodePanel, SLOT(onConfigData(QMap<QString, QVariant*>)));
+    // qDebug("Quant::onCustomize");
+    QColor colorAppHeaderBackground;
+    QFont fontTextConsole;
 
-    colorAppBackground = QColor(config.value("color_shem_AppBackground")->value<QColor>());
-    colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
+    colorAppBackground = customize->getColor("color_shem_AppBackground");
+    colorAppHeaderBackground = customize->getColor("color_shem_AppHeaderBackground");
+    colorPanelBackground = customize->getColor("color_shem_PanelBackground");
+    colorNormal = customize->getColor("color_shem_Normal");
+    colorOver = customize->getColor("color_shem_Over");
+    colorActive = customize->getColor("color_shem_Active");
+    colorText = customize->getColor("color_shem_Text");
+
+    colorMsgNormal = customize->getColor("color_shem_MsgNormal");
+    colorMsgStatus = customize->getColor("color_shem_MsgStatus");
+    colorMsgEvaluate = customize->getColor("color_shem_MsgEvaluate");
+    colorMsgResult = customize->getColor("color_shem_MsgResult");
+    colorMsgError = customize->getColor("color_shem_MsgError");
+    colorMsgWarning = customize->getColor("color_shem_MsgWarning");
+    colorMsgBundle = customize->getColor("color_shem_MsgBundle");
+
+    fontTextBig = customize->getFont("font_shem_TextBig");
+    fontTextSmall = customize->getFont("font_shem_TextSmall");
+    fontTextCode = customize->getFont("font_shem_TextCode");
+    fontTextConsole = customize->getFont("font_shem_TextConsole");
+
+    canvan->setColorHeader(colorAppHeaderBackground);
+    canvan->setColorNormal(colorNormal);
+    canvan->setColorOver(colorOver);
+    canvan->setColorActive(colorActive);
+    canvan->setColorText(colorText);
+
+    canvan->mConsole->setColorBackground(colorPanelBackground);
+    canvan->mConsole->setColorTitle(colorText);
+    canvan->mConsole->setColorText(colorText);
+    canvan->mConsole->setFontTitle(fontTextBig);
+    canvan->mConsole->setFont(fontTextConsole);
+
+    buttLang->setColorNormal(colorNormal);
+    buttServer->setColorNormal(colorNormal);
+    buttConsole->setColorNormal(colorNormal);
+    buttCustomize->setColorNormal(colorNormal);
+    buttNetwork->setColorNormal(colorNormal);
+
+    buttLang->setColorOver(colorOver);
+    buttServer->setColorOver(colorOver);
+    buttConsole->setColorOver(colorOver);
+    buttCustomize->setColorOver(colorOver);
+    buttNetwork->setColorOver(colorOver);
+
+    buttLang->setColorActive(colorActive);
+    buttServer->setColorActive(colorActive);
+    buttConsole->setColorActive(colorActive);
+    buttCustomize->setColorActive(colorActive);
+    buttNetwork->setColorActive(colorActive);
+
+    buttLang->setFont(fontTextSmall);
+    buttServer->setFont(fontTextSmall);
+    buttConsole->setFont(fontTextSmall);
+    buttCustomize->setFont(fontTextSmall);
+    buttNetwork->setFont(fontTextSmall);
+
+    globalCode->setFontCode(fontTextCode);
+
+    labelServerMeter->setFont(fontTextSmall);
+    labelServerSynths->setFont(fontTextSmall);
+    labelServerGroups->setFont(fontTextSmall);
+
+    QPalette palete = this->palette();
+    palete.setColor(this->foregroundRole(), colorText);
+    labelServerMeter->setPalette(palete);
+    labelServerSynths->setPalette(palete);
+    labelServerGroups->setPalette(palete);
+  }
+  void Quant::initStyleSheet()
+  {
+    QString txt;
+
+    txt.append(tr("QTextEdit { color: %1; }").arg(colorText.name()));
+    txt.append(tr("QTextEdit { background-color: %1; }").arg(colorPanelBackground.name()));
+    txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(colorActive.name()));
+
+    txt.append("QScrollBar:vertical { width: 2px; }");
+    txt.append("QScrollBar:horizontal { height: 2px; }");
+    txt.append(tr("QScrollBar:vertical { background: %1; }").arg(colorPanelBackground.name()));
+    txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(colorPanelBackground.name()));
+    txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(colorText.name()));
+    txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(colorText.name()));
+    txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
+    txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
+    txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
+    txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
+    txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
+    txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
+    txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
+    txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
+
+    txt.append(tr("QToolTip { color: %1; }").arg(colorText.name()));
+    txt.append(tr("QToolTip { background-color:  %1; }").arg(colorPanelBackground.name()));
+    txt.append(tr("QToolTip { border: 1px solid white; }"));
+
+    this->setStyleSheet(txt);
+  }
+
+  /*
+    void Quant::onConfigData(QMap<QString, QVariant*> config)
+    {
+    connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+    canvan, SLOT(onConfigData(QMap<QString, QVariant*>)));
+    connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+    nodePanel, SLOT(onConfigData(QMap<QString, QVariant*>)));
+
+    //customize->copyProperty(this);
+
+    colorAppBackground = this->property("color_shem_AppBackground").value<QColor>();
+    //colorAppBackground = QColor(config.value("color_shem_AppBackground")->value<QColor>());
+    colorPanelBackground = this->property("color_shem_PanelBackground").value<QColor>();
+    //colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
     colorNormal = config.value("color_shem_Normal")->value<QColor>();
     colorOver = config.value("color_shem_Over")->value<QColor>();
     colorActive = config.value("color_shem_Active")->value<QColor>();
@@ -218,6 +345,7 @@ namespace QuantIDE
 
     labelServerMeter->setFont(fontTextSmall);
     labelServerSynths->setFont(fontTextSmall);
+    labelServerGroups->setFont(fontTextSmall);
 
     emit actConfigData(config);
     onMsgStatus("Cutomization done...");
@@ -225,26 +353,29 @@ namespace QuantIDE
     update();
 
     emit actConfigDone();
-  }
+    }
+    void Quant::onConfigDataDone()
+    {
 
-  void Quant::onConfigDataDone()
-  {
-    connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
-    connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
-    connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
-    connect(bridge, SIGNAL(msgResultAct(QString)), this, SLOT(onMsgResult(QString)));
-    connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
-    connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
-    connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
 
-    connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
+    //connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
+    //connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
+    //connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
+    //connect(bridge, SIGNAL(msgResultAct(QString)), this, SLOT(onMsgResult(QString)));
+    //connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
+    //connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
+    //connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
 
-    connect(&serverTask, SIGNAL(timeout()), this, SLOT(onServerTask()));
 
-    emit bootServerAct();
-  }
 
-  // INTERPRET
+
+    //connect(&serverTask, SIGNAL(timeout()), this, SLOT(onServerTask()));
+
+
+    }
+
+    // INTERPRET
+    */
 
   void Quant::onInterpretBootInit()
   {
@@ -256,6 +387,8 @@ namespace QuantIDE
     buttLang->setState(Jui::Button::State::ON);
     buttServer->setStateKeeping(Button::StateKeeping::HOLD);
 
+    bridge->initOSC();
+    emit bootServerAct();
     //this->closeProcessDialog();
   }
   void Quant::onInterpretKillInit()
@@ -293,13 +426,14 @@ namespace QuantIDE
 
     buttServer->setState(Jui::Button::State::ON);
 
-    serverTask.start(1000);
+    onMsgStatus("Quant init done...");
   }
   void Quant::onServerKillInit()
   {
     onMsgStatus("ScServer kill init...\r\n");
-    serverTask.stop();
     labelServerMeter->setText("NaN");
+    labelServerSynths->setText("0");
+    labelServerGroups->setText("0");
   }
   void Quant::onServerKillDone()
   {
@@ -314,19 +448,18 @@ namespace QuantIDE
   }
   void Quant::closeEvent(QCloseEvent *event)	{ canvan->close(); }
 
-  void Quant::onServerTask()
+  void Quant::customizeEvent(QDynamicPropertyChangeEvent *event)
   {
+    qDebug("Quant::customizeEvent");
+  }
 
-    QString txtCPU = bridge->question("s.peakCPU").toString();
-    if (txtCPU != NULL)
-    {
-      double serverCPU = txtCPU.toDouble();
-      labelServerMeter->setText(tr("%1 %").arg(QString::number(serverCPU, 'f', 2)));
-    }
+  void Quant::onServerStatus(QStringList data)
+  {
+    float peakCPU = data[0].toFloat();
 
-    QString numSynths = bridge->question("s.numSynths").toString();
-    if (numSynths != NULL)	{ labelServerSynths->setText(numSynths); }
-
+    labelServerMeter->setText(tr("%1 %").arg(QString::number(peakCPU, 'f', 2)));
+    labelServerSynths->setText(data[1]);
+    labelServerGroups->setText(data[2]);
   }
 
   // GLOBAL CODE

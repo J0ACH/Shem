@@ -2,15 +2,16 @@
 
 namespace QuantIDE
 {
-  NodePanel::NodePanel(QWidget *parent, ScBridge *bridge) :
+  NodePanel::NodePanel(QWidget *parent, ScBridge *bridge, Customize *customize) :
     Panel(parent),
-    mBridge(bridge)
+    mBridge(bridge),
+    mCustomize(customize)
   {
-    setObjectName("NodePanel");
-
     this->initControl();
+    this->onCustomize();
     numOfNode = 0;
-    
+
+    connect(mCustomize, SIGNAL(actCustomizeChanged()), this, SLOT(onCustomize()));
     connect(buttAddNode, SIGNAL(pressAct()), this, SLOT(addNode()));
     connect(tempoBox, SIGNAL(actValueChanged(QString)), mBridge, SLOT(onChangeTempo(QString)));
   }
@@ -26,7 +27,7 @@ namespace QuantIDE
     tempoBox = new ControlBox(this);
     tempoBox->setLabel("BPM");
     tempoBox->setValue("60");
-    tempoBox->setLabelSize(20);
+    tempoBox->setLabelSize(25);
     tempoBox->setGeometry(260, 10, 80, 20);
 
     scrollArea = new QScrollArea(this);
@@ -43,45 +44,49 @@ namespace QuantIDE
     scrollArea->setWidget(scrollWidget);
   }
 
-  void NodePanel::onConfigData(QMap<QString, QVariant*> config)
+  void NodePanel::onCustomize()
   {
+    //qDebug("NodePanel::onCustomize");
 
-    colorNormal = config.value("color_shem_Normal")->value<QColor>();
-    colorOver = config.value("color_shem_Over")->value<QColor>();
-    colorActive = config.value("color_shem_Active")->value<QColor>();
-    fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
+    QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+    QFont fontTextBig, fontTextSmall;
 
-    Panel::onConfigData(config);
+    colorPanelBackground = mCustomize->getColor("color_shem_PanelBackground");
+    colorNormal = mCustomize->getColor("color_shem_Normal");
+    colorOver = mCustomize->getColor("color_shem_Over");
+    colorActive = mCustomize->getColor("color_shem_Active");
+    colorText = mCustomize->getColor("color_shem_Text");
+    fontTextBig = mCustomize->getFont("font_shem_TextBig");
+    fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
+
+    Panel::setColorBackground(colorPanelBackground);
+    Panel::setColorTitle(colorText);
+    Panel::setFontTitle(fontTextBig);
 
     buttAddNode->setColorNormal(colorNormal);
     buttAddNode->setColorOver(colorOver);
     buttAddNode->setColorActive(colorActive);
     buttAddNode->setFont(fontTextSmall);
 
-    configData = config;
-    emit actConfigData(config);
-
-    update();
+    tempoBox->setFont(fontTextSmall);
   }
+
 
   void NodePanel::addNode()
   {
     QString newName = this->nextNodeName("temp");
-    Node *newNode = new Node(scrollWidget, mBridge, newName, numOfNode);
+    Node *newNode = new Node(scrollWidget, mBridge, mCustomize, newName, numOfNode);
 
     newNode->setSourceCode("SinOsc.ar(140!2, mul:\\amp.kr())");
     newNode->setFixedWidth(scrollArea->width() - 10);
     newNode->show();
-    
+
     connect(newNode, SIGNAL(killAct(QString)), this, SLOT(deleteNode(QString)));
     connect(newNode, SIGNAL(actChangedHeight()), this, SLOT(fitNodesPosition()));
-    connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-      newNode, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
     dictNode.insert(newNode->nodeName, newNode);
 
     this->fitNodesPosition();
-    emit actConfigData(configData);
 
     scrollArea->ensureWidgetVisible(newNode, 0, newNode->height());
 
@@ -138,8 +143,8 @@ namespace QuantIDE
   }
   void NodePanel::paintEvent(QPaintEvent *event)
   {
+    //Panel::setColorBackground(mCustomize->getColor("color_shem_PanelBackground"));
     Panel::paintEvent(event); // send event to superclass
-
     QPainter painter(this);
 
     //painter.fillRect(scrollWidget->geometry(), QColor(120, 30, 30, 60));

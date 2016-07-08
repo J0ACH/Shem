@@ -5,6 +5,7 @@
 #include "CodeEditor.h"
 #include "Graph.h"
 #include "ControlBox.h"
+#include "Customize.h"
 
 #include <QWidget>
 #include <QLabel>
@@ -23,7 +24,7 @@ namespace QuantIDE
     Q_OBJECT
 
   public:
-    ControlEnvelope(QWidget *parent, ScBridge *bridge, QString nodeName, QString controlName, int cBus);
+    ControlEnvelope(QWidget *parent, ScBridge *bridge, Customize *customize, QString nodeName, QString controlName, int cBus);
     ~ControlEnvelope();
 
     QRect bounds();
@@ -44,6 +45,8 @@ namespace QuantIDE
     void onNextBeat(int beat);
     void onDurationTimerTick();
 
+    void onCustomize();
+
   signals:
     void actEnvChanged(QList<double> levels, QList<double> times, QList<QString> curves);
 
@@ -54,6 +57,7 @@ namespace QuantIDE
 
   private:
     ScBridge *mBridge;
+    Customize *mCustomize;
     QString nodeName, controlName;
 
     int quant;

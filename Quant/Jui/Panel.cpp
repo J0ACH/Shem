@@ -28,31 +28,55 @@ namespace Jui
     edges = new Edges(this);
   }
 
+  /*
   void Panel::onConfigData(QMap<QString, QVariant*> config)
   {
 
-    colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
-    colorNormal = config.value("color_shem_Normal")->value<QColor>();
-    colorOver = config.value("color_shem_Over")->value<QColor>();
-    colorActive = config.value("color_shem_Active")->value<QColor>();
-    colorText = config.value("color_shem_Text")->value<QColor>();
-    fontTextBig = config.value("font_shem_TextBig")->value<QFont>();
+  colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
+  colorNormal = config.value("color_shem_Normal")->value<QColor>();
+  colorOver = config.value("color_shem_Over")->value<QColor>();
+  colorActive = config.value("color_shem_Active")->value<QColor>();
+  colorText = config.value("color_shem_Text")->value<QColor>();
+  fontTextBig = config.value("font_shem_TextBig")->value<QFont>();
 
 
-    this->setColorBackground(colorPanelBackground);
-    this->setColorTitle(colorText);
+  this->setColorBackground(colorPanelBackground);
+  this->setColorTitle(colorText);
 
-    closeButton->setColorNormal(colorNormal);
-    closeButton->setColorOver(colorOver);
-    closeButton->setColorActive(colorActive);
+  closeButton->setColorNormal(colorNormal);
+  closeButton->setColorOver(colorOver);
+  closeButton->setColorActive(colorActive);
 
-    update();
+  update();
   }
+  void Panel::onCustomize()
+  {
+  qDebug("Panel::onCustomize");
+
+  colorPanelBackground = this->property("color_shem_PanelBackground").value<QColor>();
+  colorNormal = this->property("color_shem_Normal").value<QColor>();
+  colorOver = this->property("color_shem_Over").value<QColor>();
+  colorActive = this->property("color_shem_Active").value<QColor>();
+  colorText = this->property("color_shem_Text").value<QColor>();
+  fontTextBig = this->property("font_shem_TextBig").value<QFont>();
+
+
+  this->setColorBackground(colorPanelBackground);
+  this->setColorTitle(colorText);
+
+  closeButton->setColorNormal(colorNormal);
+  closeButton->setColorOver(colorOver);
+  closeButton->setColorActive(colorActive);
+
+  //update();
+  }
+  */
 
   void Panel::setTitle(QString name) { title = name; }
 
   void Panel::setColorBackground(QColor color) { colorPanelBackground = color; update(); }
   void Panel::setColorTitle(QColor color) { colorText = color; update(); }
+  void Panel::setFontTitle(QFont font)  { fontTitle = font; }
 
   void Panel::setEdgeControler(EdgeControler::Direction direction, bool visible)
   {
@@ -90,7 +114,7 @@ namespace Jui
   void Panel::paintEvent(QPaintEvent *event)
   {
     QPainter painter(this);
-    painter.setFont(fontTextBig);
+    painter.setFont(fontTitle);
 
     painter.fillRect(bounds(), colorPanelBackground);
 

@@ -39,6 +39,8 @@ namespace SupercolliderBridge
     bool evaluate(QString code, bool print = false, bool silent = false);
     QVariant question(QString code, bool print = false);
 
+    void initOSC();
+
     private slots:
     void onReadyRead(void);
     void onNewIpcConnection();
@@ -72,8 +74,14 @@ namespace SupercolliderBridge
 
     void actSynced();
     void actAnswered();
+    void actServerStatus(QStringList); // serverPeak, cntSynths, cntGroups
     void actNextBeat(int beat);
     void actTempoChanged();
+
+    void actGroupAdd(int ID);
+    void actGroupFree(int ID);
+    void actSynthAdd(int ID);
+    void actSynthFree(int ID);
 
     void killBridgeDoneAct();
 
@@ -97,7 +105,7 @@ namespace SupercolliderBridge
 
     void onResponse(const QString & selector, const QString & data);
 
-    //QStringList answer;
+        //QStringList answer;
     QVariant answer;
   };
 

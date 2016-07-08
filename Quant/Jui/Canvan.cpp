@@ -26,9 +26,6 @@ namespace Jui
     screen = new QWidget(this);
     tail = new QWidget(this);
 
-    QFontDatabase::addApplicationFont(":/fontText.ttf");
-    QFontDatabase::addApplicationFont(":/fontCode.ttf");
-
     headerSize = 100;
     tailSize = 50;
     isPressed = false;
@@ -70,73 +67,69 @@ namespace Jui
     setEdgeControler(EdgeControler::Direction::BOTTOM, true);
   }
 
+
+  /*
   void Canvan::onConfigData(QMap<QString, QVariant*> config)
   {
 
-    connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-      mConsole, SLOT(onConfigData(QMap<QString, QVariant*>)));
+  connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
+  mConsole, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
-    colorAppHeaderBackground = config.value("color_shem_AppHeaderBackground")->value<QColor>();
-    colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
-    colorNormal = config.value("color_shem_Normal")->value<QColor>();
-    colorOver = config.value("color_shem_Over")->value<QColor>();
-    colorActive = config.value("color_shem_Active")->value<QColor>();
-    colorText = config.value("color_shem_Text")->value<QColor>();
-    fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
-    fontCode = config.value("font_shem_TextCode")->value<QFont>();
+  colorAppHeaderBackground = config.value("color_shem_AppHeaderBackground")->value<QColor>();
+  colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
+  colorNormal = config.value("color_shem_Normal")->value<QColor>();
+  colorOver = config.value("color_shem_Over")->value<QColor>();
+  colorActive = config.value("color_shem_Active")->value<QColor>();
+  colorText = config.value("color_shem_Text")->value<QColor>();
+  fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
+  fontCode = config.value("font_shem_TextCode")->value<QFont>();
 
-    mConsole->setFont(fontTextSmall);
+  mConsole->setFont(fontTextSmall);
 
-    closeButton->setColorNormal(colorNormal);
-    maximizeButton->setColorNormal(colorNormal);
-    minimizeButton->setColorNormal(colorNormal);
+  closeButton->setColorNormal(colorNormal);
+  maximizeButton->setColorNormal(colorNormal);
+  minimizeButton->setColorNormal(colorNormal);
 
-    closeButton->setColorOver(colorOver);
-    maximizeButton->setColorOver(colorOver);
-    minimizeButton->setColorOver(colorOver);
+  closeButton->setColorOver(colorOver);
+  maximizeButton->setColorOver(colorOver);
+  minimizeButton->setColorOver(colorOver);
 
-    closeButton->setColorActive(colorActive);
-    maximizeButton->setColorActive(colorActive);
-    minimizeButton->setColorActive(colorActive);
+  closeButton->setColorActive(colorActive);
+  maximizeButton->setColorActive(colorActive);
+  minimizeButton->setColorActive(colorActive);
 
-    // STYLESHEET SETUP
-    QString txt;
-    txt.append(tr("QLabel { color: %1; }").arg(colorText.name()));
+  emit actConfigData(config);
 
-    txt.append(tr("QPushButton { background-color: %1; }").arg(colorPanelBackground.name()));
-    txt.append(tr("QPushButton { color: %1; }").arg(colorText.name()));
-    txt.append(tr("QPushButton { border-style: outset; border-width: 1px; border-color: %1}").arg(colorText.name()));
-    txt.append(tr("QPushButton:pressed{ background-color: %1; border-style: inset; }").arg(colorActive.name()));
-
-    txt.append(tr("QTextEdit { color: %1; }").arg(colorText.name()));
-    txt.append(tr("QTextEdit { background-color: %1; }").arg(colorPanelBackground.name()));
-    txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(colorActive.name()));
-
-    txt.append("QScrollBar:vertical { width: 2px; }");
-    txt.append("QScrollBar:horizontal { height: 2px; }");
-    txt.append(tr("QScrollBar:vertical { background: %1; }").arg(colorPanelBackground.name()));
-    txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(colorPanelBackground.name()));
-    txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(colorText.name()));
-    txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(colorText.name()));
-    txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
-    txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
-    txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
-    txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
-    txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
-    txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
-    txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
-    txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
-
-    txt.append(tr("QToolTip { color: %1; }").arg(colorText.name()));
-    txt.append(tr("QToolTip { background-color:  %1; }").arg(colorPanelBackground.name()));
-    txt.append(tr("QToolTip { border: 1px solid white; }"));
-
-    this->setStyleSheet(txt);
-
-    emit actConfigData(config);
-
-    update();
+  update();
   }
+  void Canvan::onCustomize()
+  {
+  qDebug("Canvan::onCustomize");
+
+  colorAppHeaderBackground = this->property("color_shem_AppHeaderBackground").value<QColor>();
+  colorPanelBackground = this->property("color_shem_PanelBackground").value<QColor>();
+  colorNormal = this->property("color_shem_Normal").value<QColor>();
+  colorOver = this->property("color_shem_Over").value<QColor>();
+  colorActive = this->property("color_shem_Active").value<QColor>();
+  colorText = this->property("color_shem_Text").value<QColor>();
+  fontTextSmall = this->property("font_shem_TextSmall").value<QFont>();
+  fontCode = this->property("font_shem_TextCode").value<QFont>();
+
+  mConsole->setFont(fontTextSmall);
+
+  closeButton->setColorNormal(colorNormal);
+  maximizeButton->setColorNormal(colorNormal);
+  minimizeButton->setColorNormal(colorNormal);
+
+  closeButton->setColorOver(colorOver);
+  maximizeButton->setColorOver(colorOver);
+  minimizeButton->setColorOver(colorOver);
+
+  closeButton->setColorActive(colorActive);
+  maximizeButton->setColorActive(colorActive);
+  minimizeButton->setColorActive(colorActive);
+  }
+  */
 
   void Canvan::print(QString text, QColor col) { emit consolePrintAct(text, col, false); }
   void Canvan::println(QString text, QColor col) { emit consolePrintAct(text, col, true); }
@@ -298,6 +291,31 @@ if (patch < 10) { strPatch.prepend(QString::number(0)); }
     version = _version;
   }
 
+  void Canvan::setColorHeader(QColor color) { colorAppHeaderBackground = color; }
+  void Canvan::setColorNormal(QColor color)
+  {
+    colorNormal = color;
+    closeButton->setColorNormal(colorNormal);
+    maximizeButton->setColorNormal(colorNormal);
+    minimizeButton->setColorNormal(colorNormal);
+  }
+  void Canvan::setColorOver(QColor color)
+  {
+    colorOver = color;
+    closeButton->setColorOver(colorOver);
+    maximizeButton->setColorOver(colorOver);
+    minimizeButton->setColorOver(colorOver);
+  }
+  void Canvan::setColorActive(QColor color)
+  {
+    colorActive = color;
+
+    closeButton->setColorActive(colorActive);
+    maximizeButton->setColorActive(colorActive);
+    minimizeButton->setColorActive(colorActive);
+  }
+  void Canvan::setColorText(QColor color) { colorText = color; }
+
   void Canvan::closeCanvan() {
     //	win->close();
     emit closeAct();
@@ -333,6 +351,12 @@ if (patch < 10) { strPatch.prepend(QString::number(0)); }
       edges->show();
     }
   }
+  /*
+  void Canvan::customizeEvent(QDynamicPropertyChangeEvent *event)
+  {
+  qDebug("Canvan::customizeEvent");
+  }
+  */
 
   Canvan::~Canvan() {	}
 }

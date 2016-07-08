@@ -2,15 +2,11 @@
 
 namespace SupercolliderBridge
 {
-  Customize::Customize(QObject *parent, ScBridge *bridge) :
-    QObject(parent),
-    mBridge(bridge)
-  {
-    connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onInterpretStart()));
-  }
+  Customize::Customize(QObject *parent) : QObject(parent)  {  }
 
-  void Customize::onInterpretStart() {
-    QString path = mBridge->question("Platform.systemExtensionDir").toString();
+  void Customize::initConfig()
+  {
+    QString path = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
     this->initConfigFile(path);
     this->mergeConfigData();
   }
@@ -54,10 +50,14 @@ namespace SupercolliderBridge
 
     foreach(QString key, mergeConfig.keys())
     {
-      qDebug() << "configKey [" << key << "] ->" << mergeConfig[key]->toString();
+      //qDebug() << "configKey [" << key << "] ->" << mergeConfig[key]->toString();
+      this->setProperty(key.toStdString().c_str(), *mergeConfig[key]);
     };
 
-    emit actConfigData(mergeConfig);
+    foreach(QString oneProp, this->dynamicPropertyNames())
+    {
+      qDebug() << "configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
+    }
   }
 
   QMap<QString, QVariant*> Customize::processingConfigData(QMap<QString, QVariant*> data)
@@ -78,6 +78,10 @@ namespace SupercolliderBridge
       font = data["font_shem_TextCode"]->value<QFont>();
       font.setStyleStrategy(QFont::PreferAntialias);
       data.insert("font_shem_TextCode", new QVariant(font));
+
+      font = data["font_shem_TextConsole"]->value<QFont>();
+      font.setStyleStrategy(QFont::PreferAntialias);
+      data.insert("font_shem_TextConsole", new QVariant(font));
     }
     else
     {
@@ -92,6 +96,10 @@ namespace SupercolliderBridge
       font = data["font_shem_TextCode"]->value<QFont>();
       font.setStyleStrategy(QFont::NoAntialias);
       data.insert("font_shem_TextCode", new QVariant(font));
+
+      font = data["font_shem_TextConsole"]->value<QFont>();
+      font.setStyleStrategy(QFont::NoAntialias);
+      data.insert("font_shem_TextConsole", new QVariant(font));
     }
 
     return data;
@@ -159,7 +167,8 @@ namespace SupercolliderBridge
     defaultConfig.insert("bool_shem_TextAntialias", new QVariant(true));
     defaultConfig.insert("font_shem_TextBig", new QVariant(QFont("Univers Condensed", 13)));
     defaultConfig.insert("font_shem_TextSmall", new QVariant(QFont("Univers Condensed", 10)));
-    defaultConfig.insert("font_shem_TextCode", new QVariant(QFont("Univers 57 Condensed", 9)));
+    defaultConfig.insert("font_shem_TextCode", new QVariant(QFont("Consolas", 8)));
+    defaultConfig.insert("font_shem_TextConsole", new QVariant(QFont("Univers 57 Condensed", 9)));
 
     return defaultConfig;
   }
@@ -201,7 +210,8 @@ namespace SupercolliderBridge
         }
 
         if (isColor) {
-          value = new QVariant(QColor(rgb[0], rgb[1], rgb[2]));
+          QColor color = QColor(rgb[0], rgb[1], rgb[2]);
+          value = new QVariant(color);
           oldConfigData.insert(key, value);
           continue;
         }
@@ -231,15 +241,41 @@ namespace SupercolliderBridge
         //qDebug() << "ConfigDataTyp: bool";
         QString value = args[0].remove(" ");
 
-        if (value == "true" || value == "1") { oldConfigData.insert(key, new QVariant(true)); }
-        else { oldConfigData.insert(key, new QVariant(false)); };
+        if (value == "true" || value == "1")
+        {
+          oldConfigData.insert(key, new QVariant(true));
+        }
+        else
+        {
+          oldConfigData.insert(key, new QVariant(false));
+        };
       }
     }
 
-    mBridge->msgNormalAct(tr("\ncustomization config file: %1\r").arg(configFile->fileName()));
+    // mBridge->msgNormalAct(tr("\ncustomization config file: %1\r").arg(configFile->fileName()));
     configFile->close();
 
     return oldConfigData;
+  }
+
+  QColor Customize::getColor(QString key)
+  {
+    QColor color;
+    color = this->property(key.toStdString().c_str()).value<QColor>();
+    if (!color.isValid())
+    {
+      qDebug() << "Customize::getColor [" << key << "] is not valid";
+      color = QColor(255, 0, 0);
+    }
+    return color;
+  }
+
+  QFont Customize::getFont(QString key)
+  {
+    QFont font;
+    font = this->property(key.toStdString().c_str()).value<QFont>();
+    //qDebug() << "Customize::getFont [" << key << "] -> " << font;
+    return font;
   }
 
   Customize::~Customize() { }
