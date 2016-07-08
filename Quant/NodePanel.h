@@ -6,6 +6,7 @@
 #include "Node.h"
 #include "Canvan.h"
 #include "ScBridge.h"
+#include "ControlBox.h"
 
 #include <QWidget>
 #include <QPushButton>
@@ -22,40 +23,45 @@ using namespace SupercolliderBridge;
 namespace QuantIDE
 {
 
-	class NodePanel : public Panel
-	{
-		Q_OBJECT
+  class NodePanel : public Panel
+  {
+    Q_OBJECT
 
-	public:
-		NodePanel(QWidget *parent = 0);
-		~NodePanel();
+  public:
+    NodePanel(QWidget *parent, ScBridge *bridge, Customize *customize);
+    ~NodePanel();
 
-		QRect bounds();
+    QRect bounds();
 
-		void setTargetBridge(ScBridge*);
+    public slots:
+    void fitNodesPosition();
+       void onCustomize();
 
-	public slots:
-		void fitGeometry();
-		void onConfigData(QMap<QString, QVariant*> config);
+    void addNode();
+    void deleteNode(QString name);
 
-		void addNode();
-		void deleteNode(QString name);
+  signals:
+       void actCustomizeChanged();
 
-	signals:
-		void actConfigData(QMap<QString, QVariant*> config);
+  protected:
+    void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
-	private:
-		void initControl();
-		QMap<QString, QVariant*> configData;
-		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-		QFont fontTextSmall;
-		Button *buttAddNode;
-		QScrollArea *scrollArea;
-		QWidget *scrollWidget;
-		QMap<QString, Node*> dictNode;
-		ScBridge *mBridge;
-		int testID;
-	};
+  private:
+    void initControl();
+    QString nextNodeName(QString);
+
+    int numOfNode;    
+     
+    Button *buttAddNode;
+    ControlBox *tempoBox;
+    QScrollArea *scrollArea;
+    QWidget *scrollWidget;
+    QMap<QString, Node*> dictNode;
+    ScBridge *mBridge;
+    Customize *mCustomize;
+
+  };
 }
 
 #endif // QUANT

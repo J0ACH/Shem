@@ -18,10 +18,14 @@ namespace Jui
 
 		void setFont(QFont);
 		void setColorText(QColor);
+  void setColorBackground(QColor);
 		
 	public slots:
 		void addText(QString text, QColor color, bool newLine );
-		void fitGeometry();
+		//void fitGeometry();
+
+	protected:
+		void resizeEvent(QResizeEvent *event);
 
 	private:
 		QTextEdit *text;

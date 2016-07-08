@@ -6,6 +6,8 @@
 #include <QLabel>
 #include <QFontDatabase>
 #include <QMap>
+#include <QDesktopWidget>
+//#include <QDynamicPropertyChangeEvent>
 
 #include "Console.h"
 #include "Button.h"
@@ -14,83 +16,93 @@
 namespace Jui
 {
 
-	class Canvan : public QWidget
-	{
-		Q_OBJECT
+  class Canvan : public QWidget
+  {
+    Q_OBJECT
 
-	public:
+  public:
 
-		Canvan(QWidget *parent = 0);
-		~Canvan();
+    Canvan(QWidget *parent = 0);
+    ~Canvan();
 
-		void initControl();
-		void setEdgeControler(EdgeControler::Direction, bool);
+    void initControl();
+    void setEdgeControler(EdgeControler::Direction, bool);
 
-		void connectWindow(QWidget*);
+    void connectWindow(QWidget*);
 
-		void addScreen(QWidget *inScreen);
+    void addScreen(QWidget *inScreen);
 
-		QWidget *win;
-		QWidget *header, *screen, *tail;
+    QWidget *win;
+    QWidget *header, *screen, *tail;
 
-		Console *mConsole;
+    Console *mConsole;
 
-		void setHeaderHeight(int);
-		void setTailHeight(int);
-		void setTitle(QString titleName);
-		void setLogo(QImage);
-		void setVersion(int major, int minor, int patch);
+    void setHeaderHeight(int);
+    void setTailHeight(int);
+    void setTitle(QString titleName);
+    void setLogo(QImage);
+    void setVersion(QString);
 
-	signals:
-		void resizeAct();
-		void resizeScreenAct();
-		void closeAct();
+    void setColorHeader(QColor);
+    void setColorNormal(QColor);
+    void setColorOver(QColor);
+    void setColorActive(QColor);
+    void setColorText(QColor);
 
-		void actConfigData(QMap<QString, QVariant*> config);
+  signals:
+    void resizeAct();
+    void resizeScreenAct();
+    void closeAct();
 
-		void consolePrintAct(QString, QColor, bool);
+    void actConfigData(QMap<QString, QVariant*> config);
 
-	public slots:
-		void print(QString, QColor);
-		void println(QString, QColor);
+    void consolePrintAct(QString, QColor, bool);
 
-		void closeCanvan();
-		void minimizeCanvan();
-		void maximizeCanvan();
+    public slots:
+    void print(QString, QColor);
+    void println(QString, QColor);
 
-		void fitScreen();
-		void onConfigData(QMap<QString, QVariant*> config);
+    void closeCanvan();
+    void minimizeCanvan();
+    void maximizeCanvan();
 
-	protected:
-		void resizeEvent(QResizeEvent *resizeEvent);
-		void mousePressEvent(QMouseEvent *mouseEvent);
-		void mouseReleaseEvent(QMouseEvent *mouseEvent);
-		void mouseMoveEvent(QMouseEvent *mouseEvent);
-		void paintEvent(QPaintEvent *paintEvent);
+    void fitScreen();
+    //void onConfigData(QMap<QString, QVariant*> config);
+    //void onCustomize();
+    
+  protected:
+    void resizeEvent(QResizeEvent *resizeEvent);
+    void mousePressEvent(QMouseEvent *mouseEvent);
+    void mouseReleaseEvent(QMouseEvent *mouseEvent);
+    void mouseMoveEvent(QMouseEvent *mouseEvent);
+    void paintEvent(QPaintEvent *paintEvent);
+    //void customizeEvent(QDynamicPropertyChangeEvent *event);
 
-	private:
-		bool isPressed;
-		bool showScreen;
+  private:
+    bool isPressed;
+    bool showScreen;
 
-		int headerSize, tailSize;
+    int headerSize, tailSize;
 
-		Button *closeButton, *maximizeButton, *minimizeButton;
-		Edges *edges;
-		QMap<QString, QVariant*> config;
+    Button *closeButton, *maximizeButton, *minimizeButton;
+    Edges *edges;
+    QMap<QString, QVariant*> config;
 
-		QImage logo;
-		//QLabel *title;
-		QString version;
+    QImage logo;
+    //QLabel *title;
+    QString version;
 
-		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-		QFont fontTextSmall, fontCode;
+    QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+    QFont fontTextSmall, fontCode;
 
-		QPoint *mCursorGlobal;
-		QPoint *mCursorLocal;
-		QPoint *mFrameOriginGlobal;
+    QPoint *mCursorGlobal;
+    QPoint *mCursorLocal;
+    QPoint *mFrameOriginGlobal;
 
+    QPoint canvanOrigin;
+    QSize canvanSize;
 
-	};
+  };
 
 }
 

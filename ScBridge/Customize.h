@@ -8,47 +8,42 @@
 #include <QFile>
 #include <QMap>
 #include <QDebug>
+#include <QStandardPaths> 
 
 
 namespace SupercolliderBridge
 {
 
-	class Customize : public QObject
-	{
-		Q_OBJECT
+  class Customize : public QObject
+  {
+    Q_OBJECT
 
-		enum QuestionType { appExtensionDir };
+  public:
+    Customize(QObject *parent);
+    ~Customize();
 
-	public:
-		Customize(QObject *parent = 0);
-		~Customize();
+    void initConfig();
+    QColor getColor(QString key);
+    QFont getFont(QString key);
 
-		void setTargetBridge(ScBridge*);
+  signals:
+    void actCustomizeChanged();
 
-	public slots:
-		void onInterpretStart();
-		void onBridgeAnswer(QString, int, QStringList);
+  private:
+    QFile *configFile;
 
-	signals:
-		void actBridgeQuestion(QString, int, QString, bool);
-		void actConfigData(QMap<QString, QVariant*> config);
+    void initConfigFile(QString systemExtensionDir);
+    void mergeConfigData();
 
-	private:
-		ScBridge *mBridge;
-		QString objectPattern;
-		QFile *configFile;
+    QMap<QString, QVariant*> readConfigFile();
+    QMap<QString, QVariant*> defaultConfig();
+    QMap<QString, QVariant*> processingConfigData(QMap<QString, QVariant*>);
 
-		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
-		void initConfigFile(QString systemExtensionDir);
-		void mergeConfigData();
+    void writeConfigFile(QMap<QString, QVariant*>);
 
-		QMap<QString, QVariant*> readConfigFile();
-		QMap<QString, QVariant*> defaultConfig();
-		QMap<QString, QVariant*> processingConfigData(QMap<QString, QVariant*>);
+  };
 
-		void writeConfigFile(QMap<QString, QVariant*>);
-		
-	};
+
 }
 
 #endif // CUSTOMIZE

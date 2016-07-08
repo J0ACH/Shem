@@ -10,64 +10,63 @@
 #include <QMouseEvent>
 #include <QDebug>
 
-//#include "Edges.h"
-
 namespace Jui
 {
 
 
-	class EdgeControler : public QWidget
-	{
-		Q_OBJECT
+  class EdgeControler : public QWidget
+  {
+    Q_OBJECT
 
-	public:
-		enum Direction
-		{
-			LEFT,
-			TOP,
-			RIGHT,
-			BOTTOM
-		};
+  public:
+    enum Direction
+    {
+      LEFT,
+      TOP,
+      RIGHT,
+      BOTTOM
+    };
 
-		EdgeControler(QWidget *parent = 0);
-		~EdgeControler();
+    EdgeControler(QWidget *parent = 0);
+    ~EdgeControler();
 
-		QRect bounds();
+    QRect bounds();
+    bool isActive;
 
-		void setDirection(Direction);
-		void setEdgeOffset(int);
-		void setParentObject(QObject*);
+    void setDirection(Direction);
+    void setEdgeOffset(int);
+    void setParentObject(QObject*);
 
-	signals:
-		void pressAct();
-		void moveAct(EdgeControler::Direction, int);
+  signals:
+    void pressAct();
+    void moveAct(EdgeControler::Direction, int);
 
-	public slots:
-		void alphaUpdate();
-		void fitGeometry();
+    public slots:
+    void alphaUpdate();
+    void fitGeometry();
 
-	protected:
-		void paintEvent(QPaintEvent *event);
-		void mousePressEvent(QMouseEvent *event);
-		void mouseMoveEvent(QMouseEvent *event);
+  protected:
+    void paintEvent(QPaintEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 
-	private:
-		QObject *conteiner;
-		Direction side;
-		bool isOver;
-		int edgeOffset;
+  private:
+    QObject *conteiner;
+    Direction side;
+    bool isOver;
+    int edgeOffset;
 
-		int fadeTimeIn;
-		int fadeTimeOut;
-		int fps;
-		int backgroundAlpha;
+    int fadeTimeIn;
+    int fadeTimeOut;
+    int fps;
+    int backgroundAlpha;
 
-		QTimer *timer;
+    QTimer *timer;
 
-		void enterEvent(QEvent *event);
-		void leaveEvent(QEvent *event);
+    void enterEvent(QEvent *event);
+    void leaveEvent(QEvent *event);
 
-	};
+  };
 }
 
 #endif // EDGECONTROLER_H

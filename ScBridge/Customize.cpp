@@ -2,288 +2,281 @@
 
 namespace SupercolliderBridge
 {
-	Customize::Customize(QObject *parent) :
-		QObject(parent),
-		mBridge(NULL)
-	{
-		setObjectName("Customize");
-		objectPattern = "ShemConfig";
-	}
+  Customize::Customize(QObject *parent) : QObject(parent)  {  }
 
-	void Customize::setTargetBridge(ScBridge *target)
-	{
-		mBridge = target;
-		connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onInterpretStart()));
-		connect(this, SIGNAL(actBridgeQuestion(QString, int, QString, bool)), mBridge, SLOT(question(QString, int, QString, bool)));
-		connect(mBridge, SIGNAL(answerAct(QString, int, QStringList)), this, SLOT(onBridgeAnswer(QString, int, QStringList)));
-	}
+  void Customize::initConfig()
+  {
+    QString path = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    this->initConfigFile(path);
+    this->mergeConfigData();
+  }
 
-	void Customize::onInterpretStart() { this->onBridgeQuestion(QuestionType::appExtensionDir); }
+  void Customize::initConfigFile(QString systemExtensionDir)
+  {
+    QDir configDir;
+    configDir.setPath(systemExtensionDir);
+    configDir.mkdir("Shem");
+    configDir.setPath(QDir::fromNativeSeparators(tr("%1/Shem").arg(systemExtensionDir)));
 
-	void Customize::onBridgeQuestion(QuestionType selector, QString args)
-	{
-		QString questionCode;
-		int selectorNum;
+    configFile = new QFile(tr("%1/ShemConfig.txt").arg(configDir.path()));
+  }
 
-		switch (selector)
-		{
-		case appExtensionDir:
-			selectorNum = QuestionType::appExtensionDir;
-			//questionCode = "Platform.userConfigDir";
-			questionCode = "Platform.systemExtensionDir";
-			emit actBridgeQuestion(objectPattern, selectorNum, questionCode, false);
-			break;
-		}
-	}
+  void Customize::mergeConfigData()
+  {
+    QMap<QString, QVariant*> oldConfig;
+    QMap<QString, QVariant*> newConfig;
+    QMap<QString, QVariant*> mergeConfig;
 
-	void Customize::onBridgeAnswer(QString pattern, int selectorNum, QStringList answer)
-	{
-		//qDebug() << "Customize::onBridgeAnswer: " << pattern << answer;
-		if (pattern == objectPattern)
-		{
-			QuestionType selector = static_cast<QuestionType>(selectorNum);
+    if (configFile->exists())
+    {
+      oldConfig = this->readConfigFile();
+      newConfig = this->defaultConfig();
 
-			switch (selector)
-			{
-			case appExtensionDir:
-				this->initConfigFile(answer[0]);
-				this->mergeConfigData();
-				break;
+      foreach(QString key, newConfig.keys())
+      {
+        if (oldConfig.contains(key)) { mergeConfig.insert(key, oldConfig[key]); }
+        else { mergeConfig.insert(key, newConfig[key]); }
+      }
 
-			default:
-				qDebug() << "Customize::onBridgeAnswer::DEFAULT";
-				break;
-			}
-		}
-	}
+      this->writeConfigFile(mergeConfig);
+    }
+    else
+    {
+      mergeConfig = this->defaultConfig();
+      this->writeConfigFile(mergeConfig);
+    }
 
-	void Customize::initConfigFile(QString systemExtensionDir)
-	{
-		QDir configDir;
-		configDir.setPath(systemExtensionDir);
-		configDir.mkdir("Shem");
-		configDir.setPath(QDir::fromNativeSeparators(tr("%1/Shem").arg(systemExtensionDir)));
+    mergeConfig = this->processingConfigData(mergeConfig);
 
-		configFile = new QFile(tr("%1/ShemConfig.txt").arg(configDir.path()));
-	}
+    foreach(QString key, mergeConfig.keys())
+    {
+      //qDebug() << "configKey [" << key << "] ->" << mergeConfig[key]->toString();
+      this->setProperty(key.toStdString().c_str(), *mergeConfig[key]);
+    };
 
-	void Customize::mergeConfigData()
-	{
-		QMap<QString, QVariant*> oldConfig;
-		QMap<QString, QVariant*> newConfig;
-		QMap<QString, QVariant*> mergeConfig;
+    foreach(QString oneProp, this->dynamicPropertyNames())
+    {
+      qDebug() << "configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
+    }
+  }
 
-		if (configFile->exists())
-		{
-			oldConfig = this->readConfigFile();
-			newConfig = this->defaultConfig();
+  QMap<QString, QVariant*> Customize::processingConfigData(QMap<QString, QVariant*> data)
+  {
+    // ANTIALIAS FONTS
+    QFont font;
+    bool textAntialias = data.value("bool_shem_TextAntialias")->value<bool>();
+    if (textAntialias)
+    {
+      font = data["font_shem_TextBig"]->value<QFont>();
+      font.setStyleStrategy(QFont::PreferAntialias);
+      data.insert("font_shem_TextBig", new QVariant(font));
 
-			foreach(QString key, newConfig.keys())
-			{
-				if (oldConfig.contains(key)) { mergeConfig.insert(key, oldConfig[key]); }
-				else { mergeConfig.insert(key, newConfig[key]); }
-			}
+      font = data["font_shem_TextSmall"]->value<QFont>();
+      font.setStyleStrategy(QFont::PreferAntialias);
+      data.insert("font_shem_TextSmall", new QVariant(font));
 
-			this->writeConfigFile(mergeConfig);
-		}
-		else
-		{
-			mergeConfig = this->defaultConfig();
-			this->writeConfigFile(mergeConfig);
-		}
+      font = data["font_shem_TextCode"]->value<QFont>();
+      font.setStyleStrategy(QFont::PreferAntialias);
+      data.insert("font_shem_TextCode", new QVariant(font));
 
-		mergeConfig = this->processingConfigData(mergeConfig);
+      font = data["font_shem_TextConsole"]->value<QFont>();
+      font.setStyleStrategy(QFont::PreferAntialias);
+      data.insert("font_shem_TextConsole", new QVariant(font));
+    }
+    else
+    {
+      font = data["font_shem_TextBig"]->value<QFont>();
+      font.setStyleStrategy(QFont::NoAntialias);
+      data.insert("font_shem_TextBig", new QVariant(font));
 
-		foreach(QString key, mergeConfig.keys())
-		{
-			qDebug() << "configKey [" << key << "] ->" << mergeConfig[key]->toString();
-		};
-		
-		emit actConfigData(mergeConfig);
-	}
+      font = data["font_shem_TextSmall"]->value<QFont>();
+      font.setStyleStrategy(QFont::NoAntialias);
+      data.insert("font_shem_TextSmall", new QVariant(font));
 
-	QMap<QString, QVariant*> Customize::processingConfigData(QMap<QString, QVariant*> data)
-	{
-		// ANTIALIAS FONTS
-		QFont font;
-		bool textAntialias = data.value("bool_shem_TextAntialias")->value<bool>();
-		if (textAntialias)
-		{
-			font = data["font_shem_TextBig"]->value<QFont>();
-			font.setStyleStrategy(QFont::PreferAntialias);
-			data.insert("font_shem_TextBig", new QVariant(font));
+      font = data["font_shem_TextCode"]->value<QFont>();
+      font.setStyleStrategy(QFont::NoAntialias);
+      data.insert("font_shem_TextCode", new QVariant(font));
 
-			font = data["font_shem_TextSmall"]->value<QFont>();
-			font.setStyleStrategy(QFont::PreferAntialias);
-			data.insert("font_shem_TextSmall", new QVariant(font));
+      font = data["font_shem_TextConsole"]->value<QFont>();
+      font.setStyleStrategy(QFont::NoAntialias);
+      data.insert("font_shem_TextConsole", new QVariant(font));
+    }
 
-			font = data["font_shem_TextCode"]->value<QFont>();
-			font.setStyleStrategy(QFont::PreferAntialias);
-			data.insert("font_shem_TextCode", new QVariant(font));
-		}
-		else
-		{
-			font = data["font_shem_TextBig"]->value<QFont>();
-			font.setStyleStrategy(QFont::NoAntialias);
-			data.insert("font_shem_TextBig", new QVariant(font));
+    return data;
+  }
 
-			font = data["font_shem_TextSmall"]->value<QFont>();
-			font.setStyleStrategy(QFont::NoAntialias);
-			data.insert("font_shem_TextSmall", new QVariant(font));
+  void Customize::writeConfigFile(QMap<QString, QVariant*> mergeConfigData)
+  {
+    //	qDebug() << "Customize::writeConfigFile " << configFile->fileName();
 
-			font = data["font_shem_TextCode"]->value<QFont>();
-			font.setStyleStrategy(QFont::NoAntialias);
-			data.insert("font_shem_TextCode", new QVariant(font));
-		}
+    configFile->open(QIODevice::WriteOnly | QIODevice::Text);
 
-		return data;
-	}
+    QTextStream out(configFile);
 
-	void Customize::writeConfigFile(QMap<QString, QVariant*> mergeConfigData)
-	{
-		//	qDebug() << "Customize::writeConfigFile " << configFile->fileName();
+    foreach(QString key, mergeConfigData.keys())
+    {
+      if (key.startsWith("color"))
+      {
+        QColor color = mergeConfigData[key]->value<QColor>();
+        out << key << " = "
+          << color.red() << ", "
+          << color.green() << ", "
+          << color.blue() << "\n";
+      }
+      if (key.startsWith("font"))
+      {
+        QFont font = mergeConfigData[key]->value<QFont>();
+        out << key << " = "
+          << font.family() << ", "
+          << font.pointSize() << "\n";
+      }
+      if (key.startsWith("bool"))
+      {
+        bool boolean = mergeConfigData[key]->value<bool>();
+        if (boolean) { out << key << " = true\n"; }
+        else { out << key << " = false\n"; }
 
-		configFile->open(QIODevice::WriteOnly | QIODevice::Text);
+      }
+    }
 
-		QTextStream out(configFile);
+    configFile->close();
 
-		foreach(QString key, mergeConfigData.keys())
-		{
-			if (key.startsWith("color"))
-			{
-				QColor color = mergeConfigData[key]->value<QColor>();
-				out << key << " = "
-					<< color.red() << ", "
-					<< color.green() << ", "
-					<< color.blue() << "\n";
-			}
-			if (key.startsWith("font"))
-			{
-				QFont font = mergeConfigData[key]->value<QFont>();
-				out << key << " = "
-					<< font.family() << ", "
-					<< font.pointSize() << "\n";
-			}
-			if (key.startsWith("bool"))
-			{
-				bool boolean = mergeConfigData[key]->value<bool>();
-				if (boolean) { out << key << " = true\n"; }
-				else { out << key << " = false\n"; }
-				
-			}
-		}
+    this->readConfigFile();
+  }
 
-		configFile->close();
+  QMap<QString, QVariant*> Customize::defaultConfig()
+  {
+    QMap<QString, QVariant*> defaultConfig;
+    defaultConfig.insert("color_shem_AppBackground", new QVariant(QColor(20, 20, 20)));
+    defaultConfig.insert("color_shem_AppHeaderBackground", new QVariant(QColor(40, 40, 40)));
+    defaultConfig.insert("color_shem_PanelBackground", new QVariant(QColor(30, 30, 30)));
+    defaultConfig.insert("color_shem_Normal", new QVariant(QColor(120, 120, 120)));
+    defaultConfig.insert("color_shem_Frozen", new QVariant(QColor(70, 70, 70)));
+    defaultConfig.insert("color_shem_Over", new QVariant(QColor(255, 255, 255)));
+    defaultConfig.insert("color_shem_Active", new QVariant(QColor(70, 140, 210)));
+    defaultConfig.insert("color_shem_Text", new QVariant(QColor(230, 230, 230)));
 
-		this->readConfigFile();
-	}
+    defaultConfig.insert("color_shem_MsgNormal", new QVariant(QColor(70, 70, 70)));
+    defaultConfig.insert("color_shem_MsgStatus", new QVariant(QColor(230, 230, 230)));
+    defaultConfig.insert("color_shem_MsgEvaluate", new QVariant(QColor(170, 230, 230)));
+    defaultConfig.insert("color_shem_MsgResult", new QVariant(QColor(170, 200, 160)));
+    defaultConfig.insert("color_shem_MsgError", new QVariant(QColor(230, 30, 30)));
+    defaultConfig.insert("color_shem_MsgWarning", new QVariant(QColor(230, 130, 30)));
+    defaultConfig.insert("color_shem_MsgBundle", new QVariant(QColor(170, 160, 20)));
 
-	QMap<QString, QVariant*> Customize::defaultConfig()
-	{
-		QMap<QString, QVariant*> defaultConfig;
-		defaultConfig.insert("color_shem_AppBackground", new QVariant(QColor(20, 20, 20)));
-		defaultConfig.insert("color_shem_AppHeaderBackground", new QVariant(QColor(40, 40, 40)));
-		defaultConfig.insert("color_shem_PanelBackground", new QVariant(QColor(30, 30, 30)));
-		defaultConfig.insert("color_shem_Normal", new QVariant(QColor(120, 120, 120)));
-		defaultConfig.insert("color_shem_Frozen", new QVariant(QColor(70, 70, 70)));
-		defaultConfig.insert("color_shem_Over", new QVariant(QColor(255, 255, 255)));
-		defaultConfig.insert("color_shem_Active", new QVariant(QColor(70, 140, 210)));
-		defaultConfig.insert("color_shem_Text", new QVariant(QColor(230, 230, 230)));
+    defaultConfig.insert("bool_shem_TextAntialias", new QVariant(true));
+    defaultConfig.insert("font_shem_TextBig", new QVariant(QFont("Univers Condensed", 13)));
+    defaultConfig.insert("font_shem_TextSmall", new QVariant(QFont("Univers Condensed", 10)));
+    defaultConfig.insert("font_shem_TextCode", new QVariant(QFont("Consolas", 8)));
+    defaultConfig.insert("font_shem_TextConsole", new QVariant(QFont("Univers 57 Condensed", 9)));
 
-		defaultConfig.insert("color_shem_MsgNormal", new QVariant(QColor(70, 70, 70)));
-		defaultConfig.insert("color_shem_MsgStatus", new QVariant(QColor(230, 230, 230)));
-		defaultConfig.insert("color_shem_MsgEvaluate", new QVariant(QColor(170, 230, 230)));
-		defaultConfig.insert("color_shem_MsgResult", new QVariant(QColor(170, 200, 160)));
-		defaultConfig.insert("color_shem_MsgError", new QVariant(QColor(230, 30, 30)));
-		defaultConfig.insert("color_shem_MsgWarning", new QVariant(QColor(230, 130, 30)));
-		defaultConfig.insert("color_shem_MsgBundle", new QVariant(QColor(170, 160, 20)));
+    return defaultConfig;
+  }
 
-		defaultConfig.insert("bool_shem_TextAntialias", new QVariant(true));
-		defaultConfig.insert("font_shem_TextBig", new QVariant(QFont("Univers Condensed", 13)));
-		defaultConfig.insert("font_shem_TextSmall", new QVariant(QFont("Univers Condensed", 10)));
-		defaultConfig.insert("font_shem_TextCode", new QVariant(QFont("Univers 57 Condensed", 9)));
+  QMap<QString, QVariant*> Customize::readConfigFile()
+  {
+    //qDebug() << "Customize::readConfigFile " << configFile->fileName();
 
-		return defaultConfig;
-	}
+    QMap<QString, QVariant*> oldConfigData;
 
-	QMap<QString, QVariant*> Customize::readConfigFile()
-	{
-		//qDebug() << "Customize::readConfigFile " << configFile->fileName();
+    configFile->open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream in(configFile);
+    while (!in.atEnd())
+    {
+      QString line = in.readLine();
+      QStringList lineParts = line.remove("\n").split("=");
 
-		QMap<QString, QVariant*> oldConfigData;
+      /*
+      qDebug() << "Customize::readConfigFile line: " << line;
+      qDebug() << "Customize::key: " << lineParts[0];
+      qDebug() << "Customize::args: " << lineParts[1];
+      */
 
-		configFile->open(QIODevice::ReadOnly | QIODevice::Text);
-		QTextStream in(configFile);
-		while (!in.atEnd())
-		{
-			QString line = in.readLine();
-			QStringList lineParts = line.remove("\n").split("=");
+      QString key = lineParts[0].remove(" ");
+      QStringList args = lineParts[1].split(",");
+      QVariant *value;
 
-			/*
-			qDebug() << "Customize::readConfigFile line: " << line;
-			qDebug() << "Customize::key: " << lineParts[0];
-			qDebug() << "Customize::args: " << lineParts[1];
-			*/
+      if (key.startsWith("color"))
+      {
+        //qDebug() << "ConfigDataTyp: color";
+        bool isColor = true;
+        int rgb[3];
+        for (int i = 0; i < 3; i++)
+        {
+          bool isNumber;
+          args[i] = args[i].remove(" ");
+          rgb[i] = args[i].toInt(&isNumber, 10);
+          if (!isNumber) { isColor = false; break; }
+        }
 
-			QString key = lineParts[0].remove(" ");
-			QStringList args = lineParts[1].split(",");
-			QVariant *value;
+        if (isColor) {
+          QColor color = QColor(rgb[0], rgb[1], rgb[2]);
+          value = new QVariant(color);
+          oldConfigData.insert(key, value);
+          continue;
+        }
+      }
+      if (key.startsWith("font"))
+      {
+        //qDebug() << "ConfigDataTyp: font";
+        bool isFont = true;
+        bool isNumber;
+        int size = args[1].remove(" ").toInt(&isNumber, 10);
+        if (!isNumber) { isFont = false; break; }
+        if (isFont)
+        {
+          if (args[0].startsWith(" ")) { args[0].remove(0, 1); }
 
-			if (key.startsWith("color"))
-			{
-				//qDebug() << "ConfigDataTyp: color";
-				bool isColor = true;
-				int rgb[3];
-				for (int i = 0; i < 3; i++)
-				{
-					bool isNumber;
-					args[i] = args[i].remove(" ");
-					rgb[i] = args[i].toInt(&isNumber, 10);
-					if (!isNumber) { isColor = false; break; }
-				}
+          QFont font;
+          font.setFamily(args[0]);
+          font.setPointSize(size);
+          font.setStretch(QFont::Unstretched);
+          value = new QVariant(font);
+          oldConfigData.insert(key, value);
+          continue;
+        }
+      }
+      if (key.startsWith("bool"))
+      {
+        //qDebug() << "ConfigDataTyp: bool";
+        QString value = args[0].remove(" ");
 
-				if (isColor) {
-					value = new QVariant(QColor(rgb[0], rgb[1], rgb[2]));
-					oldConfigData.insert(key, value);
-					continue;
-				}
-			}
-			if (key.startsWith("font"))
-			{
-				//qDebug() << "ConfigDataTyp: font";
-				bool isFont = true;
-				bool isNumber;
-				int size = args[1].remove(" ").toInt(&isNumber, 10);
-				if (!isNumber) { isFont = false; break; }
-				if (isFont)
-				{
-					if (args[0].startsWith(" ")) { args[0].remove(0,1); }
+        if (value == "true" || value == "1")
+        {
+          oldConfigData.insert(key, new QVariant(true));
+        }
+        else
+        {
+          oldConfigData.insert(key, new QVariant(false));
+        };
+      }
+    }
 
-					QFont font;
-					font.setFamily(args[0]);
-					font.setPointSize(size);
-					font.setStretch(QFont::Unstretched);
-					value = new QVariant(font);
-					oldConfigData.insert(key, value);
-					continue;
-				}
-			}
-			if (key.startsWith("bool"))
-			{
-				//qDebug() << "ConfigDataTyp: bool";
-				QString value = args[0].remove(" ");
+    // mBridge->msgNormalAct(tr("\ncustomization config file: %1\r").arg(configFile->fileName()));
+    configFile->close();
 
-				if (value == "true" || value == "1") { oldConfigData.insert(key, new QVariant(true)); }
-				else { oldConfigData.insert(key, new QVariant(false)); };
-			}
-		}
+    return oldConfigData;
+  }
 
-		mBridge->msgNormalAct(tr("\ncustomization config file: %1\r").arg(configFile->fileName()));
-		configFile->close();
+  QColor Customize::getColor(QString key)
+  {
+    QColor color;
+    color = this->property(key.toStdString().c_str()).value<QColor>();
+    if (!color.isValid())
+    {
+      qDebug() << "Customize::getColor [" << key << "] is not valid";
+      color = QColor(255, 0, 0);
+    }
+    return color;
+  }
 
-		return oldConfigData;
-	}
+  QFont Customize::getFont(QString key)
+  {
+    QFont font;
+    font = this->property(key.toStdString().c_str()).value<QFont>();
+    //qDebug() << "Customize::getFont [" << key << "] -> " << font;
+    return font;
+  }
 
-
-	Customize::~Customize() { }
+  Customize::~Customize() { }
 }

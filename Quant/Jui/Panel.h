@@ -24,17 +24,19 @@ namespace Jui
 
 		void initControl();
 		void setTitle(QString);
+  void setFontTitle(QFont);
 		void setColorBackground(QColor);
 		void setColorTitle(QColor);
 
 		void setEdgeControler(EdgeControler::Direction, bool);
 
-	public slots:
-		void onConfigData(QMap<QString, QVariant*> config);
-		
+		public slots:
+		//void onConfigData(QMap<QString, QVariant*> config);
+  //void onCustomize();
+
 	signals:
 		void resizeAct();
-	
+
 	protected:
 		void mousePressEvent(QMouseEvent *mouseEvent);
 		void paintEvent(QPaintEvent *event);
@@ -44,12 +46,12 @@ namespace Jui
 		QString title;
 
 		QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-		QFont fontTextBig;
+  QFont fontTitle;
 
 		Button *closeButton;
 		Edges *edges;
 
-		
+
 	};
 
 

@@ -33,6 +33,9 @@ namespace Jui
 		void setEdgeOffset(int);
 		void addManipulator(EdgeControler::Direction);
 		void removeManipulator(EdgeControler::Direction);
+
+  void hide();
+  void show();
 		
 	public slots:
 		void edgePressed();
@@ -45,6 +48,7 @@ namespace Jui
 		QPoint mEdgePressActGrandParentOriginGlobal;
 		int edgeOffset;
 
+  QList<EdgeControler*> conteiner;
 	};
 }
 #endif // EDGES_H

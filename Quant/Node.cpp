@@ -2,312 +2,382 @@
 
 namespace QuantIDE
 {
-	Node::Node(QWidget *parent) :
-		QWidget(parent),
-		mBridge(NULL)
-	{
-		setObjectName("Node");
-		objectPattern = QString::null;
+  Node::Node(QWidget *parent, ScBridge *bridge, Customize *customize, QString name, int nodeNum) :
+    QWidget(parent),
+    mBridge(bridge),
+    mCustomize(customize),
+    nodeName(name),
+    nodeNumber(nodeNum)
+  {
+    setFocusPolicy(Qt::StrongFocus);
 
-		this->initControl();
-		this->fitGeometry();
+    this->initControl();
 
-		stateNodePlay = StateNodePlay::FREE;
+    nodeBusIndexReserve = 30;
+    stateNodePlay = StateNodePlay::FREE;
 
-		connect(playButton, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
-		connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
+    connect(mCustomize, SIGNAL(actCustomizeChanged()), this, SLOT(onCustomize()));
 
-		connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(onReciveText(QString)));
-	}
+    connect(playButton, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
+    connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
+    connect(sourceCode, SIGNAL(sendText(QString)), this, SLOT(sendSourceCode(QString)));
+    connect(volumeBox, SIGNAL(actValueChanged(QString)), this, SLOT(setNodeVolume(QString)));
+    connect(fTimeBox, SIGNAL(actValueChanged(QString)), this, SLOT(setNodeFadeTime(QString)));
 
-	QRect Node::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+    this->initNode();
+    this->onCustomize();
+  }
 
-	void Node::initControl()
-	{
-		nameLabel = new QLabel(this);
-		nameLabel->setText("node1");
-		
-		closeButton = new Button(this);
-		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
-		closeButton->setIcon(QImage(":/smallClose16.png"), 0);
-		closeButton->setText("X");
+  void Node::initControl()
+  {
+    nameLabel = new QLabel(this);
+    nameLabel->setText(nodeName);
+    nameLabel->setGeometry(10, 5, 80, 30);
 
-		playButton = new Button(this);
-		playButton->setText("play");
-		playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
+    closeButton = new Button(this);
+    closeButton->setIcon(QImage(":/smallClose16.png"), 0);
+    closeButton->setText("X");
 
-		sourceCode = new CodeEditor(this);
+    playButton = new Button(this);
+    playButton->setText("play");
+    playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
+    playButton->setGeometry(90, 10, 40, 20);
 
-		labelNodeID = new QLabel(this);		
-		labelNamedControls = new QLabel(this);		
-	}
+    sourceCode = new CodeEditor(this);
 
-	void Node::onConfigData(QMap<QString, QVariant*> config)
-	{
-		colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
-		colorNormal = config.value("color_shem_Normal")->value<QColor>();
-		colorOver = config.value("color_shem_Over")->value<QColor>();
-		colorActive = config.value("color_shem_Active")->value<QColor>();
-		fontTextBig = config.value("font_shem_TextBig")->value<QFont>();
-		fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
-		fontTextCode = config.value("font_shem_TextCode")->value<QFont>();
-		
-		sourceCode->setFontCode(fontTextCode);
+    labelNodeID = new QLabel(this);
+    labelNamedControls = new QLabel(this);
 
-		closeButton->setColorNormal(colorNormal);
-		closeButton->setColorOver(colorOver);
-		closeButton->setColorActive(colorActive);
+    volumeBox = new ControlBox(this);
+    volumeBox->setLabel("volume");
+    volumeBox->setLabelSize(45);
 
-		playButton->setColorNormal(colorNormal);
-		playButton->setColorOver(colorOver);
-		playButton->setColorActive(colorActive);
-		playButton->setFont(fontTextSmall);
+    fTimeBox = new ControlBox(this);
+    fTimeBox->setLabel("fTime");
+    fTimeBox->setLabelSize(45);
+  }
+  void Node::onCustomize()
+  {
+    qDebug("Node::onCustomize");
 
-		nameLabel->setFont(fontTextBig);
-		labelNodeID->setFont(fontTextSmall);
-		labelNamedControls->setFont(fontTextSmall);
+    colorPanelBackground = mCustomize->getColor("color_shem_PanelBackground");
+    colorNormal = mCustomize->getColor("color_shem_Normal");
+    colorOver = mCustomize->getColor("color_shem_Over");
+    colorActive = mCustomize->getColor("color_shem_Active");
+    fontTextBig = mCustomize->getFont("font_shem_TextBig");
+    fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
+    fontTextCode = mCustomize->getFont("font_shem_TextCode");
+    colorText = mCustomize->getColor("color_shem_Text");
 
-		configData = config;
-		//emit actConfigData(config);
+    sourceCode->setFontCode(fontTextCode);
 
-		update();
-	}
+    closeButton->setColorNormal(colorNormal);
+    closeButton->setColorOver(colorOver);
+    closeButton->setColorActive(colorActive);
 
-	void Node::connectBridge(ScBridge *bridge)
-	{
-		mBridge = bridge;
-		connect(this, SIGNAL(evaluateAct(QString)), mBridge, SLOT(evaluateCode(QString)));
-		connect(this, SIGNAL(bridgeQuestionAct(QString, int, QString, bool)), mBridge, SLOT(question(QString, int, QString, bool)));
-		connect(mBridge, SIGNAL(answerAct(QString, int, QStringList)), this, SLOT(onBridgeAnswer(QString, int, QStringList)));
+    playButton->setColorNormal(colorNormal);
+    playButton->setColorOver(colorOver);
+    playButton->setColorActive(colorActive);
+    playButton->setFont(fontTextSmall);
 
-		stateNodePlay = StateNodePlay::STOP;
-		QString code;
-		code = tr("~%1 = NodeProxy.audio(s, 2)").arg(name());
-		emit evaluateAct(code);
+    nameLabel->setFont(fontTextBig);
+    labelNodeID->setFont(fontTextSmall);
+    labelNamedControls->setFont(fontTextSmall);
 
-		code = tr("~%1[0] = {%2}").arg(name(), sourceCode->toPlainText());
-		emit evaluateAct(code);
+    QPalette palete = this->palette();
+    palete.setColor(this->foregroundRole(), colorText);
+    nameLabel->setPalette(palete);
+    labelNodeID->setPalette(palete);
+    labelNamedControls->setPalette(palete);
 
-		onBridgeQuestion(QuestionType::nodeID);
-		onBridgeQuestion(QuestionType::namedControls);
+    volumeBox->setFont(fontTextSmall);
+    volumeBox->setColorBackground(colorPanelBackground);
+    volumeBox->setColorText(colorText);
 
-	}
+    fTimeBox->setFont(fontTextSmall);
+    fTimeBox->setColorBackground(colorPanelBackground);
+    fTimeBox->setColorText(colorText);
 
-	void Node::setName(QString name)
-	{
-		nameLabel->setText(name);
-		objectPattern = tr("%1/%2").arg(this->objectName(), name);
-	}
-	QString Node::name() { return nameLabel->text(); }
+  }
+  /*
+  void Node::onConfigData(QMap<QString, QVariant*> config)
+  {
+    colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
+    colorNormal = config.value("color_shem_Normal")->value<QColor>();
+    colorOver = config.value("color_shem_Over")->value<QColor>();
+    colorActive = config.value("color_shem_Active")->value<QColor>();
+    fontTextBig = config.value("font_shem_TextBig")->value<QFont>();
+    fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
+    fontTextCode = config.value("font_shem_TextCode")->value<QFont>();
 
-	void Node::setSourceCode(QString code) { sourceCode->setText(code); }
+    sourceCode->setFontCode(fontTextCode);
 
-	void Node::onReciveText(QString text)
-	{
-		QString code;
-		code = tr("~%1 = NodeProxy.audio(s, 2)").arg(name());
-		emit evaluateAct(code);
+    closeButton->setColorNormal(colorNormal);
+    closeButton->setColorOver(colorOver);
+    closeButton->setColorActive(colorActive);
 
-		code = tr("~%1[0] = {%2}").arg(name(), text);
-		emit evaluateAct(code);
+    playButton->setColorNormal(colorNormal);
+    playButton->setColorOver(colorOver);
+    playButton->setColorActive(colorActive);
+    playButton->setFont(fontTextSmall);
 
-		onBridgeQuestion(QuestionType::namedControls);
-	}
+    nameLabel->setFont(fontTextBig);
+    labelNodeID->setFont(fontTextSmall);
+    labelNamedControls->setFont(fontTextSmall);
 
-	void Node::onEvaluateNode()
-	{
-		QString code;
-		code = tr("~%1 = NodeProxy.audio(s, 2);").arg(name());
-		code += tr("~%1[0] = {%2};").arg(name(), sourceCode->toPlainText());
+    volumeBox->setFont(fontTextSmall);
+    volumeBox->setColorBackground(colorPanelBackground);
+    volumeBox->setColorText(colorNormal);
 
-		for (int i = 0; i < conteinerControls.size(); i++)
-		{
-			QString key = conteinerControls.keys().at(i);
-			QString value = conteinerControls[key]->toPlainText();
-			code += tr("~%1.set('%2', %3);").arg(name(), key, value);
-		}
+    fTimeBox->setFont(fontTextSmall);
+    fTimeBox->setColorBackground(colorPanelBackground);
+    fTimeBox->setColorText(colorNormal);
 
-		emit evaluateAct(code);
-	}
+    configData = config;
+    update();
+  }
+  */
 
-	void Node::onBridgeQuestion(QuestionType selector, QString args)
-	{
-		QString questionCode;
-		int selectorNum;
+  QRect Node::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+  void Node::setName(QString name) { nameLabel->setText(name); }
+  //QString Node::name() { return nameLabel->text(); }
 
-		switch (selector)
-		{
-		case nodeID:
-			selectorNum = QuestionType::nodeID;
-			questionCode = tr("~%1.nodeID").arg(name());
-			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
-			break;
-		case namedControls:
-			selectorNum = QuestionType::namedControls;
-			questionCode = tr("~%1.controlKeys").arg(name());
-			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
-			break;
-		case namedValues:
-			selectorNum = QuestionType::namedValues;
-			questionCode = tr("~%1.controlKeysValues (['%2'])").arg(name(), args);
-			emit bridgeQuestionAct(objectPattern, selectorNum, questionCode, true);
-			break;
-		}
-	}
+  void Node::initNode()
+  {
+    volume = "0.2";
+    fTime = "0";
 
-	void Node::onBridgeAnswer(QString pattern, int selectorNum, QStringList answer)
-	{
-		qDebug() << "Node::onBridgeAnswer: " << pattern << answer;
-		if (pattern == objectPattern)
-		{
-			QuestionType selector = static_cast<QuestionType>(selectorNum);
-			QString txt = "";
+    mBridge->evaluate(tr("~%1 = NodeProxy.audio(s, 2);").arg(nodeName), true);
+    mBridge->evaluate(tr("~%1.play(vol:%2, fadeTime: %3).quant_(1);").arg(nodeName, volume, fTime), true);
+    mBridge->evaluate(tr("~%1.pause()").arg(nodeName), true);
+    stateNodePlay = StateNodePlay::STOP;
 
-			switch (selector)
-			{
-			case nodeID:
-				qDebug() << "Node::onBridgeAnswer::target: " << selector;
-				labelNodeID->setText(tr("nodeID: %1").arg(answer[0]));
-				break;
+    labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
+    volumeBox->setValue("0.2");
+    fTimeBox->setValue("0");
+  }
 
-			case namedControls:
-				foreach(QString oneAnsw, answer)
-				{
-					txt += tr("%1; ").arg(oneAnsw);
-				}
-				qDebug() << "Node::onBridgeAnswer::target: " << selector;
-				labelNamedControls->setText(tr("controls: %1").arg(txt));
-				this->initControlsEditor(answer);
-				break;
+  QString Node::getNodeID()
+  {
+    QString txtNodeID = tr("~%1.nodeID;").arg(nodeName);
+    return mBridge->question(txtNodeID).toString();
+  }
 
-			case namedValues:
-				qDebug() << "Node::onBridgeAnswer::namedValues: " << answer[1];
-				conteinerControls[answer[0]]->setText(answer[1]);
-				break;
+  void Node::setSourceCode(QString txt)
+  {
+    sourceCode->setText(txt);
+    this->sendSourceCode(txt);
+  }
+  void Node::sendSourceCode(QString txt)
+  {
+    mBridge->evaluate(tr("(~%1[0] = { %2 })").arg(nodeName, txt), true);
 
-			default:
-				qDebug() << "Node::onBridgeAnswer::DEFAULT";
-				break;
-			}
-		}
-	}
+    //qDebug() << "Node::sendSourceCode::controlKeys: " << controlKeys;
+    labelNamedControls->setText(tr("controls: %1").arg(this->getControlKeys().join("; ")));
+  }
 
-	void Node::initControlsEditor(QStringList namedControls)
-	{
-		QStringList existKeys = conteinerControls.keys();
-		foreach(QString key, existKeys)
-		{
-			if (!namedControls.contains(key)) { this->removeControl(key); }
-		}
+  QStringList Node::getControlKeys()
+  {
+    QStringList controlKeys = mBridge->question(tr("~%1.controlKeys").arg(nodeName)).toStringList();
 
-		foreach(QString key, namedControls)
-		{
-			if (!conteinerControls.contains(key)) { this->addControl(key); }
-		}
-	}
+    //check pouze pro source (index[0])
+    //controlKeys obsahuje i namapovane klice, ktere je treba jeste ~node.unmap(\key)
+    QStringList constants = mBridge->question(tr("~%1.source.def.constants").arg(nodeName)).toStringList();
 
-	void Node::addControl(QString controlName)
-	{
-		CodeEditor *controlEditor = new CodeEditor(this);
-		controlEditor->setFontCode(fontTextCode);
-		controlEditor->show();
+    foreach(QString key, controlKeys)
+    {
+      if (!constants.contains(key))
+      {
+        mBridge->evaluate(tr("~%1.unmap(\\%2)").arg(nodeName, key), true);
+        controlKeys.removeAt(controlKeys.indexOf(key, 0));
+      }
+    }
 
-		QLabel *controlLabel = new QLabel(this);
-		controlLabel->setText(controlName);
-		controlLabel->setFont(fontTextSmall);
-		controlLabel->show();
+    QStringList existKeys = conteinerControlsGraph.keys();
+    foreach(QString key, existKeys)
+    {
+      if (!controlKeys.contains(key)) { this->removeControl(key); }
+    }
+    foreach(QString key, controlKeys)
+    {
+      if (!conteinerControlsGraph.contains(key)) { this->addControl(key); }
+    }
 
-		conteinerControls.insert(controlName, controlEditor);
-		conteinerControlsLabel.insert(controlName, controlLabel);
+    return controlKeys;
+  }
 
-		connect(controlEditor, SIGNAL(evaluateAct()), this, SLOT(onEvaluateNode()));
+  void Node::addControl(QString controlName)
+  {
+    QString defaultValue = mBridge->question(tr("~%1.controlKeysValues ([\\%2])[1]").arg(nodeName, controlName)).toString();
+    // qDebug() << controlName << "control default value is " << defaultValue;
 
-		onBridgeQuestion(QuestionType::namedValues, controlName);
+    //int busIndex = this->nextEmptyBusIndex();
+    ControlEnvelope *newGraph = new ControlEnvelope(
+      this,
+      mBridge,
+      mCustomize,
+      nameLabel->text(),
+      controlName,
+      this->nextEmptyBusIndex()
+      );
+    newGraph->setFixedHeight(250);
+    newGraph->setEnv(tr("Env([%1,%1], 1, \\sin)").arg(defaultValue));
+    newGraph->show();
 
-		this->fitGeometry();
-	}
-	void Node::removeControl(QString controlName)
-	{
-		CodeEditor *removeEditor = conteinerControls.take(controlName);
-		removeEditor->close();
+    conteinerControlsGraph.insert(controlName, newGraph);
+    this->fitControlsPosition();
+  }
+  void Node::removeControl(QString controlName)
+  {
+    conteinerControlsGraph.value(controlName)->freeControlBusIndex();
+    conteinerControlsGraph.value(controlName)->close();
+    conteinerControlsGraph.remove(controlName);
 
-		QLabel *removeLabel = conteinerControlsLabel.take(controlName);
-		removeLabel->close();
+    this->fitControlsPosition();
+  }
 
-		this->fitGeometry();
-	}
+  int Node::nextEmptyBusIndex()
+  {
+    QString fisrtPrivateBus = mBridge->question("s.options.numOutputBusChannels + s.options.numInputBusChannels").toString();
+    int startIndex = nodeNumber * nodeBusIndexReserve + fisrtPrivateBus.toInt();
+    for (int i = startIndex; i < startIndex + nodeBusIndexReserve; i++)
+    {
+      bool indexFound = false;
+      foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
+      {
+        if (i == oneEnv->busIndex)
+        {
+          indexFound = true;
+          break;
+        }
+      }
+      if (!indexFound) {
+        // qDebug() << "Node::nextEmptyBusIndex(): " << i;
+        return i;
+      };
+    }
+    mBridge->msgWarningAct(tr("Array of reserved bus index for node %1 is full").arg(nodeName));
+    return startIndex;
+  }
 
-	void Node::changeNodePlay()
-	{
-		QString code;
-		switch (stateNodePlay)
-		{
-		case QuantIDE::StateNodePlay::PLAY:
-			code = tr("~%1.stop(4)").arg(name());
-			stateNodePlay = StateNodePlay::STOP;
-			emit evaluateAct(code);
-			break;
-		case QuantIDE::StateNodePlay::STOP:
-			code = tr("~%1.play(vol: 1, fadeTime: 4);").arg(name());
-			stateNodePlay = StateNodePlay::PLAY;
-			emit evaluateAct(code);
-			break;
-		case QuantIDE::StateNodePlay::FREE:
-			code = tr("~%1.play").arg(name());
-			stateNodePlay = StateNodePlay::PLAY;
-			emit evaluateAct(code);
-			break;
-		}
+  void Node::changeNodePlay()
+  {
+    QString code;
+    switch (stateNodePlay)
+    {
+    case QuantIDE::StateNodePlay::PLAY:
+      mBridge->evaluate(tr("~%1.stop(%2)").arg(nodeName, fTime), true);
+      mBridge->evaluate(tr("~%1.pause()").arg(nodeName), true);
+      // mBridge->evaluate(tr("s.makeBundle(%1, ~%2.pause();)").arg(fTime,nodeName), true);
+      stateNodePlay = StateNodePlay::STOP;
+      break;
+    case QuantIDE::StateNodePlay::STOP:
+      mBridge->evaluate(tr("~%1.resume()").arg(nodeName), true);
+      mBridge->evaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(nodeName, volume, fTime), true);
+      stateNodePlay = StateNodePlay::PLAY;
+      break;
+    case QuantIDE::StateNodePlay::FREE:
+      mBridge->evaluate(tr("~%1.free(%2)").arg(nodeName, fTime), true);
+      break;
+    }
 
-		onBridgeQuestion(QuestionType::nodeID);
-		onBridgeQuestion(QuestionType::namedControls);
-	}
+    labelNodeID->setText(tr("nodeID: %1").arg(this->getNodeID()));
+  }
 
-	void Node::fitGeometry()
-	{
-		nameLabel->setGeometry(10, 5, 80, 30);
-		closeButton->setGeometry(this->width() - 30, 10, 16, 16);
-		playButton->setGeometry(90, 10, 40, 20);
-		sourceCode->setGeometry(10, 45, width() - 20, 60);
+  void Node::setNodeVolume(QString vol)
+  {
+    volume = vol;
+    mBridge->evaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(nodeName, volume, fTime), true);
+  }
+  void Node::setNodeFadeTime(QString time)
+  {
+    fTime = time;
+    mBridge->evaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(nodeName, volume, fTime), true);
+  }
 
-		labelNodeID->setGeometry(this->width() - 200, this->height() - 45, 180, 20);
-		labelNamedControls->setGeometry(this->width() - 200, this->height() - 25, 180, 20);
+  void Node::fitControlsPosition()
+  {
+    int nextControlOriginY = 110;
+    foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
+    {
+      oneEnv->setGeometry(10, nextControlOriginY, oneEnv->width(), oneEnv->height());
+      nextControlOriginY += oneEnv->bounds().height() + 10;
+    }
+    this->setFixedHeight(nextControlOriginY);
+  }
 
-		int controlID = 0;
-		foreach(CodeEditor *oneControler, conteinerControls)
-		{
-			oneControler->setGeometry(60, 80 + 35 * (controlID + 1), 200, 25);
-			controlID++;
-		}
-		controlID = 0;
-		foreach(QLabel *oneLabel, conteinerControlsLabel)
-		{
-			oneLabel->setGeometry(15, 80 + 35 * (controlID + 1), 40, 25);
-			controlID++;
-		}
-	}
+  bool Node::eventFilter(QObject* target, QEvent* event)
+  {
+    if (event->type() == QEvent::FocusIn)
+    {
+      qDebug() << "QEvent::FocusIn";
+      installEventFilter(this);
+      update();
+      return true;
+    }
+    if (event->type() == QEvent::FocusOut)
+    {
+      qDebug() << "QEvent::FocusOut";
+      update();
+      return true;
+    }
 
-	void Node::paintEvent(QPaintEvent *paintEvent)
-	{
-		QPainter painter(this);
-		painter.fillRect(this->bounds(), colorPanelBackground);
+    QWidget::eventFilter(target, event);
+    return false;
+  }
 
-		painter.setPen(colorOver);
-		painter.drawLine(0, 0, width(), 0);
-		painter.drawLine(0, height() - 1, width(), height() - 1);
-	}
+  void Node::resizeEvent(QResizeEvent *resizeEvent)
+  {
+    closeButton->setGeometry(this->width() - 30, 10, 16, 16);
+    sourceCode->setGeometry(10, 45, width() - 105, 60);
+    labelNodeID->setGeometry(this->width() - 300, 5, 250, 20);
+    labelNamedControls->setGeometry(this->width() - 300, 20, 250, 20);
+    volumeBox->setGeometry(width() - 90, 45, 80, 27);
+    fTimeBox->setGeometry(width() - 90, 78, 80, 27);
 
-	void Node::closeEvent(QCloseEvent *event)
-	{
-		QString code = tr("~%1.free;").arg(name());
-		stateNodePlay = StateNodePlay::FREE;
-		emit evaluateAct(code);
-		emit killAct(name());
-		qDebug("Node::closeEvent()");
-	}
+    foreach(ControlEnvelope *oneEnv, conteinerControlsGraph.values())
+    {
+      oneEnv->setFixedWidth(width() - 20);
+    }
 
-	Node::~Node()
-	{
+    emit actChangedHeight();
+    //qDebug("Node::resizeEvent");
+  }
 
-	}
+  void Node::paintEvent(QPaintEvent *paintEvent)
+  {
+    QPainter painter(this);
+    painter.fillRect(this->bounds(), colorPanelBackground);
+    //painter.fillRect(this->bounds(), QColor(120, 30, 30));
+
+    if (this->hasFocus()) { painter.setPen(colorActive); }
+    else { painter.setPen(colorNormal); }
+
+    //painter.setPen(colorOver);
+    painter.drawLine(0, 0, width(), 0);
+    painter.drawLine(0, height() - 1, width(), height() - 1);
+  }
+
+  void Node::closeEvent(QCloseEvent *event)
+  {
+    mBridge->evaluate(tr("~%1.free").arg(nodeName), true);
+    stateNodePlay = StateNodePlay::FREE;
+    emit killAct(nodeName);
+    qDebug("Node::closeEvent()");
+  }
+
+  Node::~Node()
+  {
+
+  }
+  /*
+  float Node::timeToNextQuant()
+  {
+  float time = mBridge->question(tr("p[\\tempo].clock.timeToNextBeat(%1)").arg(
+  QString::number(quant)
+  ), true).toString().toFloat();
+
+  return time;
+  }
+  */
 }

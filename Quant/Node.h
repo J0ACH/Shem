@@ -1,11 +1,14 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include "ControlBox.h"
 #include "CodeEditor.h"
+#include "ControlEnvelope.h"
+#include "Graph.h"
 #include "ScBridge.h"
+#include "Customize.h"
 
 #include <QWidget>
-#include <QPushButton>
 #include <QLabel>
 #include <QPainter>
 #include <QTextEdit>
@@ -18,70 +21,80 @@ using namespace SupercolliderBridge;
 
 namespace QuantIDE
 {
-	enum class StateNodePlay{ PLAY, STOP, FREE };
-	
-	class Node : public QWidget
-	{
-		Q_OBJECT
+  enum class StateNodePlay{ PLAY, STOP, FREE };
 
+  class Node : public QWidget
+  {
+    Q_OBJECT
+      
+  public:
+    Node(QWidget *parent, ScBridge *bridge, Customize *customize, QString name, int nodeNum);
+    ~Node();
 
-	public:
-		Node(QWidget *parent = 0);
-		~Node();
+    StateNodePlay stateNodePlay;
 
-		StateNodePlay stateNodePlay;
-		enum QuestionType {nodeID, namedControls, namedValues};
+    void setName(QString);
+    void setSourceCode(QString);
 
-		void connectBridge(ScBridge*);
-		void setName(QString);
-		void setSourceCode(QString);
+    QString nodeName;
+    QString getNodeID();
 
-		QString name();
+    //QString name();
+    QRect bounds();
 
-		QRect bounds();
+    public slots:
+    void fitControlsPosition();
+   // void onConfigData(QMap<QString, QVariant*> config);
+    void onCustomize();
 
-	public slots:
-		void fitGeometry();
-		void onConfigData(QMap<QString, QVariant*> config);
+    void changeNodePlay();  
+    void setNodeVolume(QString);
+    void setNodeFadeTime(QString);
+    void sendSourceCode(QString txt);
 
-		void onEvaluateNode();
-		void onReciveText(QString);
-		void onBridgeQuestion(QuestionType selector, QString args = QString::null);
-		void onBridgeAnswer(QString pattern, int selectorNum, QStringList answer);
-		
-		void changeNodePlay();
+  signals:
+    void killAct(QString);
+    void actChangedHeight();
 
-	signals:
-		void evaluateAct(QString);
-		void killAct(QString);
-		void bridgeQuestionAct(QString pattern, int selectorNum, QString question, bool print);
-		
-	protected:
-		void closeEvent(QCloseEvent *event);
-		void paintEvent(QPaintEvent *event);
+  protected:
+    void closeEvent(QCloseEvent *event);
+    void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
+    virtual bool eventFilter(QObject * watched, QEvent * event);
 
-	private:
-		void initControl();
-		void initControlsEditor(QStringList namedControls);
+  private:
+    void initControl();
+    void initNode();
 
-		void addControl(QString name);
-		void removeControl(QString name);
+    void addControl(QString name);
+    void removeControl(QString name);
 
-		QString objectPattern;
-		QMap<QString, QVariant*> configData;
-		QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-		QFont fontTextBig, fontTextSmall, fontTextCode;
-		ScBridge *mBridge;
+    int nodeNumber;
+    int nodeBusIndexReserve;
+    int nextEmptyBusIndex();
 
-		QLabel *nameLabel;
-		QLabel *labelNodeID, *labelNamedControls;
-		CodeEditor *sourceCode;
-		Button *closeButton, *playButton;
+    QMap<QString, QVariant*> configData;
+    QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+    QFont fontTextBig, fontTextSmall, fontTextCode;
+    ScBridge *mBridge;
+    Customize *mCustomize;
 
-		QMap<QString, CodeEditor*> conteinerControls;
-		QMap<QString, QLabel*> conteinerControlsLabel;
-		
-	};
+    QLabel *nameLabel;
+    
+    ControlBox *volumeBox, *fTimeBox;
+    QString volume, fTime;
+
+    QLabel *labelNodeID, *labelNamedControls;
+    CodeEditor *sourceCode;
+    Button *closeButton, *playButton;
+
+    QMap<QString, ControlEnvelope*> conteinerControlsGraph;
+    QStringList getControlKeys();
+    /*
+    int quant;
+    float timeToNextQuant();
+    */
+  };
 }
 
 #endif // QUANT
