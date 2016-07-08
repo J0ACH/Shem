@@ -84,6 +84,7 @@ namespace QuantIDE
     emit bootInterpretAct();
 
     this->initStyleSheet();
+    udpServer->initSocket();
   }
 
   void Quant::initControl()

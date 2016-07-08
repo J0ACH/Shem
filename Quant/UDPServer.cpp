@@ -9,7 +9,7 @@ namespace QuantIDE {
     setObjectName("UDPServer");
     objectPattern = QString::null;
 
-    connect(parent, SIGNAL(actConfigDone()), this, SLOT(initSocket()));
+    //connect(parent, SIGNAL(actConfigDone()), this, SLOT(initSocket()));
     connect(this, SIGNAL(actPrintStatus(QString)), parent,
       SLOT(onMsgStatus(QString)));
     connect(this, SIGNAL(actPrintMsg(QString)), parent,
