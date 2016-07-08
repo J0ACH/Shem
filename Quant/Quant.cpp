@@ -29,6 +29,9 @@ namespace QuantIDE
 
     customize->initConfig();
 
+    QFontDatabase::addApplicationFont(":/fontText.ttf");
+    QFontDatabase::addApplicationFont(":/fontConsole.ttf");
+
     canvan->setHeaderHeight(42);
     canvan->setTailHeight(34);
     canvan->setLogo(QImage(":/logo32.png"));
@@ -48,9 +51,6 @@ namespace QuantIDE
     connect(globalCode, SIGNAL(sendText(QString)), this, SLOT(onRecivedGlobalCode(QString)));
 
     // CONFIG
-    connect(customize, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-      this, SLOT(onConfigData(QMap<QString, QVariant*>)));
-    connect(this, SIGNAL(actConfigDone()), this, SLOT(onConfigDataDone()));
     connect(customize, SIGNAL(actCustomizeChanged()), this, SLOT(onCustomize()));
 
     // MSG actions
@@ -88,17 +88,9 @@ namespace QuantIDE
 
   void Quant::initControl()
   {
-    //customize->copyProperty(this);
-    //customize->copyProperty(canvan);
-
-    nodePanel = new NodePanel(canvan->screen, bridge, customize);
+      nodePanel = new NodePanel(canvan->screen, bridge, customize);
     nodePanel->setTitle("NodePanel");
-    //customize->copyProperty(nodePanel);
-    /*
-    customizePanel = new Panel(canvan->screen);
-    customizePanel->setTitle("Customize");
-    */
-
+   
     buttLang = new Button(canvan->tail);
     buttLang->setText("Lang");
     buttLang->setStateKeeping(Button::StateKeeping::HOLD);
@@ -158,7 +150,7 @@ namespace QuantIDE
   void Quant::fitGeometry()
   {
     QRect screenRect = canvan->screen->rect();
-    nodePanel->setGeometry(1, 0, screenRect.width(), screenRect.height());
+    nodePanel->setGeometry(1, 1, screenRect.width(), screenRect.height()-1);
 
     buttLang->setGeometry(5, 5, 24, 24);
     buttServer->setGeometry(35, 5, 24, 24);
@@ -194,6 +186,7 @@ namespace QuantIDE
   {
     // qDebug("Quant::onCustomize");
     QColor colorAppHeaderBackground;
+    QFont fontTextConsole;
 
     colorAppBackground = customize->getColor("color_shem_AppBackground");
     colorAppHeaderBackground = customize->getColor("color_shem_AppHeaderBackground");
@@ -214,6 +207,7 @@ namespace QuantIDE
     fontTextBig = customize->getFont("font_shem_TextBig");
     fontTextSmall = customize->getFont("font_shem_TextSmall");
     fontTextCode = customize->getFont("font_shem_TextCode");
+    fontTextConsole = customize->getFont("font_shem_TextConsole");
 
     canvan->setColorHeader(colorAppHeaderBackground);
     canvan->setColorNormal(colorNormal);
@@ -225,7 +219,7 @@ namespace QuantIDE
     canvan->mConsole->setColorTitle(colorText);
     canvan->mConsole->setColorText(colorText);
     canvan->mConsole->setFontTitle(fontTextBig);
-    canvan->mConsole->setFont(fontTextSmall);
+    canvan->mConsole->setFont(fontTextConsole);
 
     buttLang->setColorNormal(colorNormal);
     buttServer->setColorNormal(colorNormal);

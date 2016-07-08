@@ -104,6 +104,7 @@ namespace QuantIDE
     busLabel->setFont(fontTextSmall);
 
     durationBox->setColorText(colorText);
+    durationBox->setFont(fontTextSmall);
 
     envelopeCode->setFont(fontTextCode);
   }

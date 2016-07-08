@@ -79,7 +79,7 @@ namespace SupercolliderBridge
       font.setStyleStrategy(QFont::PreferAntialias);
       data.insert("font_shem_TextCode", new QVariant(font));
 
-      font = data["font_shem_TextCode"]->value<QFont>();
+      font = data["font_shem_TextConsole"]->value<QFont>();
       font.setStyleStrategy(QFont::PreferAntialias);
       data.insert("font_shem_TextConsole", new QVariant(font));
     }
@@ -97,7 +97,7 @@ namespace SupercolliderBridge
       font.setStyleStrategy(QFont::NoAntialias);
       data.insert("font_shem_TextCode", new QVariant(font));
 
-      font = data["font_shem_TextCode"]->value<QFont>();
+      font = data["font_shem_TextConsole"]->value<QFont>();
       font.setStyleStrategy(QFont::NoAntialias);
       data.insert("font_shem_TextConsole", new QVariant(font));
     }

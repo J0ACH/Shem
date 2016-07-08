@@ -7,8 +7,6 @@ namespace QuantIDE
     mBridge(bridge),
     mCustomize(customize)
   {
-    setObjectName("NodePanel");
-
     this->initControl();
     this->onCustomize();
     numOfNode = 0;
@@ -45,10 +43,10 @@ namespace QuantIDE
 
     scrollArea->setWidget(scrollWidget);
   }
-  
+
   void NodePanel::onCustomize()
   {
-    qDebug("NodePanel::onCustomize");
+    //qDebug("NodePanel::onCustomize");
 
     QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QFont fontTextBig, fontTextSmall;
@@ -60,19 +58,19 @@ namespace QuantIDE
     colorText = mCustomize->getColor("color_shem_Text");
     fontTextBig = mCustomize->getFont("font_shem_TextBig");
     fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
-    
+
     Panel::setColorBackground(colorPanelBackground);
     Panel::setColorTitle(colorText);
     Panel::setFontTitle(fontTextBig);
-    
+
     buttAddNode->setColorNormal(colorNormal);
     buttAddNode->setColorOver(colorOver);
     buttAddNode->setColorActive(colorActive);
     buttAddNode->setFont(fontTextSmall);
-    
-    tempoBox->setFont(fontTextSmall);    
-    }
-  
+
+    tempoBox->setFont(fontTextSmall);
+  }
+
 
   void NodePanel::addNode()
   {
@@ -85,11 +83,11 @@ namespace QuantIDE
 
     connect(newNode, SIGNAL(killAct(QString)), this, SLOT(deleteNode(QString)));
     connect(newNode, SIGNAL(actChangedHeight()), this, SLOT(fitNodesPosition()));
-   
+
     dictNode.insert(newNode->nodeName, newNode);
 
     this->fitNodesPosition();
-    
+
     scrollArea->ensureWidgetVisible(newNode, 0, newNode->height());
 
     numOfNode++;

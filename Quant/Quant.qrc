@@ -9,6 +9,6 @@
     <file alias="customize_16px.png">Resources/customize_16px.png</file>
     <file alias="network_16px.png">Resources/network_16px.png</file>    
     <file alias="fontText.ttf">Resources/UniversCondensed.ttf</file>
-    <file alias="fontCode.ttf">Resources/Univers_57_condensed.ttf</file>
+    <file alias="fontConsole.ttf">Resources/Univers_57_condensed.ttf</file>
    </qresource>
 </RCC>

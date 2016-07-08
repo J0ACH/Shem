@@ -26,9 +26,6 @@ namespace Jui
     screen = new QWidget(this);
     tail = new QWidget(this);
 
-    QFontDatabase::addApplicationFont(":/fontText.ttf");
-    QFontDatabase::addApplicationFont(":/fontCode.ttf");
-
     headerSize = 100;
     tailSize = 50;
     isPressed = false;
