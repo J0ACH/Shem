@@ -43,6 +43,12 @@ namespace Jui
     void setLogo(QImage);
     void setVersion(QString);
 
+    void setColorHeader(QColor);
+    void setColorNormal(QColor);
+    void setColorOver(QColor);
+    void setColorActive(QColor);
+    void setColorText(QColor);
+
   signals:
     void resizeAct();
     void resizeScreenAct();
@@ -61,8 +67,8 @@ namespace Jui
     void maximizeCanvan();
 
     void fitScreen();
-    void onConfigData(QMap<QString, QVariant*> config);
-    void onCustomize();
+    //void onConfigData(QMap<QString, QVariant*> config);
+    //void onCustomize();
     
   protected:
     void resizeEvent(QResizeEvent *resizeEvent);

@@ -76,6 +76,7 @@ namespace QuantIDE
 
   private:
     void initControl();
+    void initStyleSheet(); // ???? snad bude odstraneno
 
     ScBridge *bridge;
     Customize *customize;
@@ -86,7 +87,7 @@ namespace QuantIDE
 
     QColor colorAppBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgResult, colorMsgError, colorMsgWarning, colorMsgBundle;
-    QFont fontTextSmall, fontTextCode;
+    QFont fontTextBig, fontTextSmall, fontTextCode;
 
     Button *buttLang, *buttServer, *buttConsole, *buttCustomize, *buttNetwork;
     CodeEditor *globalCode;

@@ -22,8 +22,6 @@ namespace QuantIDE
 
   void NodePanel::initControl()
   {
-    Panel::setColorBackground(mCustomize->getColor("color_shem_PanelBackground"));
-
     buttAddNode = new Button(this);
     buttAddNode->setText("AddNode");
     buttAddNode->setGeometry(200, 10, 50, 20);
@@ -50,18 +48,22 @@ namespace QuantIDE
   
   void NodePanel::onCustomize()
   {
-    //qDebug("NodePanel::onCustomize");
+    qDebug("NodePanel::onCustomize");
 
-    QColor colorPanelBackground, colorNormal, colorOver, colorActive;
-    QFont fontTextSmall;
+    QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+    QFont fontTextBig, fontTextSmall;
 
     colorPanelBackground = mCustomize->getColor("color_shem_PanelBackground");
     colorNormal = mCustomize->getColor("color_shem_Normal");
     colorOver = mCustomize->getColor("color_shem_Over");
     colorActive = mCustomize->getColor("color_shem_Active");
+    colorText = mCustomize->getColor("color_shem_Text");
+    fontTextBig = mCustomize->getFont("font_shem_TextBig");
     fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
-
+    
     Panel::setColorBackground(colorPanelBackground);
+    Panel::setColorTitle(colorText);
+    Panel::setFontTitle(fontTextBig);
     
     buttAddNode->setColorNormal(colorNormal);
     buttAddNode->setColorOver(colorOver);

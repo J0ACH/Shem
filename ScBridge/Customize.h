@@ -19,22 +19,17 @@ namespace SupercolliderBridge
     Q_OBJECT
 
   public:
-    //Customize(QObject *parent, ScBridge *bridge);
     Customize(QObject *parent);
     ~Customize();
 
     void initConfig();
     QColor getColor(QString key);
     QFont getFont(QString key);
-   // void copyProperty(QObject*);
-   // static void copyProperty(QObject*, QObject*);
 
   signals:
-   // void actConfigData(QMap<QString, QVariant*> config);
     void actCustomizeChanged();
 
   private:
-   // ScBridge *mBridge;
     QFile *configFile;
 
     void initConfigFile(QString systemExtensionDir);
@@ -48,7 +43,7 @@ namespace SupercolliderBridge
 
   };
 
-  
+
 }
 
 #endif // CUSTOMIZE

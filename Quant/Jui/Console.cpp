@@ -16,6 +16,8 @@ namespace Jui
 
     text->setFrameStyle(QFrame::NoFrame);
 
+//    txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(colorActive.name()));
+
     text->append(tr("Console init..."));
 
     QTextCharFormat format;
@@ -37,6 +39,15 @@ namespace Jui
     QTextCharFormat format;
     format.setForeground(QBrush(color));
     text->setCurrentCharFormat(format);
+  }
+
+  void Console::setColorBackground(QColor color)
+  {
+    Panel::setColorBackground(color);
+    QWidget *viewport = text->viewport();
+    QPalette palete = viewport->palette();
+    palete.setColor(viewport->backgroundRole(), color);
+    viewport->setPalette(palete);
   }
 
   void Console::addText(QString newText, QColor color = QColor(70, 70, 70), bool newLine = true)

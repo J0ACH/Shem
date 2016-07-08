@@ -9,12 +9,6 @@ namespace QuantIDE
     nodeName(name),
     nodeNumber(nodeNum)
   {
-    //Customize::copyProperty(parent, this);
-    foreach(QString oneProp, this->dynamicPropertyNames())
-    {
-      qDebug() << "Node::configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
-    }
-    
     setFocusPolicy(Qt::StrongFocus);
 
     this->initControl();
@@ -31,6 +25,7 @@ namespace QuantIDE
     connect(fTimeBox, SIGNAL(actValueChanged(QString)), this, SLOT(setNodeFadeTime(QString)));
 
     this->initNode();
+    this->onCustomize();
   }
 
   void Node::initControl()
@@ -65,6 +60,43 @@ namespace QuantIDE
   {
     qDebug("Node::onCustomize");
 
+    colorPanelBackground = mCustomize->getColor("color_shem_PanelBackground");
+    colorNormal = mCustomize->getColor("color_shem_Normal");
+    colorOver = mCustomize->getColor("color_shem_Over");
+    colorActive = mCustomize->getColor("color_shem_Active");
+    fontTextBig = mCustomize->getFont("font_shem_TextBig");
+    fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
+    fontTextCode = mCustomize->getFont("font_shem_TextCode");
+    colorText = mCustomize->getColor("color_shem_Text");
+
+    sourceCode->setFontCode(fontTextCode);
+
+    closeButton->setColorNormal(colorNormal);
+    closeButton->setColorOver(colorOver);
+    closeButton->setColorActive(colorActive);
+
+    playButton->setColorNormal(colorNormal);
+    playButton->setColorOver(colorOver);
+    playButton->setColorActive(colorActive);
+    playButton->setFont(fontTextSmall);
+
+    nameLabel->setFont(fontTextBig);
+    labelNodeID->setFont(fontTextSmall);
+    labelNamedControls->setFont(fontTextSmall);
+
+    QPalette palete = this->palette();
+    palete.setColor(this->foregroundRole(), colorText);
+    nameLabel->setPalette(palete);
+    labelNodeID->setPalette(palete);
+    labelNamedControls->setPalette(palete);
+
+    volumeBox->setFont(fontTextSmall);
+    volumeBox->setColorBackground(colorPanelBackground);
+    volumeBox->setColorText(colorText);
+
+    fTimeBox->setFont(fontTextSmall);
+    fTimeBox->setColorBackground(colorPanelBackground);
+    fTimeBox->setColorText(colorText);
 
   }
   /*
@@ -183,6 +215,7 @@ namespace QuantIDE
     ControlEnvelope *newGraph = new ControlEnvelope(
       this,
       mBridge,
+      mCustomize,
       nameLabel->text(),
       controlName,
       this->nextEmptyBusIndex()

@@ -34,7 +34,6 @@ namespace QuantIDE
     canvan->setLogo(QImage(":/logo32.png"));
     canvan->setTitle("Quant");
     canvan->setVersion(tr("v%1").arg(Quant_VERSION));
-    canvan->mConsole->setColorBackground(customize->getColor("color_shem_PanelBackground"));
 
     //this->initProcessDialog();
     this->initControl();
@@ -83,6 +82,8 @@ namespace QuantIDE
 
     emit customize->actCustomizeChanged();
     emit bootInterpretAct();
+
+    this->initStyleSheet();
   }
 
   void Quant::initControl()
@@ -191,8 +192,11 @@ namespace QuantIDE
 
   void Quant::onCustomize()
   {
-    qDebug("Quant::onCustomize");
+    // qDebug("Quant::onCustomize");
+    QColor colorAppHeaderBackground;
+
     colorAppBackground = customize->getColor("color_shem_AppBackground");
+    colorAppHeaderBackground = customize->getColor("color_shem_AppHeaderBackground");
     colorPanelBackground = customize->getColor("color_shem_PanelBackground");
     colorNormal = customize->getColor("color_shem_Normal");
     colorOver = customize->getColor("color_shem_Over");
@@ -207,8 +211,21 @@ namespace QuantIDE
     colorMsgWarning = customize->getColor("color_shem_MsgWarning");
     colorMsgBundle = customize->getColor("color_shem_MsgBundle");
 
+    fontTextBig = customize->getFont("font_shem_TextBig");
     fontTextSmall = customize->getFont("font_shem_TextSmall");
     fontTextCode = customize->getFont("font_shem_TextCode");
+
+    canvan->setColorHeader(colorAppHeaderBackground);
+    canvan->setColorNormal(colorNormal);
+    canvan->setColorOver(colorOver);
+    canvan->setColorActive(colorActive);
+    canvan->setColorText(colorText);
+
+    canvan->mConsole->setColorBackground(colorPanelBackground);
+    canvan->mConsole->setColorTitle(colorText);
+    canvan->mConsole->setColorText(colorText);
+    canvan->mConsole->setFontTitle(fontTextBig);
+    canvan->mConsole->setFont(fontTextSmall);
 
     buttLang->setColorNormal(colorNormal);
     buttServer->setColorNormal(colorNormal);
@@ -239,14 +256,50 @@ namespace QuantIDE
     labelServerMeter->setFont(fontTextSmall);
     labelServerSynths->setFont(fontTextSmall);
     labelServerGroups->setFont(fontTextSmall);
+
+    QPalette palete = this->palette();
+    palete.setColor(this->foregroundRole(), colorText);
+    labelServerMeter->setPalette(palete);
+    labelServerSynths->setPalette(palete);
+    labelServerGroups->setPalette(palete);
   }
+  void Quant::initStyleSheet()
+  {
+    QString txt;
+
+    txt.append(tr("QTextEdit { color: %1; }").arg(colorText.name()));
+    txt.append(tr("QTextEdit { background-color: %1; }").arg(colorPanelBackground.name()));
+    txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(colorActive.name()));
+
+    txt.append("QScrollBar:vertical { width: 2px; }");
+    txt.append("QScrollBar:horizontal { height: 2px; }");
+    txt.append(tr("QScrollBar:vertical { background: %1; }").arg(colorPanelBackground.name()));
+    txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(colorPanelBackground.name()));
+    txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(colorText.name()));
+    txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(colorText.name()));
+    txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
+    txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
+    txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
+    txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
+    txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
+    txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
+    txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
+    txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
+
+    txt.append(tr("QToolTip { color: %1; }").arg(colorText.name()));
+    txt.append(tr("QToolTip { background-color:  %1; }").arg(colorPanelBackground.name()));
+    txt.append(tr("QToolTip { border: 1px solid white; }"));
+
+    this->setStyleSheet(txt);
+  }
+
   /*
     void Quant::onConfigData(QMap<QString, QVariant*> config)
-  {
+    {
     connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-      canvan, SLOT(onConfigData(QMap<QString, QVariant*>)));
+    canvan, SLOT(onConfigData(QMap<QString, QVariant*>)));
     connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-      nodePanel, SLOT(onConfigData(QMap<QString, QVariant*>)));
+    nodePanel, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
     //customize->copyProperty(this);
 
@@ -306,11 +359,11 @@ namespace QuantIDE
     update();
 
     emit actConfigDone();
-  }
-  void Quant::onConfigDataDone()
-  {
+    }
+    void Quant::onConfigDataDone()
+    {
 
-    
+
     //connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
     //connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
     //connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
@@ -318,17 +371,17 @@ namespace QuantIDE
     //connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
     //connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
     //connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
-    
+
 
 
 
     //connect(&serverTask, SIGNAL(timeout()), this, SLOT(onServerTask()));
 
 
-  }
+    }
 
-  // INTERPRET
-  */
+    // INTERPRET
+    */
 
   void Quant::onInterpretBootInit()
   {

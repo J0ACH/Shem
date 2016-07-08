@@ -58,9 +58,6 @@ namespace SupercolliderBridge
     {
       qDebug() << "configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
     }
-
-    //emit actConfigData(mergeConfig);
-    //emit actCustomizeChanged();
   }
 
   QMap<QString, QVariant*> Customize::processingConfigData(QMap<QString, QVariant*> data)
@@ -277,42 +274,9 @@ namespace SupercolliderBridge
   {
     QFont font;
     font = this->property(key.toStdString().c_str()).value<QFont>();
-    qDebug() << "Customize::getFont [" << key << "] -> " << font;
-      //qDebug() << "Customize::getFont [" << key << "] is not valid";
-    
+    //qDebug() << "Customize::getFont [" << key << "] -> " << font;
     return font;
   }
-
-
-  /*
-  void Customize::copyProperty(QObject *target)
-  {
-  foreach(QString oneProp, this->dynamicPropertyNames())
-  {
-  target->setProperty(
-  oneProp.toStdString().c_str(),
-  this->property(oneProp.toStdString().c_str())
-  );
-  }
-  connect(this, SIGNAL(actCustomizeChanged()), target, SLOT(onCustomize()));
-  }
-
-  void Customize::copyProperty(QObject *source, QObject *target)
-  {
-  foreach(QString oneProp, source->dynamicPropertyNames())
-  {
-  qDebug() << "copy2: configKey [" << oneProp << "] ->" << source->property(oneProp.toStdString().c_str());
-
-  target->setProperty(
-  oneProp.toStdString().c_str(),
-  source->property(oneProp.toStdString().c_str())
-  );
-  }
-
-  connect(source, SIGNAL(actCustomizeChanged()), target, SLOT(onCustomize()));
-  //emit actCustomizeChanged();
-  }
-  */
 
   Customize::~Customize() { }
 }

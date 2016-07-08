@@ -2,9 +2,10 @@
 
 namespace QuantIDE
 {
-  ControlEnvelope::ControlEnvelope(QWidget *parent, ScBridge *bridge, QString inNodeName, QString cntName, int cBus) :
+  ControlEnvelope::ControlEnvelope(QWidget *parent, ScBridge *bridge, Customize *customize, QString inNodeName, QString cntName, int cBus) :
     QWidget(parent),
     mBridge(bridge),
+    mCustomize(customize),
     nodeName(inNodeName),
     controlName(cntName),
     busIndex(cBus)
@@ -41,11 +42,15 @@ namespace QuantIDE
     connect(mBridge, SIGNAL(actNextBeat(int)), this, SLOT(onNextBeat(int)));
     connect(mBridge, SIGNAL(actTempoChanged()), this, SLOT(onTempoChanged()));
 
+    connect(mCustomize, SIGNAL(actCustomizeChanged()), this, SLOT(onCustomize()));
+
     connect(durationBox, SIGNAL(actValueChanged(QString)), this, SLOT(setDuration(QString)));
     connect(durationTimer, SIGNAL(timeout()), this, SLOT(onDurationTimerTick()));
 
     mBridge->evaluate(tr("~%1.set(\\%2, BusPlug.for(%3));").arg(nodeName, controlName, QString::number(busIndex)), true);
     durationTimer->start();
+
+    this->onCustomize();
   }
 
   QRect ControlEnvelope::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
@@ -71,6 +76,36 @@ namespace QuantIDE
     durationBox->setColorBackground(QColor(60, 30, 30));
     durationBox->setColorText(QColor(120, 120, 120));
 
+  }
+
+  void ControlEnvelope::onCustomize()
+  {
+    QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+    QFont fontTextBig, fontTextSmall, fontTextCode;
+
+    qDebug("ControlEnvelope::onCustomize");
+
+    colorPanelBackground = mCustomize->getColor("color_shem_PanelBackground");
+    colorNormal = mCustomize->getColor("color_shem_Normal");
+    colorOver = mCustomize->getColor("color_shem_Over");
+    colorActive = mCustomize->getColor("color_shem_Active");
+    colorText = mCustomize->getColor("color_shem_Text");
+    
+    fontTextBig = mCustomize->getFont("font_shem_TextBig");
+    fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
+    fontTextCode = mCustomize->getFont("font_shem_TextCode");
+
+    QPalette palete = this->palette();
+    palete.setColor(this->foregroundRole(), colorText);
+    nameLabel->setPalette(palete);
+    busLabel->setPalette(palete);
+    
+    nameLabel->setFont(fontTextBig);
+    busLabel->setFont(fontTextSmall);
+
+    durationBox->setColorText(colorText);
+
+    envelopeCode->setFont(fontTextCode);
   }
 
   void ControlEnvelope::getEnvArray(QString envCode)
@@ -356,8 +391,8 @@ namespace QuantIDE
     //painter.setPen(QPen(Qt::white, 1));
     //painter.fillRect(bounds(), QColor(120, 20, 20));
 
-    if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
-    else { painter.setPen(QColor(60, 60, 60)); }
+    if (this->hasFocus()) { painter.setPen(mCustomize->getColor("color_shem_Active")); }
+    else { painter.setPen(mCustomize->getColor("color_shem_Normal")); }
 
     //painter.setPen(colorOver);
     painter.drawLine(0, 0, width(), 0);
