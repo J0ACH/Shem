@@ -507,9 +507,17 @@ namespace SupercolliderBridge
     }
     else if (selector == introspectionSelector)
     {
-      qDebug() << "INTROSPECTION" << data;
+      //qDebug() << "INTROSPECTION" << data;
+
       // DATA O VSECH CLASS PRO SUPERCOLIDER!!!!!!
-      //emit msgStatusAct(tr("INTROSPECTION message: %1").arg(data));
+     // emit msgStatusAct(tr("INTROSPECTION message: %1").arg(data));
+    }
+    else if (selector == classLibraryRecompiledSelector)
+    {
+      //qDebug() << "INTROSPECTION" << data;
+
+      // DATA O VSECH CLASS PRO SUPERCOLIDER!!!!!!
+      //emit msgStatusAct(tr("LibraryRecompiled message: %1").arg(data));
     }
     else
     {
