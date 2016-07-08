@@ -25,7 +25,7 @@ namespace QuantIDE
     customize = new Customize(this);
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
-    udpServer = new UDPServer(this);
+    udpServer = new UDPServer(this, bridge);
 
     customize->initConfig();
 
@@ -89,9 +89,9 @@ namespace QuantIDE
 
   void Quant::initControl()
   {
-      nodePanel = new NodePanel(canvan->screen, bridge, customize);
+    nodePanel = new NodePanel(canvan->screen, bridge, customize);
     nodePanel->setTitle("NodePanel");
-   
+
     buttLang = new Button(canvan->tail);
     buttLang->setText("Lang");
     buttLang->setStateKeeping(Button::StateKeeping::HOLD);
@@ -151,7 +151,7 @@ namespace QuantIDE
   void Quant::fitGeometry()
   {
     QRect screenRect = canvan->screen->rect();
-    nodePanel->setGeometry(1, 1, screenRect.width(), screenRect.height()-1);
+    nodePanel->setGeometry(1, 1, screenRect.width(), screenRect.height() - 1);
 
     buttLang->setGeometry(5, 5, 24, 24);
     buttServer->setGeometry(35, 5, 24, 24);
@@ -465,7 +465,11 @@ namespace QuantIDE
 
   // GLOBAL CODE
 
-  void Quant::onRecivedGlobalCode(QString code) { bridge->question(code, true); }
+  void Quant::onRecivedGlobalCode(QString code) 
+  {
+    bridge->question(code, true); 
+    udpServer->sendCode(code);
+  }
 
   Quant::~Quant() { }
 }

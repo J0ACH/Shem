@@ -5,15 +5,14 @@
 
 namespace QuantIDE {
 
-  UDPServer::UDPServer(QWidget *parent) : QWidget(parent) {
-    setObjectName("UDPServer");
+  UDPServer::UDPServer(QObject *parent, ScBridge *bridge) :
+    QObject(parent),
+    mBridge(bridge)
+  {
     objectPattern = QString::null;
 
-    //connect(parent, SIGNAL(actConfigDone()), this, SLOT(initSocket()));
-    connect(this, SIGNAL(actPrintStatus(QString)), parent,
-      SLOT(onMsgStatus(QString)));
-    connect(this, SIGNAL(actPrintMsg(QString)), parent,
-      SLOT(onMsgNormal(QString)));
+    connect(this, SIGNAL(actPrintStatus(QString)), parent, SLOT(onMsgStatus(QString)));
+    connect(this, SIGNAL(actPrintMsg(QString)), parent, SLOT(onMsgNormal(QString)));
   }
 
   bool UDPServer::isConnectedToNet() {
@@ -23,23 +22,17 @@ namespace QuantIDE {
     for (int i = 0; i < ifaces.count(); i++) {
       QNetworkInterface iface = ifaces.at(i);
       if (iface.flags().testFlag(QNetworkInterface::IsUp) &&
-        !iface.flags().testFlag(QNetworkInterface::IsLoopBack)) {
+        !iface.flags().testFlag(QNetworkInterface::IsLoopBack))
+      {
+        qDebug() << "UDP: got interface:" << iface.name() << "with mac:" << iface.hardwareAddress();
 
-#ifdef DEBUG
-        qDebug() << "UDP: got interface:" << iface.name()
-          << "with mac:" << iface.hardwareAddress();
-#endif
+        for (int j = 0; j < iface.addressEntries().count(); j++)
+        {
 
-        for (int j = 0; j < iface.addressEntries().count(); j++) {
-#ifdef DEBUG
-          QString _broadcast =
-            iface.addressEntries().at(j).broadcast().toString();
-          qDebug() << "UDP: addr.:"
-            << iface.addressEntries().at(j).ip().toString();
-          qDebug() << "UDP: netmask:"
-            << iface.addressEntries().at(j).netmask().toString();
+          QString _broadcast = iface.addressEntries().at(j).broadcast().toString();
+          qDebug() << "UDP: addr.:" << iface.addressEntries().at(j).ip().toString();
+          qDebug() << "UDP: netmask:" << iface.addressEntries().at(j).netmask().toString();
           qDebug() << "UDP: broadcast:" << _broadcast;
-#endif
 
           if (result == false) {
             result = true;
@@ -52,10 +45,8 @@ namespace QuantIDE {
           }
         }
 
-#ifdef DEBUG
         if (!result)
           qDebug() << "UDP: interface seems to have no address";
-#endif
       }
     }
 
@@ -148,28 +139,37 @@ namespace QuantIDE {
       port);
   }
 
-  void UDPServer::readPendingDatagrams() {
+  void UDPServer::sendCode(QString code)
+  {
+    QByteArray datagram(code.toStdString().c_str());
+    socket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
+  }
 
-    while (socket->hasPendingDatagrams()) {
+  void UDPServer::readPendingDatagrams()
+  {
+    QByteArray datagram;
+    QHostAddress sender;
+    quint16 senderPort;
 
-      QByteArray datagram;
+    while (socket->hasPendingDatagrams())
+    {
       datagram.resize(socket->pendingDatagramSize());
+      socket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
+    } 
 
-      QHostAddress sender;
-      quint16 senderPort;
+    //emit actPrintMsg("UDP[%1]: Got some data chef!\n");
+    //emit actPrintMsg(tr("UDP: data: %1\n").arg(datagram.data()));
 
-      socket->readDatagram(datagram.data(), datagram.size(), &sender,
-        &senderPort);
+    QString postString = QString::fromUtf8(datagram);
+    emit actPrintMsg(tr("udpMsg [from %1] -> %2\n").arg(sender.toString(), postString));
+    this->processDatagram(postString);
 
-      emit actPrintMsg("UDP: Got some data chef!\n");
-      emit actPrintMsg(tr("UDP: sender: %1\n").arg(sender.toString()));
-      emit actPrintMsg(tr("UDP: data: %1\n").arg(datagram.data()));
-
-      processDatagram(datagram);
-    } // end while
   } // end void
 
-  void UDPServer::processDatagram(QByteArray datagram) {}
+  void UDPServer::processDatagram(QString code)
+  {
+    mBridge->evaluate(code, true);
+  }
 
   UDPServer::~UDPServer(){};
   // end class

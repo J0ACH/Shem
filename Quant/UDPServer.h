@@ -21,41 +21,45 @@ using namespace SupercolliderBridge;
 
 namespace QuantIDE {
 
-class UDPServer : public QWidget {
-  Q_OBJECT
+  class UDPServer : public QObject
+  {
+    Q_OBJECT
 
-public:
-  UDPServer(QWidget *parent = 0);
-  ~UDPServer();
+  public:
+    UDPServer(QObject *parent, ScBridge *bridge);
+    ~UDPServer();
 
-public slots:
-  int initSocket();
-  void readPendingDatagrams();
-  void send(const char *input);
+    public slots:
+    int initSocket();
+    void readPendingDatagrams();
+    void send(const char *input);
+    void sendCode(QString code);
 
-signals:
-  // void println(const char *input);
-  void actPrintStatus(QString);
-  void actPrintMsg(QString);
+  signals:
+    // void println(const char *input);
+    void actPrintStatus(QString);
+    void actPrintMsg(QString);
 
-private:
-  //     int initSocket();
-  void pendingDatagramSize();
-  bool isConnectedToNet();
-  int port;
-  int addressSelector;
-  bool hasBroadcast;
-  void processDatagram(QByteArray);
-  QString getUsername();
+  private:
+    //     int initSocket();
+    void pendingDatagramSize();
+    bool isConnectedToNet();
+    int port;
+    int addressSelector;
+    bool hasBroadcast;
+    void processDatagram(QString);
+    QString getUsername();
 
-  QNetworkInterface *interface;
-  QHostAddress *broadcastAddress;
-  QHostAddress *myAddress;
-  QUdpSocket *socket;
-  QHostInfo *host;
-  QString *username;
-  QString objectPattern;
-};
+    QNetworkInterface *interface;
+    QHostAddress *broadcastAddress;
+    QHostAddress *myAddress;
+    QUdpSocket *socket;
+    QHostInfo *host;
+    QString *username;
+    QString objectPattern;
+
+    ScBridge *mBridge;
+  };
 }
 
 #endif // end UDPServer
