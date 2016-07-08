@@ -22,16 +22,19 @@ namespace QuantIDE
   Quant::Quant(QWidget *parent) : QWidget(parent)
   {
 
+    customize = new Customize(this);
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
-    customize = new Customize(this);
     udpServer = new UDPServer(this);
+
+    customize->initConfig();
 
     canvan->setHeaderHeight(42);
     canvan->setTailHeight(34);
     canvan->setLogo(QImage(":/logo32.png"));
     canvan->setTitle("Quant");
     canvan->setVersion(tr("v%1").arg(Quant_VERSION));
+    canvan->mConsole->setColorBackground(customize->getColor("color_shem_PanelBackground"));
 
     //this->initProcessDialog();
     this->initControl();
@@ -78,15 +81,18 @@ namespace QuantIDE
     connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
     connect(bridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
 
-    customize->initConfig();
+    emit customize->actCustomizeChanged();
     emit bootInterpretAct();
   }
 
   void Quant::initControl()
   {
-    nodePanel = new NodePanel(canvan->screen, bridge);
+    //customize->copyProperty(this);
+    //customize->copyProperty(canvan);
+
+    nodePanel = new NodePanel(canvan->screen, bridge, customize);
     nodePanel->setTitle("NodePanel");
-    customize->copyProperty(nodePanel);
+    //customize->copyProperty(nodePanel);
     /*
     customizePanel = new Panel(canvan->screen);
     customizePanel->setTitle("Customize");
@@ -186,24 +192,63 @@ namespace QuantIDE
   void Quant::onCustomize()
   {
     qDebug("Quant::onCustomize");
+    colorAppBackground = customize->getColor("color_shem_AppBackground");
+    colorPanelBackground = customize->getColor("color_shem_PanelBackground");
+    colorNormal = customize->getColor("color_shem_Normal");
+    colorOver = customize->getColor("color_shem_Over");
+    colorActive = customize->getColor("color_shem_Active");
+    colorText = customize->getColor("color_shem_Text");
 
-   
+    colorMsgNormal = customize->getColor("color_shem_MsgNormal");
+    colorMsgStatus = customize->getColor("color_shem_MsgStatus");
+    colorMsgEvaluate = customize->getColor("color_shem_MsgEvaluate");
+    colorMsgResult = customize->getColor("color_shem_MsgResult");
+    colorMsgError = customize->getColor("color_shem_MsgError");
+    colorMsgWarning = customize->getColor("color_shem_MsgWarning");
+    colorMsgBundle = customize->getColor("color_shem_MsgBundle");
 
-    //Customize::copyProperty(customize, canvan);
-    //Customize::copyProperty(customize, nodePanel);
-    //Customize::copyProperty(customize, canvan->mConsole);
+    fontTextSmall = customize->getFont("font_shem_TextSmall");
+    fontTextCode = customize->getFont("font_shem_TextCode");
 
-    //Customize::copyProperty(customize, buttLang);    
+    buttLang->setColorNormal(colorNormal);
+    buttServer->setColorNormal(colorNormal);
+    buttConsole->setColorNormal(colorNormal);
+    buttCustomize->setColorNormal(colorNormal);
+    buttNetwork->setColorNormal(colorNormal);
+
+    buttLang->setColorOver(colorOver);
+    buttServer->setColorOver(colorOver);
+    buttConsole->setColorOver(colorOver);
+    buttCustomize->setColorOver(colorOver);
+    buttNetwork->setColorOver(colorOver);
+
+    buttLang->setColorActive(colorActive);
+    buttServer->setColorActive(colorActive);
+    buttConsole->setColorActive(colorActive);
+    buttCustomize->setColorActive(colorActive);
+    buttNetwork->setColorActive(colorActive);
+
+    buttLang->setFont(fontTextSmall);
+    buttServer->setFont(fontTextSmall);
+    buttConsole->setFont(fontTextSmall);
+    buttCustomize->setFont(fontTextSmall);
+    buttNetwork->setFont(fontTextSmall);
+
+    globalCode->setFontCode(fontTextCode);
+
+    labelServerMeter->setFont(fontTextSmall);
+    labelServerSynths->setFont(fontTextSmall);
+    labelServerGroups->setFont(fontTextSmall);
   }
-
-  void Quant::onConfigData(QMap<QString, QVariant*> config)
+  /*
+    void Quant::onConfigData(QMap<QString, QVariant*> config)
   {
     connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
       canvan, SLOT(onConfigData(QMap<QString, QVariant*>)));
     connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
       nodePanel, SLOT(onConfigData(QMap<QString, QVariant*>)));
 
-    customize->copyProperty(this);
+    //customize->copyProperty(this);
 
     colorAppBackground = this->property("color_shem_AppBackground").value<QColor>();
     //colorAppBackground = QColor(config.value("color_shem_AppBackground")->value<QColor>());
@@ -262,18 +307,18 @@ namespace QuantIDE
 
     emit actConfigDone();
   }
-
   void Quant::onConfigDataDone()
   {
-    /*
-    connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
-    connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
-    connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
-    connect(bridge, SIGNAL(msgResultAct(QString)), this, SLOT(onMsgResult(QString)));
-    connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
-    connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
-    connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
-    */
+
+    
+    //connect(bridge, SIGNAL(msgNormalAct(QString)), this, SLOT(onMsgNormal(QString)));
+    //connect(bridge, SIGNAL(msgStatusAct(QString)), this, SLOT(onMsgStatus(QString)));
+    //connect(bridge, SIGNAL(msgEvaluateAct(QString)), this, SLOT(onMsgEvaluate(QString)));
+    //connect(bridge, SIGNAL(msgResultAct(QString)), this, SLOT(onMsgResult(QString)));
+    //connect(bridge, SIGNAL(msgErrorAct(QString)), this, SLOT(onMsgError(QString)));
+    //connect(bridge, SIGNAL(msgWarningAct(QString)), this, SLOT(onMsgWarning(QString)));
+    //connect(bridge, SIGNAL(msgBundleAct(QString)), this, SLOT(onMsgBundle(QString)));
+    
 
 
 
@@ -283,6 +328,7 @@ namespace QuantIDE
   }
 
   // INTERPRET
+  */
 
   void Quant::onInterpretBootInit()
   {

@@ -24,11 +24,13 @@ namespace SupercolliderBridge
     ~Customize();
 
     void initConfig();
-    void copyProperty(QObject*);
-    void copyProperty(QObject*, QObject*);
+    QColor getColor(QString key);
+    QFont getFont(QString key);
+   // void copyProperty(QObject*);
+   // static void copyProperty(QObject*, QObject*);
 
   signals:
-    void actConfigData(QMap<QString, QVariant*> config);
+   // void actConfigData(QMap<QString, QVariant*> config);
     void actCustomizeChanged();
 
   private:

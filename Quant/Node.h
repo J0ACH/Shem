@@ -6,6 +6,7 @@
 #include "ControlEnvelope.h"
 #include "Graph.h"
 #include "ScBridge.h"
+#include "Customize.h"
 
 #include <QWidget>
 #include <QLabel>
@@ -27,7 +28,7 @@ namespace QuantIDE
     Q_OBJECT
       
   public:
-    Node(QWidget *parent, ScBridge *bridge, QString name, int nodeNum);
+    Node(QWidget *parent, ScBridge *bridge, Customize *customize, QString name, int nodeNum);
     ~Node();
 
     StateNodePlay stateNodePlay;
@@ -43,7 +44,8 @@ namespace QuantIDE
 
     public slots:
     void fitControlsPosition();
-    void onConfigData(QMap<QString, QVariant*> config);
+   // void onConfigData(QMap<QString, QVariant*> config);
+    void onCustomize();
 
     void changeNodePlay();  
     void setNodeVolume(QString);
@@ -75,6 +77,7 @@ namespace QuantIDE
     QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QFont fontTextBig, fontTextSmall, fontTextCode;
     ScBridge *mBridge;
+    Customize *mCustomize;
 
     QLabel *nameLabel;
     

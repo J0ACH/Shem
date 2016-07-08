@@ -51,7 +51,30 @@ namespace Jui
 
   void Panel::onCustomize()
   {
+    qDebug("Panel::onCustomize");
+    /*
+    foreach(QString oneProp, this->dynamicPropertyNames())
+    {
+      qDebug() << "Panel::configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
+    }
+    */
+
     colorPanelBackground = this->property("color_shem_PanelBackground").value<QColor>();
+    colorNormal = this->property("color_shem_Normal").value<QColor>();
+    colorOver = this->property("color_shem_Over").value<QColor>();
+    colorActive = this->property("color_shem_Active").value<QColor>();
+    colorText = this->property("color_shem_Text").value<QColor>();
+    fontTextBig = this->property("font_shem_TextBig").value<QFont>();
+
+
+    this->setColorBackground(colorPanelBackground);
+    this->setColorTitle(colorText);
+
+    closeButton->setColorNormal(colorNormal);
+    closeButton->setColorOver(colorOver);
+    closeButton->setColorActive(colorActive);
+
+    //update();
   }
 
   void Panel::setTitle(QString name) { title = name; }
@@ -97,7 +120,7 @@ namespace Jui
     QPainter painter(this);
     painter.setFont(fontTextBig);
 
-    QColor colorBackground = this->property("color_shem_PanelBackground").value<QColor>();
+   // QColor colorBackground = this->property("color_shem_PanelBackground").value<QColor>();
     painter.fillRect(bounds(), colorPanelBackground);
 
     painter.setPen(QPen(colorText, 1));

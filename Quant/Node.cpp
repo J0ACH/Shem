@@ -2,18 +2,27 @@
 
 namespace QuantIDE
 {
-  Node::Node(QWidget *parent, ScBridge *bridge, QString name, int nodeNum) :
+  Node::Node(QWidget *parent, ScBridge *bridge, Customize *customize, QString name, int nodeNum) :
     QWidget(parent),
     mBridge(bridge),
+    mCustomize(customize),
     nodeName(name),
     nodeNumber(nodeNum)
   {
+    //Customize::copyProperty(parent, this);
+    foreach(QString oneProp, this->dynamicPropertyNames())
+    {
+      qDebug() << "Node::configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
+    }
+    
     setFocusPolicy(Qt::StrongFocus);
 
     this->initControl();
 
     nodeBusIndexReserve = 30;
     stateNodePlay = StateNodePlay::FREE;
+
+    connect(mCustomize, SIGNAL(actCustomizeChanged()), this, SLOT(onCustomize()));
 
     connect(playButton, SIGNAL(pressAct()), this, SLOT(changeNodePlay()));
     connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
@@ -52,6 +61,13 @@ namespace QuantIDE
     fTimeBox->setLabel("fTime");
     fTimeBox->setLabelSize(45);
   }
+  void Node::onCustomize()
+  {
+    qDebug("Node::onCustomize");
+
+
+  }
+  /*
   void Node::onConfigData(QMap<QString, QVariant*> config)
   {
     colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
@@ -88,6 +104,7 @@ namespace QuantIDE
     configData = config;
     update();
   }
+  */
 
   QRect Node::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
   void Node::setName(QString name) { nameLabel->setText(name); }

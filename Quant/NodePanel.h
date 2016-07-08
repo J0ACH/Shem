@@ -28,21 +28,20 @@ namespace QuantIDE
     Q_OBJECT
 
   public:
-    NodePanel(QWidget *parent, ScBridge *bridge);
+    NodePanel(QWidget *parent, ScBridge *bridge, Customize *customize);
     ~NodePanel();
 
     QRect bounds();
 
     public slots:
     void fitNodesPosition();
-    void onConfigData(QMap<QString, QVariant*> config);
-    void onCustomize();
+       void onCustomize();
 
     void addNode();
     void deleteNode(QString name);
 
   signals:
-    void actConfigData(QMap<QString, QVariant*> config);
+       void actCustomizeChanged();
 
   protected:
     void paintEvent(QPaintEvent *event);
@@ -52,17 +51,15 @@ namespace QuantIDE
     void initControl();
     QString nextNodeName(QString);
 
-    int numOfNode;
-    
-    QMap<QString, QVariant*> configData;
-    QColor colorAppHeaderBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-    QFont fontTextSmall;
+    int numOfNode;    
+     
     Button *buttAddNode;
     ControlBox *tempoBox;
     QScrollArea *scrollArea;
     QWidget *scrollWidget;
     QMap<QString, Node*> dictNode;
     ScBridge *mBridge;
+    Customize *mCustomize;
 
   };
 }

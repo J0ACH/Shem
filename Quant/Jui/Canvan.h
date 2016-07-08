@@ -62,6 +62,7 @@ namespace Jui
 
     void fitScreen();
     void onConfigData(QMap<QString, QVariant*> config);
+    void onCustomize();
     
   protected:
     void resizeEvent(QResizeEvent *resizeEvent);

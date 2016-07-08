@@ -137,6 +137,33 @@ namespace Jui
 
     update();
   }
+  void Canvan::onCustomize()
+  {
+    qDebug("Canvan::onCustomize");
+
+    colorAppHeaderBackground = this->property("color_shem_AppHeaderBackground").value<QColor>();
+    colorPanelBackground = this->property("color_shem_PanelBackground").value<QColor>();
+    colorNormal = this->property("color_shem_Normal").value<QColor>();
+    colorOver = this->property("color_shem_Over").value<QColor>();
+    colorActive = this->property("color_shem_Active").value<QColor>();
+    colorText = this->property("color_shem_Text").value<QColor>();
+    fontTextSmall = this->property("font_shem_TextSmall").value<QFont>();
+    fontCode = this->property("font_shem_TextCode").value<QFont>();
+
+    mConsole->setFont(fontTextSmall);
+
+    closeButton->setColorNormal(colorNormal);
+    maximizeButton->setColorNormal(colorNormal);
+    minimizeButton->setColorNormal(colorNormal);
+
+    closeButton->setColorOver(colorOver);
+    maximizeButton->setColorOver(colorOver);
+    minimizeButton->setColorOver(colorOver);
+
+    closeButton->setColorActive(colorActive);
+    maximizeButton->setColorActive(colorActive);
+    minimizeButton->setColorActive(colorActive);
+  }
 
   void Canvan::print(QString text, QColor col) { emit consolePrintAct(text, col, false); }
   void Canvan::println(QString text, QColor col) { emit consolePrintAct(text, col, true); }
@@ -338,7 +365,7 @@ if (patch < 10) { strPatch.prepend(QString::number(0)); }
   /*
   void Canvan::customizeEvent(QDynamicPropertyChangeEvent *event)
   {
-    qDebug("Canvan::customizeEvent");
+  qDebug("Canvan::customizeEvent");
   }
   */
 

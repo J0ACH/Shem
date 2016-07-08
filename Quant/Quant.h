@@ -49,11 +49,11 @@ namespace QuantIDE
     void onServerKillInit();
     void onServerKillDone();
 
-    void onConfigDataDone();
+    //void onConfigDataDone();
     void onCustomize();
 
     void fitGeometry();
-    void onConfigData(QMap<QString, QVariant*> config);
+    //void onConfigData(QMap<QString, QVariant*> config);
 
     void onServerStatus(QStringList);
 
