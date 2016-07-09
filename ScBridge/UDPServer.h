@@ -1,36 +1,35 @@
 #ifndef UDPSERVER_H
 #define UDPSERVER_H
 
-#include "CodeEditor.h"
+//#include "CodeEditor.h"
 #include "ScBridge.h"
 
 #include <QDebug>
-#include <QLabel>
-#include <QMap>
-#include <QPainter>
-#include <QPushButton>
-#include <QTextEdit>
-#include <QWidget>
+//#include <QLabel>
+//#include <QMap>
+//#include <QPainter>
+//#include <QPushButton>
+//#include <QTextEdit>
+//#include <QWidget>
 
 #include <QHostInfo>
 #include <QNetworkInterface>
 #include <QtNetwork/QUdpSocket>
 
-using namespace Jui;
-using namespace SupercolliderBridge;
+//using namespace Jui;
 
-namespace QuantIDE {
-
+namespace SupercolliderBridge
+{
   class UDPServer : public QObject
   {
     Q_OBJECT
 
   public:
-    UDPServer(QObject *parent, ScBridge *bridge);
+    UDPServer(QObject *parent, ScBridge* bridge);
     ~UDPServer();
 
     public slots:
-    int initSocket();
+    int initSocket(QString name);
     void readPendingDatagrams();
     void send(const char *input);
     void sendCode(QString code);
@@ -55,8 +54,8 @@ namespace QuantIDE {
     QHostAddress *myAddress;
     QUdpSocket *socket;
     QHostInfo *host;
-    QString *username;
-    QString objectPattern;
+    QString username;
+    //QString objectPattern;
 
     ScBridge *mBridge;
   };

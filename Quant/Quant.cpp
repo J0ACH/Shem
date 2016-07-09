@@ -84,7 +84,7 @@ namespace QuantIDE
     emit bootInterpretAct();
 
     this->initStyleSheet();
-    udpServer->initSocket();
+    udpServer->initSocket(userName);
   }
 
   void Quant::initControl()
@@ -209,6 +209,8 @@ namespace QuantIDE
     fontTextSmall = customize->getFont("font_shem_TextSmall");
     fontTextCode = customize->getFont("font_shem_TextCode");
     fontTextConsole = customize->getFont("font_shem_TextConsole");
+
+    userName = customize->getString("string_shem_UserName");
 
     canvan->setColorHeader(colorAppHeaderBackground);
     canvan->setColorNormal(colorNormal);
@@ -427,7 +429,7 @@ namespace QuantIDE
 
     buttServer->setState(Jui::Button::State::ON);
 
-    onMsgStatus("Quant init done...");
+    onMsgStatus(tr("Quant init done [user: %1]").arg(userName));
   }
   void Quant::onServerKillInit()
   {
@@ -468,7 +470,7 @@ namespace QuantIDE
   void Quant::onRecivedGlobalCode(QString code) 
   {
     bridge->question(code, true); 
-    udpServer->sendCode(code);
+  udpServer->sendCode(code);
   }
 
   Quant::~Quant() { }

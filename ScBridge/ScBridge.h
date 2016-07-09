@@ -1,6 +1,9 @@
 #ifndef SCBRIDGE_H
 #define SCBRIDGE_H
 
+//#include "UDPServer.h"
+
+#include <QtWidgets/QApplication>
 #include <QAction>
 #include <QByteArray>
 #include <QDateTime>
@@ -14,7 +17,6 @@
 #include <QDebug>
 #include <QQueue>
 #include <QTimer>
-//#include <QStringList>
 
 namespace SupercolliderBridge
 {

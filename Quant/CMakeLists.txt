@@ -50,7 +50,6 @@ SET(Quant_hdr
   NodePanel.h
   Node.h
   ControlEnvelope.h
-  UDPServer.h
 )
 
 SET(Quant_src 
@@ -58,7 +57,6 @@ SET(Quant_src
   NodePanel.cpp
   Node.cpp
   ControlEnvelope.cpp
-  UDPServer.cpp
 )
 
 SET(Quant_res 

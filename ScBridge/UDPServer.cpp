@@ -3,16 +3,16 @@
 #define DEBUG 1
 #define PORT 10000
 
-namespace QuantIDE {
+namespace SupercolliderBridge {
 
-  UDPServer::UDPServer(QObject *parent, ScBridge *bridge) :
+  UDPServer::UDPServer(QObject *parent, ScBridge* bridge) :
     QObject(parent),
     mBridge(bridge)
   {
-    objectPattern = QString::null;
-
     connect(this, SIGNAL(actPrintStatus(QString)), parent, SLOT(onMsgStatus(QString)));
     connect(this, SIGNAL(actPrintMsg(QString)), parent, SLOT(onMsgNormal(QString)));
+
+
   }
 
   bool UDPServer::isConnectedToNet() {
@@ -58,16 +58,19 @@ namespace QuantIDE {
     QString name = qgetenv("USER");
     if (name.isEmpty())
       name = qgetenv("USERNAME");
-    // qDebug() << "UDP: username: " << name;
+    qDebug() << "UDP: username: " << name;
     return name;
   }
 
-  int UDPServer::initSocket() {
+  int UDPServer::initSocket(QString name)
+  {
     port = PORT;
-    username = new QString(this->getUsername());
+
+    if (!name.isEmpty()) { username = name; }
+    else { username = this->getUsername(); }
 
     emit actPrintStatus("UDP Server init...\n");
-    emit actPrintMsg(tr("UDP: my username: %1\n").arg(*username));
+    emit actPrintMsg(tr("UDP: my username: %1\n").arg(username));
 
     emit actPrintMsg("UDP: Checking network setup...\n");
 
@@ -114,7 +117,7 @@ namespace QuantIDE {
     socket->bind(QHostAddress::Any, port);
 
     if (socket->state() == 4) {
-      emit actPrintStatus("UDP: Server is ON!\n");
+      emit actPrintStatus("UDP: Server init done...\n");
     }
     else {
       emit actPrintMsg(
@@ -123,12 +126,11 @@ namespace QuantIDE {
       return 1;
     }
 
-    emit actPrintMsg(
-      "///////////////////////////////////////////////////////////////////\n\n");
+    //emit actPrintMsg("///////////////////////////////////////////////////////////////////\n\n");
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
 
-    this->send((tr("Hi all my name is %1\n").arg(*username)).toStdString().c_str());
+    this->sendCode(tr("\"Hi all my name is %1\n\".postln;").arg(username));
     return 0;
   }
 
@@ -141,7 +143,9 @@ namespace QuantIDE {
 
   void UDPServer::sendCode(QString code)
   {
-    QByteArray datagram(code.toStdString().c_str());
+    QString dataMsg = tr("%1||%2").arg(username, code);
+
+    QByteArray datagram(dataMsg.toStdString().c_str());
     socket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
   }
 
@@ -155,14 +159,19 @@ namespace QuantIDE {
     {
       datagram.resize(socket->pendingDatagramSize());
       socket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
-    } 
+    }
 
-    //emit actPrintMsg("UDP[%1]: Got some data chef!\n");
-    //emit actPrintMsg(tr("UDP: data: %1\n").arg(datagram.data()));
+    QString dataMsg = QString::fromUtf8(datagram);
+    QStringList data = dataMsg.split("||");
+    QString senderName = data[0];
+    QString recivedCode = data[1];
 
-    QString postString = QString::fromUtf8(datagram);
-    emit actPrintMsg(tr("udpMsg [from %1] -> %2\n").arg(sender.toString(), postString));
-    this->processDatagram(postString);
+    if (senderName != username)
+    {
+      //QString postSender = sender.;
+      emit actPrintMsg(tr("udpMsg [from %1] -> %2").arg(senderName, recivedCode));
+      this->processDatagram(recivedCode);
+    }
 
   } // end void
 
