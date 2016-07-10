@@ -25,7 +25,7 @@ namespace QuantIDE
     customize = new Customize(this);
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
-    udpServer = new UDPServer(this);
+    udpServer = new UDPServer(this, bridge);
 
     customize->initConfig();
 
@@ -84,14 +84,14 @@ namespace QuantIDE
     emit bootInterpretAct();
 
     this->initStyleSheet();
-    udpServer->initSocket();
+    udpServer->initSocket(userName);
   }
 
   void Quant::initControl()
   {
-      nodePanel = new NodePanel(canvan->screen, bridge, customize);
+    nodePanel = new NodePanel(canvan->screen, bridge, customize);
     nodePanel->setTitle("NodePanel");
-   
+
     buttLang = new Button(canvan->tail);
     buttLang->setText("Lang");
     buttLang->setStateKeeping(Button::StateKeeping::HOLD);
@@ -151,7 +151,7 @@ namespace QuantIDE
   void Quant::fitGeometry()
   {
     QRect screenRect = canvan->screen->rect();
-    nodePanel->setGeometry(1, 1, screenRect.width(), screenRect.height()-1);
+    nodePanel->setGeometry(1, 1, screenRect.width(), screenRect.height() - 1);
 
     buttLang->setGeometry(5, 5, 24, 24);
     buttServer->setGeometry(35, 5, 24, 24);
@@ -209,6 +209,8 @@ namespace QuantIDE
     fontTextSmall = customize->getFont("font_shem_TextSmall");
     fontTextCode = customize->getFont("font_shem_TextCode");
     fontTextConsole = customize->getFont("font_shem_TextConsole");
+
+    userName = customize->getString("string_shem_UserName");
 
     canvan->setColorHeader(colorAppHeaderBackground);
     canvan->setColorNormal(colorNormal);
@@ -427,7 +429,7 @@ namespace QuantIDE
 
     buttServer->setState(Jui::Button::State::ON);
 
-    onMsgStatus("Quant init done...");
+    onMsgStatus(tr("Quant init done [user: %1]").arg(userName));
   }
   void Quant::onServerKillInit()
   {
@@ -465,7 +467,11 @@ namespace QuantIDE
 
   // GLOBAL CODE
 
-  void Quant::onRecivedGlobalCode(QString code) { bridge->question(code, true); }
+  void Quant::onRecivedGlobalCode(QString code) 
+  {
+    bridge->question(code, true); 
+  udpServer->sendCode(code);
+  }
 
   Quant::~Quant() { }
 }

@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QDebug>
-//#include <QList>
 
 #include "ScBridge.h"
 #include "Customize.h"
@@ -85,6 +84,7 @@ namespace QuantIDE
     NodePanel *nodePanel;
     Panel *customizePanel, *networkPanel;
 
+    QString userName;
     QColor colorAppBackground, colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgResult, colorMsgError, colorMsgWarning, colorMsgBundle;
     QFont fontTextBig, fontTextSmall, fontTextCode;

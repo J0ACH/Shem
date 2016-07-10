@@ -1,6 +1,4 @@
 #include "ScBridge.h"
-#include <QtWidgets/QApplication>
-
 
 namespace SupercolliderBridge
 {
@@ -13,6 +11,9 @@ namespace SupercolliderBridge
     mTerminationRequested(false),
     mCompiled(false)
   {
+    //udpServer = new UDPServer(this);
+    //udpServer->initSocket();
+
     stateInterpret = StateInterpret::OFF;
     stateServer = StateServer::OFF;
 

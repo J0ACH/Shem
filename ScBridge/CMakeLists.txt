@@ -19,10 +19,12 @@ SET(QT_LIBRARIES
 SET(ScBridge_hdr 
   ScBridge.h
   Customize.h
+  UDPServer.h
 )
 SET(ScBridge_src 
   ScBridge.cpp
   Customize.cpp
+  UDPServer.cpp
 )
 
 QT5_WRAP_CPP( ScBridge_moc ${ScBridge_hdr} )

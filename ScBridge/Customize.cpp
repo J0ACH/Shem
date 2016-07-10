@@ -35,18 +35,17 @@ namespace SupercolliderBridge
       foreach(QString key, newConfig.keys())
       {
         if (oldConfig.contains(key)) { mergeConfig.insert(key, oldConfig[key]); }
-        else { mergeConfig.insert(key, newConfig[key]); }
+        else
+        {
+          mergeConfig.insert(key, newConfig[key]);
+          qDebug() << "Customize -> merge insert key " << key;
+        }
       }
-
-      this->writeConfigFile(mergeConfig);
     }
-    else
-    {
-      mergeConfig = this->defaultConfig();
-      this->writeConfigFile(mergeConfig);
-    }
+    else { mergeConfig = this->defaultConfig(); }
 
     mergeConfig = this->processingConfigData(mergeConfig);
+    this->writeConfigFile(mergeConfig);
 
     foreach(QString key, mergeConfig.keys())
     {
@@ -62,6 +61,14 @@ namespace SupercolliderBridge
 
   QMap<QString, QVariant*> Customize::processingConfigData(QMap<QString, QVariant*> data)
   {
+    // SET USERNAME BY SYSTEM
+    QString userName = data.value("string_shem_UserName")->value<QString>();
+    if (userName.isEmpty())
+    {
+      userName = qgetenv("USERNAME");
+      data.insert("string_shem_UserName", new QVariant(userName));
+    }
+
     // ANTIALIAS FONTS
     QFont font;
     bool textAntialias = data.value("bool_shem_TextAntialias")->value<bool>();
@@ -135,7 +142,11 @@ namespace SupercolliderBridge
         bool boolean = mergeConfigData[key]->value<bool>();
         if (boolean) { out << key << " = true\n"; }
         else { out << key << " = false\n"; }
-
+      }
+      if (key.startsWith("string"))
+      {
+        QString text = mergeConfigData[key]->value<QString>();
+        out << key << " = " << text << "\n";
       }
     }
 
@@ -147,6 +158,8 @@ namespace SupercolliderBridge
   QMap<QString, QVariant*> Customize::defaultConfig()
   {
     QMap<QString, QVariant*> defaultConfig;
+    defaultConfig.insert("string_shem_UserName", new QVariant(""));
+
     defaultConfig.insert("color_shem_AppBackground", new QVariant(QColor(20, 20, 20)));
     defaultConfig.insert("color_shem_AppHeaderBackground", new QVariant(QColor(40, 40, 40)));
     defaultConfig.insert("color_shem_PanelBackground", new QVariant(QColor(30, 30, 30)));
@@ -250,12 +263,25 @@ namespace SupercolliderBridge
           oldConfigData.insert(key, new QVariant(false));
         };
       }
+      if (key.startsWith("string"))
+      {
+        //qDebug() << "ConfigDataTyp: string";
+        QString value = args[0].remove(" ");
+        oldConfigData.insert(key, new QVariant(value));
+      }
     }
 
     // mBridge->msgNormalAct(tr("\ncustomization config file: %1\r").arg(configFile->fileName()));
     configFile->close();
 
     return oldConfigData;
+  }
+
+  QString Customize::getString(QString key)
+  {
+    QString text;
+    text = this->property(key.toStdString().c_str()).value<QString>();
+    return text;
   }
 
   QColor Customize::getColor(QString key)
