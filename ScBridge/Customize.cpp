@@ -41,16 +41,11 @@ namespace SupercolliderBridge
           qDebug() << "Customize -> merge insert key " << key;
         }
       }
-
-      this->writeConfigFile(mergeConfig);
     }
-    else
-    {
-      mergeConfig = this->defaultConfig();
-      this->writeConfigFile(mergeConfig);
-    }
+    else { mergeConfig = this->defaultConfig(); }
 
     mergeConfig = this->processingConfigData(mergeConfig);
+    this->writeConfigFile(mergeConfig);
 
     foreach(QString key, mergeConfig.keys())
     {
@@ -66,6 +61,14 @@ namespace SupercolliderBridge
 
   QMap<QString, QVariant*> Customize::processingConfigData(QMap<QString, QVariant*> data)
   {
+    // SET USERNAME BY SYSTEM
+    QString userName = data.value("string_shem_UserName")->value<QString>();
+    if (userName.isEmpty())
+    {
+      userName = qgetenv("USERNAME");
+      data.insert("string_shem_UserName", new QVariant(userName));
+    }
+
     // ANTIALIAS FONTS
     QFont font;
     bool textAntialias = data.value("bool_shem_TextAntialias")->value<bool>();
