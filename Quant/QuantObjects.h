@@ -3,36 +3,41 @@
 
 #include <QWidget>
 #include <QDebug>
+#include <QPainter>
+
+#include "ControlBox.h"
+
+using namespace Jui;
 
 namespace QuantIDE
 {
-  enum ObjectType { BASE, PROXYSPACE, NODEPROXY, ENVCONTROL, BUS };
 
-  class QuantObject : public QObject
+  class QuantObject : public QWidget
   {
     Q_OBJECT
 
   public:
-    QuantObject(QObject *parent);
+    QuantObject(QWidget *parent, QObject *core);
     ~QuantObject();
 
-    ObjectType objectType;
-
     void setMap(QString key, QString value);
-    void setMap(QString key, ObjectType value);
-    
+
+    QString getMap_string(QString key);
 
     void printMap();
-
-
+    
     public slots :
     void onObjectChanged();
 
   signals:
     void actMapChanged(QMap <QString, QVariant>);
 
+  protected:
+    void paintEvent(QPaintEvent *event);
+
   private:
     QMap <QString, QVariant> map;
+    QWidget *mCanvan;
 
   };
 
@@ -41,7 +46,7 @@ namespace QuantIDE
   class QuantProxy : public QuantObject
   {
   public:
-    QuantProxy(QObject *parente);
+    QuantProxy(QWidget *parente, QObject *core);
     ~QuantProxy();
   };
 
@@ -51,8 +56,13 @@ namespace QuantIDE
   class QuantNode : public QuantObject
   {
   public:
-    QuantNode(QObject *parent);
+    QuantNode(QWidget *parent, QObject *core);
     ~QuantNode();
+
+    void setName(QString);
+
+  private:
+    ControlBox *nameBox;
   };
 
 
@@ -61,7 +71,7 @@ namespace QuantIDE
   class QuantControl : public QuantObject
   {
   public:
-    QuantControl(QObject *parent);
+    QuantControl(QWidget *parent, QObject *core);
     ~QuantControl();
   };
 
@@ -71,7 +81,7 @@ namespace QuantIDE
   class QuantBus : public QuantObject
   {
   public:
-    QuantBus(QObject *parent);
+    QuantBus(QWidget *parent, QObject *core);
     ~QuantBus();
   };
 }

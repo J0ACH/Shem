@@ -22,6 +22,28 @@ using namespace Jui;
 namespace QuantIDE
 {
 
+
+  class QuantNEW : public QObject
+  {
+    Q_OBJECT
+
+  public:
+    QuantNEW(QObject *parent);
+    ~QuantNEW();
+
+    public slots:
+    //void onCloseQuant();
+
+
+  private:
+    Customize *customize;
+    //Canvan *canvan;
+    QWidget *canvan;
+
+    QuantCore *core;
+  };
+
+
   class Quant : public QWidget
   {
     Q_OBJECT
@@ -72,7 +94,7 @@ namespace QuantIDE
   protected:
     void closeEvent(QCloseEvent *event);
     void paintEvent(QPaintEvent *event);
-    
+
   private:
     void initControl();
     void initStyleSheet(); // ???? snad bude odstraneno
@@ -80,7 +102,7 @@ namespace QuantIDE
     ScBridge *bridge;
     Customize *customize;
     UDPServer *udpServer;
-    
+
     QuantCore *core;
     //QuantObject *proxyTest1, *proxyTest2;
 

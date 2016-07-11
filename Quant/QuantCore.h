@@ -20,14 +20,15 @@ namespace QuantIDE
     Q_OBJECT
 
   public:
-    QuantCore(QObject *parent, ScBridge *bridge, UDPServer *network, Customize *customize);
+    QuantCore(QWidget *parent, Customize *customize);
     ~QuantCore();
 
     void setLibrary(QString key, QString value);
     QString getLibrary(QString key);
-    QString printLibrary();
-
+    
     void addNode(QString name);
+
+    QWidget *mCanvan;
 
     public slots :
     void onMapChanged(QMap <QString, QVariant>);

@@ -2,16 +2,16 @@
 
 namespace QuantIDE
 {
-  QuantObject::QuantObject(QObject *parent) : QObject(parent)
+  QuantObject::QuantObject(QWidget *parent, QObject *core) : QWidget(parent)
   {
     qDebug("QuantObject init...");
 
-    objectType = BASE;
+    this->setMap("QuantObjectType", "QuantObject");
 
-    connect(parent, SIGNAL(actObjectChanged()), this, SLOT(onObjectChanged()));
+    connect(core, SIGNAL(actObjectChanged()), this, SLOT(onObjectChanged()));
     connect(
       this, SIGNAL(actMapChanged(QMap <QString, QVariant>)),
-      parent, SLOT(onMapChanged(QMap <QString, QVariant>))
+      core, SLOT(onMapChanged(QMap <QString, QVariant>))
       );
   }
 
@@ -20,11 +20,8 @@ namespace QuantIDE
     map.insert(key, QVariant(value));
     emit actMapChanged(map);
   }
-  void QuantObject::setMap(QString key, ObjectType value)
-  {
-    map.insert(key, QVariant(value));
-    emit actMapChanged(map);
-  }
+
+  QString QuantObject::getMap_string(QString key)  { return map.value(key).toString(); }
 
   void QuantObject::onObjectChanged()
   {
@@ -40,6 +37,16 @@ namespace QuantIDE
     }
   }
 
+  void QuantObject::paintEvent(QPaintEvent *event)
+  {
+    QPainter painter(this);
+    painter.setPen(QColor(120, 30, 30));
+    painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+    //painter.fillRect(QRect(0, 0, width() - 1, height() - 1), QColor(120,30,30));
+
+    painter.drawText(5, 15, this->getMap_string("QuantObjectType"));
+  }
+
   QuantObject::~QuantObject()
   {
   }
@@ -47,11 +54,10 @@ namespace QuantIDE
 
   // QUANT PROXYSPACE ////////////////////////////////////////////////////////////////  
 
-  QuantProxy::QuantProxy(QObject *parent) : QuantObject(parent)
+  QuantProxy::QuantProxy(QWidget *parent, QObject *core) : QuantObject(parent, core)
   {
     qDebug("QuantProxy init...");
-    objectType = PROXYSPACE;
-    
+    this->setMap("QuantObjectType", "QuantProxy");
   }
   QuantProxy::~QuantProxy()
   {
@@ -59,11 +65,21 @@ namespace QuantIDE
 
   // QUANT NODEPROXY ////////////////////////////////////////////////////////////////
 
-  QuantNode::QuantNode(QObject *parent) : QuantObject(parent)
+  QuantNode::QuantNode(QWidget *parent, QObject *core) : QuantObject(parent, core)
   {
     qDebug("QuantNode init...");
-    objectType = NODEPROXY;
-    this->setMap("QuantObjectType", objectType);
+    this->setMap("QuantObjectType", "QuantNode");
+
+    nameBox = new ControlBox(this);
+    nameBox->setGeometry(5, 50, 90, 20);
+    nameBox->setLabel("name");
+    nameBox->setValue(this->getMap_string("name"));
+    nameBox->setColorText(QColor(120, 30, 30));
+  }
+  void QuantNode::setName(QString name)
+  {
+    this->setMap("name", name);
+    nameBox->setValue(this->getMap_string("name"));
   }
   QuantNode::~QuantNode()
   {
@@ -71,10 +87,10 @@ namespace QuantIDE
 
   // QUANT CONTROLS ////////////////////////////////////////////////////////////////
 
-  QuantControl::QuantControl(QObject *parent) : QuantObject(parent)
+  QuantControl::QuantControl(QWidget *parent, QObject *core) : QuantObject(parent, core)
   {
     qDebug("QuantControl init...");
-    objectType = ENVCONTROL;
+    this->setMap("QuantObjectType", "QuantControl");
   }
   QuantControl::~QuantControl()
   {
@@ -82,10 +98,10 @@ namespace QuantIDE
 
   // QUANT BUS ////////////////////////////////////////////////////////////////
 
-  QuantBus::QuantBus(QObject *parent) : QuantObject(parent)
+  QuantBus::QuantBus(QWidget *parent, QObject *core) : QuantObject(parent, core)
   {
     qDebug("QuantBus init...");
-    objectType = BUS;
+    this->setMap("QuantObjectType", "QuantBus");
   }
   QuantBus::~QuantBus()
   {

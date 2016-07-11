@@ -2,11 +2,12 @@
 
 namespace QuantIDE
 {
-  QuantCore::QuantCore(QObject *parent, ScBridge *bridge, UDPServer *network, Customize *customize) :
+  QuantCore::QuantCore(QWidget *parent, Customize *customize) :
     QObject(parent),
-    mBridge(bridge),
-    mNetwork(network),
-    mCustomize(customize)
+    mCustomize(customize),
+    mCanvan(parent),
+    mBridge(new ScBridge(parent)),
+    mNetwork(new UDPServer(parent, mBridge))
   {
     qDebug("Core init...");
     this->setLibrary("user", "testName");
@@ -32,24 +33,13 @@ namespace QuantIDE
     }
   }
 
-  QString QuantCore::printLibrary()
-  {
-    QString printTxt;
-    foreach(QString oneValue, library.values())
-    {
-      printTxt += tr("\t-> %1\n").arg(oneValue);
-    }
-    return printTxt;
-  }
 
   void QuantCore::addNode(QString name)
   {
-
-    QuantNode testNode(this);
-    testNode.setMap(name, "QuantNode");
-
-    // testNode->setLibrary("aaa", "reverseTest");
-
+    QuantNode *testNode = new QuantNode(mCanvan, this);
+    testNode->setGeometry(50, 50, 100, 100);
+    testNode->show();
+    testNode->setName(name);
   }
 
   QuantCore::~QuantCore() { }

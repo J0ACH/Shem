@@ -10,15 +10,38 @@ int main(int argc, char** argv){
 
   QApplication app(argc, argv);
 
+  QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0); 
+  /*
   QuantIDE::Quant *win = new QuantIDE::Quant();
   win->setGeometry(50, 50, 1400, 700);
   win->show();
+  */
 
   return app.exec();
 }
 
 namespace QuantIDE
 {
+
+
+  QuantNEW::QuantNEW(QObject *parent) : QObject(parent)
+  {
+    customize = new Customize(this);
+    canvan = new QWidget();
+    canvan->setGeometry(550, 350, 400, 300);
+    canvan->show();
+
+    core = new QuantCore(canvan, customize);
+    core->addNode("testNode1");
+  }
+ 
+  QuantNEW::~QuantNEW() 
+  {
+    qDebug("Quant closing...");
+  }
+
+
+
   Quant::Quant(QWidget *parent) : QWidget(parent)
   {
 
@@ -27,8 +50,8 @@ namespace QuantIDE
     bridge = new ScBridge(this);
     udpServer = new UDPServer(this, bridge);
     
-    core = new QuantCore(this, bridge, udpServer, customize);
-    core->addNode("testNode");
+    //core = new QuantCore(this, bridge, udpServer, customize);
+    //core->addNode("testNode1");
     //proxyTest1 = new QuantObject(this, core);
     //proxyTest2 = new QuantProxy(this, core);
 
