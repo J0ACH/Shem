@@ -15,7 +15,7 @@ namespace QuantIDE
   void QuantCore::setLibrary(QString key, QString value)
   {
     library.insert(key, value);
-    emit actLibraryChanged();
+    emit actObjectChanged();
   }
 
   QString QuantCore::getLibrary(QString key)
@@ -23,24 +23,33 @@ namespace QuantIDE
     return library.value(key);
   }
 
-  void QuantCore::onLibraryChange(QMap<QString, QString> newLib)
+  void QuantCore::onMapChanged(QMap <QString, QVariant> map)
   {
-    foreach(QString oneValue, newLib.values())
+    foreach(QString oneKey, map.keys())
     {
-      qDebug() << "QuantCore::onLibraryChange get library:" << oneValue;
+      qDebug() << "Core::onMapChanged [key: " << oneKey
+        << " || value: " << map.value(oneKey).toString() << "]";
     }
   }
 
   QString QuantCore::printLibrary()
   {
-    QString printTxt; // = tr("%1::printLibrary\n").arg(objectName);
-
+    QString printTxt;
     foreach(QString oneValue, library.values())
     {
       printTxt += tr("\t-> %1\n").arg(oneValue);
     }
-
     return printTxt;
+  }
+
+  void QuantCore::addNode(QString name)
+  {
+
+    QuantNode testNode(this);
+    testNode.setMap(name, "QuantNode");
+
+    // testNode->setLibrary("aaa", "reverseTest");
+
   }
 
   QuantCore::~QuantCore() { }

@@ -28,12 +28,13 @@ namespace QuantIDE
     udpServer = new UDPServer(this, bridge);
     
     core = new QuantCore(this, bridge, udpServer, customize);
-    proxyTest1 = new QuantObject(this, core);
-    proxyTest2 = new QuantObject(this, core);
+    core->addNode("testNode");
+    //proxyTest1 = new QuantObject(this, core);
+    //proxyTest2 = new QuantProxy(this, core);
 
-    proxyTest1->setLibrary("user", "ahoj");
-    proxyTest1->printLibrary("proxyTest1");
-    proxyTest2->printLibrary("proxyTest2");
+    //proxyTest1->setLibrary("user", "ahoj");
+   // proxyTest1->printLibrary("proxyTest1");
+    //proxyTest2->printLibrary("proxyTest2");
 
     customize->initConfig();
 

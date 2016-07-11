@@ -8,6 +8,8 @@
 #include "Customize.h"
 #include "UDPServer.h"
 
+#include "QuantObjects.h"
+
 using namespace SupercolliderBridge;
 
 namespace QuantIDE
@@ -25,11 +27,14 @@ namespace QuantIDE
     QString getLibrary(QString key);
     QString printLibrary();
 
+    void addNode(QString name);
+
     public slots :
-    void onLibraryChange(QMap <QString, QString>);
+    void onMapChanged(QMap <QString, QVariant>);
+    
 
   signals:
-    void actLibraryChanged();
+    void actObjectChanged();
 
 
   protected:
@@ -41,6 +46,12 @@ namespace QuantIDE
     Customize *mCustomize;
 
     QMap <QString, QString> library;
+    QuantProxy *proxy;
+    QMap <QString, QuantNode> nodeLibrary;
+    QMap <QString, QuantControl> controloLibrary;
+    QMap <QString, QuantBus> busLibrary;
+    
+    //QMap <QString, QuantNode> library;
 
   }; 
 }

@@ -2,43 +2,92 @@
 
 namespace QuantIDE
 {
-  QuantObject::QuantObject(QObject *parent, QuantCore *core) :
-    QObject(parent),
-    mCore(core)
+  QuantObject::QuantObject(QObject *parent) : QObject(parent)
   {
-    qDebug("Proxy init...");
-    qDebug() << "QuantProxy get[username] " << mCore->getLibrary("user");
+    qDebug("QuantObject init...");
 
-    connect(mCore, SIGNAL(actLibraryChanged()), this, SLOT(onLibraryChanged()));
+    objectType = BASE;
 
+    connect(parent, SIGNAL(actObjectChanged()), this, SLOT(onObjectChanged()));
+    connect(
+      this, SIGNAL(actMapChanged(QMap <QString, QVariant>)),
+      parent, SLOT(onMapChanged(QMap <QString, QVariant>))
+      );
   }
 
-  void QuantObject::setLibrary(QString key, QString value)
+  void QuantObject::setMap(QString key, QString value)
   {
-    mCore->setLibrary(key, value);
+    map.insert(key, QVariant(value));
+    emit actMapChanged(map);
+  }
+  void QuantObject::setMap(QString key, ObjectType value)
+  {
+    map.insert(key, QVariant(value));
+    emit actMapChanged(map);
   }
 
-  QString QuantObject::getLibrary(QString key)
+  void QuantObject::onObjectChanged()
   {
-    QString value = mCore->getLibrary(key);
-    qDebug() << "QuantObject::getLibrary [" << key << "] :" << value;
-    return value;
+    qDebug() << "QuantObject::onObjectChanged()";
   }
 
-  void QuantObject::onLibraryChanged()
+  void QuantObject::printMap()
   {
-    qDebug() << "QuantObject::onLibraryChanged()";
-  }
-
-  void QuantObject::printLibrary(QString objectName)
-  {
-    QString printTxt = tr("%1::printLibrary\n").arg(objectName);
-    printTxt += mCore->printLibrary();
-
-    qDebug() << printTxt;
+    foreach(QString oneKey, map.keys())
+    {
+      qDebug() << "QuantObject::printMap [key: " << oneKey
+        << " || value: " << map.value(oneKey).toString() << "]";
+    }
   }
 
   QuantObject::~QuantObject()
+  {
+  }
+
+
+  // QUANT PROXYSPACE ////////////////////////////////////////////////////////////////  
+
+  QuantProxy::QuantProxy(QObject *parent) : QuantObject(parent)
+  {
+    qDebug("QuantProxy init...");
+    objectType = PROXYSPACE;
+    
+  }
+  QuantProxy::~QuantProxy()
+  {
+  }
+
+  // QUANT NODEPROXY ////////////////////////////////////////////////////////////////
+
+  QuantNode::QuantNode(QObject *parent) : QuantObject(parent)
+  {
+    qDebug("QuantNode init...");
+    objectType = NODEPROXY;
+    this->setMap("QuantObjectType", objectType);
+  }
+  QuantNode::~QuantNode()
+  {
+  }
+
+  // QUANT CONTROLS ////////////////////////////////////////////////////////////////
+
+  QuantControl::QuantControl(QObject *parent) : QuantObject(parent)
+  {
+    qDebug("QuantControl init...");
+    objectType = ENVCONTROL;
+  }
+  QuantControl::~QuantControl()
+  {
+  }
+
+  // QUANT BUS ////////////////////////////////////////////////////////////////
+
+  QuantBus::QuantBus(QObject *parent) : QuantObject(parent)
+  {
+    qDebug("QuantBus init...");
+    objectType = BUS;
+  }
+  QuantBus::~QuantBus()
   {
   }
 }
