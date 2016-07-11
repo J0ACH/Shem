@@ -47,6 +47,8 @@ ADD_SUBDIRECTORY(Jui)
 
 SET(Quant_hdr 
   Quant.h
+  QuantCore.h
+  QuantObjects.h
   NodePanel.h
   Node.h
   ControlEnvelope.h
@@ -54,6 +56,8 @@ SET(Quant_hdr
 
 SET(Quant_src 
   Quant.cpp
+  QuantCore.cpp
+  QuantObjects.cpp
   NodePanel.cpp
   Node.cpp
   ControlEnvelope.cpp

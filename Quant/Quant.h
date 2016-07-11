@@ -7,6 +7,7 @@
 #include "ScBridge.h"
 #include "Customize.h"
 #include "UDPServer.h"
+#include "QuantObjects.h"
 #include "Canvan.h"
 #include "Panel.h"
 #include "Edges.h"
@@ -71,8 +72,7 @@ namespace QuantIDE
   protected:
     void closeEvent(QCloseEvent *event);
     void paintEvent(QPaintEvent *event);
-    void customizeEvent(QDynamicPropertyChangeEvent *event);
-
+    
   private:
     void initControl();
     void initStyleSheet(); // ???? snad bude odstraneno
@@ -80,6 +80,10 @@ namespace QuantIDE
     ScBridge *bridge;
     Customize *customize;
     UDPServer *udpServer;
+    
+    QuantCore *core;
+    QuantObject *proxyTest1, *proxyTest2;
+
     Canvan *canvan;
     NodePanel *nodePanel;
     Panel *customizePanel, *networkPanel;

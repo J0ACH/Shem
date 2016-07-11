@@ -26,6 +26,14 @@ namespace QuantIDE
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
     udpServer = new UDPServer(this, bridge);
+    
+    core = new QuantCore(this, bridge, udpServer, customize);
+    proxyTest1 = new QuantObject(this, core);
+    proxyTest2 = new QuantObject(this, core);
+
+    proxyTest1->setLibrary("user", "ahoj");
+    proxyTest1->printLibrary("proxyTest1");
+    proxyTest2->printLibrary("proxyTest2");
 
     customize->initConfig();
 
@@ -451,11 +459,6 @@ namespace QuantIDE
   }
   void Quant::closeEvent(QCloseEvent *event)	{ canvan->close(); }
 
-  void Quant::customizeEvent(QDynamicPropertyChangeEvent *event)
-  {
-    qDebug("Quant::customizeEvent");
-  }
-
   void Quant::onServerStatus(QStringList data)
   {
     float peakCPU = data[0].toFloat();
@@ -467,10 +470,10 @@ namespace QuantIDE
 
   // GLOBAL CODE
 
-  void Quant::onRecivedGlobalCode(QString code) 
+  void Quant::onRecivedGlobalCode(QString code)
   {
-    bridge->question(code, true); 
-  udpServer->sendCode(code);
+    bridge->question(code, true);
+    udpServer->sendCode(code);
   }
 
   Quant::~Quant() { }
