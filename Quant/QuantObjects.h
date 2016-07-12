@@ -46,7 +46,7 @@ namespace QuantIDE
   class QuantProxy : public QuantObject
   {
   public:
-    QuantProxy(QWidget *parente, QObject *core);
+    QuantProxy(QWidget *parent, QObject *core);
     ~QuantProxy();
   };
 

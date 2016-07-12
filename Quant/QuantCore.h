@@ -4,10 +4,11 @@
 #include <QWidget>
 #include <QDebug>
 
-#include "ScBridge.h"
 #include "Customize.h"
+#include "ScBridge.h"
 #include "UDPServer.h"
 
+#include "Canvan.h"
 #include "QuantObjects.h"
 
 using namespace SupercolliderBridge;
@@ -20,17 +21,15 @@ namespace QuantIDE
     Q_OBJECT
 
   public:
-    QuantCore(QWidget *parent, Customize *customize);
+    QuantCore(CanvanNEW *canvan, Customize *customize);
     ~QuantCore();
 
     void addProxySpace();
     void addNode(QString name);
 
-    QWidget *mCanvan;
-
     public slots :
     void onMapChanged(QMap <QString, QVariant>);
-    
+
 
   signals:
     void actObjectChanged();
@@ -40,6 +39,7 @@ namespace QuantIDE
 
 
   private:
+    CanvanNEW *mCanvan;
     ScBridge *mBridge;
     UDPServer *mNetwork;
     Customize *mCustomize;
@@ -49,10 +49,10 @@ namespace QuantIDE
     QMap <QString, QuantNode> nodeLibrary;
     QMap <QString, QuantControl> controloLibrary;
     QMap <QString, QuantBus> busLibrary;
-    
+
     //QMap <QString, QuantNode> library;
 
-  }; 
+  };
 }
 #endif // QUANTCORE_H
 

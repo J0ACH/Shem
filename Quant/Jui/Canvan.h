@@ -43,9 +43,9 @@ namespace Jui
   private:
     void initControl();
     int headerSize;
-    QWidget *screen;
     QMenuBar *menuBar;
     QMenu *fileMenu;
+    QWidget *screen;
     Button *closeButton, *maximizeButton, *minimizeButton;
 
     bool isMoveing;

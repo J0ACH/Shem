@@ -3,8 +3,6 @@
 namespace Jui
 {
 
-
-
   PanelNEW::PanelNEW(QWidget *parent) : QDockWidget(parent, Qt::FramelessWindowHint)
   {
     this->setFeatures(QDockWidget::DockWidgetMovable);
@@ -14,17 +12,13 @@ namespace Jui
     this->setColorBackground(QColor(30, 30, 30));
     this->setColorHeader(QColor(40, 40, 40));
     this->setColorTitle(QColor(130, 30, 30));
-    
+
     closeButton = new Button(this);
     closeButton->setIcon(QImage(":/smallClose16.png"), 0);
     connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
   }
 
-  void PanelNEW::setTitle(QString name)
-  {
-    title = name;
-    this->setWindowTitle(title);
-  }
+  void PanelNEW::setTitle(QString name)  { title = name; this->setWindowTitle(title); }
   void PanelNEW::setFontTitle(QFont font)  { fontTitle = font; }
   void PanelNEW::setColorTitle(QColor color) { colorText = color; update(); }
   void PanelNEW::setColorBackground(QColor color) { colorBackground = color; update(); }

@@ -47,10 +47,8 @@ namespace QuantIDE
     painter.drawText(5, 15, this->getMap_string("QuantObjectType"));
   }
 
-  QuantObject::~QuantObject()
-  {
-  }
-
+  QuantObject::~QuantObject() { }
+  
 
   // QUANT PROXYSPACE ////////////////////////////////////////////////////////////////  
 
@@ -59,10 +57,8 @@ namespace QuantIDE
     qDebug("QuantProxy init...");
     this->setMap("QuantObjectType", "QuantProxy");
   }
-  QuantProxy::~QuantProxy()
-  {
-  }
-
+  QuantProxy::~QuantProxy() { }
+  
   // QUANT NODEPROXY ////////////////////////////////////////////////////////////////
 
   QuantNode::QuantNode(QWidget *parent, QObject *core) : QuantObject(parent, core)
@@ -81,9 +77,7 @@ namespace QuantIDE
     this->setMap("name", name);
     nameBox->setValue(this->getMap_string("name"));
   }
-  QuantNode::~QuantNode()
-  {
-  }
+  QuantNode::~QuantNode() { }
 
   // QUANT CONTROLS ////////////////////////////////////////////////////////////////
 
@@ -92,10 +86,8 @@ namespace QuantIDE
     qDebug("QuantControl init...");
     this->setMap("QuantObjectType", "QuantControl");
   }
-  QuantControl::~QuantControl()
-  {
-  }
-
+  QuantControl::~QuantControl() { }
+  
   // QUANT BUS ////////////////////////////////////////////////////////////////
 
   QuantBus::QuantBus(QWidget *parent, QObject *core) : QuantObject(parent, core)
@@ -103,9 +95,8 @@ namespace QuantIDE
     qDebug("QuantBus init...");
     this->setMap("QuantObjectType", "QuantBus");
   }
-  QuantBus::~QuantBus()
-  {
-  }
+  QuantBus::~QuantBus() { }
+  
 }
 
 

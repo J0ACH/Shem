@@ -2,12 +2,12 @@
 
 namespace QuantIDE
 {
-  QuantCore::QuantCore(QWidget *parent, Customize *customize) :
-    QObject(parent),
+  QuantCore::QuantCore(CanvanNEW *canvan, Customize *customize) :
+    QObject(canvan),
+    mCanvan(canvan),
     mCustomize(customize),
-    mCanvan(parent),
-    mBridge(new ScBridge(parent)),
-    mNetwork(new UDPServer(parent, mBridge))
+    mBridge(new ScBridge(canvan)),
+    mNetwork(new UDPServer(canvan, mBridge))
   {
     qDebug("Core init...");
   }
@@ -23,18 +23,25 @@ namespace QuantIDE
 
   void QuantCore::addProxySpace()
   {
-    QuantProxy *proxy = new QuantProxy(mCanvan, this);
+    qDebug() << "Core::addProxySpace mCanvan->getScreen: " << mCanvan->centralWidget()->geometry();
+    QuantProxy *proxy = new QuantProxy(mCanvan->centralWidget(), this);
     proxy->setGeometry(50, 25, 100, 100);
     proxy->show();
+
+    //mCanvan->update();
+
     //proxy->setName("testProxy");
   }
 
   void QuantCore::addNode(QString name)
   {
-    QuantNode *testNode = new QuantNode(mCanvan, this);
+
+    QuantNode *testNode = new QuantNode(mCanvan->centralWidget(), this);
     testNode->setGeometry(50, 150, 100, 100);
     testNode->show();
     testNode->setName(name);
+
+
   }
 
   QuantCore::~QuantCore() { }

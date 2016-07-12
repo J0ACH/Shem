@@ -13,12 +13,12 @@ namespace Jui
     isMoveing = false;
 
     this->initControl();
-    
+
   }
   void CanvanNEW::initControl()
   {
     screen = new QWidget(this);
-    this->setCentralWidget(screen);
+    //screen->show();
     //this->setCorner(Qt::Corner::TopLeftCorner, Qt::DockWidgetArea::);
     menuBar = new QMenuBar(this);
     menuBar->installEventFilter(this);
@@ -48,6 +48,8 @@ namespace Jui
     minimizeButton = new Button(menuBar);
     minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
     connect(minimizeButton, SIGNAL(pressAct()), this, SLOT(onCanvanMinimized()));
+    
+    this->setCentralWidget(screen);
   }
 
   void CanvanNEW::addPanel(PanelNEW *panel)
@@ -63,6 +65,8 @@ namespace Jui
     style += tr("QMenuBar:item{background-color: %1; }").arg(color.name());
     menuBar->setStyleSheet(style);
   }
+
+  //QWidget* CanvanNEW::getScreen()  { return this->centralWidget(); }
 
   void CanvanNEW::onCanvanClosed()
   {
@@ -204,7 +208,7 @@ namespace Jui
     minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
 
     mConsole = new Console(this);
-//    mConsole->setTitle("Console");
+    //    mConsole->setTitle("Console");
     //mConsole->setColorText(QColor(70, 70, 70)); // default text color 
 
     mConsole->setGeometry(0, 0, 550, 150);

@@ -22,10 +22,8 @@ namespace QuantIDE
     customize = new Customize(this);
     customize->initConfig();
 
-    screen = new QWidget();
-
     canvanNEW = new CanvanNEW();
-    canvanNEW->setGeometry(50, 50, 700, 500);
+    canvanNEW->setGeometry(50, 50, 1400, 700);
     canvanNEW->setColorHeader(QColor(50, 50, 50));
     canvanNEW->show();
 
@@ -36,13 +34,15 @@ namespace QuantIDE
     console->setColorTitle(QColor(130, 30, 30));
     console->setColorText(QColor(130, 130, 130));
 
-    canvanNEW->setCentralWidget(screen);
     canvanNEW->addPanel(console);
     canvanNEW->addPanel(panelNEW);
-
-    core = new QuantCore(screen, customize);
+    
+    core = new QuantCore(canvanNEW, customize);
     core->addProxySpace();
     core->addNode("testNode1");
+
+
+
   }
 
   QuantNEW::~QuantNEW()
