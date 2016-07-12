@@ -13,6 +13,7 @@ namespace Jui
     isMoveing = false;
 
     this->initControl();
+    
   }
   void CanvanNEW::initControl()
   {
@@ -22,6 +23,10 @@ namespace Jui
     menuBar = new QMenuBar(this);
     menuBar->installEventFilter(this);
     menuBar->setFixedHeight(headerSize);
+    /*
+    menuBar->move(1, 1);
+    menuBar->setFixedWidth(this->width()-2);
+    */
     this->setMenuBar(menuBar);
 
     fileMenu = new QMenu("file");
@@ -30,18 +35,6 @@ namespace Jui
 
     fileMenu->addAction("setup");
     fileMenu->addAction("exit");
-
-    console = new Console(this);
-
-    testDock1 = new QDockWidget(this);
-    testDock1->setWindowTitle("Console");
-    //testDock1->setFixedWidth(300);
-    //testDock1->setFeatures(QDockWidget::DockWidgetMovable);
-    testDock1->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea); 
-    this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, testDock1);
-    
-    //testDock1->setAllowedAreas(Qt::DockWidgetArea::RightDockWidgetArea);
-    testDock1->setWidget(console);
 
     closeButton = new Button(menuBar);
     closeButton->setIcon(QImage(":/close16.png"), 0);
@@ -55,6 +48,12 @@ namespace Jui
     minimizeButton = new Button(menuBar);
     minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
     connect(minimizeButton, SIGNAL(pressAct()), this, SLOT(onCanvanMinimized()));
+  }
+
+  void CanvanNEW::addPanel(PanelNEW *panel)
+  {
+    panel->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+    this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, panel);
   }
 
   void CanvanNEW::setColor_Background_Header(QColor color)
@@ -128,7 +127,7 @@ namespace Jui
 
     return QMainWindow::eventFilter(target, event);
   }
-  
+
   void CanvanNEW::resizeEvent(QResizeEvent *resizeEvent)
   {
     menuBar->setGeometry(QRect(1, 1, width() - 2, headerSize));
@@ -142,7 +141,7 @@ namespace Jui
   void CanvanNEW::paintEvent(QPaintEvent *paintEvent)
   {
     QPainter painter(this);
-    painter.fillRect(QRect(0, 0, width(), height()), QColor(30, 30, 30));
+    painter.fillRect(QRect(0, headerSize, width(), height() - headerSize), QColor(30, 30, 30));
 
     painter.setPen(QColor(150, 150, 150));
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));

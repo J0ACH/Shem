@@ -1,6 +1,7 @@
 #ifndef PANEL_H
 #define PANEL_H
 
+#include <QDockWidget>
 #include <QWidget>
 #include <QLabel>
 #include <QPainter>
@@ -12,47 +13,66 @@
 
 namespace Jui
 {
-	class Panel : public QWidget
-	{
-		Q_OBJECT
+  class PanelNEW : public QDockWidget
+  {
+    Q_OBJECT
 
-	public:
-		Panel(QWidget *parent = 0);
-		~Panel();
+  public:
+    PanelNEW(QWidget *parent = 0);
+    ~PanelNEW();
 
-		QRect bounds();
+  protected:
+        void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
-		void initControl();
-		void setTitle(QString);
-  void setFontTitle(QFont);
-		void setColorBackground(QColor);
-		void setColorTitle(QColor);
+  private:
+    Button *closeButton;
 
-		void setEdgeControler(EdgeControler::Direction, bool);
+    bool isMoveing;
+    QPoint cursorScreen, cursorCanvan, originCanvanScreen;
+  };
 
-		public slots:
-		//void onConfigData(QMap<QString, QVariant*> config);
-  //void onCustomize();
+  class Panel : public QWidget
+  {
+    Q_OBJECT
 
-	signals:
-		void resizeAct();
+  public:
+    Panel(QWidget *parent = 0);
+    ~Panel();
 
-	protected:
-		void mousePressEvent(QMouseEvent *mouseEvent);
-		void paintEvent(QPaintEvent *event);
-		void resizeEvent(QResizeEvent *event);
+    QRect bounds();
 
-	private:
-		QString title;
+    void initControl();
+    void setTitle(QString);
+    void setFontTitle(QFont);
+    void setColorBackground(QColor);
+    void setColorTitle(QColor);
 
-		QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
-  QFont fontTitle;
+    void setEdgeControler(EdgeControler::Direction, bool);
 
-		Button *closeButton;
-		Edges *edges;
+    public slots:
+    //void onConfigData(QMap<QString, QVariant*> config);
+    //void onCustomize();
+
+  signals :
+    void resizeAct();
+
+  protected:
+    void mousePressEvent(QMouseEvent *mouseEvent);
+    void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
+
+  private:
+    QString title;
+
+    QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
+    QFont fontTitle;
+
+    Button *closeButton;
+    Edges *edges;
 
 
-	};
+  };
 
 
 

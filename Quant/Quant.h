@@ -38,6 +38,7 @@ namespace QuantIDE
     Customize *customize;
     CanvanNEW *canvanNEW;
     
+    PanelNEW *panelNEW;
 
     QuantCore *core;
   };

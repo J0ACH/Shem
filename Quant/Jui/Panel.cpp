@@ -3,6 +3,46 @@
 namespace Jui
 {
 
+
+
+  PanelNEW::PanelNEW(QWidget *parent) : QDockWidget(parent, Qt::FramelessWindowHint)
+  {
+    this->setFeatures(QDockWidget::DockWidgetMovable);
+    this->setWindowTitle("test");
+    this->setMinimumWidth(150);
+
+    closeButton = new Button(this);
+    closeButton->setIcon(QImage(":/smallClose16.png"), 0);
+    connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
+  }
+  void PanelNEW::resizeEvent(QResizeEvent *resizeEvent)
+  {
+    closeButton->setGeometry(this->width() - 18, 2, 16, 16);
+  }
+
+  void PanelNEW::paintEvent(QPaintEvent *event)
+  {
+    QPainter painter(this);
+    //painter.setFont(fontTitle);
+    painter.fillRect(QRect(1, 0, this->width()-2, 20), QColor(30, 60, 30));
+    painter.fillRect(QRect(1,20,this->width()-2, this->height()-21), QColor(30, 130, 30));
+
+    painter.setPen(QColor(150, 150, 150));
+    painter.drawText(10, 14, "test");
+
+    bool showScreen = false;
+    if (showScreen)
+    {
+      painter.setPen(QColor(30, 30, 130));
+      painter.drawLine(this->geometry().topLeft(), this->geometry().bottomRight());
+      painter.drawLine(this->geometry().bottomLeft(), this->geometry().topRight());
+    }
+  }
+  
+  PanelNEW::~PanelNEW() {}
+
+
+
   Panel::Panel(QWidget *parent) : QWidget(parent)
   {
     //this->setParent(parent);

@@ -27,6 +27,7 @@ namespace Jui
     CanvanNEW(QWidget *parent = 0, Qt::WindowFlags flags = 0);
     ~CanvanNEW();
 
+    void addPanel(PanelNEW *panel);
     void setColor_Background_Header(QColor);
 
     public slots:
@@ -47,7 +48,7 @@ namespace Jui
     QMenu *fileMenu;
     QDockWidget *testDock1;
     Button *closeButton, *maximizeButton, *minimizeButton;
-    Console *console;
+    //Console *console;
 
     bool isMoveing;
     QPoint cursorScreen, cursorCanvan, originCanvanScreen;

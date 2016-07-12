@@ -38,13 +38,16 @@ namespace QuantIDE
     
 
     canvanNEW = new CanvanNEW();
-    canvanNEW->setGeometry(50, 50, 400, 300);
-    canvanNEW->setColor_Background_Header(QColor(120, 30, 30));
+    canvanNEW->setGeometry(50, 50, 500, 300);
+    canvanNEW->setColor_Background_Header(QColor(50, 50, 50));
     canvanNEW->show();
 
-    
-    
 
+    panelNEW = new PanelNEW();
+    panelNEW->setGeometry(650, 50, 200, 200);
+    panelNEW->show(); 
+
+    canvanNEW->addPanel(panelNEW);
 
 
     /*
