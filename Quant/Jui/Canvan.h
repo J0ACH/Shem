@@ -1,13 +1,16 @@
 #ifndef CANVAN_H
 #define CANVAN_H
 
+#include <QMainWindow>
+#include <QMenuBar>
+#include <QDockWidget>
 #include <QtWidgets/QMainWindow>
 #include <QTimer>
 #include <QLabel>
 #include <QFontDatabase>
 #include <QMap>
 #include <QDesktopWidget>
-//#include <QDynamicPropertyChangeEvent>
+
 
 #include "Console.h"
 #include "Button.h"
@@ -15,6 +18,41 @@
 
 namespace Jui
 {
+
+  class CanvanNEW : public QMainWindow
+  {
+    Q_OBJECT
+
+  public:
+    CanvanNEW(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    ~CanvanNEW();
+
+    void setColor_Background_Header(QColor);
+
+    public slots:
+    void onCanvanClosed();
+    void onCanvanMaximized();
+    void onCanvanMinimized();
+
+  protected:
+    void resizeEvent(QResizeEvent *resizeEvent);
+    void paintEvent(QPaintEvent *paintEvent);
+    bool eventFilter(QObject *target, QEvent *event);
+
+  private:
+    void initControl();
+    int headerSize;
+    QWidget *screen;
+    QMenuBar *menuBar;
+    QMenu *fileMenu;
+    QDockWidget *testDock1;
+    Button *closeButton, *maximizeButton, *minimizeButton;
+    Console *console;
+
+    bool isMoveing;
+    QPoint cursorScreen, cursorCanvan, originCanvanScreen;
+    
+  };
 
   class Canvan : public QWidget
   {
@@ -69,7 +107,7 @@ namespace Jui
     void fitScreen();
     //void onConfigData(QMap<QString, QVariant*> config);
     //void onCustomize();
-    
+
   protected:
     void resizeEvent(QResizeEvent *resizeEvent);
     void mousePressEvent(QMouseEvent *mouseEvent);

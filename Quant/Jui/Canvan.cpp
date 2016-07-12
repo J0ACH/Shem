@@ -3,6 +3,157 @@
 
 namespace Jui
 {
+
+  CanvanNEW::CanvanNEW(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(parent, flags)
+  {
+    this->setWindowFlags(Qt::FramelessWindowHint);
+    this->setWindowTitle("CanvanNEW");
+
+    headerSize = 50;
+    isMoveing = false;
+
+    this->initControl();
+  }
+  void CanvanNEW::initControl()
+  {
+    screen = new QWidget(this);
+    this->setCentralWidget(screen);
+    //this->setCorner(Qt::Corner::TopLeftCorner, Qt::DockWidgetArea::);
+    menuBar = new QMenuBar(this);
+    menuBar->installEventFilter(this);
+    menuBar->setFixedHeight(headerSize);
+    this->setMenuBar(menuBar);
+
+    fileMenu = new QMenu("file");
+    fileMenu->installEventFilter(this);
+    menuBar->addMenu(fileMenu);
+
+    fileMenu->addAction("setup");
+    fileMenu->addAction("exit");
+
+    console = new Console(this);
+
+    testDock1 = new QDockWidget(this);
+    testDock1->setWindowTitle("Console");
+    //testDock1->setFixedWidth(300);
+    //testDock1->setFeatures(QDockWidget::DockWidgetMovable);
+    testDock1->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea); 
+    this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, testDock1);
+    
+    //testDock1->setAllowedAreas(Qt::DockWidgetArea::RightDockWidgetArea);
+    testDock1->setWidget(console);
+
+    closeButton = new Button(menuBar);
+    closeButton->setIcon(QImage(":/close16.png"), 0);
+    connect(closeButton, SIGNAL(pressAct()), this, SLOT(onCanvanClosed()));
+
+    maximizeButton = new Button(menuBar);
+    maximizeButton->setIcon(QImage(":/maximize16.png"), 0);
+    maximizeButton->setStateKeeping(Button::StateKeeping::HOLD);
+    connect(maximizeButton, SIGNAL(pressAct()), this, SLOT(onCanvanMaximized()));
+
+    minimizeButton = new Button(menuBar);
+    minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
+    connect(minimizeButton, SIGNAL(pressAct()), this, SLOT(onCanvanMinimized()));
+  }
+
+  void CanvanNEW::setColor_Background_Header(QColor color)
+  {
+    QString style;
+    style += tr("QMenuBar{background-color: %1; }").arg(color.name());
+    style += tr("QMenuBar:item{background-color: %1; }").arg(color.name());
+    menuBar->setStyleSheet(style);
+  }
+
+  void CanvanNEW::onCanvanClosed()
+  {
+    this->close();
+    this->deleteLater();
+  }
+  void CanvanNEW::onCanvanMaximized()
+  {
+    if (this->windowState() == Qt::WindowNoState)
+    {
+      this->showMaximized();
+      this->setWindowState(Qt::WindowMaximized);
+    }
+    else
+    {
+      this->showNormal();
+      this->setWindowState(Qt::WindowNoState);
+    }
+  }
+  void CanvanNEW::onCanvanMinimized()  { this->showMinimized(); }
+
+  bool CanvanNEW::eventFilter(QObject *target, QEvent *event)
+  {
+    if (target == fileMenu)
+    {
+      //qDebug() << "CanvanNEW::eventFilter event: " << event;
+      if (event->type() == QEvent::MouseButtonRelease)
+      {
+        isMoveing = false;
+        return true;
+      }
+    }
+    else if (target == menuBar)
+    {
+      if (event->type() == QEvent::MouseButtonPress)
+      {
+        // qDebug() << "CanvanNEW::eventFilter target: " << target;
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+
+        isMoveing = true;
+        cursorScreen = mouseEvent->globalPos();
+        cursorCanvan = mouseEvent->pos();
+        originCanvanScreen = QPoint(cursorScreen.x() - cursorCanvan.x(), cursorScreen.y() - cursorCanvan.y());
+
+      }
+      if (event->type() == QEvent::MouseMove)
+      {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        if (this->windowState() == Qt::WindowNoState) {
+          if (isMoveing)
+          {
+            QPoint mouseCurrentGlobal = mouseEvent->globalPos();
+            int posX = originCanvanScreen.x() - cursorScreen.x() + mouseCurrentGlobal.x();
+            int posY = originCanvanScreen.y() - cursorScreen.y() + mouseCurrentGlobal.y();
+            this->move(posX, posY);
+          }
+        }
+      }
+      if (event->type() == QEvent::MouseButtonRelease) { isMoveing = false; }
+    }
+
+
+    return QMainWindow::eventFilter(target, event);
+  }
+  
+  void CanvanNEW::resizeEvent(QResizeEvent *resizeEvent)
+  {
+    menuBar->setGeometry(QRect(1, 1, width() - 2, headerSize));
+    fileMenu->setGeometry(QRect(150, 1, 30, 30));
+
+    closeButton->setGeometry(width() - 36, 10, 24, 24);
+    maximizeButton->setGeometry(width() - 60, 10, 24, 24);
+    minimizeButton->setGeometry(width() - 84, 10, 24, 24);
+
+  }
+  void CanvanNEW::paintEvent(QPaintEvent *paintEvent)
+  {
+    QPainter painter(this);
+    painter.fillRect(QRect(0, 0, width(), height()), QColor(30, 30, 30));
+
+    painter.setPen(QColor(150, 150, 150));
+    painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+  }
+
+  CanvanNEW::~CanvanNEW()
+  {
+    qDebug("CanvanNEW closed");
+  }
+
+
   Canvan::Canvan(QWidget *window) : QWidget(window)
   {
     win = window;
@@ -66,70 +217,6 @@ namespace Jui
     setEdgeControler(EdgeControler::Direction::RIGHT, true);
     setEdgeControler(EdgeControler::Direction::BOTTOM, true);
   }
-
-
-  /*
-  void Canvan::onConfigData(QMap<QString, QVariant*> config)
-  {
-
-  connect(this, SIGNAL(actConfigData(QMap<QString, QVariant*>)),
-  mConsole, SLOT(onConfigData(QMap<QString, QVariant*>)));
-
-  colorAppHeaderBackground = config.value("color_shem_AppHeaderBackground")->value<QColor>();
-  colorPanelBackground = config.value("color_shem_PanelBackground")->value<QColor>();
-  colorNormal = config.value("color_shem_Normal")->value<QColor>();
-  colorOver = config.value("color_shem_Over")->value<QColor>();
-  colorActive = config.value("color_shem_Active")->value<QColor>();
-  colorText = config.value("color_shem_Text")->value<QColor>();
-  fontTextSmall = config.value("font_shem_TextSmall")->value<QFont>();
-  fontCode = config.value("font_shem_TextCode")->value<QFont>();
-
-  mConsole->setFont(fontTextSmall);
-
-  closeButton->setColorNormal(colorNormal);
-  maximizeButton->setColorNormal(colorNormal);
-  minimizeButton->setColorNormal(colorNormal);
-
-  closeButton->setColorOver(colorOver);
-  maximizeButton->setColorOver(colorOver);
-  minimizeButton->setColorOver(colorOver);
-
-  closeButton->setColorActive(colorActive);
-  maximizeButton->setColorActive(colorActive);
-  minimizeButton->setColorActive(colorActive);
-
-  emit actConfigData(config);
-
-  update();
-  }
-  void Canvan::onCustomize()
-  {
-  qDebug("Canvan::onCustomize");
-
-  colorAppHeaderBackground = this->property("color_shem_AppHeaderBackground").value<QColor>();
-  colorPanelBackground = this->property("color_shem_PanelBackground").value<QColor>();
-  colorNormal = this->property("color_shem_Normal").value<QColor>();
-  colorOver = this->property("color_shem_Over").value<QColor>();
-  colorActive = this->property("color_shem_Active").value<QColor>();
-  colorText = this->property("color_shem_Text").value<QColor>();
-  fontTextSmall = this->property("font_shem_TextSmall").value<QFont>();
-  fontCode = this->property("font_shem_TextCode").value<QFont>();
-
-  mConsole->setFont(fontTextSmall);
-
-  closeButton->setColorNormal(colorNormal);
-  maximizeButton->setColorNormal(colorNormal);
-  minimizeButton->setColorNormal(colorNormal);
-
-  closeButton->setColorOver(colorOver);
-  maximizeButton->setColorOver(colorOver);
-  minimizeButton->setColorOver(colorOver);
-
-  closeButton->setColorActive(colorActive);
-  maximizeButton->setColorActive(colorActive);
-  minimizeButton->setColorActive(colorActive);
-  }
-  */
 
   void Canvan::print(QString text, QColor col) { emit consolePrintAct(text, col, false); }
   void Canvan::println(QString text, QColor col) { emit consolePrintAct(text, col, true); }
@@ -283,11 +370,11 @@ namespace Jui
   void Canvan::setVersion(QString _version)
   {
     /*
-QString strMajor = QString::number(major);
-QString strMinor = QString::number(minor);
-QString strPatch = QString::number(patch);
-if (patch < 10) { strPatch.prepend(QString::number(0)); }
-*/
+  QString strMajor = QString::number(major);
+  QString strMinor = QString::number(minor);
+  QString strPatch = QString::number(patch);
+  if (patch < 10) { strPatch.prepend(QString::number(0)); }
+  */
     version = _version;
   }
 

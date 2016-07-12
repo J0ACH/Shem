@@ -10,18 +10,6 @@ namespace QuantIDE
     mNetwork(new UDPServer(parent, mBridge))
   {
     qDebug("Core init...");
-    this->setLibrary("user", "testName");
-  }
-
-  void QuantCore::setLibrary(QString key, QString value)
-  {
-    library.insert(key, value);
-    emit actObjectChanged();
-  }
-
-  QString QuantCore::getLibrary(QString key)
-  {
-    return library.value(key);
   }
 
   void QuantCore::onMapChanged(QMap <QString, QVariant> map)
@@ -33,11 +21,18 @@ namespace QuantIDE
     }
   }
 
+  void QuantCore::addProxySpace()
+  {
+    QuantProxy *proxy = new QuantProxy(mCanvan, this);
+    proxy->setGeometry(50, 25, 100, 100);
+    proxy->show();
+    //proxy->setName("testProxy");
+  }
 
   void QuantCore::addNode(QString name)
   {
     QuantNode *testNode = new QuantNode(mCanvan, this);
-    testNode->setGeometry(50, 50, 100, 100);
+    testNode->setGeometry(50, 150, 100, 100);
     testNode->show();
     testNode->setName(name);
   }

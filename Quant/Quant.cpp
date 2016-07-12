@@ -1,14 +1,15 @@
 #include "Quant.h"
 #include "QuantConfig.h"
 
-#include <QApplication>
-
-//using namespace Jui;
-using namespace SupercolliderBridge;
-
 int main(int argc, char** argv){
 
   QApplication app(argc, argv);
+  /*
+  Jui::CanvanNEW *win = new Jui::CanvanNEW();
+  win->setGeometry(50, 50, 400, 400);
+  win->setColor_Background_Header(QColor(120, 30, 30));
+  win->show();
+  */
 
   QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0); 
   /*
@@ -26,13 +27,31 @@ namespace QuantIDE
 
   QuantNEW::QuantNEW(QObject *parent) : QObject(parent)
   {
+
     customize = new Customize(this);
+
+    /*
     canvan = new QWidget();
     canvan->setGeometry(550, 350, 400, 300);
     canvan->show();
+    */
+    
 
+    canvanNEW = new CanvanNEW();
+    canvanNEW->setGeometry(50, 50, 400, 300);
+    canvanNEW->setColor_Background_Header(QColor(120, 30, 30));
+    canvanNEW->show();
+
+    
+    
+
+
+
+    /*
     core = new QuantCore(canvan, customize);
+    core->addProxySpace();
     core->addNode("testNode1");
+    */
   }
  
   QuantNEW::~QuantNEW() 
@@ -50,15 +69,6 @@ namespace QuantIDE
     bridge = new ScBridge(this);
     udpServer = new UDPServer(this, bridge);
     
-    //core = new QuantCore(this, bridge, udpServer, customize);
-    //core->addNode("testNode1");
-    //proxyTest1 = new QuantObject(this, core);
-    //proxyTest2 = new QuantProxy(this, core);
-
-    //proxyTest1->setLibrary("user", "ahoj");
-   // proxyTest1->printLibrary("proxyTest1");
-    //proxyTest2->printLibrary("proxyTest2");
-
     customize->initConfig();
 
     QFontDatabase::addApplicationFont(":/fontText.ttf");

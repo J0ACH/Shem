@@ -23,9 +23,7 @@ namespace QuantIDE
     QuantCore(QWidget *parent, Customize *customize);
     ~QuantCore();
 
-    void setLibrary(QString key, QString value);
-    QString getLibrary(QString key);
-    
+    void addProxySpace();
     void addNode(QString name);
 
     QWidget *mCanvan;

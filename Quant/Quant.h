@@ -21,8 +21,7 @@ using namespace Jui;
 
 namespace QuantIDE
 {
-
-
+  
   class QuantNEW : public QObject
   {
     Q_OBJECT
@@ -37,8 +36,8 @@ namespace QuantIDE
 
   private:
     Customize *customize;
-    //Canvan *canvan;
-    QWidget *canvan;
+    CanvanNEW *canvanNEW;
+    
 
     QuantCore *core;
   };
