@@ -37,8 +37,9 @@ namespace QuantIDE
   private:
     Customize *customize;
     CanvanNEW *canvanNEW;
-    
+    QWidget *screen;
     PanelNEW *panelNEW;
+    Console *console;
 
     QuantCore *core;
   };

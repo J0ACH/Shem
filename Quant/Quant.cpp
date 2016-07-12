@@ -4,14 +4,8 @@
 int main(int argc, char** argv){
 
   QApplication app(argc, argv);
-  /*
-  Jui::CanvanNEW *win = new Jui::CanvanNEW();
-  win->setGeometry(50, 50, 400, 400);
-  win->setColor_Background_Header(QColor(120, 30, 30));
-  win->show();
-  */
 
-  QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0); 
+  QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0);
   /*
   QuantIDE::Quant *win = new QuantIDE::Quant();
   win->setGeometry(50, 50, 1400, 700);
@@ -23,41 +17,35 @@ int main(int argc, char** argv){
 
 namespace QuantIDE
 {
-
-
   QuantNEW::QuantNEW(QObject *parent) : QObject(parent)
   {
-
     customize = new Customize(this);
+    customize->initConfig();
 
-    /*
-    canvan = new QWidget();
-    canvan->setGeometry(550, 350, 400, 300);
-    canvan->show();
-    */
-    
+    screen = new QWidget();
 
     canvanNEW = new CanvanNEW();
-    canvanNEW->setGeometry(50, 50, 500, 300);
-    canvanNEW->setColor_Background_Header(QColor(50, 50, 50));
+    canvanNEW->setGeometry(50, 50, 700, 500);
+    canvanNEW->setColorHeader(QColor(50, 50, 50));
     canvanNEW->show();
 
-
     panelNEW = new PanelNEW();
-    panelNEW->setGeometry(650, 50, 200, 200);
-    panelNEW->show(); 
+    console = new Console();
+    console->setColorBackground(QColor(30, 30, 30));
+    console->setColorHeader(QColor(40, 40, 40));
+    console->setColorTitle(QColor(130, 30, 30));
+    console->setColorText(QColor(130, 130, 130));
 
+    canvanNEW->setCentralWidget(screen);
+    canvanNEW->addPanel(console);
     canvanNEW->addPanel(panelNEW);
 
-
-    /*
-    core = new QuantCore(canvan, customize);
+    core = new QuantCore(screen, customize);
     core->addProxySpace();
     core->addNode("testNode1");
-    */
   }
- 
-  QuantNEW::~QuantNEW() 
+
+  QuantNEW::~QuantNEW()
   {
     qDebug("Quant closing...");
   }
@@ -71,7 +59,7 @@ namespace QuantIDE
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
     udpServer = new UDPServer(this, bridge);
-    
+
     customize->initConfig();
 
     QFontDatabase::addApplicationFont(":/fontText.ttf");
@@ -264,9 +252,9 @@ namespace QuantIDE
     canvan->setColorText(colorText);
 
     canvan->mConsole->setColorBackground(colorPanelBackground);
-    canvan->mConsole->setColorTitle(colorText);
+    // canvan->mConsole->setColorTitle(colorText);
     canvan->mConsole->setColorText(colorText);
-    canvan->mConsole->setFontTitle(fontTextBig);
+    // canvan->mConsole->setFontTitle(fontTextBig);
     canvan->mConsole->setFont(fontTextConsole);
 
     buttLang->setColorNormal(colorNormal);

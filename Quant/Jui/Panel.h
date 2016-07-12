@@ -21,15 +21,25 @@ namespace Jui
     PanelNEW(QWidget *parent = 0);
     ~PanelNEW();
 
+    void setTitle(QString);
+    void setFontTitle(QFont);
+    void setColorTitle(QColor);
+    void setColorBackground(QColor);
+    void setColorHeader(QColor);
+
   protected:
-        void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
 
   private:
+    QString title;
     Button *closeButton;
 
     bool isMoveing;
     QPoint cursorScreen, cursorCanvan, originCanvanScreen;
+
+    QColor colorHeader, colorBackground, colorText;
+    QFont fontTitle;
   };
 
   class Panel : public QWidget

@@ -8,28 +8,27 @@
 
 namespace Jui
 {
-	class Console : public Panel
-	{
-		Q_OBJECT
+  class Console : public PanelNEW
+  {
+    Q_OBJECT
 
-	public:
-		Console(QWidget *parent);
-		~Console();
+  public:
+    Console(QWidget *parent = 0);
+    ~Console();
 
-		void setFont(QFont);
-		void setColorText(QColor);
-  void setColorBackground(QColor);
-		
-	public slots:
-		void addText(QString text, QColor color, bool newLine );
-		//void fitGeometry();
+    void setFont(QFont);
+    void setColorText(QColor);
+    void setColorBackground(QColor);
 
-	protected:
-		void resizeEvent(QResizeEvent *event);
+    public slots:
+    void addText(QString text, QColor color, bool newLine);
 
-	private:
-		QTextEdit *text;
-	};
+  protected:
+    void resizeEvent(QResizeEvent *event);
+
+  private:
+    QTextEdit *text;
+  };
 
 }
 #endif // CONSOLE_H

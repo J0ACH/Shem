@@ -56,7 +56,7 @@ namespace Jui
     this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, panel);
   }
 
-  void CanvanNEW::setColor_Background_Header(QColor color)
+  void CanvanNEW::setColorHeader(QColor color)
   {
     QString style;
     style += tr("QMenuBar{background-color: %1; }").arg(color.name());
@@ -136,7 +136,6 @@ namespace Jui
     closeButton->setGeometry(width() - 36, 10, 24, 24);
     maximizeButton->setGeometry(width() - 60, 10, 24, 24);
     minimizeButton->setGeometry(width() - 84, 10, 24, 24);
-
   }
   void CanvanNEW::paintEvent(QPaintEvent *paintEvent)
   {
@@ -205,7 +204,7 @@ namespace Jui
     minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
 
     mConsole = new Console(this);
-    mConsole->setTitle("Console");
+//    mConsole->setTitle("Console");
     //mConsole->setColorText(QColor(70, 70, 70)); // default text color 
 
     mConsole->setGeometry(0, 0, 550, 150);
