@@ -10,7 +10,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QThread>
-#include <QUuid>
+//#include <QUuid>
 #include <QtNetwork/QLocalSocket>
 #include <QtNetwork/QLocalServer>
 #include <QBuffer>
@@ -48,7 +48,8 @@ namespace SupercolliderBridge
     void onNewIpcConnection();
     void finalizeConnection();
     void onIpcData();
-
+    
+    public slots:
     void killBridge();
     void changeInterpretState();
     void changeServerState();

@@ -8,25 +8,32 @@ namespace QuantIDE
 
     this->setMap("QuantObjectType", "QuantObject");
 
-    connect(core, SIGNAL(actObjectChanged()), this, SLOT(onObjectChanged()));
-    connect(
-      this, SIGNAL(actMapChanged(QMap <QString, QVariant>)),
-      core, SLOT(onMapChanged(QMap <QString, QVariant>))
-      );
-  }
-
-  void QuantObject::setMap(QString key, QString value)
-  {
-    map.insert(key, QVariant(value));
-    emit actMapChanged(map);
+    connect(this, SIGNAL(actEvaluate(QString)), core, SLOT(onEvaluate(QString)));
+    connect(this, SIGNAL(actMyMapSet(QMap <QString, QVariant>)), core, SLOT(onMyMapSet(QMap <QString, QVariant>)));
+    connect(core, SIGNAL(actNetworkMapSet()), this, SLOT(onNetworkMapSet()));
   }
 
   QString QuantObject::getMap_string(QString key)  { return map.value(key).toString(); }
 
-  void QuantObject::onObjectChanged()
+  //nastaveni s odeslanim
+  void QuantObject::onMyMapSet(QString key, QString value)
   {
-    qDebug() << "QuantObject::onObjectChanged()";
+    qDebug() << "QuantObject::onMySetMap() [ key:" << key << " || value: " << value << "]";
+    map.insert(key, QVariant(value));
+    emit actMyMapSet(map);
   }
+
+  //nastaveni od ostatnich bez zpeneho odeslani
+  void QuantObject::onNetworkMapSet(QString key, QString value)
+  {
+    qDebug() << "QuantObject::onNetworkSetMap() [ key:" << key << " || value: " << value << "]";
+    map.insert(key, QVariant(value));
+    emit actNetworkMapSet(map); 
+  }
+
+  //vnitrni nastaveni bez odezvy
+  void QuantObject::setMap(QString key, QString value)  { map.insert(key, QVariant(value)); }
+
 
   void QuantObject::printMap()
   {
@@ -42,13 +49,12 @@ namespace QuantIDE
     QPainter painter(this);
     painter.setPen(QColor(120, 30, 30));
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
-    //painter.fillRect(QRect(0, 0, width() - 1, height() - 1), QColor(120,30,30));
 
     painter.drawText(5, 15, this->getMap_string("QuantObjectType"));
   }
 
   QuantObject::~QuantObject() { }
-  
+
 
   // QUANT PROXYSPACE ////////////////////////////////////////////////////////////////  
 
@@ -56,9 +62,23 @@ namespace QuantIDE
   {
     qDebug("QuantProxy init...");
     this->setMap("QuantObjectType", "QuantProxy");
+
+    testButton = new Button(this);
+    testButton->setGeometry(5, 50, 90, 20);
+    testButton->setColorNormal(QColor(120, 30, 30));
+    testButton->setText("beep");
+    connect(testButton, SIGNAL(pressAct()), this, SLOT(onBeep()));
   }
+
+  void QuantProxy::onBeep()
+  {
+    qDebug("QuantProxy::onBeep");
+    this->onMyMapSet("code", "().play");
+    emit actEvaluate("().play");
+  }
+
   QuantProxy::~QuantProxy() { }
-  
+
   // QUANT NODEPROXY ////////////////////////////////////////////////////////////////
 
   QuantNode::QuantNode(QWidget *parent, QObject *core) : QuantObject(parent, core)
@@ -87,7 +107,7 @@ namespace QuantIDE
     this->setMap("QuantObjectType", "QuantControl");
   }
   QuantControl::~QuantControl() { }
-  
+
   // QUANT BUS ////////////////////////////////////////////////////////////////
 
   QuantBus::QuantBus(QWidget *parent, QObject *core) : QuantObject(parent, core)
@@ -96,7 +116,7 @@ namespace QuantIDE
     this->setMap("QuantObjectType", "QuantBus");
   }
   QuantBus::~QuantBus() { }
-  
+
 }
 
 

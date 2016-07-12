@@ -27,7 +27,9 @@ namespace QuantIDE
     canvanNEW->setColorHeader(QColor(50, 50, 50));
     canvanNEW->show();
 
-    panelNEW = new PanelNEW();
+    networkPanel = new PanelNEW();
+    networkPanel->setTitle("Network");
+    
     console = new Console();
     console->setColorBackground(QColor(30, 30, 30));
     console->setColorHeader(QColor(40, 40, 40));
@@ -35,8 +37,8 @@ namespace QuantIDE
     console->setColorText(QColor(130, 130, 130));
 
     canvanNEW->addPanel(console);
-    canvanNEW->addPanel(panelNEW);
-    
+    canvanNEW->addPanel(networkPanel);
+
     core = new QuantCore(canvanNEW, customize);
     core->addProxySpace();
     core->addNode("testNode1");
@@ -48,6 +50,7 @@ namespace QuantIDE
   QuantNEW::~QuantNEW()
   {
     qDebug("Quant closing...");
+    core->deleteLater();
   }
 
 

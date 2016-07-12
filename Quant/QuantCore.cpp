@@ -10,9 +10,24 @@ namespace QuantIDE
     mNetwork(new UDPServer(canvan, mBridge))
   {
     qDebug("Core init...");
+
+    connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onInterpretBootDone()));
+    connect(mBridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
+    mBridge->changeInterpretState();
   }
 
-  void QuantCore::onMapChanged(QMap <QString, QVariant> map)
+  void QuantCore::onInterpretBootDone()
+  {
+    qDebug("QuantCore::onInterpretBooted");
+    mBridge->changeServerState();
+  }
+  void QuantCore::onServerBootDone()
+  {
+    qDebug("QuantCore::onServerBootDone");
+  }
+
+
+  void QuantCore::onMyMapSet(QMap <QString, QVariant> map)
   {
     foreach(QString oneKey, map.keys())
     {
@@ -20,6 +35,7 @@ namespace QuantIDE
         << " || value: " << map.value(oneKey).toString() << "]";
     }
   }
+  void QuantCore::onEvaluate(QString code)  { mBridge->evaluate(code); }
 
   void QuantCore::addProxySpace()
   {
@@ -44,7 +60,12 @@ namespace QuantIDE
 
   }
 
-  QuantCore::~QuantCore() { }
+  QuantCore::~QuantCore()
+  {
+    qDebug("Core closing...");
+    mBridge->killBridge();
+    qDebug("Bridge killed...");
+  }
 }
 
 

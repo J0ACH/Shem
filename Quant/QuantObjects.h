@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QPainter>
 
+#include "Button.h"
 #include "ControlBox.h"
 
 using namespace Jui;
@@ -20,24 +21,28 @@ namespace QuantIDE
     QuantObject(QWidget *parent, QObject *core);
     ~QuantObject();
 
-    void setMap(QString key, QString value);
-
     QString getMap_string(QString key);
 
     void printMap();
-    
+
     public slots :
-    void onObjectChanged();
+    void onMyMapSet(QString key, QString value);
+    void onNetworkMapSet(QString key, QString value);
 
   signals:
-    void actMapChanged(QMap <QString, QVariant>);
+    void actEvaluate(QString code);
+    void actMyMapSet(QMap <QString, QVariant>);
+    void actNetworkMapSet(QMap <QString, QVariant>);
 
-  protected:
+  protected: // protected je viditelna jen detmi, ne z venku
     void paintEvent(QPaintEvent *event);
+    void setMap(QString key, QString value);
 
   private:
-    QMap <QString, QVariant> map;
     QWidget *mCanvan;
+    QMap <QString, QVariant> map;
+
+
 
   };
 
@@ -45,9 +50,16 @@ namespace QuantIDE
 
   class QuantProxy : public QuantObject
   {
+    Q_OBJECT
   public:
     QuantProxy(QWidget *parent, QObject *core);
     ~QuantProxy();
+
+    public slots:
+    void onBeep();
+
+  private:
+    Button *testButton;
   };
 
 
@@ -55,6 +67,7 @@ namespace QuantIDE
 
   class QuantNode : public QuantObject
   {
+    Q_OBJECT
   public:
     QuantNode(QWidget *parent, QObject *core);
     ~QuantNode();
@@ -70,6 +83,7 @@ namespace QuantIDE
 
   class QuantControl : public QuantObject
   {
+    Q_OBJECT
   public:
     QuantControl(QWidget *parent, QObject *core);
     ~QuantControl();
@@ -80,6 +94,7 @@ namespace QuantIDE
 
   class QuantBus : public QuantObject
   {
+    Q_OBJECT
   public:
     QuantBus(QWidget *parent, QObject *core);
     ~QuantBus();

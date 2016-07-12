@@ -28,11 +28,15 @@ namespace QuantIDE
     void addNode(QString name);
 
     public slots :
-    void onMapChanged(QMap <QString, QVariant>);
+    void onInterpretBootDone();
+    void onServerBootDone();
+
+    void onMyMapSet(QMap <QString, QVariant>);
+    void onEvaluate(QString code);
 
 
   signals:
-    void actObjectChanged();
+    void actNetworkMapSet();
 
 
   protected:
