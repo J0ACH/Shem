@@ -19,6 +19,9 @@ namespace QuantIDE
 {
   QuantNEW::QuantNEW(QObject *parent) : QObject(parent)
   {
+    QFontDatabase::addApplicationFont(":/fontText.ttf");
+    QFontDatabase::addApplicationFont(":/fontConsole.ttf");
+
     customize = new Customize(this);
     customize->initConfig();
 
@@ -28,23 +31,78 @@ namespace QuantIDE
     canvanNEW->show();
 
     networkPanel = new PanelNEW();
-    networkPanel->setTitle("Network");
-    
+    customizePanel = new PanelNEW();    
+
     console = new Console();
     console->setColorBackground(QColor(30, 30, 30));
     console->setColorHeader(QColor(40, 40, 40));
     console->setColorTitle(QColor(130, 30, 30));
     console->setColorText(QColor(130, 130, 130));
 
-    canvanNEW->addPanel(console);
-    canvanNEW->addPanel(networkPanel);
+   
+
+    canvanNEW->addPanel(console, "Console");
+    canvanNEW->addPanel(networkPanel, "Network");
+    canvanNEW->addPanel(customizePanel, "Customize");
+
+    this->onCustomize();
+    this->initStyleSheet();
 
     core = new QuantCore(canvanNEW, customize);
     core->addProxySpace();
     core->addNode("testNode1");
 
 
+  }
 
+  void QuantNEW::onCustomize()
+  {
+    networkPanel->setFontTitle(customize->getFont("font_shem_TextSmall"));
+    networkPanel->setColorTitle(customize->getColor("color_shem_Over"));
+
+    customizePanel->setFontTitle(customize->getFont("font_shem_TextSmall"));
+    customizePanel->setColorTitle(customize->getColor("color_shem_Over"));
+
+    console->setFont(customize->getFont("font_shem_TextConsole"));
+    console->setFontTitle(customize->getFont("font_shem_TextSmall"));
+    console->setColorTitle(customize->getColor("color_shem_Over"));
+    console->setColorNormal(customize->getColor("color_shem_MsgNormal"));
+    console->setColorStatus(customize->getColor("color_shem_MsgStatus"));
+    console->setColorEvaluate(customize->getColor("color_shem_MsgEvaluate"));
+    console->setColorResult(customize->getColor("color_shem_MsgResult"));
+    console->setColorError(customize->getColor("color_shem_MsgError"));
+    console->setColorWarning(customize->getColor("color_shem_MsgWarning"));
+    console->setColorBundle(customize->getColor("color_shem_MsgBundle"));
+  }
+
+  void QuantNEW::initStyleSheet()
+  {
+    QString txt;
+
+    txt.append(tr("QTextEdit { color: %1; }").arg(customize->getColor("color_shem_Text").name()));
+    txt.append(tr("QTextEdit { background-color: %1; }").arg(customize->getColor("color_shem_PanelBackground").name()));
+    txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(customize->getColor("color_shem_Active").name()));
+
+    txt.append("QScrollBar:vertical { width: 2px; }");
+    txt.append("QScrollBar:horizontal { height: 2px; }");
+    txt.append(tr("QScrollBar:vertical { background: %1; }").arg(customize->getColor("color_shem_PanelBackground").name()));
+    txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(customize->getColor("color_shem_PanelBackground").name()));
+    txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(customize->getColor("color_shem_Text").name()));
+    txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(customize->getColor("color_shem_Text").name()));
+    txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
+    txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
+    txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
+    txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
+    txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
+    txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
+    txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
+    txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
+
+    txt.append(tr("QToolTip { color: %1; }").arg(customize->getColor("color_shem_Text").name()));
+    txt.append(tr("QToolTip { background-color:  %1; }").arg(customize->getColor("color_shem_PanelBackground").name()));
+    txt.append(tr("QToolTip { border: 1px solid white; }"));
+
+    qApp->setStyleSheet(txt);
   }
 
   QuantNEW::~QuantNEW()

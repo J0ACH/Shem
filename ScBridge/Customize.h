@@ -24,6 +24,7 @@ namespace SupercolliderBridge
 
     void initConfig();
     QString getString(QString key);
+    bool getBool(QString key);
     QColor getColor(QString key);
     QFont getFont(QString key);
 

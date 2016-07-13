@@ -31,16 +31,19 @@ namespace QuantIDE
     ~QuantNEW();
 
     public slots:
+    void onCustomize();
     //void onCloseQuant();
 
 
   private:
     Customize *customize;
     CanvanNEW *canvanNEW;
-    PanelNEW *networkPanel;
+    PanelNEW *networkPanel, *customizePanel;
     Console *console;
 
     QuantCore *core;
+
+    void initStyleSheet();
   };
 
 

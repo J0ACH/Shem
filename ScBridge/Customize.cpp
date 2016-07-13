@@ -183,6 +183,9 @@ namespace SupercolliderBridge
     defaultConfig.insert("font_shem_TextCode", new QVariant(QFont("Consolas", 8)));
     defaultConfig.insert("font_shem_TextConsole", new QVariant(QFont("Univers 57 Condensed", 9)));
 
+    defaultConfig.insert("bool_shem_onStartBoot_Interpret", new QVariant(true));
+    defaultConfig.insert("bool_shem_onStartBoot_Server", new QVariant(false));
+
     return defaultConfig;
   }
 
@@ -283,7 +286,6 @@ namespace SupercolliderBridge
     text = this->property(key.toStdString().c_str()).value<QString>();
     return text;
   }
-
   QColor Customize::getColor(QString key)
   {
     QColor color;
@@ -295,13 +297,18 @@ namespace SupercolliderBridge
     }
     return color;
   }
-
   QFont Customize::getFont(QString key)
   {
     QFont font;
     font = this->property(key.toStdString().c_str()).value<QFont>();
     //qDebug() << "Customize::getFont [" << key << "] -> " << font;
     return font;
+  }
+  bool Customize::getBool(QString key)
+  {
+    bool boolean;
+    boolean = this->property(key.toStdString().c_str()).value<bool>();
+    return boolean;
   }
 
   Customize::~Customize() { }

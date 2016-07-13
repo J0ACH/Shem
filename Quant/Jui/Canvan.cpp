@@ -12,6 +12,8 @@ namespace Jui
     headerSize = 50;
     isMoveing = false;
 
+    mapPanels = new QMap<QString, PanelNEW*>;
+
     this->initControl();
 
   }
@@ -48,15 +50,19 @@ namespace Jui
     minimizeButton = new Button(menuBar);
     minimizeButton->setIcon(QImage(":/minimize16.png"), 0);
     connect(minimizeButton, SIGNAL(pressAct()), this, SLOT(onCanvanMinimized()));
-    
+
     this->setCentralWidget(screen);
   }
 
-  void CanvanNEW::addPanel(PanelNEW *panel)
+  void CanvanNEW::addPanel(PanelNEW *panel, QString name)
   {
+    panel->setTitle(name);
     panel->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
-    this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, panel);
+    this->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, panel);
+
+    mapPanels->insert(name, panel);
   }
+  QWidget* CanvanNEW::getPanel(QString name)  { return mapPanels->value(name); }
 
   void CanvanNEW::setColorHeader(QColor color)
   {
@@ -65,8 +71,6 @@ namespace Jui
     style += tr("QMenuBar:item{background-color: %1; }").arg(color.name());
     menuBar->setStyleSheet(style);
   }
-
-  //QWidget* CanvanNEW::getScreen()  { return this->centralWidget(); }
 
   void CanvanNEW::onCanvanClosed()
   {
@@ -134,8 +138,8 @@ namespace Jui
 
   void CanvanNEW::resizeEvent(QResizeEvent *resizeEvent)
   {
-    menuBar->setGeometry(QRect(1, 1, width() - 2, headerSize));
-    fileMenu->setGeometry(QRect(150, 1, 30, 30));
+    //menuBar->setGeometry(QRect(1, 1, width() - 2, headerSize));
+    //fileMenu->setGeometry(QRect(150, 1, 30, 30));
 
     closeButton->setGeometry(width() - 36, 10, 24, 24);
     maximizeButton->setGeometry(width() - 60, 10, 24, 24);
@@ -144,7 +148,7 @@ namespace Jui
   void CanvanNEW::paintEvent(QPaintEvent *paintEvent)
   {
     QPainter painter(this);
-    painter.fillRect(QRect(0, headerSize, width(), height() - headerSize), QColor(30, 30, 30));
+    painter.fillRect(QRect(0, headerSize, width(), height() - headerSize), QColor(25, 25, 25));
 
     painter.setPen(QColor(150, 150, 150));
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
@@ -155,6 +159,8 @@ namespace Jui
     qDebug("CanvanNEW closed");
   }
 
+  ///////////////////////////////////////////////////////////////////////////
+  // nize bude odstraneno
 
   Canvan::Canvan(QWidget *window) : QWidget(window)
   {

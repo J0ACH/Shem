@@ -27,7 +27,8 @@ namespace Jui
     CanvanNEW(QWidget *parent = 0, Qt::WindowFlags flags = 0);
     ~CanvanNEW();
 
-    void addPanel(PanelNEW *panel);
+    void addPanel(PanelNEW *panel, QString name);
+    QWidget* getPanel(QString name);
     void setColorHeader(QColor);
 
     public slots:
@@ -46,6 +47,7 @@ namespace Jui
     QMenuBar *menuBar;
     QMenu *fileMenu;
     QWidget *screen;
+    QMap<QString, PanelNEW*> *mapPanels;
     Button *closeButton, *maximizeButton, *minimizeButton;
 
     bool isMoveing;

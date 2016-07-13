@@ -48,7 +48,9 @@ namespace QuantIDE
     UDPServer *mNetwork;
     Customize *mCustomize;
 
-    QMap <QString, QString> library;
+    bool initInterpretOnStart, initServerOnStart;
+
+    //QMap <QString, QString> library;
     QuantProxy *proxy;
     QMap <QString, QuantNode> nodeLibrary;
     QMap <QString, QuantControl> controloLibrary;

@@ -11,15 +11,30 @@ namespace QuantIDE
   {
     qDebug("Core init...");
 
+    initInterpretOnStart = mCustomize->getBool("bool_shem_onStartBoot_Interpret");
+    initServerOnStart = mCustomize->getBool("bool_shem_onStartBoot_Server");
+
+    qDebug() << "QuantCore::initInterpretOnStart: " << initInterpretOnStart;
+    qDebug() << "QuantCore::initServerOnStart: " << initServerOnStart;
+
     connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onInterpretBootDone()));
     connect(mBridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
-    mBridge->changeInterpretState();
+
+    connect(mBridge, SIGNAL(msgNormalAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgNormal(QString)));
+    connect(mBridge, SIGNAL(msgStatusAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgStatus(QString)));
+    connect(mBridge, SIGNAL(msgEvaluateAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgEvaluate(QString)));
+    connect(mBridge, SIGNAL(msgResultAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgResult(QString)));
+    connect(mBridge, SIGNAL(msgErrorAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgError(QString)));
+    connect(mBridge, SIGNAL(msgWarningAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgWarning(QString)));
+    connect(mBridge, SIGNAL(msgBundleAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgBundle(QString)));
+
+    if (initInterpretOnStart) { mBridge->changeInterpretState(); }
   }
 
   void QuantCore::onInterpretBootDone()
   {
     qDebug("QuantCore::onInterpretBooted");
-    mBridge->changeServerState();
+    if (initServerOnStart) { mBridge->changeServerState(); }    
   }
   void QuantCore::onServerBootDone()
   {
@@ -52,7 +67,7 @@ namespace QuantIDE
   void QuantCore::addNode(QString name)
   {
 
-    QuantNode *testNode = new QuantNode(mCanvan->centralWidget(), this);
+    QuantNode *testNode = new QuantNode(mCanvan->getPanel("Network"), this);
     testNode->setGeometry(50, 150, 100, 100);
     testNode->show();
     testNode->setName(name);
