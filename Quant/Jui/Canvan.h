@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QStatusBar>
 #include <QDockWidget>
 #include <QtWidgets/QMainWindow>
 #include <QTimer>
@@ -10,6 +11,7 @@
 #include <QFontDatabase>
 #include <QMap>
 #include <QDesktopWidget>
+#include <QStyle>
 
 
 #include "Console.h"
@@ -18,6 +20,39 @@
 
 namespace Jui
 {
+
+  class CanvanNEW_MenuBar : public QMenuBar
+  {
+    Q_OBJECT
+  public:
+    CanvanNEW_MenuBar(QWidget *parent = 0);
+    ~CanvanNEW_MenuBar();
+
+    void setColorBackground(QColor);
+
+  protected:
+    void resizeEvent(QResizeEvent *event);
+    void paintEvent(QPaintEvent *event);
+
+  private:
+    QColor colorBackground;
+  };
+
+  class CanvanNEW_StatusBar : public QStatusBar
+  {
+    Q_OBJECT
+  public:
+    CanvanNEW_StatusBar(QWidget *parent = 0);
+    ~CanvanNEW_StatusBar();
+
+    void setColorBackground(QColor);
+
+  protected:
+    void paintEvent(QPaintEvent *event);
+
+  private:
+    QColor colorBackground;
+  };
 
   class CanvanNEW : public QMainWindow
   {
@@ -29,7 +64,7 @@ namespace Jui
 
     void addPanel(PanelNEW *panel, QString name);
     QWidget* getPanel(QString name);
-    void setColorHeader(QColor);
+    void setColorBars(QColor);
 
     public slots:
     void onCanvanClosed();
@@ -43,17 +78,19 @@ namespace Jui
 
   private:
     void initControl();
-    int headerSize;
-    QMenuBar *menuBar;
+    int headerSize, tailSize;
+    CanvanNEW_MenuBar *menuBar;
     QMenu *fileMenu;
+    CanvanNEW_StatusBar *statusBar;
     QWidget *screen;
     QMap<QString, PanelNEW*> *mapPanels;
     Button *closeButton, *maximizeButton, *minimizeButton;
 
     bool isMoveing;
     QPoint cursorScreen, cursorCanvan, originCanvanScreen;
-
   };
+
+
 
   class Canvan : public QWidget
   {

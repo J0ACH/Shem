@@ -27,8 +27,7 @@ namespace QuantIDE
 
     canvanNEW = new CanvanNEW();
     canvanNEW->setGeometry(50, 50, 1400, 700);
-    canvanNEW->setColorHeader(QColor(50, 50, 50));
-    canvanNEW->show();
+        canvanNEW->show();
 
     networkPanel = new PanelNEW();
     customizePanel = new PanelNEW();    
@@ -37,9 +36,7 @@ namespace QuantIDE
     console->setColorBackground(QColor(30, 30, 30));
     console->setColorHeader(QColor(40, 40, 40));
     console->setColorTitle(QColor(130, 30, 30));
-    console->setColorText(QColor(130, 130, 130));
-
-   
+    console->setColorText(QColor(130, 130, 130));   
 
     canvanNEW->addPanel(console, "Console");
     canvanNEW->addPanel(networkPanel, "Network");
@@ -57,6 +54,8 @@ namespace QuantIDE
 
   void QuantNEW::onCustomize()
   {
+    canvanNEW->setColorBars(customize->getColor("color_shem_AppHeaderBackground"));        
+
     networkPanel->setFontTitle(customize->getFont("font_shem_TextSmall"));
     networkPanel->setColorTitle(customize->getColor("color_shem_Over"));
 

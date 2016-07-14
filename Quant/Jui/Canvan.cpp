@@ -4,12 +4,15 @@
 namespace Jui
 {
 
+
+
   CanvanNEW::CanvanNEW(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(parent, flags)
   {
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setWindowTitle("CanvanNEW");
 
     headerSize = 50;
+    tailSize = 30;
     isMoveing = false;
 
     mapPanels = new QMap<QString, PanelNEW*>;
@@ -20,16 +23,16 @@ namespace Jui
   void CanvanNEW::initControl()
   {
     screen = new QWidget(this);
-    //screen->show();
-    //this->setCorner(Qt::Corner::TopLeftCorner, Qt::DockWidgetArea::);
-    menuBar = new QMenuBar(this);
+
+    menuBar = new CanvanNEW_MenuBar(this);
     menuBar->installEventFilter(this);
     menuBar->setFixedHeight(headerSize);
-    /*
-    menuBar->move(1, 1);
-    menuBar->setFixedWidth(this->width()-2);
-    */
     this->setMenuBar(menuBar);
+
+    statusBar = new CanvanNEW_StatusBar(this);
+    statusBar->setFixedHeight(tailSize);
+    this->setStatusBar(statusBar);
+
 
     fileMenu = new QMenu("file");
     fileMenu->installEventFilter(this);
@@ -64,12 +67,10 @@ namespace Jui
   }
   QWidget* CanvanNEW::getPanel(QString name)  { return mapPanels->value(name); }
 
-  void CanvanNEW::setColorHeader(QColor color)
+  void CanvanNEW::setColorBars(QColor color)
   {
-    QString style;
-    style += tr("QMenuBar{background-color: %1; }").arg(color.name());
-    style += tr("QMenuBar:item{background-color: %1; }").arg(color.name());
-    menuBar->setStyleSheet(style);
+    menuBar->setColorBackground(color);
+    statusBar->setColorBackground(color);
   }
 
   void CanvanNEW::onCanvanClosed()
@@ -132,15 +133,11 @@ namespace Jui
       if (event->type() == QEvent::MouseButtonRelease) { isMoveing = false; }
     }
 
-
     return QMainWindow::eventFilter(target, event);
   }
 
   void CanvanNEW::resizeEvent(QResizeEvent *resizeEvent)
   {
-    //menuBar->setGeometry(QRect(1, 1, width() - 2, headerSize));
-    //fileMenu->setGeometry(QRect(150, 1, 30, 30));
-
     closeButton->setGeometry(width() - 36, 10, 24, 24);
     maximizeButton->setGeometry(width() - 60, 10, 24, 24);
     minimizeButton->setGeometry(width() - 84, 10, 24, 24);
@@ -158,6 +155,51 @@ namespace Jui
   {
     qDebug("CanvanNEW closed");
   }
+
+
+
+  CanvanNEW_MenuBar::CanvanNEW_MenuBar(QWidget *parent) : QMenuBar(parent)
+  {
+    colorBackground = QColor(120, 120, 120);
+
+    // jak preskocit tohle, je to jen pro reset stylu????
+    QString style;
+    style += tr("QMenuBar{background-color: %1; }").arg(colorBackground.name());
+    style += tr("QMenuBar:item{background-color: %1; }").arg(colorBackground.name());
+    this->setStyleSheet(style);
+    /////
+
+    //qDebug() << "CanvanNEW_MenuBar::children" << this->children();
+  }
+  void CanvanNEW_MenuBar::setColorBackground(QColor color)  { colorBackground = color; }
+  void CanvanNEW_MenuBar::paintEvent(QPaintEvent *event)
+  {
+
+    QPainter painter(this);
+    painter.fillRect(QRect(1, 1, width() - 2, height() - 1), colorBackground);
+
+    QMenuBar::paintEvent(event);
+    //this->adjustSize();
+  }
+  void CanvanNEW_MenuBar::resizeEvent(QResizeEvent *event)
+  {
+    this->setMask(QRegion(1, 1, width() - 2, height() - 1));
+  }
+  CanvanNEW_MenuBar::~CanvanNEW_MenuBar() { }
+
+
+
+  CanvanNEW_StatusBar::CanvanNEW_StatusBar(QWidget *parent) : QStatusBar(parent) { colorBackground = QColor(120, 120, 120); }
+  void CanvanNEW_StatusBar::setColorBackground(QColor color)  { colorBackground = color; }
+  void CanvanNEW_StatusBar::paintEvent(QPaintEvent *event)
+  {
+
+    QPainter painter(this);
+    painter.fillRect(QRect(1, 1, width() - 2, height() - 2), colorBackground);
+
+    QStatusBar::paintEvent(event);
+  }
+  CanvanNEW_StatusBar::~CanvanNEW_StatusBar() { }
 
   ///////////////////////////////////////////////////////////////////////////
   // nize bude odstraneno

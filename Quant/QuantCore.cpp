@@ -11,6 +11,11 @@ namespace QuantIDE
   {
     qDebug("Core init...");
 
+    proxyPanel = new PanelNEW();
+    proxyPanel->setFontTitle(customize->getFont("font_shem_TextSmall"));
+    proxyPanel->setColorTitle(customize->getColor("color_shem_Over"));
+    mCanvan->addPanel(proxyPanel, "ProxySpace");
+
     initInterpretOnStart = mCustomize->getBool("bool_shem_onStartBoot_Interpret");
     initServerOnStart = mCustomize->getBool("bool_shem_onStartBoot_Server");
 
@@ -55,7 +60,7 @@ namespace QuantIDE
   void QuantCore::addProxySpace()
   {
     qDebug() << "Core::addProxySpace mCanvan->getScreen: " << mCanvan->centralWidget()->geometry();
-    QuantProxy *proxy = new QuantProxy(mCanvan->centralWidget(), this);
+    QuantProxy *proxy = new QuantProxy(mCanvan->getPanel("ProxySpace"), this);
     proxy->setGeometry(50, 25, 100, 100);
     proxy->show();
 
@@ -67,7 +72,7 @@ namespace QuantIDE
   void QuantCore::addNode(QString name)
   {
 
-    QuantNode *testNode = new QuantNode(mCanvan->getPanel("Network"), this);
+    QuantNode *testNode = new QuantNode(mCanvan->centralWidget(), this);
     testNode->setGeometry(50, 150, 100, 100);
     testNode->show();
     testNode->setName(name);

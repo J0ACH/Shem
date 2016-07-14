@@ -56,6 +56,7 @@ namespace QuantIDE
     QMap <QString, QuantControl> controloLibrary;
     QMap <QString, QuantBus> busLibrary;
 
+    PanelNEW *proxyPanel;
     //QMap <QString, QuantNode> library;
 
   };
