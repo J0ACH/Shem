@@ -10,6 +10,7 @@
 
 #include "Canvan.h"
 #include "QuantObjects.h"
+#include "CustomizePanel.h"
 
 using namespace SupercolliderBridge;
 
@@ -30,6 +31,8 @@ namespace QuantIDE
     public slots :
     void onInterpretBootDone();
     void onServerBootDone();
+
+    void onCustomize(Customize*);
 
     void onMyMapSet(QMap <QString, QVariant>);
     void onEvaluate(QString code);

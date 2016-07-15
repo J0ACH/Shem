@@ -46,6 +46,10 @@ namespace QuantIDE
     qDebug("QuantCore::onServerBootDone");
   }
 
+  void QuantCore::onCustomize(Customize *custom)
+  {
+    qDebug() << "QuantCore::onCustomize";
+  }
 
   void QuantCore::onMyMapSet(QMap <QString, QVariant> map)
   {

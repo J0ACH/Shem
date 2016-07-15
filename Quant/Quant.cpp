@@ -23,48 +23,53 @@ namespace QuantIDE
     QFontDatabase::addApplicationFont(":/fontConsole.ttf");
 
     customize = new Customize(this);
-    customize->initConfig();
 
     canvanNEW = new CanvanNEW();
     canvanNEW->setGeometry(50, 50, 1400, 700);
-        canvanNEW->show();
+    canvanNEW->show();
 
     networkPanel = new PanelNEW();
-    customizePanel = new PanelNEW();    
+    customizePanel = new CustomziePanel();
 
     console = new Console();
     console->setColorBackground(QColor(30, 30, 30));
     console->setColorHeader(QColor(40, 40, 40));
     console->setColorTitle(QColor(130, 30, 30));
-    console->setColorText(QColor(130, 130, 130));   
+    console->setColorText(QColor(130, 130, 130));
 
     canvanNEW->addPanel(console, "Console");
     canvanNEW->addPanel(networkPanel, "Network");
     canvanNEW->addPanel(customizePanel, "Customize");
 
-    this->onCustomize();
-    this->initStyleSheet();
+    //this->onCustomize();
+    //this->initStyleSheet();
 
     core = new QuantCore(canvanNEW, customize);
     core->addProxySpace();
     core->addNode("testNode1");
 
+    connect(customize, SIGNAL(actCustomizeChanged(Customize*)), this, SLOT(onCustomize(Customize*)));
+    connect(customize, SIGNAL(actCustomizeChanged(Customize*)), core, SLOT(onCustomize(Customize*)));
+    connect(customize, SIGNAL(actCustomizeChanged(Customize*)), customizePanel, SLOT(onCustomize(Customize*)));
+    
+
+    customize->refresh();
 
   }
 
-  void QuantNEW::onCustomize()
+  void QuantNEW::onCustomize(Customize *custom)
   {
-    canvanNEW->setColorBars(customize->getColor("color_shem_AppHeaderBackground"));        
+    canvanNEW->setColorBars(customize->getColor("color_shem_AppHeaderBackground"));
 
     networkPanel->setFontTitle(customize->getFont("font_shem_TextSmall"));
     networkPanel->setColorTitle(customize->getColor("color_shem_Over"));
 
-    customizePanel->setFontTitle(customize->getFont("font_shem_TextSmall"));
-    customizePanel->setColorTitle(customize->getColor("color_shem_Over"));
-
+    
     console->setFont(customize->getFont("font_shem_TextConsole"));
     console->setFontTitle(customize->getFont("font_shem_TextSmall"));
-    console->setColorTitle(customize->getColor("color_shem_Over"));
+    //console->setColorTitle(customize->getColor("color_shem_Over"));
+    console->setColorTitle(custom->getColor(Customize::colorOver));
+
     console->setColorNormal(customize->getColor("color_shem_MsgNormal"));
     console->setColorStatus(customize->getColor("color_shem_MsgStatus"));
     console->setColorEvaluate(customize->getColor("color_shem_MsgEvaluate"));
@@ -72,6 +77,8 @@ namespace QuantIDE
     console->setColorError(customize->getColor("color_shem_MsgError"));
     console->setColorWarning(customize->getColor("color_shem_MsgWarning"));
     console->setColorBundle(customize->getColor("color_shem_MsgBundle"));
+
+    this->initStyleSheet();
   }
 
   void QuantNEW::initStyleSheet()
@@ -120,7 +127,7 @@ namespace QuantIDE
     bridge = new ScBridge(this);
     udpServer = new UDPServer(this, bridge);
 
-    customize->initConfig();
+    //customize->initConfig();
 
     QFontDatabase::addApplicationFont(":/fontText.ttf");
     QFontDatabase::addApplicationFont(":/fontConsole.ttf");
@@ -173,7 +180,7 @@ namespace QuantIDE
     connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
     connect(bridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
 
-    emit customize->actCustomizeChanged();
+//    emit customize->actCustomizeChanged();
     emit bootInterpretAct();
 
     this->initStyleSheet();

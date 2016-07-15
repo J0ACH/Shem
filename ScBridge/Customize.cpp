@@ -2,14 +2,16 @@
 
 namespace SupercolliderBridge
 {
-  Customize::Customize(QObject *parent) : QObject(parent)  {  }
-
-  void Customize::initConfig()
+  Customize::Customize(QObject *parent) : QObject(parent)
   {
     QString path = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
     this->initConfigFile(path);
     this->mergeConfigData();
+
+    emit actCustomizeChanged(this);
   }
+
+  void Customize::refresh()  { emit actCustomizeChanged(this); }
 
   void Customize::initConfigFile(QString systemExtensionDir)
   {
@@ -57,6 +59,7 @@ namespace SupercolliderBridge
     {
       qDebug() << "configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
     }
+
   }
 
   QMap<QString, QVariant*> Customize::processingConfigData(QMap<QString, QVariant*> data)
@@ -286,6 +289,15 @@ namespace SupercolliderBridge
     text = this->property(key.toStdString().c_str()).value<QString>();
     return text;
   }
+  QString Customize::getString(Customize::Keys key)
+  {
+    switch (key)
+    {
+    case userName: return this->getString("string_shem_UserName"); break;
+    default: return "NaN"; break;
+    }
+  }
+
   QColor Customize::getColor(QString key)
   {
     QColor color;
@@ -297,6 +309,48 @@ namespace SupercolliderBridge
     }
     return color;
   }
+  QColor Customize::getColor(Customize::Keys key)
+  {
+    QColor color;
+    switch (key)
+    {
+    case colorHeaders: color = this->getColor("color_shem_AppHeaderBackground"); break;
+    case colorBackground: color = this->getColor("color_shem_PanelBackground"); break;
+    case colorNormal: color = this->getColor("color_shem_Normal"); break;
+    case colorOver: color = this->getColor("color_shem_Over"); break;
+    case colorActive: color = this->getColor("color_shem_Active"); break;
+    case colorText: color = this->getColor("color_shem_Text"); break;
+    default: color = QColor(255, 0, 0); break;
+    }
+
+    if (!color.isValid())
+    {
+      qDebug() << "Customize::getColor [" << key << "] is not valid";
+      color = QColor(255, 0, 0);
+    }
+    return color;
+  }
+  void Customize::setColor(Customize::Keys key, QColor color)
+  {
+    switch (key)
+    {
+    case colorHeaders: color = this->setProperty("color_shem_AppHeaderBackground", color); break;
+    case colorBackground: color = this->setProperty("color_shem_PanelBackground", color); break;
+    case colorNormal: color = this->getColor("color_shem_Normal"); break;
+    case colorOver: color = this->getColor("color_shem_Over"); break;
+    case colorActive: color = this->getColor("color_shem_Active"); break;
+    case colorText: color = this->getColor("color_shem_Text"); break;
+    default: color = QColor(255, 0, 0); break;
+    }
+
+    foreach(QString oneProp, this->dynamicPropertyNames())
+    {
+      qDebug() << "configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
+    }
+
+    emit actCustomizeChanged(this);
+  }
+
   QFont Customize::getFont(QString key)
   {
     QFont font;
@@ -304,11 +358,33 @@ namespace SupercolliderBridge
     //qDebug() << "Customize::getFont [" << key << "] -> " << font;
     return font;
   }
+  QFont Customize::getFont(Customize::Keys key)
+  {
+    switch (key)
+    {
+    case fontBig: return this->getFont("font_shem_TextBig"); break;
+    case fontSmall: return this->getFont("font_shem_TextSmall"); break;
+    case fontConsole: return this->getFont("font_shem_TextConsole"); break;
+    case fontCode: return this->getFont("font_shem_TextCode"); break;
+    default: return QFont("Consolas", 8); break;
+    }
+  }
+
   bool Customize::getBool(QString key)
   {
     bool boolean;
     boolean = this->property(key.toStdString().c_str()).value<bool>();
     return boolean;
+  }
+  bool Customize::getBool(Customize::Keys key)
+  {
+    switch (key)
+    {
+    case boolBootInterpretr: return this->getBool("bool_shem_onStartBoot_Interpret"); break;
+    case boolBootServer: return this->getBool("bool_shem_onStartBoot_Server"); break;
+    case boolTextAntialiasing: return this->getBool("bool_shem_TextAntialias"); break;
+    default: return false; break;
+    }
   }
 
   Customize::~Customize() { }
