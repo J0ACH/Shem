@@ -1,6 +1,7 @@
 #ifndef CUSTOMIZE_H
 #define CUSTOMIZE_H
 
+#include "Data.h"
 #include "ScBridge.h"
 
 #include <QWidget>
@@ -33,7 +34,7 @@ namespace SupercolliderBridge
     QString getString(QString key);
     bool getBool(QString key);
     QColor getColor(QString key);
-    QFont getFont(QString key);    
+    QFont getFont(QString key);
 
     QString getString(Keys);
     QColor getColor(Keys);
@@ -45,20 +46,32 @@ namespace SupercolliderBridge
     public slots:
     //void onModify();
 
-  signals:
-    void actCustomizeChanged(Customize*);
+  signals :
+    void actDataChanged(Data);
+          void actCustomizeChanged(Customize*);
 
   private:
     QFile *configFile;
 
+    void configFileAssocciation();
+
     void initConfigFile(QString systemExtensionDir);
     void mergeConfigData();
+    //void prepareData(QMap<QString, QVariant*>);
 
     QMap<QString, QVariant*> readConfigFile();
     QMap<QString, QVariant*> defaultConfig();
     QMap<QString, QVariant*> processingConfigData(QMap<QString, QVariant*>);
-            
+
+    Data library;
+    QMap<DataKey, QString> configFileKeys;
+
+    void defaultLibrary();
+    void readConfigFileNEW();
+    void postprocessingLibrary();
+
     void writeConfigFile(QMap<QString, QVariant*>);
+    void writeConfigFileNEW();
 
     //void makePalette();
     //QPalette customPalette;

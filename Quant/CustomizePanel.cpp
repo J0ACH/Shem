@@ -45,12 +45,36 @@ namespace QuantIDE
     buttonConfirm->setColorNormal(custom->getColor(Customize::colorNormal));
     buttonConfirm->setFont(custom->getFont(Customize::fontSmall));
 
-    boxName->setValue(custom->getString(Customize::userName));
+    //boxName->setValue(custom->getString(Customize::userName));
     boxName->setFont(custom->getFont(Customize::fontSmall));
 
     boxColorBackground->setValue(this->color2String(custom->getColor(Customize::colorBackground)));
     boxColorBackground->setFont(custom->getFont(Customize::fontSmall));
-   // connect(boxColorBackground, SIGNAL(actValueChanged(Customize::colorBackground, QString)), custom, SLOT(setColor(Customize::colorBackground, QString)));
+    // connect(boxColorBackground, SIGNAL(actValueChanged(Customize::colorBackground, QString)), custom, SLOT(setColor(Customize::colorBackground, QString)));
+  }
+
+  void CustomziePanel::onData(Data data)
+  {
+    //qDebug() << "CustomziePanel::onData ->" << data.getValue_string(DataKey::USERNAME);
+
+
+    this->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
+    this->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
+    this->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
+    this->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
+
+    buttonConfirm->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    buttonConfirm->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    buttonConfirm->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    buttonConfirm->setFont(data.getValue_font(DataKey::FONT_SMALL));
+
+    
+    boxName->setValue(data.getValue_string(DataKey::USERNAME));
+    boxName->setFont(data.getValue_font(DataKey::FONT_SMALL));
+
+    boxColorBackground->setValue(data.toString(DataKey::COLOR_PANEL_BACKGROUND));
+    boxColorBackground->setFont(data.getValue_font(DataKey::FONT_SMALL));
+
   }
 
   void CustomziePanel::resizeEvent(QResizeEvent *event)

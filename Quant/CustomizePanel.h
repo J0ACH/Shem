@@ -29,6 +29,7 @@ namespace QuantIDE
 
     public slots:
     void onCustomize(Customize*);
+    void onData(Data);
 
   signals:
     void actChanged();

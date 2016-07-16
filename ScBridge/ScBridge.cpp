@@ -381,12 +381,12 @@ namespace SupercolliderBridge
       if (nodeMSG[6].toInt() == 0)
       {
         emit actSynthAdd(nodeMSG[2].toInt());
-        emit msgBundleAct(tr("synth [ %1 ] started").arg(QString::number(nodeID)));
+        //emit msgBundleAct(tr("synth [ %1 ] started").arg(QString::number(nodeID)));
       }
       else if (nodeMSG[6].toInt() == 1)
       {
         emit actGroupAdd(nodeMSG[2].toInt());
-        emit msgBundleAct(tr("group [ %1 ] started").arg(QString::number(nodeID)));
+       // emit msgBundleAct(tr("group [ %1 ] started").arg(QString::number(nodeID)));
       }
     }
     else if (msg.contains("nodeFlag_END"))
@@ -399,12 +399,12 @@ namespace SupercolliderBridge
       if (nodeMSG[6].toInt() == 0)
       {
         emit actSynthFree(nodeMSG[2].toInt());
-        emit msgBundleAct(tr("synth [ %1 ] end").arg(QString::number(nodeID)));
+        //emit msgBundleAct(tr("synth [ %1 ] end").arg(QString::number(nodeID)));
       }
       else if (nodeMSG[6].toInt() == 1)
       {
         emit actGroupFree(nodeMSG[2].toInt());
-        emit msgBundleAct(tr("group [ %1 ] end").arg(QString::number(nodeID)));
+       // emit msgBundleAct(tr("group [ %1 ] end").arg(QString::number(nodeID)));
       }
     }
     else {

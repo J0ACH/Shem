@@ -20,11 +20,13 @@ SET(ScBridge_hdr
   ScBridge.h
   Customize.h
   UDPServer.h
+  Data.h
 )
 SET(ScBridge_src 
   ScBridge.cpp
   Customize.cpp
   UDPServer.cpp
+  Data.cpp
 )
 
 QT5_WRAP_CPP( ScBridge_moc ${ScBridge_hdr} )
