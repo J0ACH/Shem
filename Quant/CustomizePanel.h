@@ -5,6 +5,7 @@
 #include "Button.h"
 #include "Panel.h"
 #include "ControlBox.h"
+#include "Text.h"
 
 #include <QWidget>
 #include <QPainter>
@@ -27,7 +28,6 @@ namespace QuantIDE
     ~CustomizePanel();
 
     public slots:
-   // void onCustomize(Customize*);
     void onCustomize(Data);
     void onChangePressed();
     void onSavePressed();
@@ -47,11 +47,13 @@ namespace QuantIDE
 
     QScrollArea *scrollArea;
     QWidget *scrollWidget;
-    Button *buttonSave;
 
+    Text *textApp, *textColor, *textFont;
+    Text *subTextCanvan, *subTextPanels, *subTextMsg;
     ControlBox *boxName;
-    ControlBox *boxColorBackground;
-
+    ControlBox *boxColorNormal, *boxColorOver, *boxColorActive, *boxColorText;
+    ControlBox *boxColorPanelBackground;
+    Button *buttonSave;
   };
 }
 

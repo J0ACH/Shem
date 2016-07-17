@@ -72,18 +72,18 @@ namespace Jui
 
   }
 
-  void Console::setColorNormal(QColor color) { this->colorMsgNormal = color; }
-  void Console::setColorStatus(QColor color) { this->colorMsgStatus = color; }
-  void Console::setColorEvaluate(QColor color) { this->colorMsgEvaluate = color; }
-  void Console::setColorResult(QColor color) { this->colorMsgResult = color; }
-  void Console::setColorError(QColor color) { this->colorMsgError = color; }
-  void Console::setColorWarning(QColor color) { this->colorMsgWarning = color; }
-  void Console::setColorBundle(QColor color) { this->colorMsgBundle = color; }
+  void Console::setColorMsgNormal(QColor color) { this->colorMsgNormal = color; }
+  void Console::setColorMsgStatus(QColor color) { this->colorMsgStatus = color; }
+  void Console::setColorMsgEvaluate(QColor color) { this->colorMsgEvaluate = color; }
+  void Console::setColorMsgAnswer(QColor color) { this->colorMsgAnswer = color; }
+  void Console::setColorMsgError(QColor color) { this->colorMsgError = color; }
+  void Console::setColorMsgWarning(QColor color) { this->colorMsgWarning = color; }
+  void Console::setColorMsgBundle(QColor color) { this->colorMsgBundle = color; }
 
   void Console::onMsgNormal(QString msg)  { this->addText(msg, colorMsgNormal); }
   void Console::onMsgStatus(QString msg)  { this->addText(msg, colorMsgStatus); }
   void Console::onMsgEvaluate(QString msg)  { this->addText(msg, colorMsgEvaluate); }
-  void Console::onMsgResult(QString msg)  { this->addText(msg, colorMsgResult); }
+  void Console::onMsgAnswer(QString msg)  { this->addText(msg, colorMsgAnswer); }
   void Console::onMsgError(QString msg)  { this->addText(msg, colorMsgError); }
   void Console::onMsgWarning(QString msg)  { this->addText(msg, colorMsgWarning); }
   void Console::onMsgBundle(QString msg)  { this->addText(msg, colorMsgBundle); }

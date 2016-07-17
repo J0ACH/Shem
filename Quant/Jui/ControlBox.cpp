@@ -13,6 +13,7 @@ namespace Jui
     value->setText("NaN");
 
     labelSizeX = 30;
+    isFocused = false;
     //text->setTabStopWidth(30);
 
     backgroundAlpha = 0;
@@ -20,10 +21,14 @@ namespace Jui
     fps = 25;
     timer = new QTimer(this);
 
+    label->installEventFilter(this);
     value->installEventFilter(this);
 
     colorText = Qt::white;
     colorBackground = Qt::black;
+    colorNormal = Qt::gray;
+    colorOver = Qt::white;
+    colorActive = QColor(255, 30, 30);
     this->updateStyleSheet();
 
     connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
@@ -53,6 +58,9 @@ namespace Jui
     colorBackground = color;
     this->updateStyleSheet();
   }
+  void ControlBox::setColorNormal(QColor color){ colorNormal = color; }
+  void ControlBox::setColorOver(QColor color){ colorOver = color; }
+  void ControlBox::setColorActive(QColor color){ colorActive = color; }
   void ControlBox::setColorText(QColor color)
   {
     colorText = color;
@@ -75,10 +83,12 @@ namespace Jui
 
     label->setStyleSheet(styleTxt);
     value->setStyleSheet(styleTxt);
-  }
+    update();
+      }
 
   bool ControlBox::eventFilter(QObject* target, QEvent* event)
   {
+    //qDebug() << "ControlBox target " << target << "event" << event;
     if (event->type() == QEvent::KeyPress)
     {
       QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
@@ -98,46 +108,49 @@ namespace Jui
 
         oldValue = value->displayText();
         emit actValueChanged(value->displayText());
-        value->clearFocus();
+        value->setFocus();
+        //value->clearFocus();
         //qDebug() << "OldValue" << oldValue;
-
+        isFocused = true;
+        this->update();
         return true;
       case Qt::Key::Key_Escape:
         //qDebug() << "ControlBox Esc";
         //qDebug() << "OldValue" << oldValue;
         value->setText(oldValue);
         value->clearFocus();
-        //this->parentWidget()::focusInEvent;
+        isFocused = false;
+        this->update();
         return true;
       }
+    };
+
+    if (event->type() == QEvent::MouseButtonRelease)
+    {
+      // qDebug("ControlBox Pressed");
+      isFocused = true;
+      value->setFocus();
+      this->update();
+    }
+    if (event->type() == QEvent::FocusOut)
+    {
+      // qDebug("ControlBox FocusOut");
+      isFocused = false;
+      this->update();
     }
     return QWidget::eventFilter(target, event);
   }
-  /*
-  void ControlBox::focusInEvent(QFocusEvent *event)
-  {
-  qDebug() << "ControlBox Focus IN";
-  //value->setFocus(:: focusInEvent(event);
-  //value->parentWidget().focusNextChild();
-  }
-  */
-  /*
-  void ControlBox::mousePressEvent(QMouseEvent *event)
-  {
-  qDebug() << "ControlBox CLICK";
-  //value->parentWidget().focusNextChild();
-  }
-  */
 
   void ControlBox::paintEvent(QPaintEvent *event)
   {
     QPainter painter(this);
-    QColor fillColor = QColor(255, 30, 30);// activeColor;
+    QColor fillColor = colorActive;
     fillColor.setAlpha(backgroundAlpha);
     painter.fillRect(this->bounds(), fillColor);
 
     painter.setPen(colorText);
-    if (this->hasFocus()) { painter.setPen(QColor(120, 20, 20)); }
+    if (isFocused) { painter.setPen(colorOver); }
+    else { painter.setPen(colorNormal); }
 
     painter.drawLine(QLine(0, 0, labelSizeX - 1, 0));
     painter.drawLine(QLine(0, this->height() - 1, labelSizeX - 1, this->height() - 1));

@@ -26,6 +26,7 @@ SET(Jui_hdr
 	CodeEditor.h
 	Graph.h
 	ControlBox.h
+	Text.h
 )
 
 SET(Jui_src
@@ -38,6 +39,7 @@ SET(Jui_src
 	CodeEditor.cpp
 	Graph.cpp
 	ControlBox.cpp
+	Text.cpp
 )
 
 QT5_WRAP_CPP( Jui_moc ${Jui_hdr} )

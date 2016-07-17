@@ -505,19 +505,6 @@ namespace SupercolliderBridge
     return oldConfigData;
   }
 
-  /*
-  void Customize::prepareData(QMap<QString, QVariant*> mergeConfigData)
-  {
-  foreach(QString key, mergeConfigData.keys())
-  {
-  qDebug() << "configKey [" << key << "] ->" << mergeConfigData[key]->toString();
-  // if (key == "string_shem_UserName") { data.setValue(DataKey::USERNAME, mergeConfigData[key]); }
-  }
-  //this->setProperty(key.toStdString().c_str(), *mergeConfig[key]);
-
-  }
-  */
-
   // vse nize bude odstraneno
   QString Customize::getString(QString key)
   {
@@ -540,7 +527,7 @@ namespace SupercolliderBridge
     color = this->property(key.toStdString().c_str()).value<QColor>();
     if (!color.isValid())
     {
-      qDebug() << "Customize::getColor [" << key << "] is not valid";
+      //qDebug() << "Customize::getColor [" << key << "] is not valid";
       color = QColor(255, 0, 0);
     }
     return color;
@@ -561,7 +548,7 @@ namespace SupercolliderBridge
 
     if (!color.isValid())
     {
-      qDebug() << "Customize::getColor [" << key << "] is not valid";
+    //  qDebug() << "Customize::getColor [" << key << "] is not valid";
       color = QColor(255, 0, 0);
     }
     return color;
@@ -581,7 +568,7 @@ namespace SupercolliderBridge
 
     foreach(QString oneProp, this->dynamicPropertyNames())
     {
-      qDebug() << "configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
+      //qDebug() << "configKey [" << oneProp << "] ->" << this->property(oneProp.toStdString().c_str());
     }
 
     emit actCustomizeChanged(this);

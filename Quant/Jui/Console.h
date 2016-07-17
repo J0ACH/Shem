@@ -20,13 +20,13 @@ namespace Jui
     void setColorText(QColor);
     void setColorBackground(QColor);
 
-    void setColorNormal(QColor);
-    void setColorStatus(QColor);
-    void setColorEvaluate(QColor);
-    void setColorResult(QColor);
-    void setColorError(QColor);
-    void setColorWarning(QColor);
-    void setColorBundle(QColor);
+    void setColorMsgNormal(QColor);
+    void setColorMsgStatus(QColor);
+    void setColorMsgEvaluate(QColor);
+    void setColorMsgAnswer(QColor);
+    void setColorMsgError(QColor);
+    void setColorMsgWarning(QColor);
+    void setColorMsgBundle(QColor);
 
     public slots:
     void addText(QString text, QColor color, bool newLine);
@@ -34,7 +34,7 @@ namespace Jui
     void onMsgNormal(QString);
     void onMsgStatus(QString);
     void onMsgEvaluate(QString);
-    void onMsgResult(QString);
+    void onMsgAnswer(QString);
     void onMsgError(QString);
     void onMsgWarning(QString);
     void onMsgBundle(QString);
@@ -45,7 +45,7 @@ namespace Jui
   private:
     QTextEdit *text;
 
-    QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgResult, colorMsgError, colorMsgWarning, colorMsgBundle;
+    QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgAnswer, colorMsgError, colorMsgWarning, colorMsgBundle;
   };
 
 }

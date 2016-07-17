@@ -64,7 +64,12 @@ namespace Jui
 
     void addPanel(PanelNEW *panel, QString name);
     QWidget* getPanel(QString name);
-    void setColorBars(QColor);
+
+    void setColorBackground(QColor);
+    void setColorHeaders(QColor);
+    void setColorNormal(QColor);
+    void setColorOver(QColor);
+    void setColorActive(QColor);
 
     public slots:
     void onCanvanClosed();
@@ -88,6 +93,8 @@ namespace Jui
 
     bool isMoveing;
     QPoint cursorScreen, cursorCanvan, originCanvanScreen;
+
+    QColor colorBackground;
   };
 
 

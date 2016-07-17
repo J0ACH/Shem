@@ -23,6 +23,9 @@ namespace Jui
   void PanelNEW::setColorTitle(QColor color) { colorText = color; update(); }
   void PanelNEW::setColorBackground(QColor color) { colorBackground = color; update(); }
   void PanelNEW::setColorHeader(QColor color) { colorHeader = color; update(); }
+  void PanelNEW::setColorNormal(QColor color){ closeButton->setColorNormal(color); }
+  void PanelNEW::setColorOver(QColor color){ closeButton->setColorOver(color); }
+  void PanelNEW::setColorActive(QColor color){ closeButton->setColorActive(color); }
 
   void PanelNEW::resizeEvent(QResizeEvent *resizeEvent)
   {

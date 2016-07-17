@@ -26,7 +26,10 @@ namespace Jui
     void setColorTitle(QColor);
     void setColorBackground(QColor);
     void setColorHeader(QColor);
-   
+    void setColorNormal(QColor);
+    void setColorOver(QColor);
+    void setColorActive(QColor);
+
   protected:
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);

@@ -62,18 +62,35 @@ namespace QuantIDE
 
   void QuantNEW::onCustomize(Data data)
   {
-    canvanNEW->setColorBars(data.getValue_color(DataKey::COLOR_APP_HEADER));
+    canvanNEW->setColorHeaders(data.getValue_color(DataKey::COLOR_APP_HEADER));
+    canvanNEW->setColorBackground(data.getValue_color(DataKey::COLOR_APP_BACKGROUND));
+    canvanNEW->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    canvanNEW->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    canvanNEW->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
     console->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
     console->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
     console->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
     console->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
     console->setFont(data.getValue_font(DataKey::FONT_CONSOLE));
+    console->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    console->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    console->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    console->setColorMsgNormal(data.getValue_color(DataKey::COLOR_MSG_NORMAL));
+    console->setColorMsgStatus(data.getValue_color(DataKey::COLOR_MSG_STATUS));
+    console->setColorMsgEvaluate(data.getValue_color(DataKey::COLOR_MSG_EVALUATE));
+    console->setColorMsgAnswer(data.getValue_color(DataKey::COLOR_MSG_ANSWER));
+    console->setColorMsgError(data.getValue_color(DataKey::COLOR_MSG_ERROR));
+    console->setColorMsgWarning(data.getValue_color(DataKey::COLOR_MSG_WARNINIG));
+    console->setColorMsgBundle(data.getValue_color(DataKey::COLOR_MSG_BUNDLE));
 
     networkPanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
     networkPanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
     networkPanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
     networkPanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
+    networkPanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    networkPanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    networkPanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
     QString txt;
     txt.append(tr("QTextEdit { color: %1; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));

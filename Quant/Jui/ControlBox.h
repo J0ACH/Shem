@@ -29,6 +29,9 @@ namespace Jui
     double getValue_double();
 
     void setFont(QFont);
+    void setColorNormal(QColor);
+    void setColorOver(QColor);
+    void setColorActive(QColor);
     void setColorText(QColor);
     void setColorBackground(QColor);
     void setLabelSize(int);
@@ -41,9 +44,7 @@ namespace Jui
     void actValueChanged(QString);
 
   protected:
-    // void mousePressEvent(QMouseEvent *event);
-    // void focusInEvent(QFocusEvent*);
-    void paintEvent(QPaintEvent *event);
+      void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
     virtual bool eventFilter(QObject * watched, QEvent * event);
 
@@ -52,8 +53,10 @@ namespace Jui
     QLineEdit *value;
     QString oldValue;
 
+    bool isFocused;
     int labelSizeX;
     QColor colorText, colorBackground;
+    QColor colorNormal, colorOver, colorActive;
 
     int fadeTimeOut;
     int fps;

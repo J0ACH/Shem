@@ -17,6 +17,8 @@ namespace Jui
 
     mapPanels = new QMap<QString, PanelNEW*>;
 
+    colorBackground = QColor(25, 25, 25);
+
     this->initControl();
 
   }
@@ -57,6 +59,8 @@ namespace Jui
     this->setCentralWidget(screen);
   }
 
+
+
   void CanvanNEW::addPanel(PanelNEW *panel, QString name)
   {
     panel->setTitle(name);
@@ -67,10 +71,29 @@ namespace Jui
   }
   QWidget* CanvanNEW::getPanel(QString name)  { return mapPanels->value(name); }
 
-  void CanvanNEW::setColorBars(QColor color)
+  void CanvanNEW::setColorHeaders(QColor color)
   {
     menuBar->setColorBackground(color);
     statusBar->setColorBackground(color);
+  }
+  void CanvanNEW::setColorBackground(QColor color)  { colorBackground = color; }
+  void CanvanNEW::setColorNormal(QColor color)
+  {
+    closeButton->setColorNormal(color);
+    maximizeButton->setColorNormal(color);
+    minimizeButton->setColorNormal(color);
+  }
+  void CanvanNEW::setColorOver(QColor color)
+  {
+    closeButton->setColorOver(color);
+    maximizeButton->setColorOver(color);
+    minimizeButton->setColorOver(color);
+  }
+  void CanvanNEW::setColorActive(QColor color)
+  {
+    closeButton->setColorActive(color);
+    maximizeButton->setColorActive(color);
+    minimizeButton->setColorActive(color);
   }
 
   void CanvanNEW::onCanvanClosed()
@@ -145,7 +168,7 @@ namespace Jui
   void CanvanNEW::paintEvent(QPaintEvent *paintEvent)
   {
     QPainter painter(this);
-    painter.fillRect(QRect(0, headerSize, width(), height() - headerSize), QColor(25, 25, 25));
+    painter.fillRect(QRect(0, headerSize, width(), height() - headerSize), colorBackground);
 
     painter.setPen(QColor(150, 150, 150));
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
