@@ -19,20 +19,21 @@ using namespace SupercolliderBridge;
 namespace QuantIDE
 {
 
-  class CustomziePanel : public PanelNEW
+  class CustomizePanel : public PanelNEW
   {
     Q_OBJECT
 
   public:
-    CustomziePanel(QWidget *parent = 0);
-    ~CustomziePanel();
+    CustomizePanel(QWidget *parent = 0);
+    ~CustomizePanel();
 
     public slots:
     void onCustomize(Customize*);
-    void onData(Data);
+    void onCustomize(Data);
+    void onConfirmPressed();
 
   signals:
-    void actChanged();
+    void actChangeConfirmed(Data);
 
   protected:
     void resizeEvent(QResizeEvent *event);

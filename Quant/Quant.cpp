@@ -29,7 +29,7 @@ namespace QuantIDE
     canvanNEW->show();
 
     networkPanel = new PanelNEW();
-    customizePanel = new CustomziePanel();
+    customizePanel = new CustomizePanel();
 
     console = new Console();
     console->setColorBackground(QColor(30, 30, 30));
@@ -52,12 +52,58 @@ namespace QuantIDE
     connect(customize, SIGNAL(actCustomizeChanged(Customize*)), core, SLOT(onCustomize(Customize*)));
     connect(customize, SIGNAL(actCustomizeChanged(Customize*)), customizePanel, SLOT(onCustomize(Customize*)));
     connect(customize, SIGNAL(actCustomizeChanged(Customize*)), customizePanel, SLOT(onCustomize(Customize*)));
-    connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onData(Data)));
+
+    connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
+    connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onCustomize(Data)));
+    connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
 
     customize->refresh();
 
   }
 
+  void QuantNEW::onCustomize(Data data)
+  {
+    canvanNEW->setColorBars(data.getValue_color(DataKey::COLOR_APP_HEADER));
+
+    console->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
+    console->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
+    console->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
+    console->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
+    console->setFont(data.getValue_font(DataKey::FONT_CONSOLE));
+
+    networkPanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
+    networkPanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
+    networkPanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
+    networkPanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
+
+    QString txt;
+    txt.append(tr("QTextEdit { color: %1; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
+    txt.append(tr("QTextEdit { background-color: %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
+    txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(data.getValue_color(DataKey::COLOR_ACTIVE).name()));
+
+    txt.append("QScrollBar:vertical { width: 2px; }");
+    txt.append("QScrollBar:horizontal { height: 2px; }");
+    txt.append(tr("QScrollBar:vertical { background: %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
+    txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
+    txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
+    txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
+    txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
+    txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
+    txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
+    txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
+    txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
+    txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
+    txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
+    txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
+
+    txt.append(tr("QToolTip { color: %1; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
+    txt.append(tr("QToolTip { background-color:  %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
+    txt.append(tr("QToolTip { border: 1px solid white; }"));
+
+    qApp->setStyleSheet(txt);
+  }
+
+  // bude odstraneno
   void QuantNEW::onCustomize(Customize *custom)
   {
     canvanNEW->setColorBars(customize->getColor("color_shem_AppHeaderBackground"));
@@ -65,7 +111,7 @@ namespace QuantIDE
     networkPanel->setFontTitle(customize->getFont("font_shem_TextSmall"));
     networkPanel->setColorTitle(customize->getColor("color_shem_Over"));
 
-    
+
     console->setFont(customize->getFont("font_shem_TextConsole"));
     console->setFontTitle(customize->getFont("font_shem_TextSmall"));
     //console->setColorTitle(customize->getColor("color_shem_Over"));
@@ -181,7 +227,7 @@ namespace QuantIDE
     connect(bridge, SIGNAL(serverKillDoneAct()), this, SLOT(onServerKillDone()));
     connect(bridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
 
-//    emit customize->actCustomizeChanged();
+    //    emit customize->actCustomizeChanged();
     emit bootInterpretAct();
 
     this->initStyleSheet();

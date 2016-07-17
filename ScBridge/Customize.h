@@ -23,6 +23,7 @@ namespace SupercolliderBridge
     ~Customize();
     void refresh();
 
+    // bude odstraneno
     enum Keys {
       userName,
       boolBootInterpretr, boolBootServer, boolTextAntialiasing,
@@ -31,20 +32,23 @@ namespace SupercolliderBridge
       msgNormal, msgStatus, msgEvaluate, msgAnswer, msgError, msgWarninig, msgBundle
     };
 
+    // bude odstraneno
     QString getString(QString key);
     bool getBool(QString key);
     QColor getColor(QString key);
     QFont getFont(QString key);
 
+    // bude odstraneno
     QString getString(Keys);
     QColor getColor(Keys);
     bool getBool(Keys);
     QFont getFont(Keys);
-
+    
+    // bude odstraneno
     void setColor(Keys, QColor);
 
     public slots:
-    //void onModify();
+    void onModify(Data);
 
   signals :
     void actDataChanged(Data);

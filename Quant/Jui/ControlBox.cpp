@@ -38,7 +38,10 @@ namespace Jui
     oldValue = val;
   }
 
-  double ControlBox::getValue()  { return value->displayText().toDouble(); }
+  double ControlBox::getValue()  { qDebug("ControlBox::getValue() BUDE ODSTANENO -> POUZIT ControlBox::getValue_double()");  return value->displayText().toDouble(); }
+  QString ControlBox::getValue_string()  { return value->displayText(); }
+  int ControlBox::getValue_int()  { return value->displayText().toInt(); }
+  double ControlBox::getValue_double()  { return value->displayText().toDouble(); }
 
   void ControlBox::setFont(QFont font)
   {

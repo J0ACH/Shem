@@ -22,7 +22,11 @@ namespace Jui
     QRect bounds();
 
     void setLabel(QString);
-    double getValue();
+
+    double getValue(); // bude odstraneno
+    QString getValue_string();
+    int getValue_int();
+    double getValue_double();
 
     void setFont(QFont);
     void setColorText(QColor);

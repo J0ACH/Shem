@@ -12,19 +12,6 @@ namespace SupercolliderBridge
     this->postprocessingLibrary();
     this->writeConfigFileNEW();
 
-
-    //this->mergeConfigData();
-
-
-    //data = new Data();
-    // qDebug("!!!!!!!! data") ;
-
-    //QString aaa("pokus");
-    //data->setValue(DataKey::USERNAME, aaa);
-    //data.setValue(DataKey::USERNAME, "TestName");
-
-
-    //emit actCustomizeChanged(this);
     emit actDataChanged(library);
   }
 
@@ -406,11 +393,17 @@ namespace SupercolliderBridge
 
     foreach(DataKey oneKey, configFileKeys.keys())
     {
-      qDebug() << "Customize::writeConfigFileNEW()"<< configFileKeys.value(oneKey) << "=" << library.toString(oneKey);
-     out << configFileKeys.value(oneKey) << " = " << library.toString(oneKey) << "\n";
+      //qDebug() << "Customize::writeConfigFileNEW()"<< configFileKeys.value(oneKey) << "=" << library.toString(oneKey);
+      out << configFileKeys.value(oneKey) << " = " << library.toString(oneKey) << "\n";
     }
 
     configFile->close();
+  }
+
+  void Customize::onModify(Data data)
+  {
+    library = data;
+    emit actDataChanged(library);
   }
 
   // bude odstraneno
