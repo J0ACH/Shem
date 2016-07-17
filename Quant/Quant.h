@@ -31,7 +31,7 @@ namespace QuantIDE
     ~QuantNEW();
 
     public slots:
-    void onCustomize(Customize*);
+    //void onCustomize(Customize*);
     void onCustomize(Data);
     //void onCloseQuant();
 
@@ -44,7 +44,7 @@ namespace QuantIDE
 
     QuantCore *core;
 
-    void initStyleSheet();
+   // void initStyleSheet();
   };
 
 

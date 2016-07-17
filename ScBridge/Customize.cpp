@@ -302,7 +302,7 @@ namespace SupercolliderBridge
           rgb[i] = args[i].toInt(&isNumber, 10);
           if (!isNumber) { isColor = false; break; }
         }
-
+        if (!isColor) { rgb[0] = 255; rgb[1] = 0; rgb[2] = 0; }
         if (isColor) {
           QColor color = QColor(rgb[0], rgb[1], rgb[2]);
 
@@ -318,6 +318,7 @@ namespace SupercolliderBridge
         bool isNumber;
         int size = args[1].remove(" ").toInt(&isNumber, 10);
         if (!isNumber) { isFont = false; break; }
+        
         if (isFont)
         {
           if (args[0].startsWith(" ")) { args[0].remove(0, 1); }
@@ -403,6 +404,12 @@ namespace SupercolliderBridge
   void Customize::onModify(Data data)
   {
     library = data;
+    emit actDataChanged(library);
+  }
+  void Customize::onSave(Data data)
+  {
+    library = data;
+    this->writeConfigFileNEW();
     emit actDataChanged(library);
   }
 

@@ -46,7 +46,7 @@ namespace QuantIDE
     qDebug("QuantCore::onServerBootDone");
   }
 
-  void QuantCore::onCustomize(Customize *custom)
+  void QuantCore::onCustomize(Data data)
   {
     qDebug() << "QuantCore::onCustomize";
   }

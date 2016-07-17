@@ -48,14 +48,13 @@ namespace QuantIDE
     core->addProxySpace();
     core->addNode("testNode1");
 
-    connect(customize, SIGNAL(actCustomizeChanged(Customize*)), this, SLOT(onCustomize(Customize*)));
-    connect(customize, SIGNAL(actCustomizeChanged(Customize*)), core, SLOT(onCustomize(Customize*)));
-    connect(customize, SIGNAL(actCustomizeChanged(Customize*)), customizePanel, SLOT(onCustomize(Customize*)));
-    connect(customize, SIGNAL(actCustomizeChanged(Customize*)), customizePanel, SLOT(onCustomize(Customize*)));
 
     connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
+    connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));
+
     connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onCustomize(Data)));
     connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
+    connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
 
     customize->refresh();
 
@@ -104,6 +103,7 @@ namespace QuantIDE
   }
 
   // bude odstraneno
+  /*
   void QuantNEW::onCustomize(Customize *custom)
   {
     canvanNEW->setColorBars(customize->getColor("color_shem_AppHeaderBackground"));
@@ -157,6 +157,7 @@ namespace QuantIDE
 
     qApp->setStyleSheet(txt);
   }
+  */
 
   QuantNEW::~QuantNEW()
   {

@@ -12,13 +12,13 @@ namespace SupercolliderBridge
 
   //void Data::setDataType(DataType tableType)  {  }
 
-  void Data::setValue(DataKey key, char* value)  { library->insert(key, QVariant(value)); qDebug() << "Data::setValue asChar(" << key << "," << value << " ) ->" << library->value(key); }
-  void Data::setValue(DataKey key, QString value)  { library->insert(key, QVariant(value)); qDebug() << "Data::setValue asString(" << key << "," << value << " ) ->" << library->value(key); }
-  void Data::setValue(DataKey key, bool value)  { library->insert(key, value); qDebug() << "Data::setValue asBool(" << key << "," << value << " ) ->" << library->value(key); }
-  void Data::setValue(DataKey key, int value)  { library->insert(key, value); qDebug() << "Data::setValue asInt(" << key << "," << value << " ) ->" << library->value(key); }
-  void Data::setValue(DataKey key, double value) { library->insert(key, value); qDebug() << "Data::setValue asDouble(" << key << "," << value << " ) ->" << library->value(key); }
-  void Data::setValue(DataKey key, QFont value) { library->insert(key, value); qDebug() << "Data::setValue asFont(" << key << "," << value << " ) ->" << library->value(key); }
-  void Data::setValue(DataKey key, QColor value) { library->insert(key, value); qDebug() << "Data::setValue asColor(" << key << "," << value << " ) ->" << library->value(key); }
+  void Data::setValue(DataKey key, char* value)  { library->insert(key, QVariant(value)); }
+  void Data::setValue(DataKey key, QString value)  { library->insert(key, QVariant(value)); }
+  void Data::setValue(DataKey key, bool value)  { library->insert(key, value); }
+  void Data::setValue(DataKey key, int value)  { library->insert(key, value); }
+  void Data::setValue(DataKey key, double value) { library->insert(key, value); }
+  void Data::setValue(DataKey key, QFont value) { library->insert(key, value); }
+  void Data::setValue(DataKey key, QColor value) { library->insert(key, value); }
 
   QString Data::getValue_string(DataKey key) { return library->value(key).toString(); }
   bool Data::getValue_bool(DataKey key) { return library->value(key).toBool(); }
@@ -27,10 +27,7 @@ namespace SupercolliderBridge
   QFont Data::getValue_font(DataKey key) { return library->value(key).value<QFont>(); }
   QColor Data::getValue_color(DataKey key) { return library->value(key).value<QColor>(); }
 
-  void Data::deleteValue(DataKey key)
-  {
-  }
-  void Data::print(DataKey key)
+    void Data::print(DataKey key)
   {
     switch (library->value(key).type())
     {
@@ -90,12 +87,7 @@ namespace SupercolliderBridge
       break;
     }
   }
-  /*
-  void Data::toDataType()
-  {
-
-  }
-  */
+  
 
   Data::~Data() { }
 

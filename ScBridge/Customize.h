@@ -49,6 +49,7 @@ namespace SupercolliderBridge
 
     public slots:
     void onModify(Data);
+    void onSave(Data);
 
   signals :
     void actDataChanged(Data);

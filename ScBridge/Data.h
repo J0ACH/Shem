@@ -5,7 +5,6 @@
 #include <QMap>
 #include <QColor>
 #include <QFont>
-//#include <QTranslator>
 
 namespace SupercolliderBridge
 {
@@ -43,11 +42,8 @@ namespace SupercolliderBridge
     QFont getValue_font(DataKey);
     QColor getValue_color(DataKey);
 
-    void deleteValue(DataKey);
     void print(DataKey);
-
     QString toString(DataKey);
-    //void toDataType();
 
   private:
     //QString senderName;

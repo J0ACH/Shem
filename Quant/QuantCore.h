@@ -32,7 +32,7 @@ namespace QuantIDE
     void onInterpretBootDone();
     void onServerBootDone();
 
-    void onCustomize(Customize*);
+    void onCustomize(Data);
 
     void onMyMapSet(QMap <QString, QVariant>);
     void onEvaluate(QString code);

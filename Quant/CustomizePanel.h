@@ -8,7 +8,6 @@
 
 #include <QWidget>
 #include <QPainter>
-#include <QMap>
 #include <QDebug>
 #include <QScrollArea>
 
@@ -28,12 +27,14 @@ namespace QuantIDE
     ~CustomizePanel();
 
     public slots:
-    void onCustomize(Customize*);
+   // void onCustomize(Customize*);
     void onCustomize(Data);
-    void onConfirmPressed();
+    void onChangePressed();
+    void onSavePressed();
 
   signals:
     void actChangeConfirmed(Data);
+    void actSaveConfirmed(Data);
 
   protected:
     void resizeEvent(QResizeEvent *event);
@@ -42,8 +43,11 @@ namespace QuantIDE
     void initControl();
     QString color2String(QColor);
     QColor string2Color(QString);
+    Data makeData();
 
-    Button *buttonConfirm;
+    QScrollArea *scrollArea;
+    QWidget *scrollWidget;
+    Button *buttonSave;
 
     ControlBox *boxName;
     ControlBox *boxColorBackground;
