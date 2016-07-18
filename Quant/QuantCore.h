@@ -4,9 +4,9 @@
 #include <QWidget>
 #include <QDebug>
 
-//#include "Customize.h"
 #include "ScBridge.h"
 #include "UDPServer.h"
+//#include "Data.h" // for testData
 
 #include "Canvan.h"
 #include "QuantObjects.h"

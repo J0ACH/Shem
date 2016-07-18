@@ -25,7 +25,7 @@ namespace QuantIDE
     customize = new Customize(this);
 
     canvanNEW = new CanvanNEW();
-    canvanNEW->setGeometry(50, 50, 1200, 600);
+    canvanNEW->setGeometry(10, 10, 1200, 600);
     canvanNEW->show();
 
     customizePanel = new CustomizePanel();

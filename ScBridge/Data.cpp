@@ -8,6 +8,26 @@ namespace SupercolliderBridge
     library = new QMap<DataKey, QVariant>();
   }
 
+  Data::Data(QByteArray wrapedData)
+  {
+    library = new QMap<DataKey, QVariant>();
+
+    QString dataMsg = QString::fromUtf8(wrapedData);
+    QStringList dataList = dataMsg.split("||");
+   
+    foreach(QString oneLine, dataList)
+    {
+      QStringList args = oneLine.split("|");
+
+
+
+      //qDebug() << "\t - line:" << oneLine;
+      qDebug() << "\t - key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
+    }
+
+    //qDebug() << "List2:" << list;
+  }
+
   //Data::Data(DataType tableType)  {  }
 
   //void Data::setDataType(DataType tableType)  {  }
@@ -90,10 +110,28 @@ namespace SupercolliderBridge
 
   QByteArray Data::wrap()
   {
+    QStringList list;
+    QByteArray bArray;
+
+    qDebug() << "Data::wrap() library keys:" << library->keys();
+    qDebug() << "Data::wrap() library values:" << library->values();
+
+    foreach(DataKey oneKey, library->keys())
+    {
+      qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
+      list.append(QString("%1|%2|%3").arg(QString::number(oneKey), library->value(oneKey).typeName(), library->value(oneKey).toString()));
+
+      bArray.append(QString("%1|%2|%3").arg(
+        QString::number(oneKey),
+        library->value(oneKey).typeName(),
+        library->value(oneKey).toString()
+        ));
+      if (oneKey != library->keys().at(library->keys().size() - 1)) { bArray.append("||"); }
+    }
+    qDebug() << "List1:" << list;
+    return bArray;
   }
-  void Data::unwrap()
-  {
-  }
+
 
   Data::~Data() { }
 

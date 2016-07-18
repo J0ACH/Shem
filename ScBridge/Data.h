@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QColor>
 #include <QFont>
+#include <QDataStream>
 
 namespace SupercolliderBridge
 {
@@ -22,6 +23,7 @@ namespace SupercolliderBridge
     //enum DataType { proxyspace, customize };
 
     Data();
+    Data(QByteArray);
     //Data(DataType);
     ~Data();
 
@@ -46,8 +48,7 @@ namespace SupercolliderBridge
     QString toString(DataKey);
 
     QByteArray wrap();
-    void unwrap();
-
+    
   private:
     //QString senderName;
     //DataType type;
