@@ -260,9 +260,6 @@ namespace QuantIDE
     textFont->setGeometry(5, 385, width() - 20, 20);
 
 
-
-
-
     scrollWidget->setFixedHeight(410); // end of scroll
 
     PanelNEW::resizeEvent(event);

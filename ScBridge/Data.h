@@ -45,6 +45,9 @@ namespace SupercolliderBridge
     void print(DataKey);
     QString toString(DataKey);
 
+    QByteArray wrap();
+    void unwrap();
+
   private:
     //QString senderName;
     //DataType type;

@@ -25,10 +25,9 @@ namespace QuantIDE
     customize = new Customize(this);
 
     canvanNEW = new CanvanNEW();
-    canvanNEW->setGeometry(50, 50, 1400, 700);
+    canvanNEW->setGeometry(50, 50, 1200, 600);
     canvanNEW->show();
 
-    networkPanel = new PanelNEW();
     customizePanel = new CustomizePanel();
 
     console = new Console();
@@ -38,13 +37,9 @@ namespace QuantIDE
     console->setColorText(QColor(130, 130, 130));
 
     canvanNEW->addPanel(console, "Console");
-    canvanNEW->addPanel(networkPanel, "Network");
     canvanNEW->addPanel(customizePanel, "Customize");
-
-    //this->onCustomize();
-    //this->initStyleSheet();
-
-    core = new QuantCore(canvanNEW, customize);
+    
+    core = new QuantCore(canvanNEW);
     core->addProxySpace();
     core->addNode("testNode1");
 
@@ -57,7 +52,6 @@ namespace QuantIDE
     connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
 
     customize->refresh();
-
   }
 
   void QuantNEW::onCustomize(Data data)
@@ -84,14 +78,7 @@ namespace QuantIDE
     console->setColorMsgWarning(data.getValue_color(DataKey::COLOR_MSG_WARNINIG));
     console->setColorMsgBundle(data.getValue_color(DataKey::COLOR_MSG_BUNDLE));
 
-    networkPanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    networkPanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
-    networkPanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
-    networkPanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    networkPanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    networkPanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    networkPanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-
+   
     QString txt;
     txt.append(tr("QTextEdit { color: %1; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
     txt.append(tr("QTextEdit { background-color: %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
@@ -118,64 +105,7 @@ namespace QuantIDE
 
     qApp->setStyleSheet(txt);
   }
-
-  // bude odstraneno
-  /*
-  void QuantNEW::onCustomize(Customize *custom)
-  {
-    canvanNEW->setColorBars(customize->getColor("color_shem_AppHeaderBackground"));
-
-    networkPanel->setFontTitle(customize->getFont("font_shem_TextSmall"));
-    networkPanel->setColorTitle(customize->getColor("color_shem_Over"));
-
-
-    console->setFont(customize->getFont("font_shem_TextConsole"));
-    console->setFontTitle(customize->getFont("font_shem_TextSmall"));
-    //console->setColorTitle(customize->getColor("color_shem_Over"));
-    console->setColorTitle(custom->getColor(Customize::colorOver));
-
-    console->setColorNormal(customize->getColor("color_shem_MsgNormal"));
-    console->setColorStatus(customize->getColor("color_shem_MsgStatus"));
-    console->setColorEvaluate(customize->getColor("color_shem_MsgEvaluate"));
-    console->setColorResult(customize->getColor("color_shem_MsgResult"));
-    console->setColorError(customize->getColor("color_shem_MsgError"));
-    console->setColorWarning(customize->getColor("color_shem_MsgWarning"));
-    console->setColorBundle(customize->getColor("color_shem_MsgBundle"));
-
-    this->initStyleSheet();
-  }
-
-  void QuantNEW::initStyleSheet()
-  {
-    QString txt;
-
-    txt.append(tr("QTextEdit { color: %1; }").arg(customize->getColor("color_shem_Text").name()));
-    txt.append(tr("QTextEdit { background-color: %1; }").arg(customize->getColor("color_shem_PanelBackground").name()));
-    txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(customize->getColor("color_shem_Active").name()));
-
-    txt.append("QScrollBar:vertical { width: 2px; }");
-    txt.append("QScrollBar:horizontal { height: 2px; }");
-    txt.append(tr("QScrollBar:vertical { background: %1; }").arg(customize->getColor("color_shem_PanelBackground").name()));
-    txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(customize->getColor("color_shem_PanelBackground").name()));
-    txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(customize->getColor("color_shem_Text").name()));
-    txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(customize->getColor("color_shem_Text").name()));
-    txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
-    txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
-    txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
-    txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
-    txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
-    txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
-    txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
-    txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
-
-    txt.append(tr("QToolTip { color: %1; }").arg(customize->getColor("color_shem_Text").name()));
-    txt.append(tr("QToolTip { background-color:  %1; }").arg(customize->getColor("color_shem_PanelBackground").name()));
-    txt.append(tr("QToolTip { border: 1px solid white; }"));
-
-    qApp->setStyleSheet(txt);
-  }
-  */
-
+  
   QuantNEW::~QuantNEW()
   {
     qDebug("Quant closing...");
@@ -190,7 +120,7 @@ namespace QuantIDE
     customize = new Customize(this);
     canvan = new Canvan(this);
     bridge = new ScBridge(this);
-    udpServer = new UDPServer(this, bridge);
+   // udpServer = new UDPServer(this, bridge);
 
     //customize->initConfig();
 
@@ -249,7 +179,7 @@ namespace QuantIDE
     emit bootInterpretAct();
 
     this->initStyleSheet();
-    udpServer->initSocket(userName);
+//    udpServer->initSocket(userName);
   }
 
   void Quant::initControl()

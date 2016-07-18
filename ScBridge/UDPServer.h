@@ -1,22 +1,12 @@
 #ifndef UDPSERVER_H
 #define UDPSERVER_H
 
-//#include "CodeEditor.h"
-#include "ScBridge.h"
+#include "Data.h"
 
 #include <QDebug>
-//#include <QLabel>
-//#include <QMap>
-//#include <QPainter>
-//#include <QPushButton>
-//#include <QTextEdit>
-//#include <QWidget>
-
 #include <QHostInfo>
 #include <QNetworkInterface>
 #include <QtNetwork/QUdpSocket>
-
-//using namespace Jui;
 
 namespace SupercolliderBridge
 {
@@ -25,39 +15,34 @@ namespace SupercolliderBridge
     Q_OBJECT
 
   public:
-    UDPServer(QObject *parent, ScBridge* bridge);
+    UDPServer(QObject *parent);
     ~UDPServer();
 
-    public slots:
-    int initSocket(QString name);
-    void readPendingDatagrams();
-    void send(const char *input);
+    void initNetwork(QString name);
     void sendCode(QString code);
 
+    public slots:
+    void onSendData(Data data);
+    void onDatagramRecived();
+
   signals:
-    // void println(const char *input);
+    void actPrintNormal(QString);
     void actPrintStatus(QString);
-    void actPrintMsg(QString);
 
   private:
-    //     int initSocket();
-    void pendingDatagramSize();
-    bool isConnectedToNet();
-    int port;
-    int addressSelector;
-    bool hasBroadcast;
-    void processDatagram(QString);
-    QString getUsername();
+    QUdpSocket *mSocket;
 
     QNetworkInterface *interface;
     QHostAddress *broadcastAddress;
-    QHostAddress *myAddress;
-    QUdpSocket *socket;
-    QHostInfo *host;
-    QString username;
-    //QString objectPattern;
 
-    ScBridge *mBridge;
+    int port;
+    QString userName;
+
+    void pendingDatagramSize();
+    bool isConnectedToNet();
+    int addressSelector;
+    bool hasBroadcast;
+    void processDatagram(QString);
   };
 }
 

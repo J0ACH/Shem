@@ -62,7 +62,7 @@ namespace Jui
     CanvanNEW(QWidget *parent = 0, Qt::WindowFlags flags = 0);
     ~CanvanNEW();
 
-    void addPanel(PanelNEW *panel, QString name);
+    void addPanel(PanelNEW *panel, QString name, Qt::DockWidgetArea startPosition = Qt::DockWidgetArea::RightDockWidgetArea);
     QWidget* getPanel(QString name);
 
     void setColorBackground(QColor);

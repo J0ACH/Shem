@@ -58,14 +58,12 @@ namespace Jui
 
     this->setCentralWidget(screen);
   }
-
-
-
-  void CanvanNEW::addPanel(PanelNEW *panel, QString name)
+  
+  void CanvanNEW::addPanel(PanelNEW *panel, QString name, Qt::DockWidgetArea startPosition)
   {
     panel->setTitle(name);
     panel->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
-    this->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, panel);
+    this->addDockWidget(startPosition, panel);
 
     mapPanels->insert(name, panel);
   }

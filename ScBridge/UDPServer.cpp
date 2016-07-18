@@ -1,38 +1,76 @@
 #include "UDPServer.h"
 
-#define DEBUG 1
-#define PORT 10000
-
 namespace SupercolliderBridge {
 
-  UDPServer::UDPServer(QObject *parent, ScBridge* bridge) :
+  UDPServer::UDPServer(QObject *parent) :
     QObject(parent),
-    mBridge(bridge)
+    mSocket(new QUdpSocket(this))
   {
-    connect(this, SIGNAL(actPrintStatus(QString)), parent, SLOT(onMsgStatus(QString)));
-    connect(this, SIGNAL(actPrintMsg(QString)), parent, SLOT(onMsgNormal(QString)));
+    qDebug("UDPServer:: init...");
+    port = 10000;
+    mSocket->bind(QHostAddress::Any, port);
 
-
+    connect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
   }
 
-  bool UDPServer::isConnectedToNet() {
+  void UDPServer::initNetwork(QString name)
+  {
+    userName = name;
+    qDebug() << "UDPServer::initNetwork: my username: " << userName;
+
+    if (isConnectedToNet()) { qDebug("UDP: Network link is ESTABLISHED\n"); }
+    else { qDebug("UDP: ERROR! you are not connected to any network.\n"); return; }
+
+    int count = 0;
+    foreach(const QHostAddress &address, QNetworkInterface::allAddresses())
+    {
+      if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
+      {
+        if (count == 0) { qDebug() << "UDP: local IP address: " << address.toString(); }
+        else { qDebug("UDP WARN: multiple network addresses detected, picking first one"); }
+      }
+    }
+
+    if (hasBroadcast)
+    {
+      QString _baddress = interface->addressEntries().at(addressSelector).broadcast().toString();
+      broadcastAddress = new QHostAddress(_baddress);
+      qDebug() << "UDP: OK broadcast addr.: " << _baddress;
+    }
+    else
+    {
+      qDebug("UDP: WARNING: network seems to have no Broadcast support, setting default one");
+      broadcastAddress = new QHostAddress("239.0.0.1");
+    }
+    qDebug() << "UDP: Server starting, listening at port: " << port;
+
+    if (mSocket->state() == 4)
+    {
+      emit actPrintStatus("Network init done...");
+      qDebug("UDP: Server init done...");
+    }
+    else { qDebug() << "UDP: There is a problem starting the server on port" << port; return; }
+
+    this->sendCode(tr("Hi all my name is %1").arg(userName));
+  }
+
+  bool UDPServer::isConnectedToNet()
+  {
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
     bool result = false;
 
     for (int i = 0; i < ifaces.count(); i++) {
       QNetworkInterface iface = ifaces.at(i);
-      if (iface.flags().testFlag(QNetworkInterface::IsUp) &&
-        !iface.flags().testFlag(QNetworkInterface::IsLoopBack))
+      if (iface.flags().testFlag(QNetworkInterface::IsUp) && !iface.flags().testFlag(QNetworkInterface::IsLoopBack))
       {
-        qDebug() << "UDP: got interface:" << iface.name() << "with mac:" << iface.hardwareAddress();
+        // qDebug() << "UDP: got interface:" << iface.name() << "with mac:" << iface.hardwareAddress();
 
         for (int j = 0; j < iface.addressEntries().count(); j++)
         {
-
           QString _broadcast = iface.addressEntries().at(j).broadcast().toString();
-          qDebug() << "UDP: addr.:" << iface.addressEntries().at(j).ip().toString();
-          qDebug() << "UDP: netmask:" << iface.addressEntries().at(j).netmask().toString();
-          qDebug() << "UDP: broadcast:" << _broadcast;
+          // qDebug() << "UDP: addr.:" << iface.addressEntries().at(j).ip().toString();
+          // qDebug() << "UDP: netmask:" << iface.addressEntries().at(j).netmask().toString();
+          //  qDebug() << "UDP: broadcast:" << _broadcast;
 
           if (result == false) {
             result = true;
@@ -53,112 +91,34 @@ namespace SupercolliderBridge {
     return result;
   }
 
-  QString UDPServer::getUsername() {
-
-    QString name = qgetenv("USER");
-    if (name.isEmpty())
-      name = qgetenv("USERNAME");
-    qDebug() << "UDP: username: " << name;
-    return name;
-  }
-
-  int UDPServer::initSocket(QString name)
-  {
-    port = PORT;
-
-    if (!name.isEmpty()) { username = name; }
-    else { username = this->getUsername(); }
-
-    emit actPrintStatus("UDP Server init...\n");
-    emit actPrintMsg(tr("UDP: my username: %1\n").arg(username));
-
-    emit actPrintMsg("UDP: Checking network setup...\n");
-
-    if (isConnectedToNet()) {
-      emit actPrintMsg("UDP: Network link is ESTABLISHED\n");
-    }
-    else {
-      emit actPrintMsg("UDP: ERROR! you are not connected to any network.\n");
-      return 1;
-    }
-
-    int count = 0;
-    foreach(const QHostAddress &address, QNetworkInterface::allAddresses()) {
-      if (address.protocol() == QAbstractSocket::IPv4Protocol &&
-        address != QHostAddress(QHostAddress::LocalHost)) {
-        if (count == 0) {
-          emit actPrintMsg(
-            tr("UDP: local IP address: %1\n").arg(address.toString()));
-        }
-        else {
-          emit actPrintMsg(
-            "UDP WARN: multiple network addresses detected, picking first one\n");
-        }
-      }
-    }
-
-    if (hasBroadcast) {
-      QString _baddress =
-      interface->addressEntries().at(addressSelector).broadcast().toString();
-      broadcastAddress = new QHostAddress(_baddress);
-      emit actPrintMsg(tr("UDP: OK broadcast addr.: %1\n").arg(_baddress));
-    }
-    else {
-      emit actPrintMsg("UDP: WARNING: network seems to have no Broadcast "
-        "support, setting default one.\n");
-      broadcastAddress = new QHostAddress("239.0.0.1");
-    }
-
-    emit actPrintMsg(tr("UDP: Server starting, listening at port: %1\n")
-      .arg(QString::number(port)));
-
-    socket = new QUdpSocket(this);
-    host = new QHostInfo();
-    socket->bind(QHostAddress::Any, port);
-
-    if (socket->state() == 4) {
-      emit actPrintStatus("UDP: Server init done...\n");
-    }
-    else {
-      emit actPrintMsg(
-        tr("UDP: There is a problem starting the server on port %1\n")
-        .arg(QString::number(port)));
-      return 1;
-    }
-
-    //emit actPrintMsg("///////////////////////////////////////////////////////////////////\n\n");
-
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
-
-    this->sendCode(tr("\"Hi all my name is %1\n\".postln;").arg(username));
-    return 0;
-  }
-
-  void UDPServer::send(const char *input) {
-
-    QByteArray datagram(input);
-    socket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress,
-      port);
-  }
-
   void UDPServer::sendCode(QString code)
   {
-    QString dataMsg = tr("%1||%2").arg(username, code);
+    QString dataMsg = tr("%1||%2").arg(userName, code);
 
     QByteArray datagram(dataMsg.toStdString().c_str());
-    socket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
+    mSocket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
   }
 
-  void UDPServer::readPendingDatagrams()
+  void UDPServer::onSendData(Data data)
+  {
+    /*
+    QString dataMsg = tr("%1||%2").arg(userName, code);
+
+    QByteArray datagram(dataMsg.toStdString().c_str());
+    mSocket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
+    */
+  }
+
+  void UDPServer::onDatagramRecived()
   {
     QByteArray datagram;
     QHostAddress sender;
     quint16 senderPort;
 
-    while (socket->hasPendingDatagrams())
+    while (mSocket->hasPendingDatagrams())
     {
-      datagram.resize(socket->pendingDatagramSize());
-      socket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
+      datagram.resize(mSocket->pendingDatagramSize());
+      mSocket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
     }
 
     QString dataMsg = QString::fromUtf8(datagram);
@@ -166,21 +126,19 @@ namespace SupercolliderBridge {
     QString senderName = data[0];
     QString recivedCode = data[1];
 
-    if (senderName != username)
+    if (senderName != userName)
     {
-      //QString postSender = sender.;
-      emit actPrintMsg(tr("udpMsg [from %1] -> %2").arg(senderName, recivedCode));
+            emit actPrintNormal(tr("udpMsg [from %1] -> %2").arg(senderName, recivedCode));
       this->processDatagram(recivedCode);
     }
 
-  } // end void
+  }
+
 
   void UDPServer::processDatagram(QString code)
   {
-    mBridge->evaluate(code, true);
+    //mBridge->evaluate(code, true);
   }
 
   UDPServer::~UDPServer(){};
-  // end class
-
-} // end namespace
+}

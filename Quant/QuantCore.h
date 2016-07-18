@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QDebug>
 
-#include "Customize.h"
+//#include "Customize.h"
 #include "ScBridge.h"
 #include "UDPServer.h"
 
@@ -14,6 +14,7 @@
 
 using namespace SupercolliderBridge;
 
+
 namespace QuantIDE
 {
 
@@ -22,23 +23,26 @@ namespace QuantIDE
     Q_OBJECT
 
   public:
-    QuantCore(CanvanNEW *canvan, Customize *customize);
-    ~QuantCore();
+    QuantCore(CanvanNEW *canvan);
+        ~QuantCore();
 
     void addProxySpace();
     void addNode(QString name);
 
     public slots :
+    void onCustomize(Data);
+    void onInitCore();
     void onInterpretBootDone();
     void onServerBootDone();
 
-    void onCustomize(Data);
 
     void onMyMapSet(QMap <QString, QVariant>);
     void onEvaluate(QString code);
 
 
   signals:
+    void actCoreInitPrepared();
+
     void actNetworkMapSet();
 
 
@@ -51,7 +55,10 @@ namespace QuantIDE
     UDPServer *mNetwork;
     Customize *mCustomize;
 
-    bool initInterpretOnStart, initServerOnStart;
+    PanelNEW *networkPanel;
+    QString userName;
+    bool isCoreRunning;
+    bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
 
     //QMap <QString, QString> library;
     QuantProxy *proxy;
@@ -61,6 +68,8 @@ namespace QuantIDE
 
     PanelNEW *proxyPanel;
     //QMap <QString, QuantNode> library;
+
+    
 
   };
 }

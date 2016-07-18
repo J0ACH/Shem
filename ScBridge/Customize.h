@@ -43,7 +43,7 @@ namespace SupercolliderBridge
     QColor getColor(Keys);
     bool getBool(Keys);
     QFont getFont(Keys);
-    
+
     // bude odstraneno
     void setColor(Keys, QColor);
 
@@ -51,9 +51,9 @@ namespace SupercolliderBridge
     void onModify(Data);
     void onSave(Data);
 
-  signals :
+  signals:
     void actDataChanged(Data);
-          void actCustomizeChanged(Customize*);
+    void actCustomizeChanged(Customize*);
 
   private:
     QFile *configFile;
@@ -62,8 +62,7 @@ namespace SupercolliderBridge
 
     void initConfigFile(QString systemExtensionDir);
     void mergeConfigData();
-    //void prepareData(QMap<QString, QVariant*>);
-
+    
     QMap<QString, QVariant*> readConfigFile();
     QMap<QString, QVariant*> defaultConfig();
     QMap<QString, QVariant*> processingConfigData(QMap<QString, QVariant*>);

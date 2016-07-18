@@ -27,7 +27,7 @@ namespace SupercolliderBridge
   QFont Data::getValue_font(DataKey key) { return library->value(key).value<QFont>(); }
   QColor Data::getValue_color(DataKey key) { return library->value(key).value<QColor>(); }
 
-    void Data::print(DataKey key)
+  void Data::print(DataKey key)
   {
     switch (library->value(key).type())
     {
@@ -87,7 +87,13 @@ namespace SupercolliderBridge
       break;
     }
   }
-  
+
+  QByteArray Data::wrap()
+  {
+  }
+  void Data::unwrap()
+  {
+  }
 
   Data::~Data() { }
 

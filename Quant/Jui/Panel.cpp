@@ -7,7 +7,9 @@ namespace Jui
   {
     this->setFeatures(QDockWidget::DockWidgetMovable);
     this->setTitle("Panel");
-    this->setMinimumWidth(150);
+    this->setMinimumWidth(250);
+    //this->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
+    //this->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
 
     this->setColorBackground(QColor(30, 30, 30));
     this->setColorHeader(QColor(40, 40, 40));
@@ -27,6 +29,9 @@ namespace Jui
   void PanelNEW::setColorOver(QColor color){ closeButton->setColorOver(color); }
   void PanelNEW::setColorActive(QColor color){ closeButton->setColorActive(color); }
 
+  void PanelNEW::setPanelAllowedSides(Qt::DockWidgetAreas sides) { this->setAllowedAreas(sides); }
+  //void PanelNEW::setPanelSide(Qt::DockWidgetArea side) { this->parent setCorneAl(side); }
+  
   void PanelNEW::resizeEvent(QResizeEvent *resizeEvent)
   {
     closeButton->setGeometry(this->width() - 18, 2, 16, 16);

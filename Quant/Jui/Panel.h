@@ -13,9 +13,12 @@
 
 namespace Jui
 {
+ // const enum PanelSide{ LEFT, RIGHT };
+
   class PanelNEW : public QDockWidget
   {
     Q_OBJECT
+
 
   public:
     PanelNEW(QWidget *parent = 0);
@@ -30,6 +33,9 @@ namespace Jui
     void setColorOver(QColor);
     void setColorActive(QColor);
 
+    void setPanelAllowedSides(Qt::DockWidgetAreas);
+    //void setPanelSide(Qt::DockWidgetArea side);
+
   protected:
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -43,6 +49,9 @@ namespace Jui
 
     QColor colorHeader, colorBackground, colorText;
     QFont fontTitle;
+
+    //Qt::DockWidgetArea allowedSide;
+    //PanelSide allowedSide;
   };
 
   class Panel : public QWidget
