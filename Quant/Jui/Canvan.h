@@ -12,7 +12,8 @@
 #include <QFontDatabase>
 #include <QMap>
 #include <QDesktopWidget>
-#include <QStyle>
+//#include <QStyle>
+#include <QBitmap>
 
 
 #include "Console.h"
@@ -66,10 +67,19 @@ namespace Jui
     CanvanNEW_ToolBar(QWidget *parent = 0);
     ~CanvanNEW_ToolBar();
 
+    void addButton(char* iconPath, char* iconText, const QObject* reciver, const char* member);
+
     void setColorBackground(QColor);
+    void setColorNormal(QColor);
+    void setColorOver(QColor);
+    void setColorActive(QColor);
+
+    public slots:
+    void onHovered();
 
   protected:
     void paintEvent(QPaintEvent *event);
+    //bool eventFilter(QObject *target, QEvent *event);
 
   private:
     QColor colorBackground;

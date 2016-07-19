@@ -56,16 +56,16 @@ namespace QuantIDE
   void QuantNEW::initObjects()
   {
     console = new Console();
-    networkPanel = new PanelNEW();    
+    networkPanel = new PanelNEW();
     customizePanel = new CustomizePanel();
     proxyPanel = new PanelNEW();
 
     toolBar = new CanvanNEW_ToolBar();
-    toolBar->addAction("Console", console, SLOT(onSwitchVisible()));
-    toolBar->addAction("Network", networkPanel, SLOT(onSwitchVisible()));
-    toolBar->addAction("Customize", customizePanel, SLOT(onSwitchVisible()));
-    toolBar->addAction("Time", proxyPanel, SLOT(onSwitchVisible()));
-    toolBar->setColorBackground(QColor(120, 30, 30));
+    toolBar->addButton(":/console_16px.png", "Console", console, SLOT(onSwitchVisible()));
+    toolBar->addButton(":/network_16px.png", "Network", networkPanel, SLOT(onSwitchVisible()));
+    toolBar->addButton(":/customize_16px.png", "Customize", customizePanel, SLOT(onSwitchVisible()));
+    toolBar->addButton(":/network_16px.png", "Time", proxyPanel, SLOT(onSwitchVisible()));
+    toolBar->setColorBackground(QColor(30, 30, 30));
 
     textServerMeter = new Text(canvanNEW->getStaustBar());
     textServerMeter->setText("NaN");
@@ -84,8 +84,6 @@ namespace QuantIDE
     textServerGroups->setToolTip("numGroups");
     textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 5, 15, 25);
     textServerGroups->show();
-
-
   }
 
   void QuantNEW::onCustomize(Data data)

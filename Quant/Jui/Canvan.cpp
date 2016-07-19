@@ -229,14 +229,58 @@ namespace Jui
   ///////////////////////////////////////////////////////////////////////////
 
   CanvanNEW_ToolBar::CanvanNEW_ToolBar(QWidget *parent) : QToolBar(parent)  { colorBackground = QColor(120, 120, 120); }
+
+  void CanvanNEW_ToolBar::addButton(char* iconPath, char* iconText, const QObject* reciver, const char* member)
+  {
+    QImage image(iconPath);
+    image.fill(QColor(240, 220, 120));
+    image.setAlphaChannel(QImage(iconPath));
+    QPixmap pMap = QPixmap::fromImage(image);
+
+    QAction *action = new QAction(pMap, iconText, this);
+    action->setCheckable(true);
+    // action->installEventFilter(this);
+    connect(action, SIGNAL(triggered()), reciver, member);
+    connect(action, SIGNAL(hovered()), this, SLOT(onHovered()));
+
+    //this->addAction(pMap, iconText, reciver, member);
+    this->addAction(action);
+  }
+
   void CanvanNEW_ToolBar::setColorBackground(QColor color)  { colorBackground = color; }
+  void CanvanNEW_ToolBar::setColorNormal(QColor color)  {  }
+  void CanvanNEW_ToolBar::setColorOver(QColor color)  {  }
+  void CanvanNEW_ToolBar::setColorActive(QColor color)  {  }
+
   void CanvanNEW_ToolBar::paintEvent(QPaintEvent *event)
   {
     QPainter painter(this);
-    painter.fillRect(QRect(1, 1, width() - 2, height()-2), colorBackground);
+    painter.fillRect(QRect(1, 1, width() - 2, height() - 2), colorBackground);
 
     // QToolBar::paintEvent(event);
   }
+
+  void CanvanNEW_ToolBar::onHovered()
+  {
+    qDebug() << "CanvanNEW_ToolBar::onHovered";
+  }
+
+  /*
+  bool CanvanNEW_ToolBar::eventFilter(QObject *target, QEvent *event)
+  {
+  // if (target == fileMenu)
+  // {
+  qDebug() << "CanvanNEW_ToolBar::eventFilter event: " << event;
+  if (event->type() == QEvent::MouseButtonRelease)
+  {
+
+  return true;
+  }
+  // }
+  return QToolBar::eventFilter(target, event);
+  }
+  */
+
   CanvanNEW_ToolBar::~CanvanNEW_ToolBar() { }
 
   ///////////////////////////////////////////////////////////////////////////
