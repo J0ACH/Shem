@@ -55,7 +55,6 @@ namespace QuantIDE
     UDPServer *mNetwork;
     Customize *mCustomize;
 
-    PanelNEW *networkPanel;
     QString userName;
     bool isCoreRunning;
     bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
@@ -66,7 +65,8 @@ namespace QuantIDE
     QMap <QString, QuantControl> controloLibrary;
     QMap <QString, QuantBus> busLibrary;
 
-    PanelNEW *proxyPanel;
+    //PanelNEW *networkPanel;
+    //PanelNEW *proxyPanel;
     //QMap <QString, QuantNode> library;
 
     

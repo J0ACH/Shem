@@ -30,21 +30,27 @@ namespace QuantIDE
     QuantNEW(QObject *parent);
     ~QuantNEW();
 
+    void initObjects();
+
     public slots:
-    //void onCustomize(Customize*);
     void onCustomize(Data);
     //void onCloseQuant();
 
+  protected:
+    //void resizeEvent(QResizeEvent *resizeEvent);
+    bool eventFilter(QObject *target, QEvent *event);
 
   private:
     Customize *customize;
     CanvanNEW *canvanNEW;
-    PanelNEW *networkPanel, *customizePanel;
     Console *console;
-
+    PanelNEW *networkPanel, *customizePanel, *proxyPanel;
+    Text *textServerMeter, *textServerSynths, *textServerGroups;
     QuantCore *core;
 
-   // void initStyleSheet();
+    CanvanNEW_ToolBar *toolBar;
+
+    
   };
 
 

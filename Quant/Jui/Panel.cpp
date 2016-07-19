@@ -17,7 +17,7 @@ namespace Jui
 
     closeButton = new Button(this);
     closeButton->setIcon(QImage(":/smallClose16.png"), 0);
-    connect(closeButton, SIGNAL(pressAct()), this, SLOT(close()));
+    connect(closeButton, SIGNAL(pressAct()), this, SLOT(onSwitchVisible()));
   }
 
   void PanelNEW::setTitle(QString name)  { title = name; this->setWindowTitle(title); }
@@ -31,10 +31,19 @@ namespace Jui
 
   void PanelNEW::setPanelAllowedSides(Qt::DockWidgetAreas sides) { this->setAllowedAreas(sides); }
   //void PanelNEW::setPanelSide(Qt::DockWidgetArea side) { this->parent setCorneAl(side); }
-  
+
+  void PanelNEW::onSwitchVisible()
+  {
+    if (this->isVisible()) { this->setVisible(false); }
+    else { this->setVisible(true); }
+  }
+
   void PanelNEW::resizeEvent(QResizeEvent *resizeEvent)
   {
     closeButton->setGeometry(this->width() - 18, 2, 16, 16);
+    
+    QDockWidget::resizeEvent(resizeEvent);
+    this->update();
   }
 
   void PanelNEW::paintEvent(QPaintEvent *event)

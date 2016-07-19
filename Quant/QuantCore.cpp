@@ -11,11 +11,11 @@ namespace QuantIDE
     qDebug("Core init...");
     isCoreRunning = false;
 
-    proxyPanel = new PanelNEW();
-    mCanvan->addPanel(proxyPanel, "ProxySpace");
-
-    networkPanel = new PanelNEW();
-    mCanvan->addPanel(networkPanel, "Network", Qt::DockWidgetArea::LeftDockWidgetArea);
+    //proxyPanel = new PanelNEW();
+    //mCanvan->addPanel(proxyPanel, "ProxySpace");
+    
+    //networkPanel = new PanelNEW();
+    //mCanvan->addPanel(networkPanel, "Network", Qt::DockWidgetArea::LeftDockWidgetArea);
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onInitCore()));
 
@@ -57,21 +57,7 @@ namespace QuantIDE
     initServerOnStart = data.getValue_bool(DataKey::BOOL_BOOT_SERVER);
 
 
-    networkPanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    networkPanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
-    networkPanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
-    networkPanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    networkPanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    networkPanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    networkPanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-
-    proxyPanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    proxyPanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
-    proxyPanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
-    proxyPanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    proxyPanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    proxyPanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    proxyPanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    
 
     emit actCoreInitPrepared(); // ceka na initInterpretOnStart a initServerOnStart
   }

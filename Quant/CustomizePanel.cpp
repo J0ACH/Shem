@@ -2,10 +2,7 @@
 
 namespace QuantIDE
 {
-  CustomizePanel::CustomizePanel(QWidget *parent) : PanelNEW(parent)
-  {
-    this->initControl();
-  }
+  CustomizePanel::CustomizePanel(QWidget *parent) : PanelNEW(parent)  { this->initControl(); }
 
   void CustomizePanel::initControl()
   {
@@ -87,28 +84,6 @@ namespace QuantIDE
     return QColor(red, green, blue);
   }
 
-  //bude odstraneno
-  /*
-  void CustomizePanel::onCustomize(Customize* custom)
-  {
-  this->setColorHeader(custom->getColor(Customize::colorHeaders));
-  this->setColorTitle(custom->getColor(Customize::colorText));
-  this->setFontTitle(custom->getFont(Customize::fontSmall));
-
-  buttonConfirm->setColorActive(custom->getColor(Customize::colorActive));
-  buttonConfirm->setColorOver(custom->getColor(Customize::colorOver));
-  buttonConfirm->setColorNormal(custom->getColor(Customize::colorNormal));
-  buttonConfirm->setFont(custom->getFont(Customize::fontSmall));
-
-  //boxName->setValue(custom->getString(Customize::userName));
-  boxName->setFont(custom->getFont(Customize::fontSmall));
-
-  boxColorBackground->setValue(this->color2String(custom->getColor(Customize::colorBackground)));
-  boxColorBackground->setFont(custom->getFont(Customize::fontSmall));
-  // connect(boxColorBackground, SIGNAL(actValueChanged(Customize::colorBackground, QString)), custom, SLOT(setColor(Customize::colorBackground, QString)));
-  }
-  */
-
   void CustomizePanel::onCustomize(Data data)
   {
     this->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
@@ -126,15 +101,19 @@ namespace QuantIDE
 
     textApp->setFont(data.getValue_font(DataKey::FONT_BIG));
     textApp->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
+
     textColor->setFont(data.getValue_font(DataKey::FONT_BIG));
     textColor->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
+    
     textFont->setFont(data.getValue_font(DataKey::FONT_BIG));
     textFont->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
 
     subTextCanvan->setFont(data.getValue_font(DataKey::FONT_SMALL));
     subTextCanvan->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
+
     subTextPanels->setFont(data.getValue_font(DataKey::FONT_SMALL));
     subTextPanels->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
+    
     subTextMsg->setFont(data.getValue_font(DataKey::FONT_SMALL));
     subTextMsg->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
 
@@ -243,13 +222,13 @@ namespace QuantIDE
 
     /////////////////////////////
     textColor->setGeometry(5, 85, width() - 20, 20);
-    
+
     subTextCanvan->setGeometry(20, 115, width() - 30, 20);
     boxColorNormal->setGeometry(20, 145, width() - 30, 20);
     boxColorOver->setGeometry(20, 175, width() - 30, 20);
     boxColorActive->setGeometry(20, 205, width() - 30, 20);
     boxColorText->setGeometry(20, 235, width() - 30, 20);
-    
+
     subTextPanels->setGeometry(20, 275, width() - 30, 20);
     boxColorPanelBackground->setGeometry(20, 305, width() - 30, 20);
 

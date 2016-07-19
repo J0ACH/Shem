@@ -3,9 +3,6 @@
 
 namespace Jui
 {
-
-
-
   CanvanNEW::CanvanNEW(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(parent, flags)
   {
     this->setWindowFlags(Qt::FramelessWindowHint);
@@ -35,7 +32,6 @@ namespace Jui
     statusBar->setFixedHeight(tailSize);
     this->setStatusBar(statusBar);
 
-
     fileMenu = new QMenu("file");
     fileMenu->installEventFilter(this);
     menuBar->addMenu(fileMenu);
@@ -58,7 +54,7 @@ namespace Jui
 
     this->setCentralWidget(screen);
   }
-  
+
   void CanvanNEW::addPanel(PanelNEW *panel, QString name, Qt::DockWidgetArea startPosition)
   {
     panel->setTitle(name);
@@ -68,6 +64,14 @@ namespace Jui
     mapPanels->insert(name, panel);
   }
   QWidget* CanvanNEW::getPanel(QString name)  { return mapPanels->value(name); }
+
+  void CanvanNEW::addButtonBar(CanvanNEW_ToolBar *buttonBar, Qt::ToolBarArea startPosition)
+  {
+    buttonBar->setAllowedAreas(Qt::ToolBarArea::TopToolBarArea | Qt::ToolBarArea::BottomToolBarArea);
+    this->addToolBar(startPosition, buttonBar);
+  }
+
+  QWidget* CanvanNEW::getStaustBar() { return statusBar; }
 
   void CanvanNEW::setColorHeaders(QColor color)
   {
@@ -177,7 +181,7 @@ namespace Jui
     qDebug("CanvanNEW closed");
   }
 
-
+  ///////////////////////////////////////////////////////////////////////////
 
   CanvanNEW_MenuBar::CanvanNEW_MenuBar(QWidget *parent) : QMenuBar(parent)
   {
@@ -200,7 +204,7 @@ namespace Jui
     painter.fillRect(QRect(1, 1, width() - 2, height() - 1), colorBackground);
 
     QMenuBar::paintEvent(event);
-    //this->adjustSize();
+
   }
   void CanvanNEW_MenuBar::resizeEvent(QResizeEvent *event)
   {
@@ -208,7 +212,7 @@ namespace Jui
   }
   CanvanNEW_MenuBar::~CanvanNEW_MenuBar() { }
 
-
+  ///////////////////////////////////////////////////////////////////////////
 
   CanvanNEW_StatusBar::CanvanNEW_StatusBar(QWidget *parent) : QStatusBar(parent) { colorBackground = QColor(120, 120, 120); }
   void CanvanNEW_StatusBar::setColorBackground(QColor color)  { colorBackground = color; }
@@ -223,6 +227,20 @@ namespace Jui
   CanvanNEW_StatusBar::~CanvanNEW_StatusBar() { }
 
   ///////////////////////////////////////////////////////////////////////////
+
+  CanvanNEW_ToolBar::CanvanNEW_ToolBar(QWidget *parent) : QToolBar(parent)  { colorBackground = QColor(120, 120, 120); }
+  void CanvanNEW_ToolBar::setColorBackground(QColor color)  { colorBackground = color; }
+  void CanvanNEW_ToolBar::paintEvent(QPaintEvent *event)
+  {
+    QPainter painter(this);
+    painter.fillRect(QRect(1, 1, width() - 2, height()-2), colorBackground);
+
+    // QToolBar::paintEvent(event);
+  }
+  CanvanNEW_ToolBar::~CanvanNEW_ToolBar() { }
+
+  ///////////////////////////////////////////////////////////////////////////
+
   // nize bude odstraneno
 
   Canvan::Canvan(QWidget *window) : QWidget(window)

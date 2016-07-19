@@ -4,10 +4,11 @@
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QToolBar>
 #include <QDockWidget>
 #include <QtWidgets/QMainWindow>
 #include <QTimer>
-#include <QLabel>
+//#include <QLabel>
 #include <QFontDatabase>
 #include <QMap>
 #include <QDesktopWidget>
@@ -38,6 +39,8 @@ namespace Jui
     QColor colorBackground;
   };
 
+  ///////////////////////////////////////////////////////////////////////////
+
   class CanvanNEW_StatusBar : public QStatusBar
   {
     Q_OBJECT
@@ -54,6 +57,26 @@ namespace Jui
     QColor colorBackground;
   };
 
+  ///////////////////////////////////////////////////////////////////////////
+
+  class CanvanNEW_ToolBar : public QToolBar
+  {
+    Q_OBJECT
+  public:
+    CanvanNEW_ToolBar(QWidget *parent = 0);
+    ~CanvanNEW_ToolBar();
+
+    void setColorBackground(QColor);
+
+  protected:
+    void paintEvent(QPaintEvent *event);
+
+  private:
+    QColor colorBackground;
+  };
+
+  ///////////////////////////////////////////////////////////////////////////
+
   class CanvanNEW : public QMainWindow
   {
     Q_OBJECT
@@ -64,6 +87,8 @@ namespace Jui
 
     void addPanel(PanelNEW *panel, QString name, Qt::DockWidgetArea startPosition = Qt::DockWidgetArea::RightDockWidgetArea);
     QWidget* getPanel(QString name);
+    void addButtonBar(CanvanNEW_ToolBar *buttonBar, Qt::ToolBarArea startPosition = Qt::ToolBarArea::BottomToolBarArea);
+    QWidget* getStaustBar();
 
     void setColorBackground(QColor);
     void setColorHeaders(QColor);
@@ -84,10 +109,10 @@ namespace Jui
   private:
     void initControl();
     int headerSize, tailSize;
-    CanvanNEW_MenuBar *menuBar;
-    QMenu *fileMenu;
-    CanvanNEW_StatusBar *statusBar;
     QWidget *screen;
+    CanvanNEW_MenuBar *menuBar;
+    CanvanNEW_StatusBar *statusBar;
+        QMenu *fileMenu;
     QMap<QString, PanelNEW*> *mapPanels;
     Button *closeButton, *maximizeButton, *minimizeButton;
 

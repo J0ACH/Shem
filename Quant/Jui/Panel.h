@@ -13,7 +13,7 @@
 
 namespace Jui
 {
- // const enum PanelSide{ LEFT, RIGHT };
+  // const enum PanelSide{ LEFT, RIGHT };
 
   class PanelNEW : public QDockWidget
   {
@@ -35,6 +35,9 @@ namespace Jui
 
     void setPanelAllowedSides(Qt::DockWidgetAreas);
     //void setPanelSide(Qt::DockWidgetArea side);
+
+    public slots:
+    void onSwitchVisible();
 
   protected:
     void paintEvent(QPaintEvent *event);
