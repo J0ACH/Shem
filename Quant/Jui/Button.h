@@ -17,7 +17,7 @@ namespace Jui
     Q_OBJECT
 
   public:
-    Button(QWidget *parent);
+    Button(QWidget *parent = 0);
     ~Button();
 
     enum State { OFF, ON };
@@ -44,7 +44,8 @@ namespace Jui
 
     public slots:
     void fadeRatio();
-    void onSwitchOFF();
+    void onSwitch();
+    void onSwitchOFF(); // bude odstraneno
 
   protected:
     void paintEvent(QPaintEvent *);

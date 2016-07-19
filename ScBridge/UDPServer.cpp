@@ -6,7 +6,7 @@ namespace SupercolliderBridge {
     QObject(parent),
     mSocket(new QUdpSocket(this))
   {
-    qDebug("UDPServer:: init...");
+    qDebug("UDPServer:: new...");
     port = 10000;
     mSocket->bind(QHostAddress::Any, port);
 
@@ -15,10 +15,13 @@ namespace SupercolliderBridge {
 
   void UDPServer::initNetwork(QString name)
   {
-    userName = name;
-    qDebug() << "UDPServer::initNetwork: my username: " << userName;
+    qDebug() << "UDPServer::initNetwork name:" << name;
+    emit actPrint("Network init start...", MessageType::STATUS);
 
-    if (isConnectedToNet()) { qDebug("UDP: Network link is ESTABLISHED\n"); }
+    userName = name;
+    emit actPrint(tr("Username is set on %1").arg(userName));
+
+    if (isConnectedToNet()) { emit actPrint("Network link is estabilished"); }
     else { qDebug("UDP: ERROR! you are not connected to any network.\n"); return; }
 
     int count = 0;
@@ -26,7 +29,7 @@ namespace SupercolliderBridge {
     {
       if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
       {
-        if (count == 0) { qDebug() << "UDP: local IP address: " << address.toString(); }
+        if (count == 0) { emit actPrint(tr("\t - local IP address: %1").arg(address.toString())); }
         else { qDebug("UDP WARN: multiple network addresses detected, picking first one"); }
       }
     }
@@ -35,19 +38,20 @@ namespace SupercolliderBridge {
     {
       QString _baddress = interface->addressEntries().at(addressSelector).broadcast().toString();
       broadcastAddress = new QHostAddress(_baddress);
-      qDebug() << "UDP: OK broadcast addr.: " << _baddress;
+      emit actPrint(tr("Set broadcast address: %1").arg(_baddress));
     }
     else
     {
       qDebug("UDP: WARNING: network seems to have no Broadcast support, setting default one");
       broadcastAddress = new QHostAddress("239.0.0.1");
     }
-    qDebug() << "UDP: Server starting, listening at port: " << port;
+    emit actPrint(tr("Server starting, listening at port: %1").arg(QString::number(port)));
 
     if (mSocket->state() == 4)
     {
-      emit actPrintStatus("Network init done...");
-      qDebug("UDP: Server init done...");
+      emit actPrint("Network init done...\n", MessageType::STATUS);
+      qDebug("UDPServer::initNetwork done...");
+      emit actNetworkBooted();
     }
     else { qDebug() << "UDP: There is a problem starting the server on port" << port; return; }
 
@@ -128,7 +132,7 @@ namespace SupercolliderBridge {
 
     if (senderName != userName)
     {
-            emit actPrintNormal(tr("udpMsg [from %1] -> %2").arg(senderName, recivedCode));
+      emit actPrint(tr("udpMsg [from %1] -> %2").arg(senderName, recivedCode));
       this->processDatagram(recivedCode);
     }
 

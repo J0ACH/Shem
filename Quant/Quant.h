@@ -4,11 +4,12 @@
 #include <QWidget>
 #include <QDebug>
 
-#include "ScBridge.h"
 #include "Customize.h"
+#include "Canvan.h"
+#include "Console.h"
+#include "ScBridge.h"
 #include "UDPServer.h"
 #include "QuantCore.h"
-#include "Canvan.h"
 #include "Panel.h"
 #include "Edges.h"
 #include "CodeEditor.h"
@@ -21,6 +22,8 @@ using namespace Jui;
 
 namespace QuantIDE
 {
+
+  
 
   class QuantNEW : public QObject
   {
@@ -44,11 +47,11 @@ namespace QuantIDE
     Customize *customize;
     CanvanNEW *canvanNEW;
     Console *console;
-    PanelNEW *networkPanel, *customizePanel, *proxyPanel;
+    PanelNEW *networkPanel, *customizePanel, *timePanel;
     Text *textServerMeter, *textServerSynths, *textServerGroups;
     QuantCore *core;
 
-    CanvanNEW_ToolBar *toolBar;
+    CanvanNEW_ToolBar *controlsBar, *panelsBar;
 
     
   };

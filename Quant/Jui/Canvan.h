@@ -67,7 +67,8 @@ namespace Jui
     CanvanNEW_ToolBar(QWidget *parent = 0);
     ~CanvanNEW_ToolBar();
 
-    void addButton(char* iconPath, char* iconText, const QObject* reciver, const char* member);
+    void addButton(QString name, QImage icon, const QObject* reciver, const char* member);
+    Button* getButton(QString name);
 
     void setColorBackground(QColor);
     void setColorNormal(QColor);
@@ -75,7 +76,7 @@ namespace Jui
     void setColorActive(QColor);
 
     public slots:
-    void onHovered();
+    // void onHovered();
 
   protected:
     void paintEvent(QPaintEvent *event);
@@ -83,6 +84,7 @@ namespace Jui
 
   private:
     QColor colorBackground;
+    QMap<QString, Button*> buttonsList;
   };
 
   ///////////////////////////////////////////////////////////////////////////
@@ -122,7 +124,7 @@ namespace Jui
     QWidget *screen;
     CanvanNEW_MenuBar *menuBar;
     CanvanNEW_StatusBar *statusBar;
-        QMenu *fileMenu;
+    QMenu *fileMenu;
     QMap<QString, PanelNEW*> *mapPanels;
     Button *closeButton, *maximizeButton, *minimizeButton;
 

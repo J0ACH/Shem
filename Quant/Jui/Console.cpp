@@ -7,26 +7,15 @@ namespace Jui
   {
     //setEdgeControler(EdgeControler::Direction::LEFT, true);
     this->setTitle("Console");
-    this->setMinimumWidth(500);
+    this->setMinimumWidth(400);
 
     text = new QTextEdit(this);
     text->setReadOnly(true);
     text->setOverwriteMode(false);
     text->setTabStopWidth(30);
-
-    this->setColorText(QColor(130, 130, 130));
-
     text->setFrameStyle(QFrame::NoFrame);
 
-    //    txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(colorActive.name()));
-
-    text->append(tr("Console init..."));
-
-    QTextCharFormat format;
-    format.setForeground(QBrush(QColor(230, 30, 30)));
-    text->setCurrentCharFormat(format);
-
-    //connect(this, SIGNAL(resizeAct()), this, SLOT(fitGeometry()));
+    this->setColorText(QColor(130, 130, 130));
   }
 
   void Console::setFont(QFont font)
@@ -69,25 +58,8 @@ namespace Jui
 
     format.setForeground(QBrush(QColor(230, 230, 230), Qt::SolidPattern));
     text->setCurrentCharFormat(format);
-
   }
 
-  void Console::setColorMsgNormal(QColor color) { this->colorMsgNormal = color; }
-  void Console::setColorMsgStatus(QColor color) { this->colorMsgStatus = color; }
-  void Console::setColorMsgEvaluate(QColor color) { this->colorMsgEvaluate = color; }
-  void Console::setColorMsgAnswer(QColor color) { this->colorMsgAnswer = color; }
-  void Console::setColorMsgError(QColor color) { this->colorMsgError = color; }
-  void Console::setColorMsgWarning(QColor color) { this->colorMsgWarning = color; }
-  void Console::setColorMsgBundle(QColor color) { this->colorMsgBundle = color; }
-
-  void Console::onMsgNormal(QString msg)  { this->addText(msg, colorMsgNormal); }
-  void Console::onMsgStatus(QString msg)  { this->addText(msg, colorMsgStatus); }
-  void Console::onMsgEvaluate(QString msg)  { this->addText(msg, colorMsgEvaluate); }
-  void Console::onMsgAnswer(QString msg)  { this->addText(msg, colorMsgAnswer); }
-  void Console::onMsgError(QString msg)  { this->addText(msg, colorMsgError); }
-  void Console::onMsgWarning(QString msg)  { this->addText(msg, colorMsgWarning); }
-  void Console::onMsgBundle(QString msg)  { this->addText(msg, colorMsgBundle); }
-  
   void Console::resizeEvent(QResizeEvent *event)
   {
     PanelNEW::resizeEvent(event); // send event to superclass

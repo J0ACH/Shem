@@ -17,6 +17,8 @@ namespace SupercolliderBridge
     FONT_BIG, FONT_SMALL, FONT_CONSOLE, FONT_CODE
   };
 
+  enum class MessageType{ NORMAL, STATUS, EVAULATE, ANSWER, ERROR, WARNING, BUNDLE };
+
   class Data
   {
   public:

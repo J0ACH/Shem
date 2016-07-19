@@ -38,6 +38,10 @@ namespace Jui
 
     public slots:
     void onSwitchVisible();
+    void onClose();
+
+  signals:
+    void actClosed();
 
   protected:
     void paintEvent(QPaintEvent *event);

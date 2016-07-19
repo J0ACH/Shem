@@ -1,8 +1,6 @@
 #ifndef SCBRIDGE_H
 #define SCBRIDGE_H
 
-//#include "UDPServer.h"
-
 #include <QtWidgets/QApplication>
 #include <QAction>
 #include <QByteArray>
@@ -22,7 +20,7 @@ namespace SupercolliderBridge
 {
   enum class StateInterpret{ OFF, RUNNING };
   enum class StateServer{ OFF, RUNNING };
-  enum class MessageType{ ERROR, WARNING, STATUS, EVAULATE, RESULT, ANSWER };
+ // enum class MessageType{ ERROR, WARNING, STATUS, EVAULATE, RESULT, ANSWER };
 
   class ScBridge : public QProcess
   {

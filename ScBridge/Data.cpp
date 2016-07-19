@@ -22,7 +22,7 @@ namespace SupercolliderBridge
 
 
       //qDebug() << "\t - line:" << oneLine;
-      qDebug() << "\t - key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
+      //qDebug() << "\t - key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
     }
 
     //qDebug() << "List2:" << list;
@@ -113,12 +113,12 @@ namespace SupercolliderBridge
     QStringList list;
     QByteArray bArray;
 
-    qDebug() << "Data::wrap() library keys:" << library->keys();
-    qDebug() << "Data::wrap() library values:" << library->values();
+    //qDebug() << "Data::wrap() library keys:" << library->keys();
+    //qDebug() << "Data::wrap() library values:" << library->values();
 
     foreach(DataKey oneKey, library->keys())
     {
-      qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
+     // qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
       list.append(QString("%1|%2|%3").arg(QString::number(oneKey), library->value(oneKey).typeName(), library->value(oneKey).toString()));
 
       bArray.append(QString("%1|%2|%3").arg(
@@ -128,7 +128,7 @@ namespace SupercolliderBridge
         ));
       if (oneKey != library->keys().at(library->keys().size() - 1)) { bArray.append("||"); }
     }
-    qDebug() << "List1:" << list;
+   // qDebug() << "List1:" << list;
     return bArray;
   }
 

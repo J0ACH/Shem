@@ -67,7 +67,7 @@ namespace Jui
 
   void CanvanNEW::addButtonBar(CanvanNEW_ToolBar *buttonBar, Qt::ToolBarArea startPosition)
   {
-    buttonBar->setAllowedAreas(Qt::ToolBarArea::TopToolBarArea | Qt::ToolBarArea::BottomToolBarArea);
+    //buttonBar->setAllowedAreas(Qt::ToolBarArea::TopToolBarArea | Qt::ToolBarArea::BottomToolBarArea);
     this->addToolBar(startPosition, buttonBar);
   }
 
@@ -214,7 +214,9 @@ namespace Jui
 
   ///////////////////////////////////////////////////////////////////////////
 
-  CanvanNEW_StatusBar::CanvanNEW_StatusBar(QWidget *parent) : QStatusBar(parent) { colorBackground = QColor(120, 120, 120); }
+  CanvanNEW_StatusBar::CanvanNEW_StatusBar(QWidget *parent) : QStatusBar(parent) {
+    colorBackground = QColor(120, 120, 120);
+  }
   void CanvanNEW_StatusBar::setColorBackground(QColor color)  { colorBackground = color; }
   void CanvanNEW_StatusBar::paintEvent(QPaintEvent *event)
   {
@@ -228,29 +230,39 @@ namespace Jui
 
   ///////////////////////////////////////////////////////////////////////////
 
-  CanvanNEW_ToolBar::CanvanNEW_ToolBar(QWidget *parent) : QToolBar(parent)  { colorBackground = QColor(120, 120, 120); }
-
-  void CanvanNEW_ToolBar::addButton(char* iconPath, char* iconText, const QObject* reciver, const char* member)
+  CanvanNEW_ToolBar::CanvanNEW_ToolBar(QWidget *parent) : QToolBar(parent)
   {
-    QImage image(iconPath);
-    image.fill(QColor(240, 220, 120));
-    image.setAlphaChannel(QImage(iconPath));
-    QPixmap pMap = QPixmap::fromImage(image);
-
-    QAction *action = new QAction(pMap, iconText, this);
-    action->setCheckable(true);
-    // action->installEventFilter(this);
-    connect(action, SIGNAL(triggered()), reciver, member);
-    connect(action, SIGNAL(hovered()), this, SLOT(onHovered()));
-
-    //this->addAction(pMap, iconText, reciver, member);
-    this->addAction(action);
+    this->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
+    this->setMinimumWidth(32);
+    colorBackground = QColor(120, 120, 120);
   }
 
+  void CanvanNEW_ToolBar::addButton(QString name, QImage icon, const QObject* reciver, const char* member)
+  {
+    QAction *action = new QAction(this);
+    //action->rise
+    this->addAction(action);
+
+
+    Button *button = new Button(this->widgetForAction(action));
+    button->setGeometry(0, 0, 28, 28);
+    button->setToolTip(name);
+    button->setIcon(QImage(icon), 0);
+    button->setStateKeeping(Button::StateKeeping::HOLD);
+    button->setColorNormal(QColor(120, 120, 120));
+    button->setColorOver(QColor(230, 230, 230));
+    button->setColorActive(QColor(255, 60, 60));
+
+    connect(button, SIGNAL(pressAct()), reciver, member);
+
+    buttonsList.insert(name, button);
+  }
+  Button* CanvanNEW_ToolBar::getButton(QString name)  { return buttonsList.value(name); }
+
   void CanvanNEW_ToolBar::setColorBackground(QColor color)  { colorBackground = color; }
-  void CanvanNEW_ToolBar::setColorNormal(QColor color)  {  }
-  void CanvanNEW_ToolBar::setColorOver(QColor color)  {  }
-  void CanvanNEW_ToolBar::setColorActive(QColor color)  {  }
+  void CanvanNEW_ToolBar::setColorNormal(QColor color)  { foreach(Button *oneB, buttonsList) { oneB->setColorNormal(color); } }
+  void CanvanNEW_ToolBar::setColorOver(QColor color)  { foreach(Button *oneB, buttonsList) { oneB->setColorOver(color); } }
+  void CanvanNEW_ToolBar::setColorActive(QColor color)  { foreach(Button *oneB, buttonsList) { oneB->setColorActive(color); } }
 
   void CanvanNEW_ToolBar::paintEvent(QPaintEvent *event)
   {
@@ -259,13 +271,13 @@ namespace Jui
 
     // QToolBar::paintEvent(event);
   }
-
+  /*
   void CanvanNEW_ToolBar::onHovered()
   {
-    qDebug() << "CanvanNEW_ToolBar::onHovered";
+  //qDebug() << "CanvanNEW_ToolBar::onHovered";
   }
 
-  /*
+
   bool CanvanNEW_ToolBar::eventFilter(QObject *target, QEvent *event)
   {
   // if (target == fileMenu)
@@ -280,6 +292,7 @@ namespace Jui
   return QToolBar::eventFilter(target, event);
   }
   */
+
 
   CanvanNEW_ToolBar::~CanvanNEW_ToolBar() { }
 

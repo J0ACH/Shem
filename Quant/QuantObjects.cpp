@@ -9,8 +9,8 @@ namespace QuantIDE
     this->setMap("QuantObjectType", "QuantObject");
 
     connect(this, SIGNAL(actEvaluate(QString)), core, SLOT(onEvaluate(QString)));
-    connect(this, SIGNAL(actMyMapSet(QMap <QString, QVariant>)), core, SLOT(onMyMapSet(QMap <QString, QVariant>)));
-    connect(core, SIGNAL(actNetworkMapSet()), this, SLOT(onNetworkMapSet()));
+  //  connect(this, SIGNAL(actMyMapSet(QMap <QString, QVariant>)), core, SLOT(onMyMapSet(QMap <QString, QVariant>)));
+   // connect(core, SIGNAL(actNetworkMapSet()), this, SLOT(onNetworkMapSet()));
   }
 
   QString QuantObject::getMap_string(QString key)  { return map.value(key).toString(); }

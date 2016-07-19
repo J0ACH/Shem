@@ -33,14 +33,14 @@ namespace QuantIDE
 
     canvanNEW->addPanel(console, "Console");
     canvanNEW->addPanel(customizePanel, "Customize");
-    canvanNEW->addPanel(proxyPanel, "ProxySpace");
+    canvanNEW->addPanel(timePanel, "Time");
     canvanNEW->addPanel(networkPanel, "Network", Qt::DockWidgetArea::LeftDockWidgetArea);
 
-    canvanNEW->addButtonBar(toolBar, Qt::ToolBarArea::RightToolBarArea);
 
     core = new QuantCore(canvanNEW);
     core->addProxySpace();
     core->addNode("testNode1");
+    
 
     connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
     connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));
@@ -48,6 +48,8 @@ namespace QuantIDE
     connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onCustomize(Data)));
     connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
     connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
+
+    connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));
 
     customize->refresh();
 
@@ -57,15 +59,33 @@ namespace QuantIDE
   {
     console = new Console();
     networkPanel = new PanelNEW();
+    networkPanel->setVisible(false);
     customizePanel = new CustomizePanel();
-    proxyPanel = new PanelNEW();
+    customizePanel->setVisible(false);
+    timePanel = new PanelNEW();
+    timePanel->setVisible(false);
 
-    toolBar = new CanvanNEW_ToolBar();
-    toolBar->addButton(":/console_16px.png", "Console", console, SLOT(onSwitchVisible()));
-    toolBar->addButton(":/network_16px.png", "Network", networkPanel, SLOT(onSwitchVisible()));
-    toolBar->addButton(":/customize_16px.png", "Customize", customizePanel, SLOT(onSwitchVisible()));
-    toolBar->addButton(":/network_16px.png", "Time", proxyPanel, SLOT(onSwitchVisible()));
-    toolBar->setColorBackground(QColor(30, 30, 30));
+    controlsBar = new CanvanNEW_ToolBar();
+    canvanNEW->addButtonBar(controlsBar, Qt::ToolBarArea::BottomToolBarArea);
+    controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), console, SLOT(onSwitchVisible()));
+    controlsBar->addButton("Server", QImage(":/server_16px.png"), console, SLOT(onSwitchVisible()));
+
+    panelsBar = new CanvanNEW_ToolBar();
+    canvanNEW->addButtonBar(panelsBar, Qt::ToolBarArea::BottomToolBarArea);
+
+    panelsBar->addButton("Console", QImage(":/console_16px.png"), console, SLOT(onSwitchVisible()));
+    panelsBar->getButton("Console")->setState(Button::State::ON);
+    connect(console, SIGNAL(actClosed()), panelsBar->getButton("Console"), SLOT(onSwitch()));
+
+    panelsBar->addButton("Network", QImage(":/network_16px.png"), networkPanel, SLOT(onSwitchVisible()));
+    connect(networkPanel, SIGNAL(actClosed()), panelsBar->getButton("Network"), SLOT(onSwitch()));
+
+    panelsBar->addButton("Customize", QImage(":/customize_16px.png"), customizePanel, SLOT(onSwitchVisible()));
+    connect(customizePanel, SIGNAL(actClosed()), panelsBar->getButton("Customize"), SLOT(onSwitch()));
+
+    panelsBar->addButton("Time", QImage(":/network_16px.png"), timePanel, SLOT(onSwitchVisible()));
+    connect(timePanel, SIGNAL(actClosed()), panelsBar->getButton("Time"), SLOT(onSwitch()));
+
 
     textServerMeter = new Text(canvanNEW->getStaustBar());
     textServerMeter->setText("NaN");
@@ -94,6 +114,16 @@ namespace QuantIDE
     canvanNEW->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
     canvanNEW->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
+    controlsBar->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
+    controlsBar->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    controlsBar->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    controlsBar->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+
+    panelsBar->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
+    panelsBar->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    panelsBar->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    panelsBar->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+
     console->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
     console->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
     console->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
@@ -102,14 +132,7 @@ namespace QuantIDE
     console->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
     console->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
     console->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    console->setColorMsgNormal(data.getValue_color(DataKey::COLOR_MSG_NORMAL));
-    console->setColorMsgStatus(data.getValue_color(DataKey::COLOR_MSG_STATUS));
-    console->setColorMsgEvaluate(data.getValue_color(DataKey::COLOR_MSG_EVALUATE));
-    console->setColorMsgAnswer(data.getValue_color(DataKey::COLOR_MSG_ANSWER));
-    console->setColorMsgError(data.getValue_color(DataKey::COLOR_MSG_ERROR));
-    console->setColorMsgWarning(data.getValue_color(DataKey::COLOR_MSG_WARNINIG));
-    console->setColorMsgBundle(data.getValue_color(DataKey::COLOR_MSG_BUNDLE));
-
+    
     networkPanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
     networkPanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
     networkPanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
@@ -118,13 +141,13 @@ namespace QuantIDE
     networkPanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
     networkPanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
-    proxyPanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    proxyPanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
-    proxyPanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
-    proxyPanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    proxyPanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    proxyPanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    proxyPanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    timePanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
+    timePanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
+    timePanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
+    timePanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
+    timePanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    timePanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    timePanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
     textServerMeter->setFont(data.getValue_font(DataKey::FONT_SMALL));
     textServerMeter->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
@@ -157,6 +180,9 @@ namespace QuantIDE
     txt.append(tr("QToolTip { color: %1; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
     txt.append(tr("QToolTip { background-color:  %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
     txt.append(tr("QToolTip { border: 1px solid white; }"));
+
+    txt.append(tr("QToolButton { border: 0px; }"));
+    
 
     qApp->setStyleSheet(txt);
 

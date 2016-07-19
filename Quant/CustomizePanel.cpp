@@ -2,7 +2,11 @@
 
 namespace QuantIDE
 {
-  CustomizePanel::CustomizePanel(QWidget *parent) : PanelNEW(parent)  { this->initControl(); }
+  CustomizePanel::CustomizePanel(QWidget *parent) : PanelNEW(parent)  
+  {
+    this->setMinimumWidth(400);
+    this->initControl(); 
+  }
 
   void CustomizePanel::initControl()
   {

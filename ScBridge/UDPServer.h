@@ -26,8 +26,10 @@ namespace SupercolliderBridge
     void onDatagramRecived();
 
   signals:
-    void actPrintNormal(QString);
-    void actPrintStatus(QString);
+    void actNetworkBooted();
+
+    void actPrint(QString, MessageType type = MessageType::NORMAL);
+    //void actPrintStatus(QString, MessageType type = MessageType::STATUS);
 
   private:
     QUdpSocket *mSocket;

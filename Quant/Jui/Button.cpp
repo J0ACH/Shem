@@ -49,6 +49,7 @@ namespace Jui
     }
   }
 
+  // bude odstraneno
   void Button::onSwitchOFF()
   {
     if (buttonKeeping == SWITCH)
@@ -57,7 +58,16 @@ namespace Jui
       this->update();
     }
   }
-
+  
+  void Button::onSwitch()
+  {
+    if (buttonKeeping == Button::StateKeeping::HOLD )
+    {
+      if (buttonState = OFF) { buttonState = ON; }
+      else { buttonState = OFF; }
+      this->update();
+    }
+  }
 
   void Button::fadeRatio()
   {
