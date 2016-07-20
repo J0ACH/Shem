@@ -15,6 +15,15 @@ namespace Jui
   class Button : public QWidget
   {
     Q_OBJECT
+      Q_PROPERTY(QColor colorNormal READ getColorNormal WRITE setColorNormal)
+      Q_PROPERTY(QColor colorOver READ getColorOver WRITE setColorOver)
+      Q_PROPERTY(QColor colorActive READ getColorActive WRITE setColorActive)
+
+      /*
+      Q_PROPERTY(QColor colorNormal READ getColorNormal WRITE setColorNormal)
+      Q_PROPERTY(QColor colorOver READ getColorOver WRITE setColorOver)
+      Q_PROPERTY(QColor colorActive READ getColorActive WRITE setColorActive)
+      */
 
   public:
     Button(QWidget *parent = 0);
@@ -35,6 +44,12 @@ namespace Jui
     void setColorOver(QColor);
     void setColorActive(QColor);
     void setButtonGroup(QList<Button *> other);
+
+
+    QColor getColorNormal();
+    QColor getColorOver();
+    QColor getColorActive();
+
 
   signals:
     void pressAct();
@@ -60,7 +75,7 @@ namespace Jui
     QString name;
     QFont fontText;
     QImage icon;
-    QColor normalColor, overColor, activeColor;
+    QColor colorNormal, colorOver, colorActive;
     QColor blendColor(QColor, QColor, qreal);
     QColor penColor, fillColor;
     int iconOffset;
@@ -79,7 +94,7 @@ namespace Jui
 
     QTimer *timer;
 
-
+    //QColor customColor, customColor2;
 
 
   };

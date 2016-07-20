@@ -39,7 +39,7 @@ namespace QuantIDE
    // connect(mNetwork, SIGNAL(actPrintStatus(QString)), mCanvan->getPanel("Console"), SLOT(onMsgStatus(QString)));
 
 
-    // TEST DATA WRAPPING
+        // TEST DATA WRAPPING
     //qDebug("\n\n QuantCore::TEST DATA WRAPPING ////////////////////");
     Data testData;
     testData.setValue(USERNAME, "testData user name Jachym");

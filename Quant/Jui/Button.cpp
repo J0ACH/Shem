@@ -1,6 +1,6 @@
 #include "Button.h"
 
-#include "string.h"
+//#include "string.h"
 
 namespace Jui
 {
@@ -33,9 +33,6 @@ namespace Jui
   void Button::setText(QString buttonName) { name = buttonName; }
   void Button::setFont(QFont font) { fontText = font;	update(); }
   void Button::setIcon(QImage img, int offset = 0) { icon = img; iconOffset = offset; }
-  void Button::setColorNormal(QColor color){ normalColor = color; penColor = normalColor; update(); }
-  void Button::setColorOver(QColor color){ overColor = color; update(); }
-  void Button::setColorActive(QColor color){ activeColor = color; update(); }
   void Button::setState(State newState) { buttonState = newState; update(); }
   void Button::setStateKeeping(StateKeeping mode) { buttonKeeping = mode; }
   void Button::setButtonGroup(QList<Button*> others)
@@ -49,6 +46,13 @@ namespace Jui
     }
   }
 
+  void Button::setColorNormal(QColor color){ colorNormal = color; penColor = colorNormal; update(); }
+  void Button::setColorOver(QColor color){ colorOver = color; update(); }
+  void Button::setColorActive(QColor color){ colorActive = color; update(); }
+  QColor Button::getColorNormal()  { return colorNormal; }
+  QColor Button::getColorOver()  { return colorOver; }
+  QColor Button::getColorActive()  { return colorActive; }
+
   // bude odstraneno
   void Button::onSwitchOFF()
   {
@@ -58,10 +62,10 @@ namespace Jui
       this->update();
     }
   }
-  
+
   void Button::onSwitch()
   {
-    if (buttonKeeping == Button::StateKeeping::HOLD )
+    if (buttonKeeping == Button::StateKeeping::HOLD)
     {
       if (buttonState = OFF) { buttonState = ON; }
       else { buttonState = OFF; }
@@ -107,7 +111,9 @@ namespace Jui
     QPainter painter(this);
     painter.setFont(fontText);
 
-    penColor = blendColor(normalColor, overColor, ratio);
+    //painter.setPen(getCustomColor());
+    penColor = blendColor(colorNormal, colorOver, ratio);
+    //penColor = blendColor(normalColor, overColor, ratio);
     painter.setPen(QPen(penColor, 1));
 
     if (icon.isNull())
@@ -115,7 +121,7 @@ namespace Jui
       switch (buttonState)
       {
       case ON:
-        fillColor = activeColor;
+        fillColor = colorActive;
         break;
       case OFF:
         fillColor = Qt::transparent;;
@@ -130,7 +136,7 @@ namespace Jui
     }
     else
     {
-      if (buttonState == ON) { penColor = activeColor; };
+      if (buttonState == ON) { penColor = colorActive; };
       float moveX = (this->width() - icon.width()) / 2;
       float moveY = (this->height() - icon.height()) / 2;
 
@@ -143,6 +149,9 @@ namespace Jui
       painter.drawImage(target, renderedIcon, source);  // draw image to QWidget
     };
   }
+
+
+
 
   void Button::mousePressEvent(QMouseEvent *mouseEvent)
   {

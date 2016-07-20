@@ -6,6 +6,7 @@ int main(int argc, char** argv){
   QApplication app(argc, argv);
 
   QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0);
+
   /*
   QuantIDE::Quant *win = new QuantIDE::Quant();
   win->setGeometry(50, 50, 1400, 700);
@@ -36,11 +37,10 @@ namespace QuantIDE
     canvanNEW->addPanel(timePanel, "Time");
     canvanNEW->addPanel(networkPanel, "Network", Qt::DockWidgetArea::LeftDockWidgetArea);
 
-
     core = new QuantCore(canvanNEW);
     core->addProxySpace();
     core->addNode("testNode1");
-    
+
 
     connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
     connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));
@@ -86,7 +86,6 @@ namespace QuantIDE
     panelsBar->addButton("Time", QImage(":/network_16px.png"), timePanel, SLOT(onSwitchVisible()));
     connect(timePanel, SIGNAL(actClosed()), panelsBar->getButton("Time"), SLOT(onSwitch()));
 
-
     textServerMeter = new Text(canvanNEW->getStaustBar());
     textServerMeter->setText("NaN");
     textServerMeter->setToolTip("CPU");
@@ -104,10 +103,28 @@ namespace QuantIDE
     textServerGroups->setToolTip("numGroups");
     textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 5, 15, 25);
     textServerGroups->show();
+
+    Button *testButton = new Button(canvanNEW->centralWidget());
+    testButton->setGeometry(150, 50, 200, 50);
+    testButton->setText("testButton");
+    testButton->show();
   }
 
   void QuantNEW::onCustomize(Data data)
   {
+    QString qProperty = tr(
+      "Jui--Button {qproperty-colorNormal: %1;}"
+      "Jui--Button {qproperty-colorOver: %2;}"
+      "Jui--Button {qproperty-colorActive: %3;}"
+      ).arg(
+      data.getValue_color(DataKey::COLOR_NORMAL).name(),
+      data.getValue_color(DataKey::COLOR_OVER).name(),
+      data.getValue_color(DataKey::COLOR_ACTIVE).name()
+      );
+    canvanNEW->setStyleSheet(qProperty);
+
+
+
     canvanNEW->setColorHeaders(data.getValue_color(DataKey::COLOR_APP_HEADER));
     canvanNEW->setColorBackground(data.getValue_color(DataKey::COLOR_APP_BACKGROUND));
     canvanNEW->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
@@ -115,39 +132,39 @@ namespace QuantIDE
     canvanNEW->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
     controlsBar->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    controlsBar->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    controlsBar->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    controlsBar->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    //controlsBar->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    //controlsBar->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    //controlsBar->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
     panelsBar->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    panelsBar->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    panelsBar->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    panelsBar->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    //panelsBar->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    //panelsBar->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    //panelsBar->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
     console->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
     console->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
     console->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
     console->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
     console->setFont(data.getValue_font(DataKey::FONT_CONSOLE));
-    console->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    console->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    console->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    
+    //console->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    //console->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    //console->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+
     networkPanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
     networkPanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
     networkPanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
     networkPanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    networkPanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    networkPanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    networkPanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    //networkPanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    //networkPanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    //networkPanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
     timePanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
     timePanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
     timePanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
     timePanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    timePanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    timePanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    timePanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    //timePanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    //timePanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    //timePanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
     textServerMeter->setFont(data.getValue_font(DataKey::FONT_SMALL));
     textServerMeter->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
@@ -182,7 +199,8 @@ namespace QuantIDE
     txt.append(tr("QToolTip { border: 1px solid white; }"));
 
     txt.append(tr("QToolButton { border: 0px; }"));
-    
+
+
 
     qApp->setStyleSheet(txt);
 
