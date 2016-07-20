@@ -38,9 +38,11 @@ namespace QuantIDE
     qDebug("QuantCore::TEST DATA WRAPPING KONEC /////////////////////\n\n");
 
 
+    Data::Type::CUSTOMIZE;
+    Data::Customize::USERNAME;
+    Data::Type::CUSTOMIZE
 
-
-    /*
+   
     QMap<QString, QVariant> lev1;
     QMap<QString, QVariant> lev2;
 
@@ -63,30 +65,9 @@ namespace QuantIDE
         break;
       }
     }
-    */
+   
 
-    QMap<DataKey, QVariant> lev1;
-    QMap<DataKey, QVariant> lev2;
-
-    lev1.insert(DataKey::USERNAME, "proxy");
-    lev1.insert(DataKey::COLOR_ACTIVE, lev2);
-    lev2.insert(DataKey::FONT_BIG, "aaaa");
-    lev2.insert(DataKey::FONT_SMALL, "bbbb");
-
-    foreach(DataKey oneKey, lev1.keys())
-    {
-      qDebug() << "TEST MultiMap key:" << oneKey << " value:" << lev1.value(oneKey) << "type: " << lev1.value(oneKey).type();
-
-      switch (lev1.value(oneKey).type())
-      {
-      case QVariant::Map:
-        foreach(DataKey oneKey2, lev2.keys())
-        {
-          qDebug() << "\t - key2:" << oneKey2 << " value2:" << lev2.value(oneKey2);
-        }
-        break;
-      }
-    }
+   
   }
 
   void QuantCore::onCustomize(Data data)

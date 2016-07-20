@@ -28,9 +28,37 @@ namespace SupercolliderBridge
     //qDebug() << "List2:" << list;
   }
 
-  //Data::Data(DataType tableType)  {  }
 
-  //void Data::setDataType(DataType tableType)  {  }
+  QString Data::enum2str(Customize key)
+  {
+    switch (key)
+    {
+    case Data::USERNAME: return "USERNAME"; break;
+    case Data::BOOL_BOOT_INTERPRETR: return "BOOL_BOOT_INTERPRETR"; break;
+    case Data::BOOL_BOOT_SERVER: return "BOOL_BOOT_SERVER"; break;
+    case Data::BOOL_TEXT_ANTIALIASING: return "BOOL_TEXT_ANTIALIASING"; break;
+    case Data::COLOR_APP_HEADER: return "COLOR_APP_HEADER"; break;
+    case Data::COLOR_APP_BACKGROUND: return "COLOR_APP_BACKGROUND"; break;
+    case Data::COLOR_PANEL_HEADER: return "COLOR_PANEL_HEADER"; break;
+    case Data::COLOR_PANEL_BACKGROUND: return "COLOR_PANEL_BACKGROUND"; break;
+    case Data::COLOR_NORMAL: return "COLOR_NORMAL"; break;
+    case Data::COLOR_OVER: return "COLOR_OVER"; break;
+    case Data::COLOR_ACTIVE: return "COLOR_ACTIVE"; break;
+    case Data::COLOR_TEXT: return "COLOR_TEXT"; break;
+    case Data::COLOR_MSG_NORMAL: return "COLOR_MSG_NORMAL"; break;
+    case Data::COLOR_MSG_STATUS: return "COLOR_MSG_STATUS"; break;
+    case Data::COLOR_MSG_EVALUATE: return "COLOR_MSG_EVALUATE"; break;
+    case Data::COLOR_MSG_ANSWER: return "COLOR_MSG_ANSWER"; break;
+    case Data::COLOR_MSG_ERROR: return "COLOR_MSG_ERROR"; break;
+    case Data::COLOR_MSG_WARNINIG: return "COLOR_MSG_WARNINIG"; break;
+    case Data::COLOR_MSG_BUNDLE: return "COLOR_MSG_BUNDLE"; break;
+    case Data::FONT_BIG: return "FONT_BIG"; break;
+    case Data::FONT_SMALL: return "FONT_SMALL"; break;
+    case Data::FONT_CONSOLE: return "FONT_CONSOLE"; break;
+    case Data::FONT_CODE: return "FONT_CODE"; break;
+    default: return "NaN"; break;
+    }
+  }
 
   void Data::setValue(DataKey key, char* value)  { library->insert(key, QVariant(value)); }
   void Data::setValue(DataKey key, QString value)  { library->insert(key, QVariant(value)); }
@@ -146,7 +174,7 @@ namespace SupercolliderBridge
 
     foreach(DataKey oneKey, library->keys())
     {
-       qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
+      qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
       list.append(QString("%1|%2|%3").arg(QString::number(oneKey), library->value(oneKey).typeName(), library->value(oneKey).toString()));
 
       bArray.append(QString("%1|%2|%3").arg(
@@ -156,7 +184,7 @@ namespace SupercolliderBridge
         ));
       if (oneKey != library->keys().at(library->keys().size() - 1)) { bArray.append("||"); }
     }
-     qDebug() << "List1:" << list;
+    qDebug() << "List1:" << list;
     return bArray;
   }
 
