@@ -9,6 +9,7 @@
 
 #include <QMouseEvent>
 
+
 namespace Jui
 {
 
@@ -66,7 +67,7 @@ namespace Jui
 
     bool isPressed, isOver;
 
-    QString name;
+    QString text;
     QFont fontText;
     QImage icon;
     QColor colorNormal, colorOver, colorActive;

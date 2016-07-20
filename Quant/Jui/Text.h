@@ -19,7 +19,7 @@ namespace Jui
 
     void setText(QString);
     void setAlign(Qt::Alignment alignment);
-    
+
     void setColorText(QColor);
     QColor getColorText();
 
@@ -33,7 +33,7 @@ namespace Jui
     QString text;
     QColor colorText;
     QFont font;
-        Qt::Alignment align;
+    Qt::Alignment align;
   };
 }
 #endif // TEXT_H

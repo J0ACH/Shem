@@ -1,17 +1,16 @@
 #include "Button.h"
 
-//#include "string.h"
+#define DISPLAY_FRAMES 0
 
 namespace Jui
 {
-
   Button::Button(QWidget *parent) : QWidget(parent)
   {
     buttonState = OFF;
     buttonDisplay = NORMAL;
     buttonKeeping = TOUCH;
 
-    name = "button";
+    text = "button";
     isPressed = false;
     isOver = false;
 
@@ -34,7 +33,7 @@ namespace Jui
 
   QRect Button::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
 
-  void Button::setText(QString buttonName) { name = buttonName; }
+  void Button::setText(QString buttonName) { text = buttonName; }
   void Button::setFont(QFont font) { fontText = font;	update(); }
   void Button::setIcon(QImage img, int offset = 0) { icon = img; iconOffset = offset; }
   void Button::setState(State newState) { buttonState = newState; update(); }
@@ -116,9 +115,7 @@ namespace Jui
     QPainter painter(this);
     painter.setFont(fontText);
 
-    //painter.setPen(getCustomColor());
     penColor = blendColor(colorNormal, colorOver, ratio);
-    //penColor = blendColor(normalColor, overColor, ratio);
     painter.setPen(QPen(penColor, 1));
 
     if (icon.isNull())
@@ -136,7 +133,7 @@ namespace Jui
 
       QTextOption opt;
       opt.setAlignment(Qt::AlignCenter);
-      painter.drawText(bounds(), name, opt);
+      painter.drawText(bounds(), text, opt);
       painter.drawRect(bounds());
     }
     else
@@ -153,8 +150,13 @@ namespace Jui
       renderedIcon.setAlphaChannel(icon);
       painter.drawImage(target, renderedIcon, source);  // draw image to QWidget
     };
+
+#if DISPLAY_FRAMES
+    painter.setPen(Qt::red);
+    painter.drawRect(bounds());
+#endif
   }
-  
+
   void Button::mousePressEvent(QMouseEvent *mouseEvent)
   {
     isPressed = true;
@@ -234,4 +236,4 @@ namespace Jui
   }
 
   Button::~Button() {	}
-}
+  }

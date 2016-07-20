@@ -1,12 +1,14 @@
 #include "Text.h"
 
+#define DISPLAY_FRAMES 0
+
 namespace Jui
 {
 
   Text::Text(QWidget *parent) : QWidget(parent)
   {
     colorText = QColor(240, 30, 30);
-    align = Qt::AlignVCenter | Qt::AlignLeft; // Qt::AlignCenter;
+    align = Qt::AlignVCenter | Qt::AlignLeft; 
   }
 
   void Text::setText(QString txt) { text = txt; }
@@ -32,7 +34,7 @@ namespace Jui
     painter.setPen(colorText);
     painter.drawText(rect, text, option);
 
-#ifdef _DEBUG   // nevim, jestli to pobezi i mimo VS
+#if DISPLAY_FRAMES
     painter.setPen(Qt::red);
     painter.drawRect(rect);   
 #endif

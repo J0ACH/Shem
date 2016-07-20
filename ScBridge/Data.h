@@ -18,18 +18,27 @@ namespace SupercolliderBridge
   };
 
   enum class MessageType{ NORMAL, STATUS, EVAULATE, ANSWER, ERROR, WARNING, BUNDLE };
-
+  
   class Data
   {
   public:
-    //enum DataType { proxyspace, customize };
+    enum Type { CUSTOMIZE, PROXYSPACE };
+    enum Customize { 
+      USERNAME,
+      BOOL_BOOT_INTERPRETR, BOOL_BOOT_SERVER, BOOL_TEXT_ANTIALIASING,
+      COLOR_APP_HEADER, COLOR_APP_BACKGROUND, COLOR_PANEL_HEADER, COLOR_PANEL_BACKGROUND, COLOR_NORMAL, COLOR_OVER, COLOR_ACTIVE, COLOR_TEXT,
+      COLOR_MSG_NORMAL, COLOR_MSG_STATUS, COLOR_MSG_EVALUATE, COLOR_MSG_ANSWER, COLOR_MSG_ERROR, COLOR_MSG_WARNINIG, COLOR_MSG_BUNDLE,
+      FONT_BIG, FONT_SMALL, FONT_CONSOLE, FONT_CODE
+    };
+    enum Proxyspace { BEATS, TEMPO };
 
     Data();
     Data(QByteArray);
-    //Data(DataType);
-    ~Data();
+        ~Data();
 
-    //void setDataType(DataType);
+    QString enum2str(Customize);
+    QString enum2str(Proxyspace);
+    
 
     void setValue(DataKey, char*);
     void setValue(DataKey, QString);
@@ -38,6 +47,7 @@ namespace SupercolliderBridge
     void setValue(DataKey, double);
     void setValue(DataKey, QFont);
     void setValue(DataKey, QColor);
+    //void setValue(DataKey key, QMap<DataKey, QVariant>);
 
     QString getValue_string(DataKey);
     bool getValue_bool(DataKey);

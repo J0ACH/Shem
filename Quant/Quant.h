@@ -22,9 +22,6 @@ using namespace Jui;
 
 namespace QuantIDE
 {
-
-  
-
   class QuantNEW : public QObject
   {
     Q_OBJECT
