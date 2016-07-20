@@ -18,13 +18,7 @@ namespace Jui
       Q_PROPERTY(QColor colorNormal READ getColorNormal WRITE setColorNormal)
       Q_PROPERTY(QColor colorOver READ getColorOver WRITE setColorOver)
       Q_PROPERTY(QColor colorActive READ getColorActive WRITE setColorActive)
-
-      /*
-      Q_PROPERTY(QColor colorNormal READ getColorNormal WRITE setColorNormal)
-      Q_PROPERTY(QColor colorOver READ getColorOver WRITE setColorOver)
-      Q_PROPERTY(QColor colorActive READ getColorActive WRITE setColorActive)
-      */
-
+      
   public:
     Button(QWidget *parent = 0);
     ~Button();
@@ -40,11 +34,11 @@ namespace Jui
     void setIcon(QImage, int);
     void setText(QString name);
     void setFont(QFont);
+    void setButtonGroup(QList<Button *> other);
+
     void setColorNormal(QColor);
     void setColorOver(QColor);
     void setColorActive(QColor);
-    void setButtonGroup(QList<Button *> other);
-
 
     QColor getColorNormal();
     QColor getColorOver();
@@ -52,8 +46,8 @@ namespace Jui
 
 
   signals:
-    void pressAct();
-    void actPressed(Button::State);
+    void pressAct(); // bude odstraneno
+    void actPressed();
     //void enterAct(QString name);
     //void leaveAct(QString name);
 

@@ -20,26 +20,11 @@ namespace QuantIDE
     connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onNetworkBootDone()));
     connect(mBridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
 
-    //connect(this, SIGNAL(actPrint(QString, Jui::MessageType)), mCanvan->getPanel("Console"), SLOT(onPrint(QString, Jui::MessageType)));
-    /*
-    connect(mBridge, SIGNAL(msgNormalAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgNormal(QString)));
-    connect(mBridge, SIGNAL(msgStatusAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgStatus(QString)));
-    connect(mBridge, SIGNAL(msgEvaluateAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgEvaluate(QString)));
-    connect(mBridge, SIGNAL(msgResultAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgAnswer(QString)));
-    connect(mBridge, SIGNAL(msgErrorAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgError(QString)));
-    connect(mBridge, SIGNAL(msgWarningAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgWarning(QString)));
-    connect(mBridge, SIGNAL(msgBundleAct(QString)), mCanvan->getPanel("Console"), SLOT(onMsgBundle(QString)));
-    */
-
     connect(mNetwork, SIGNAL(actNetworkBooted()), this, SLOT(onNetworkBootDone()));
     connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
-    //connect(mNetwork, SIGNAL(actPrintStatus(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
 
 
-   // connect(mNetwork, SIGNAL(actPrintStatus(QString)), mCanvan->getPanel("Console"), SLOT(onMsgStatus(QString)));
-
-
-        // TEST DATA WRAPPING
+    // TEST DATA WRAPPING
     //qDebug("\n\n QuantCore::TEST DATA WRAPPING ////////////////////");
     Data testData;
     testData.setValue(USERNAME, "testData user name Jachym");
@@ -127,8 +112,8 @@ namespace QuantIDE
   }
   void QuantCore::onEvaluate(QString code)  { mBridge->evaluate(code); }
 
-  void QuantCore::onPrint(QString message, MessageType type) 
-  { 
+  void QuantCore::onPrint(QString message, MessageType type)
+  {
     switch (type)
     {
     default:
@@ -154,7 +139,7 @@ namespace QuantIDE
       emit actPrint(message, colorMsgBundle, true);
       break;
     }
-    
+
   }
 
   void QuantCore::addProxySpace()

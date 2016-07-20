@@ -18,20 +18,37 @@ namespace Jui
   class PanelNEW : public QDockWidget
   {
     Q_OBJECT
-
+      Q_PROPERTY(QColor colorHeader READ getColorHeader WRITE setColorHeader)
+      Q_PROPERTY(QColor colorBackground READ getColorBackground WRITE setColorBackground)
+      Q_PROPERTY(QColor colorTitle READ getColorTitle WRITE setColorTitle)
+      Q_PROPERTY(QFont fontTitle READ getFontTitle WRITE setFontTitle)
+      Q_PROPERTY(QFont fontBig READ getFontBig WRITE setFontBig)
+      Q_PROPERTY(QFont fontSmall READ getFontSmall WRITE setFontSmall)
+     // Q_PROPERTY(QFont fontConsole READ getFontConsole WRITE setFontConsole)
 
   public:
     PanelNEW(QWidget *parent = 0);
     ~PanelNEW();
 
     void setTitle(QString);
-    void setFontTitle(QFont);
-    void setColorTitle(QColor);
+
     void setColorBackground(QColor);
     void setColorHeader(QColor);
-    void setColorNormal(QColor);
-    void setColorOver(QColor);
-    void setColorActive(QColor);
+    void setColorTitle(QColor);
+
+    QColor getColorHeader();
+    QColor getColorBackground();
+    QColor getColorTitle();
+
+    void setFontTitle(QFont);
+    void setFontBig(QFont);
+    void setFontSmall(QFont);
+   // void setFontConsole(QFont);
+    
+    QFont getFontTitle();
+    QFont getFontBig();
+    QFont getFontSmall();
+   // QFont getFontConsole();
 
     void setPanelAllowedSides(Qt::DockWidgetAreas);
     //void setPanelSide(Qt::DockWidgetArea side);
@@ -54,12 +71,14 @@ namespace Jui
     bool isMoveing;
     QPoint cursorScreen, cursorCanvan, originCanvanScreen;
 
-    QColor colorHeader, colorBackground, colorText;
-    QFont fontTitle;
-
-    //Qt::DockWidgetArea allowedSide;
-    //PanelSide allowedSide;
+    QColor colorHeader, colorBackground, colorTitle;
+    QFont fontTitle, fontBig, fontSmall; // , fontConsole;
   };
+
+  ///////////////////////////////////////////////////////////////////////////
+
+  // nize bude odstraneno
+
 
   class Panel : public QWidget
   {

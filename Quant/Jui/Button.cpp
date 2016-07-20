@@ -15,6 +15,10 @@ namespace Jui
     isPressed = false;
     isOver = false;
 
+    colorNormal = QColor(120, 120, 120);
+    colorOver = QColor(230, 230, 230);
+    colorActive = QColor(255, 60, 60);
+
     iconOffset = 0;
 
     ratio = 0;
@@ -49,6 +53,7 @@ namespace Jui
   void Button::setColorNormal(QColor color){ colorNormal = color; penColor = colorNormal; update(); }
   void Button::setColorOver(QColor color){ colorOver = color; update(); }
   void Button::setColorActive(QColor color){ colorActive = color; update(); }
+
   QColor Button::getColorNormal()  { return colorNormal; }
   QColor Button::getColorOver()  { return colorOver; }
   QColor Button::getColorActive()  { return colorActive; }
@@ -149,10 +154,7 @@ namespace Jui
       painter.drawImage(target, renderedIcon, source);  // draw image to QWidget
     };
   }
-
-
-
-
+  
   void Button::mousePressEvent(QMouseEvent *mouseEvent)
   {
     isPressed = true;
@@ -172,9 +174,9 @@ namespace Jui
     float stepTime = time / frames;
     float stemAdd = 1 / frames;
 
-    emit actPressed(buttonState);
-    emit pressAct();
-    //qDebug() << "Button (%1) pressed" << name;
+    emit pressAct(); // bude odsraneno
+    emit actPressed();
+
     mouseEvent->accept();
   }
 

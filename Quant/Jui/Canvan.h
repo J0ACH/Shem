@@ -8,12 +8,10 @@
 #include <QDockWidget>
 #include <QtWidgets/QMainWindow>
 #include <QTimer>
-//#include <QLabel>
 #include <QFontDatabase>
 #include <QMap>
 #include <QDesktopWidget>
-//#include <QStyle>
-#include <QBitmap>
+//#include <QBitmap>
 
 
 #include "Console.h"
@@ -26,11 +24,14 @@ namespace Jui
   class CanvanNEW_MenuBar : public QMenuBar
   {
     Q_OBJECT
+      Q_PROPERTY(QColor colorBackground READ getColorBackground WRITE setColorBackground)
+
   public:
     CanvanNEW_MenuBar(QWidget *parent = 0);
     ~CanvanNEW_MenuBar();
 
     void setColorBackground(QColor);
+    QColor getColorBackground();
 
   protected:
     void resizeEvent(QResizeEvent *event);
@@ -45,11 +46,14 @@ namespace Jui
   class CanvanNEW_StatusBar : public QStatusBar
   {
     Q_OBJECT
+      Q_PROPERTY(QColor colorBackground READ getColorBackground WRITE setColorBackground)
+
   public:
     CanvanNEW_StatusBar(QWidget *parent = 0);
     ~CanvanNEW_StatusBar();
 
     void setColorBackground(QColor);
+    QColor getColorBackground();
 
   protected:
     void paintEvent(QPaintEvent *event);
@@ -63,6 +67,8 @@ namespace Jui
   class CanvanNEW_ToolBar : public QToolBar
   {
     Q_OBJECT
+      Q_PROPERTY(QColor colorBackground READ getColorBackground WRITE setColorBackground)
+
   public:
     CanvanNEW_ToolBar(QWidget *parent = 0);
     ~CanvanNEW_ToolBar();
@@ -71,17 +77,11 @@ namespace Jui
     Button* getButton(QString name);
 
     void setColorBackground(QColor);
-    void setColorNormal(QColor);
-    void setColorOver(QColor);
-    void setColorActive(QColor);
-
-    public slots:
-    // void onHovered();
-
-  protected:
+    QColor getColorBackground();
+  
+    protected:
     void paintEvent(QPaintEvent *event);
-    //bool eventFilter(QObject *target, QEvent *event);
-
+   
   private:
     QColor colorBackground;
     QMap<QString, Button*> buttonsList;
@@ -92,6 +92,7 @@ namespace Jui
   class CanvanNEW : public QMainWindow
   {
     Q_OBJECT
+      Q_PROPERTY(QColor colorBackground READ getColorBackground WRITE setColorBackground)
 
   public:
     CanvanNEW(QWidget *parent = 0, Qt::WindowFlags flags = 0);
@@ -103,11 +104,8 @@ namespace Jui
     QWidget* getStaustBar();
 
     void setColorBackground(QColor);
-    void setColorHeaders(QColor);
-    void setColorNormal(QColor);
-    void setColorOver(QColor);
-    void setColorActive(QColor);
-
+    QColor getColorBackground();
+ 
     public slots:
     void onCanvanClosed();
     void onCanvanMaximized();

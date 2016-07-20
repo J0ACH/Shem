@@ -4,8 +4,7 @@
 #include "Panel.h"
 #include <QWidget>
 #include <QTextEdit>
-#include <QScrollBar>
-  
+#include <QScrollBar>  
 
 namespace Jui
 {
@@ -13,12 +12,15 @@ namespace Jui
     class Console : public PanelNEW
   {
     Q_OBJECT
+      Q_PROPERTY(QFont fontConsole READ getFontConsole WRITE setFontConsole)
 
   public:
     Console(QWidget *parent = 0);
     ~Console();
 
-    void setFont(QFont);
+    void setFontConsole(QFont);
+    QFont getFontConsole();
+
     void setColorText(QColor);
     void setColorBackground(QColor);
     
@@ -29,9 +31,8 @@ namespace Jui
     void resizeEvent(QResizeEvent *event);
 
   private:
-    QTextEdit *text;
-
-    
+    QTextEdit *text;  
+    QFont fontConsole;
   };
 
 }

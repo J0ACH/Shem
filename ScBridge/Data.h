@@ -48,6 +48,7 @@ namespace SupercolliderBridge
 
     void print(DataKey);
     QString toString(DataKey);
+    QString toStyleSheet(DataKey);
 
     QByteArray wrap();
     

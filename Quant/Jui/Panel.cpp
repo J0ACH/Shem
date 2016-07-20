@@ -11,9 +11,9 @@ namespace Jui
     //this->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
     //this->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
 
-    this->setColorBackground(QColor(30, 30, 30));
-    this->setColorHeader(QColor(40, 40, 40));
-    this->setColorTitle(QColor(130, 30, 30));
+    colorBackground = QColor(130, 30, 30);
+    colorHeader = QColor(140, 40, 40);
+    colorTitle = QColor(230, 30, 30);
 
     closeButton = new Button(this);
     closeButton->setIcon(QImage(":/smallClose16.png"), 0);
@@ -22,13 +22,24 @@ namespace Jui
   }
 
   void PanelNEW::setTitle(QString name)  { title = name; this->setWindowTitle(title); }
-  void PanelNEW::setFontTitle(QFont font)  { fontTitle = font; }
-  void PanelNEW::setColorTitle(QColor color) { colorText = color; update(); }
-  void PanelNEW::setColorBackground(QColor color) { colorBackground = color; update(); }
+
   void PanelNEW::setColorHeader(QColor color) { colorHeader = color; update(); }
-  void PanelNEW::setColorNormal(QColor color){ closeButton->setColorNormal(color); }
-  void PanelNEW::setColorOver(QColor color){ closeButton->setColorOver(color); }
-  void PanelNEW::setColorActive(QColor color){ closeButton->setColorActive(color); }
+  void PanelNEW::setColorBackground(QColor color) { colorBackground = color; update(); }
+  void PanelNEW::setColorTitle(QColor color) { colorTitle = color; update(); }
+  
+  QColor PanelNEW::getColorHeader() { return colorHeader; }
+  QColor PanelNEW::getColorBackground() { return colorBackground; }
+  QColor PanelNEW::getColorTitle() { return colorTitle; }
+  
+  void PanelNEW::setFontTitle(QFont font)  { fontTitle = font; update(); }
+  void PanelNEW::setFontBig(QFont font)  { fontBig = font; update(); }
+  void PanelNEW::setFontSmall(QFont font)  { fontSmall = font; update(); }
+ // void PanelNEW::setFontConsole(QFont font)  { fontConsole = font; update(); }
+  
+  QFont PanelNEW::getFontTitle() { return fontTitle; }
+  QFont PanelNEW::getFontBig() { return fontBig; }
+  QFont PanelNEW::getFontSmall() { return fontSmall; }
+ // QFont PanelNEW::getFontConsole() { return fontConsole; }
 
   void PanelNEW::setPanelAllowedSides(Qt::DockWidgetAreas sides) { this->setAllowedAreas(sides); }
   //void PanelNEW::setPanelSide(Qt::DockWidgetArea side) { this->parent setCorneAl(side); }
@@ -51,11 +62,11 @@ namespace Jui
   void PanelNEW::paintEvent(QPaintEvent *event)
   {
     QPainter painter(this);
-    painter.setFont(fontTitle);
     painter.fillRect(QRect(1, 0, this->width() - 2, 20), colorHeader);
     painter.fillRect(QRect(1, 20, this->width() - 2, this->height() - 21), colorBackground);
 
-    painter.setPen(colorText);
+    painter.setFont(fontTitle);
+    painter.setPen(colorTitle);
     painter.drawText(10, 14, title);
 
     bool showScreen = false;
@@ -69,7 +80,9 @@ namespace Jui
 
   PanelNEW::~PanelNEW() {}
 
+  ///////////////////////////////////////////////////////////////////////////
 
+  // nize bude odstraneno
 
   Panel::Panel(QWidget *parent) : QWidget(parent)
   {

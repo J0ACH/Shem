@@ -2,10 +2,10 @@
 
 namespace QuantIDE
 {
-  CustomizePanel::CustomizePanel(QWidget *parent) : PanelNEW(parent)  
+  CustomizePanel::CustomizePanel(QWidget *parent) : PanelNEW(parent)
   {
     this->setMinimumWidth(400);
-    this->initControl(); 
+    this->initControl();
   }
 
   void CustomizePanel::initControl()
@@ -27,10 +27,15 @@ namespace QuantIDE
 
     textApp = new Text(scrollWidget);
     textApp->setText("Application");
+    textApp->setFont(getFontBig());
+    
     textColor = new Text(scrollWidget);
     textColor->setText("Colors");
+    textColor->setFont(getFontBig());
+
     textFont = new Text(scrollWidget);
     textFont->setText("Fonts");
+    textColor->setFont(getFontBig());
 
     subTextCanvan = new Text(scrollWidget);
     subTextCanvan->setText("Canvan");
@@ -68,6 +73,7 @@ namespace QuantIDE
     boxColorPanelBackground->setLabel("background");
     boxColorPanelBackground->setLabelSize(150);
     connect(boxColorPanelBackground, SIGNAL(actValueChanged(QString)), this, SLOT(onChangePressed()));
+
   }
 
   QString CustomizePanel::color2String(QColor color)
@@ -90,25 +96,26 @@ namespace QuantIDE
 
   void CustomizePanel::onCustomize(Data data)
   {
-    this->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    this->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
-    this->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
-    this->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    this->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    this->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    this->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    // this->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
+    // this->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
+    // this->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
+    // this->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
+    //    this->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    //   this->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    //  this->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
 
-    buttonSave->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    buttonSave->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    buttonSave->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    buttonSave->setFont(data.getValue_font(DataKey::FONT_SMALL));
+    //buttonSave->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
+    //buttonSave->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
+    //buttonSave->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
+    //buttonSave->setFont(data.getValue_font(DataKey::FONT_SMALL));
 
-    textApp->setFont(data.getValue_font(DataKey::FONT_BIG));
+    //textApp->setFont(data.getValue_font(DataKey::FONT_BIG));
+    /*
     textApp->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
 
     textColor->setFont(data.getValue_font(DataKey::FONT_BIG));
     textColor->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    
+
     textFont->setFont(data.getValue_font(DataKey::FONT_BIG));
     textFont->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
 
@@ -117,9 +124,10 @@ namespace QuantIDE
 
     subTextPanels->setFont(data.getValue_font(DataKey::FONT_SMALL));
     subTextPanels->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    
+
     subTextMsg->setFont(data.getValue_font(DataKey::FONT_SMALL));
     subTextMsg->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
+    */
 
     boxName->setValue(data.getValue_string(DataKey::USERNAME));
     boxName->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
@@ -213,6 +221,8 @@ namespace QuantIDE
 
   void CustomizePanel::resizeEvent(QResizeEvent *event)
   {
+
+
     scrollArea->setGeometry(10, 30, width() - 20, height() - 70);
     scrollWidget->setFixedWidth(scrollArea->width() - 10);
 

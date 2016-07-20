@@ -18,12 +18,13 @@ namespace Jui
     this->setColorText(QColor(130, 130, 130));
   }
 
-  void Console::setFont(QFont font)
+  void Console::setFontConsole(QFont font)
   {
     text->setFont(font);
     text->verticalScrollBar()->setValue(text->verticalScrollBar()->maximum());
     update();
   }
+  QFont Console::getFontConsole() { return fontConsole; }
 
   void Console::setColorText(QColor color)
   {

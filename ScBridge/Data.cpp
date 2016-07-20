@@ -14,7 +14,7 @@ namespace SupercolliderBridge
 
     QString dataMsg = QString::fromUtf8(wrapedData);
     QStringList dataList = dataMsg.split("||");
-   
+
     foreach(QString oneLine, dataList)
     {
       QStringList args = oneLine.split("|");
@@ -108,6 +108,33 @@ namespace SupercolliderBridge
     }
   }
 
+  QString Data::toStyleSheet(DataKey key)
+  {
+    QString text;
+    QFont font, font2;
+    switch (library->value(key).type())
+    {
+    case QVariant::Int:
+    case QVariant::Double:
+    case QVariant::String: return library->value(key).toString();  break;
+    case QVariant::Bool:
+      if (library->value(key).toBool()) { return "true"; }
+      else { return "false"; }
+      break;
+    case QVariant::Font:
+      font = library->value(key).value<QFont>();
+      return QString("\"%1\"").arg(font.toString());
+      break;
+    case QVariant::Color:
+      return library->value(key).value<QColor>().name();
+      break;
+    default:
+      qDebug() << "Data::toString() NESPECIFIKOVANY TYP (" << key << "," << library->value(key) << " ) ->" << library->value(key).type();
+      return "NaN";
+      break;
+    }
+  }
+
   QByteArray Data::wrap()
   {
     QStringList list;
@@ -118,7 +145,7 @@ namespace SupercolliderBridge
 
     foreach(DataKey oneKey, library->keys())
     {
-     // qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
+      // qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
       list.append(QString("%1|%2|%3").arg(QString::number(oneKey), library->value(oneKey).typeName(), library->value(oneKey).toString()));
 
       bArray.append(QString("%1|%2|%3").arg(
@@ -128,7 +155,7 @@ namespace SupercolliderBridge
         ));
       if (oneKey != library->keys().at(library->keys().size() - 1)) { bArray.append("||"); }
     }
-   // qDebug() << "List1:" << list;
+    // qDebug() << "List1:" << list;
     return bArray;
   }
 
