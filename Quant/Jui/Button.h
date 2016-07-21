@@ -19,6 +19,7 @@ namespace Jui
       Q_PROPERTY(QColor colorNormal READ getColorNormal WRITE setColorNormal)
       Q_PROPERTY(QColor colorOver READ getColorOver WRITE setColorOver)
       Q_PROPERTY(QColor colorActive READ getColorActive WRITE setColorActive)
+      Q_PROPERTY(QFont font READ getFont WRITE setFont)
       
   public:
     Button(QWidget *parent = 0);
@@ -34,16 +35,17 @@ namespace Jui
     void setStateKeeping(StateKeeping);
     void setIcon(QImage, int);
     void setText(QString name);
-    void setFont(QFont);
     void setButtonGroup(QList<Button *> other);
 
     void setColorNormal(QColor);
     void setColorOver(QColor);
     void setColorActive(QColor);
+    void setFont(QFont);
 
     QColor getColorNormal();
     QColor getColorOver();
     QColor getColorActive();
+    QFont getFont();
 
 
   signals:
@@ -68,7 +70,7 @@ namespace Jui
     bool isPressed, isOver;
 
     QString text;
-    QFont fontText;
+    QFont font;
     QImage icon;
     QColor colorNormal, colorOver, colorActive;
     QColor blendColor(QColor, QColor, qreal);

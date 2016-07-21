@@ -6,7 +6,7 @@ namespace Jui
   ControlBox::ControlBox(QWidget *parent) :
     QWidget(parent)
   {
-    label = new QLabel(this);
+    label = new Text(this);
     label->setText("label");
 
     value = new QLineEdit(this);
@@ -25,11 +25,10 @@ namespace Jui
     value->installEventFilter(this);
 
     colorText = Qt::white;
-    colorBackground = Qt::black;
     colorNormal = Qt::gray;
     colorOver = Qt::white;
-    colorActive = QColor(255, 30, 30);
-    this->updateStyleSheet();
+    colorActive = QColor(120, 30, 30);
+    colorText = QColor(255, 30, 30);
 
     connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
   }
@@ -43,29 +42,26 @@ namespace Jui
     oldValue = val;
   }
 
-  double ControlBox::getValue()  { qDebug("ControlBox::getValue() BUDE ODSTANENO -> POUZIT ControlBox::getValue_double()");  return value->displayText().toDouble(); }
   QString ControlBox::getValue_string()  { return value->displayText(); }
   int ControlBox::getValue_int()  { return value->displayText().toInt(); }
   double ControlBox::getValue_double()  { return value->displayText().toDouble(); }
 
-  void ControlBox::setFont(QFont font)
-  {
+  void ControlBox::setColorNormal(QColor color) { colorNormal = color; }
+  void ControlBox::setColorOver(QColor color) { colorOver = color; }
+  void ControlBox::setColorActive(QColor color) { colorActive = color; }
+  void ControlBox::setColorText(QColor color) { colorText = color; }
+  void ControlBox::setFont(QFont f){
+    font = f;
     label->setFont(font);
     value->setFont(font);
   }
-  void ControlBox::setColorBackground(QColor color)
-  {
-    colorBackground = color;
-    this->updateStyleSheet();
-  }
-  void ControlBox::setColorNormal(QColor color){ colorNormal = color; }
-  void ControlBox::setColorOver(QColor color){ colorOver = color; }
-  void ControlBox::setColorActive(QColor color){ colorActive = color; }
-  void ControlBox::setColorText(QColor color)
-  {
-    colorText = color;
-    this->updateStyleSheet();
-  }
+
+  QColor ControlBox::getColorNormal()  { return colorNormal; }
+  QColor ControlBox::getColorOver()  { return colorOver; }
+  QColor ControlBox::getColorActive()  { return colorActive; }
+  QColor ControlBox::getColorText()  { return colorActive; }
+  QFont ControlBox::getFont()  { return font; }
+
   void ControlBox::setLabelSize(int size)
   {
     labelSizeX = size;
@@ -73,18 +69,6 @@ namespace Jui
     // label->setGeometry(0, 0, labelSizeX, this->height());
     //  value->setGeometry(labelSizeX, 1, this->width() - labelSizeX - 6, this->height() - 2);    
   }
-  void ControlBox::updateStyleSheet()
-  {
-    QString styleTxt;
-    styleTxt.append(tr("QLabel { color: %1; }").arg(colorText.name()));
-    styleTxt.append(tr("QLineEdit { color: %1; }").arg(colorText.name()));
-    styleTxt.append("QLineEdit { background-color: rgba(0,0,0,0); }");
-    styleTxt.append("QLineEdit { border: none;}");
-
-    label->setStyleSheet(styleTxt);
-    value->setStyleSheet(styleTxt);
-    update();
-      }
 
   bool ControlBox::eventFilter(QObject* target, QEvent* event)
   {

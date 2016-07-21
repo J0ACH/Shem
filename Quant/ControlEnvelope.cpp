@@ -73,7 +73,7 @@ namespace QuantIDE
     durationBox->setLabel("quant");
     durationBox->setValue("1");
     durationBox->setLabelSize(45);
-    durationBox->setColorBackground(QColor(60, 30, 30));
+//    durationBox->setColorBackground(QColor(60, 30, 30));
     durationBox->setColorText(QColor(120, 120, 120));
 
   }
@@ -84,7 +84,7 @@ namespace QuantIDE
     QFont fontTextBig, fontTextSmall, fontTextCode;
 
     qDebug("ControlEnvelope::onCustomize");
-
+    /*
     colorPanelBackground = mCustomize->getColor("color_shem_PanelBackground");
     colorNormal = mCustomize->getColor("color_shem_Normal");
     colorOver = mCustomize->getColor("color_shem_Over");
@@ -94,6 +94,7 @@ namespace QuantIDE
     fontTextBig = mCustomize->getFont("font_shem_TextBig");
     fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
     fontTextCode = mCustomize->getFont("font_shem_TextCode");
+    */
 
     QPalette palete = this->palette();
     palete.setColor(this->foregroundRole(), colorText);
@@ -184,16 +185,16 @@ namespace QuantIDE
       // set duration by quant
       duration = mBridge->question(tr("%1.totalDuration").arg(envCode)).toString().toDouble();
 
-      float restTime = durationBox->getValue() - duration;
+      float restTime = durationBox->getValue_double() - duration;
       // qDebug() << "duration quant reduce by " << restTime;
       if (times[times.size() - 1] + restTime >= 0)
       {
         times[times.size() - 1] += restTime;
-        duration = durationBox->getValue();
+        duration = durationBox->getValue_double();
       }
       else
       {
-        mBridge->msgWarningAct(tr("Set duration is too high. Env sum of duration is set back to %1").arg(QString::number(durationBox->getValue())));
+        mBridge->msgWarningAct(tr("Set duration is too high. Env sum of duration is set back to %1").arg(QString::number(durationBox->getValue_double())));
         this->setEnv(previousEnv);
       }
 
@@ -391,9 +392,10 @@ namespace QuantIDE
 
     //painter.setPen(QPen(Qt::white, 1));
     //painter.fillRect(bounds(), QColor(120, 20, 20));
-
+    /*
     if (this->hasFocus()) { painter.setPen(mCustomize->getColor("color_shem_Active")); }
     else { painter.setPen(mCustomize->getColor("color_shem_Normal")); }
+    */
 
     //painter.setPen(colorOver);
     painter.drawLine(0, 0, width(), 0);

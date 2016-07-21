@@ -34,7 +34,6 @@ namespace Jui
   QRect Button::bounds() { return QRect(1, 1, width() - 2, height() - 2); }
 
   void Button::setText(QString buttonName) { text = buttonName; }
-  void Button::setFont(QFont font) { fontText = font;	update(); }
   void Button::setIcon(QImage img, int offset = 0) { icon = img; iconOffset = offset; }
   void Button::setState(State newState) { buttonState = newState; update(); }
   void Button::setStateKeeping(StateKeeping mode) { buttonKeeping = mode; }
@@ -52,10 +51,12 @@ namespace Jui
   void Button::setColorNormal(QColor color){ colorNormal = color; penColor = colorNormal; update(); }
   void Button::setColorOver(QColor color){ colorOver = color; update(); }
   void Button::setColorActive(QColor color){ colorActive = color; update(); }
+  void Button::setFont(QFont f) { font = f;	update(); }
 
   QColor Button::getColorNormal()  { return colorNormal; }
   QColor Button::getColorOver()  { return colorOver; }
   QColor Button::getColorActive()  { return colorActive; }
+  QFont Button::getFont()  { return font; }
 
   // bude odstraneno
   void Button::onSwitchOFF()
@@ -113,7 +114,7 @@ namespace Jui
   void Button::paintEvent(QPaintEvent *event)
   {
     QPainter painter(this);
-    painter.setFont(fontText);
+    painter.setFont(font);
 
     penColor = blendColor(colorNormal, colorOver, ratio);
     painter.setPen(QPen(penColor, 1));

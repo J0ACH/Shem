@@ -59,7 +59,7 @@ namespace QuantIDE
   void Node::onCustomize()
   {
     qDebug("Node::onCustomize");
-
+    /*
     colorPanelBackground = mCustomize->getColor("color_shem_PanelBackground");
     colorNormal = mCustomize->getColor("color_shem_Normal");
     colorOver = mCustomize->getColor("color_shem_Over");
@@ -68,6 +68,7 @@ namespace QuantIDE
     fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
     fontTextCode = mCustomize->getFont("font_shem_TextCode");
     colorText = mCustomize->getColor("color_shem_Text");
+    */
 
     sourceCode->setFontCode(fontTextCode);
 
@@ -91,11 +92,11 @@ namespace QuantIDE
     labelNamedControls->setPalette(palete);
 
     volumeBox->setFont(fontTextSmall);
-    volumeBox->setColorBackground(colorPanelBackground);
+//    volumeBox->setColorBackground(colorPanelBackground);
     volumeBox->setColorText(colorText);
 
     fTimeBox->setFont(fontTextSmall);
-    fTimeBox->setColorBackground(colorPanelBackground);
+   // fTimeBox->setColorBackground(colorPanelBackground);
     fTimeBox->setColorText(colorText);
 
   }

@@ -37,10 +37,11 @@ namespace QuantIDE
     testDataReciver.print(USERNAME);
     qDebug("QuantCore::TEST DATA WRAPPING KONEC /////////////////////\n\n");
 
-
+    /*
     Data::Type::CUSTOMIZE;
     Data::Customize::USERNAME;
     Data::Type::CUSTOMIZE
+    */
 
    
     QMap<QString, QVariant> lev1;

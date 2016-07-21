@@ -12,10 +12,8 @@ namespace QuantIDE
   {
     scrollArea = new QScrollArea(this);
     scrollArea->setFrameStyle(QFrame::NoFrame);
-    scrollArea->setStyleSheet("background-color: rgba(0,0,0,0)");
 
     scrollWidget = new QWidget(this);
-    scrollWidget->setAutoFillBackground(true);
     scrollWidget->setStyleSheet("background-color: rgba(0,0,0,0)");
     scrollWidget->setGeometry(0, 0, 300, 1000);
 
@@ -28,7 +26,7 @@ namespace QuantIDE
     textApp = new Text(scrollWidget);
     textApp->setText("Application");
     textApp->setFont(getFontBig());
-    
+
     textColor = new Text(scrollWidget);
     textColor->setText("Colors");
     textColor->setFont(getFontBig());
@@ -73,7 +71,6 @@ namespace QuantIDE
     boxColorPanelBackground->setLabel("background");
     boxColorPanelBackground->setLabelSize(150);
     connect(boxColorPanelBackground, SIGNAL(actValueChanged(QString)), this, SLOT(onChangePressed()));
-
   }
 
   QString CustomizePanel::color2String(QColor color)
@@ -96,86 +93,18 @@ namespace QuantIDE
 
   void CustomizePanel::onCustomize(Data data)
   {
-    // this->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    // this->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
-    // this->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
-    // this->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    //    this->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    //   this->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    //  this->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-
-    //buttonSave->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    //buttonSave->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    //buttonSave->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    //buttonSave->setFont(data.getValue_font(DataKey::FONT_SMALL));
-
-    //textApp->setFont(data.getValue_font(DataKey::FONT_BIG));
-    /*
-    textApp->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-
-    textColor->setFont(data.getValue_font(DataKey::FONT_BIG));
-    textColor->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-
-    textFont->setFont(data.getValue_font(DataKey::FONT_BIG));
-    textFont->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-
-    subTextCanvan->setFont(data.getValue_font(DataKey::FONT_SMALL));
-    subTextCanvan->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-
-    subTextPanels->setFont(data.getValue_font(DataKey::FONT_SMALL));
-    subTextPanels->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-
-    subTextMsg->setFont(data.getValue_font(DataKey::FONT_SMALL));
-    subTextMsg->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    */
-
     boxName->setValue(data.getValue_string(DataKey::USERNAME));
-    boxName->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    boxName->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    boxName->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    boxName->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    boxName->setFont(data.getValue_font(DataKey::FONT_SMALL));
-
     boxColorNormal->setValue(data.toString(DataKey::COLOR_NORMAL));
-    boxColorNormal->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    boxColorNormal->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    boxColorNormal->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    boxColorNormal->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    boxColorNormal->setFont(data.getValue_font(DataKey::FONT_SMALL));
-
     boxColorOver->setValue(data.toString(DataKey::COLOR_OVER));
-    boxColorOver->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    boxColorOver->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    boxColorOver->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    boxColorOver->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    boxColorOver->setFont(data.getValue_font(DataKey::FONT_SMALL));
-
     boxColorActive->setValue(data.toString(DataKey::COLOR_ACTIVE));
-    boxColorActive->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    boxColorActive->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    boxColorActive->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    boxColorActive->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    boxColorActive->setFont(data.getValue_font(DataKey::FONT_SMALL));
-
     boxColorText->setValue(data.toString(DataKey::COLOR_TEXT));
-    boxColorText->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    boxColorText->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    boxColorText->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    boxColorText->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    boxColorText->setFont(data.getValue_font(DataKey::FONT_SMALL));
-
     boxColorPanelBackground->setValue(data.toString(DataKey::COLOR_PANEL_BACKGROUND));
-    boxColorPanelBackground->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    boxColorPanelBackground->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    boxColorPanelBackground->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-    boxColorPanelBackground->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    boxColorPanelBackground->setFont(data.getValue_font(DataKey::FONT_SMALL));
   }
 
   Data CustomizePanel::makeData()
   {
     Data data;
-    // bude nahrazeno hodnotami dole
+    // bude nahrazeno hodnotami dole, az budou pridana na panel
     data.setValue(DataKey::COLOR_APP_HEADER, QColor(40, 40, 40));
     data.setValue(DataKey::COLOR_APP_BACKGROUND, QColor(20, 20, 20));
     data.setValue(DataKey::COLOR_PANEL_HEADER, QColor(30, 30, 30));
@@ -210,12 +139,12 @@ namespace QuantIDE
 
   void CustomizePanel::onChangePressed()
   {
-    qDebug("CustomizePanel::onChangePressed()");
+    // qDebug("CustomizePanel::onChangePressed()");
     emit actChangeConfirmed(this->makeData());
   }
   void CustomizePanel::onSavePressed()
   {
-    qDebug("CustomizePanel::onSavePressed()");
+    // qDebug("CustomizePanel::onSavePressed()");
     emit actSaveConfirmed(this->makeData());
   }
 
@@ -257,8 +186,5 @@ namespace QuantIDE
 
     PanelNEW::resizeEvent(event);
   }
-  CustomizePanel::~CustomizePanel()
-  {
-
-  }
+  CustomizePanel::~CustomizePanel() { }
 }

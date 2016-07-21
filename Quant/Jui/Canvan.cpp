@@ -34,7 +34,8 @@ namespace Jui
 
     fileMenu = new QMenu("file");
     fileMenu->installEventFilter(this);
-    menuBar->addMenu(fileMenu);
+    fileMenu->hide(); // skryte
+    //menuBar->addMenu(fileMenu);
 
     fileMenu->addAction("setup");
     fileMenu->addAction("exit");

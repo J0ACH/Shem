@@ -121,7 +121,7 @@ namespace QuantIDE
       "Jui--Button {qproperty-colorActive: %3;}"
 
       "Jui--CanvanNEW {qproperty-colorBackground: %6;}"
-      "Jui--CanvanNEW_MenuBar {background-color: rgba(0,0,0,0); qproperty-colorBackground: %5;}"
+      "Jui--CanvanNEW_MenuBar {qproperty-colorBackground: %5;}"
       "Jui--CanvanNEW_StatusBar {qproperty-colorBackground: %5;}"
       "Jui--CanvanNEW_ToolBar {qproperty-colorBackground: %7;}"
 
@@ -130,6 +130,11 @@ namespace QuantIDE
       "Jui--PanelNEW {qproperty-colorTitle: %4;}"
 
       "Jui--Text {qproperty-colorText: %4;}"
+
+      "Jui--ControlBox {qproperty-colorNormal: %1;}"
+      "Jui--ControlBox {qproperty-colorOver: %2;}"
+      "Jui--ControlBox {qproperty-colorActive: %3;}"
+      "Jui--ControlBox {qproperty-colorText: %4;}"
       ).arg(
       data.toStyleSheet(DataKey::COLOR_NORMAL),
       data.toStyleSheet(DataKey::COLOR_OVER),
@@ -146,137 +151,73 @@ namespace QuantIDE
       "Jui--PanelNEW {qproperty-fontTitle: %2;}"
       "Jui--PanelNEW {qproperty-fontBig: %1;}"
       "Jui--PanelNEW {qproperty-fontSmall: %2;}"
-            
+
       "Jui--Console {qproperty-fontConsole: %3;}"
 
       "Jui--Text {qproperty-font: %2;}"
+
+      "Jui--Button {qproperty-font: %2;}"
+      "Jui--ControlBox {qproperty-font: %2;}"
       ).arg(
       data.toStyleSheet(DataKey::FONT_BIG),
       data.toStyleSheet(DataKey::FONT_SMALL),
       data.toStyleSheet(DataKey::FONT_CONSOLE)
       );
 
-    canvanNEW->setStyleSheet(qPropertyColors + qPropertyFonts);
+    QString qtStyleSheet =
+      "QMenuBar { background-color: rgba(0,0,0,0); }"
 
-    /*
-    QString qProperty = tr(
-      "Jui--Button {qproperty-colorNormal: %1;}"
-      "Jui--Button {qproperty-colorOver: %2;}"
-      "Jui--Button {qproperty-colorActive: %3;}"
+      "QLineEdit { background-color: rgba(0,0,0,0); border: none;}"
 
-      "Jui--CanvanNEW {qproperty-colorBackground: %6;}"
-      "Jui--CanvanNEW_MenuBar {background-color: rgba(0,0,0,0); qproperty-colorBackground: %5;}"
-      "Jui--CanvanNEW_StatusBar {qproperty-colorBackground: %5;}"
-      "Jui--CanvanNEW_ToolBar {qproperty-colorBackground: %7;}"
+      "QScrollArea { background-color: rgba(0,0,0,0); }"
 
-      "Jui--PanelNEW {qproperty-colorHeader: %7;}"
-      "Jui--PanelNEW {qproperty-colorBackground: %8;}"
-      "Jui--PanelNEW {qproperty-colorTitle: %4;}"
-      "Jui--PanelNEW {qproperty-fontTitle: %10;}"
-      "Jui--PanelNEW {qproperty-fontBig: %9;}"
-      "Jui--PanelNEW {qproperty-fontSmall: %10;}"
-      "Jui--PanelNEW {qproperty-fontConsole: %11;}"
+      "QScrollBar:vertical { width: 4px; }"
+      "QScrollBar:horizontal { height: 4px; }"
+      "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }"
+      "QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }"
+      "QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }"
+      "QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }"
+      "QScrollBar::add-line:horizontal { border: none; background: none; }"
+      "QScrollBar::sub-line:horizontal { border: none;	background: none; }"
+      "QScrollBar::add-line:vertical { border: none; background: none; }"
+      "QScrollBar::sub-line:vertical { border: none;	background: none; }"
 
+           "QToolButton { border: 0px; }"
+      ;
+
+    QString qtStyleSheet_Colors = tr(
+      "QTextEdit { color: %3; }"
+      "QTextEdit { background-color: %4; }"
+      "QTextEdit { selection-background-color: %2; }"
       
+      "QLineEdit { color: %3; }"
+
+      "QScrollBar:vertical { background: %4; }"
+      "QScrollBar:horizontal { background: %4; }"
+      "QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }"
+      "QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }"
+
+      //"QTabBar::tab{ background: %4; border: 1px solid %1; border-bottom-color: %3}"
+
+      "QToolTip { color: %3; }"
+      "QToolTip { background-color: %4; }"
+      "QToolTip { border: 1px solid %1; }"
       ).arg(
       data.toStyleSheet(DataKey::COLOR_NORMAL),
-      data.toStyleSheet(DataKey::COLOR_OVER),
       data.toStyleSheet(DataKey::COLOR_ACTIVE),
       data.toStyleSheet(DataKey::COLOR_TEXT),
 
-      data.toStyleSheet(DataKey::COLOR_APP_HEADER),
-      data.toStyleSheet(DataKey::COLOR_APP_BACKGROUND),
-      data.toStyleSheet(DataKey::COLOR_PANEL_HEADER),
-      data.toStyleSheet(DataKey::COLOR_PANEL_BACKGROUND),
-
-      data.toStyleSheet(DataKey::FONT_BIG),
-      data.toStyleSheet(DataKey::FONT_SMALL),
-      data.toStyleSheet(DataKey::FONT_CONSOLE)
+      data.toStyleSheet(DataKey::COLOR_PANEL_BACKGROUND)
       );
-    */
 
+    QString qtStyleSeet_Fonts = tr(
+      "QToolTip { font: %1; }"
+      ).arg(
+      data.toStyleSheet(DataKey::FONT_SMALL)
+      );
 
-    //canvanNEW->setColorHeaders(data.getValue_color(DataKey::COLOR_APP_HEADER));
-    //canvanNEW->setColorBackground(data.getValue_color(DataKey::COLOR_APP_BACKGROUND));
-    //canvanNEW->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    //canvanNEW->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    //canvanNEW->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-
-    //controlsBar->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    //controlsBar->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    //controlsBar->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    //controlsBar->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-
-    //panelsBar->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    //panelsBar->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    //panelsBar->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    //panelsBar->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-
-    //console->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    //console->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
-    //console->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
-    // console->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    //console->setFont(data.getValue_font(DataKey::FONT_CONSOLE));
-    //console->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    //console->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    //console->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-
-    //networkPanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    //networkPanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
-    //networkPanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
-    //networkPanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    //networkPanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    //networkPanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    //networkPanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-
-    //timePanel->setColorHeader(data.getValue_color(DataKey::COLOR_PANEL_HEADER));
-    //timePanel->setColorBackground(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND));
-    //timePanel->setColorTitle(data.getValue_color(DataKey::COLOR_TEXT));
-    //timePanel->setFontTitle(data.getValue_font(DataKey::FONT_SMALL));
-    //timePanel->setColorNormal(data.getValue_color(DataKey::COLOR_NORMAL));
-    //timePanel->setColorOver(data.getValue_color(DataKey::COLOR_OVER));
-    //timePanel->setColorActive(data.getValue_color(DataKey::COLOR_ACTIVE));
-
-    //textServerMeter->setFont(data.getValue_font(DataKey::FONT_SMALL));
-   // textServerMeter->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    //textServerSynths->setFont(data.getValue_font(DataKey::FONT_SMALL));
-   // textServerSynths->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-    //textServerGroups->setFont(data.getValue_font(DataKey::FONT_SMALL));
-   // textServerGroups->setColorText(data.getValue_color(DataKey::COLOR_TEXT));
-
-
-    QString txt;
-    txt.append(tr("QTextEdit { color: %1; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
-    txt.append(tr("QTextEdit { background-color: %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
-    txt.append(tr("QTextEdit { selection-background-color: %1; }").arg(data.getValue_color(DataKey::COLOR_ACTIVE).name()));
-
-    txt.append("QScrollBar:vertical { width: 2px; }");
-    txt.append("QScrollBar:horizontal { height: 2px; }");
-    txt.append(tr("QScrollBar:vertical { background: %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
-    txt.append(tr("QScrollBar:horizontal { background: %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
-    txt.append(tr("QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
-    txt.append(tr("QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
-    txt.append("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
-    txt.append("QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }");
-    txt.append("QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }");
-    txt.append("QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }");
-    txt.append("QScrollBar::add-line:horizontal { border: none; background: none; }");
-    txt.append("QScrollBar::sub-line:horizontal { border: none;	background: none; }");
-    txt.append("QScrollBar::add-line:vertical { border: none; background: none; }");
-    txt.append("QScrollBar::sub-line:vertical { border: none;	background: none; }");
-
-    txt.append(tr("QToolTip { color: %1; }").arg(data.getValue_color(DataKey::COLOR_TEXT).name()));
-    txt.append(tr("QToolTip { background-color:  %1; }").arg(data.getValue_color(DataKey::COLOR_PANEL_BACKGROUND).name()));
-    txt.append(tr("QToolTip { border: 1px solid white; }"));
-
-    txt.append(tr("QToolButton { border: 0px; }"));
-
-
-
-    qApp->setStyleSheet(txt);
-
-
-  }
+    qApp->setStyleSheet(qPropertyColors + qPropertyFonts + qtStyleSheet + qtStyleSheet_Colors + qtStyleSeet_Fonts);
+     }
 
   bool QuantNEW::eventFilter(QObject *target, QEvent *event)
   {
@@ -292,8 +233,6 @@ namespace QuantIDE
     }
     return QObject::eventFilter(target, event);
   }
-
-
 
   QuantNEW::~QuantNEW()
   {
@@ -472,7 +411,7 @@ namespace QuantIDE
     // qDebug("Quant::onCustomize");
     QColor colorAppHeaderBackground;
     QFont fontTextConsole;
-
+    /*
     colorAppBackground = customize->getColor("color_shem_AppBackground");
     colorAppHeaderBackground = customize->getColor("color_shem_AppHeaderBackground");
     colorPanelBackground = customize->getColor("color_shem_PanelBackground");
@@ -495,6 +434,7 @@ namespace QuantIDE
     fontTextConsole = customize->getFont("font_shem_TextConsole");
 
     userName = customize->getString("string_shem_UserName");
+    */
 
     canvan->setColorHeader(colorAppHeaderBackground);
     canvan->setColorNormal(colorNormal);

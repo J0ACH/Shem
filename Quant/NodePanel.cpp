@@ -50,7 +50,7 @@ namespace QuantIDE
 
     QColor colorPanelBackground, colorNormal, colorOver, colorActive, colorText;
     QFont fontTextBig, fontTextSmall;
-
+    /*
     colorPanelBackground = mCustomize->getColor("color_shem_PanelBackground");
     colorNormal = mCustomize->getColor("color_shem_Normal");
     colorOver = mCustomize->getColor("color_shem_Over");
@@ -58,6 +58,7 @@ namespace QuantIDE
     colorText = mCustomize->getColor("color_shem_Text");
     fontTextBig = mCustomize->getFont("font_shem_TextBig");
     fontTextSmall = mCustomize->getFont("font_shem_TextSmall");
+    */
 
     Panel::setColorBackground(colorPanelBackground);
     Panel::setColorTitle(colorText);
