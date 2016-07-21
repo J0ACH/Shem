@@ -38,11 +38,13 @@ namespace QuantIDE
     qDebug("QuantCore::TEST DATA WRAPPING KONEC /////////////////////\n\n");
 
     /*
-    Data::Type::CUSTOMIZE;
-    Data::Customize::USERNAME;
-    Data::Type::CUSTOMIZE
+    DataCustomize::Key::USERNAME
+    DataProxy::Key::BEATS
     */
 
+    DataProxy data;
+    data.setValue(DataProxy::TEMPO, "120bpm");
+    qDebug() << "QuantCore::libraryNEW get TEST:" << data.getValue_string(DataProxy::TEMPO);
    
     QMap<QString, QVariant> lev1;
     QMap<QString, QVariant> lev2;

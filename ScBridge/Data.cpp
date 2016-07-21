@@ -6,6 +6,7 @@ namespace SupercolliderBridge
   Data::Data()
   {
     library = new QMap<DataKey, QVariant>();
+    libraryNEW = new QMap<QString, QVariant>();
   }
 
   Data::Data(QByteArray wrapedData)
@@ -28,9 +29,9 @@ namespace SupercolliderBridge
     //qDebug() << "List2:" << list;
   }
 
-
-  QString Data::enum2str(Customize key)
+  QString Data::enum2str(Key key)
   {
+    /*
     switch (key)
     {
     case Data::USERNAME: return "USERNAME"; break;
@@ -58,6 +59,8 @@ namespace SupercolliderBridge
     case Data::FONT_CODE: return "FONT_CODE"; break;
     default: return "NaN"; break;
     }
+    */
+    return "";
   }
 
   void Data::setValue(DataKey key, char* value)  { library->insert(key, QVariant(value)); }
@@ -67,7 +70,16 @@ namespace SupercolliderBridge
   void Data::setValue(DataKey key, double value) { library->insert(key, value); }
   void Data::setValue(DataKey key, QFont value) { library->insert(key, value); }
   void Data::setValue(DataKey key, QColor value) { library->insert(key, value); }
+
+  // test
+  void Data::setValue(QString key, char* value)
+  {
+    qDebug() << "Data::setValue [key:" << key << ", value:" << value << "]";
+    libraryNEW->insert(key, value);
+  }
+  QString Data::getValue_stringNEW(QString key) { return libraryNEW->value(key).toString(); }
   //void Data::setValue(DataKey key, QMap<DataKey, QVariant> *value) { library->insert(key, *value); }
+  // test
 
   QString Data::getValue_string(DataKey key) { return library->value(key).toString(); }
   bool Data::getValue_bool(DataKey key) { return library->value(key).toBool(); }
@@ -191,5 +203,29 @@ namespace SupercolliderBridge
 
   Data::~Data() { }
 
+  //////////////////////////////////////////////////////////////////////////////////
 
+  DataCustomize::DataCustomize() : Data()
+  {
+    dataType = Type::CUSTOMIZE;
+  }
+
+  DataCustomize::~DataCustomize()  {  }
+
+  //////////////////////////////////////////////////////////////////////////////////
+
+  DataProxy::DataProxy() : Data()
+  {
+    dataType = Type::PROXYSPACE;
+  }
+
+  void DataProxy::setValue(Key key, char* value)
+  {
+    Data::setValue("tempo", value);
+    qDebug() << "DataProxy::setValue [key:" << key << ", value:" << value << "]";
+    //library->insert(key, value);
+  }
+  QString DataProxy::getValue_string(Key key) { return Data::getValue_stringNEW("tempo"); }
+
+  DataProxy::~DataProxy()  {  }
 }
