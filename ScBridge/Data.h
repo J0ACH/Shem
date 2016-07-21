@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QFont>
 #include <QDataStream>
+#include <QMetaEnum>
 
 namespace SupercolliderBridge
 {
@@ -22,15 +23,14 @@ namespace SupercolliderBridge
   class Data
   {
   public:
-   
-    enum Key { };
+
 
     Data();
     Data(QByteArray);
     ~Data();
 
-    QString enum2str(Key);
-    
+    //QString enum2str(Key);
+
     void setValue(DataKey, char*);
     void setValue(DataKey, QString);
     void setValue(DataKey, bool);
@@ -41,7 +41,7 @@ namespace SupercolliderBridge
     //void setValue(DataKey key, QMap<DataKey, QVariant>);
 
     //test
-   // void setValue(Key, char*);
+    // void setValue(Key, char*);
 
     QString getValue_string(DataKey);
     bool getValue_bool(DataKey);
@@ -56,18 +56,21 @@ namespace SupercolliderBridge
 
     QByteArray wrap();
 
-    
+
   protected:
     enum Type { CUSTOMIZE, PROXYSPACE };
     Type dataType;
 
     void setValue(QString, char*);
-    QString getValue_stringNEW(QString);
+    QString getValue_string(QString);
 
   private:
+    //    enum Key { };
     //QString senderName;
     QMap <DataKey, QVariant> *library;
     QMap <QString, QVariant> *libraryNEW;
+
+
   };
 
   //////////////////////////////////////////////////////////////////////////////////
@@ -89,16 +92,48 @@ namespace SupercolliderBridge
 
   //////////////////////////////////////////////////////////////////////////////////
 
-  class DataProxy : public Data
+  class DataNEW
   {
   public:
-     enum Key{ BEATS, TEMPO };
-    
-    DataProxy();
-    ~DataProxy();
+    DataNEW();
+    DataNEW(QByteArray);
 
-    void setValue(Key, char*);
+    void print();
+    QByteArray wrap();
+
+  protected:
+    void setValue(QString, QVariant);
+    QVariant getValue(QString);
+
+  private:
+    QMap <QString, QVariant> *library;
+  };
+
+  //////////////////////////////////////////////////////////////////////////////////
+
+  class DataProxy : public DataNEW
+  {
+    Q_GADGET
+      Q_ENUMS(Key)
+
+  public:
+    enum Key { BEATS, TEMPO, PLAYING, color, font };
+
+    DataProxy();
+    DataProxy(QByteArray);
+
+    void setValue(enum Key, QVariant);
+    
     QString getValue_string(Key);
+    bool getValue_bool(Key);
+    int getValue_int(Key);
+    float getValue_double(Key);
+    QFont getValue_font(Key);
+    QColor getValue_color(Key);
+    
+
+  private:
+    QMetaEnum metaEnum;
   };
 
 }

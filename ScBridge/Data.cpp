@@ -29,40 +29,6 @@ namespace SupercolliderBridge
     //qDebug() << "List2:" << list;
   }
 
-  QString Data::enum2str(Key key)
-  {
-    /*
-    switch (key)
-    {
-    case Data::USERNAME: return "USERNAME"; break;
-    case Data::BOOL_BOOT_INTERPRETR: return "BOOL_BOOT_INTERPRETR"; break;
-    case Data::BOOL_BOOT_SERVER: return "BOOL_BOOT_SERVER"; break;
-    case Data::BOOL_TEXT_ANTIALIASING: return "BOOL_TEXT_ANTIALIASING"; break;
-    case Data::COLOR_APP_HEADER: return "COLOR_APP_HEADER"; break;
-    case Data::COLOR_APP_BACKGROUND: return "COLOR_APP_BACKGROUND"; break;
-    case Data::COLOR_PANEL_HEADER: return "COLOR_PANEL_HEADER"; break;
-    case Data::COLOR_PANEL_BACKGROUND: return "COLOR_PANEL_BACKGROUND"; break;
-    case Data::COLOR_NORMAL: return "COLOR_NORMAL"; break;
-    case Data::COLOR_OVER: return "COLOR_OVER"; break;
-    case Data::COLOR_ACTIVE: return "COLOR_ACTIVE"; break;
-    case Data::COLOR_TEXT: return "COLOR_TEXT"; break;
-    case Data::COLOR_MSG_NORMAL: return "COLOR_MSG_NORMAL"; break;
-    case Data::COLOR_MSG_STATUS: return "COLOR_MSG_STATUS"; break;
-    case Data::COLOR_MSG_EVALUATE: return "COLOR_MSG_EVALUATE"; break;
-    case Data::COLOR_MSG_ANSWER: return "COLOR_MSG_ANSWER"; break;
-    case Data::COLOR_MSG_ERROR: return "COLOR_MSG_ERROR"; break;
-    case Data::COLOR_MSG_WARNINIG: return "COLOR_MSG_WARNINIG"; break;
-    case Data::COLOR_MSG_BUNDLE: return "COLOR_MSG_BUNDLE"; break;
-    case Data::FONT_BIG: return "FONT_BIG"; break;
-    case Data::FONT_SMALL: return "FONT_SMALL"; break;
-    case Data::FONT_CONSOLE: return "FONT_CONSOLE"; break;
-    case Data::FONT_CODE: return "FONT_CODE"; break;
-    default: return "NaN"; break;
-    }
-    */
-    return "";
-  }
-
   void Data::setValue(DataKey key, char* value)  { library->insert(key, QVariant(value)); }
   void Data::setValue(DataKey key, QString value)  { library->insert(key, QVariant(value)); }
   void Data::setValue(DataKey key, bool value)  { library->insert(key, value); }
@@ -77,7 +43,8 @@ namespace SupercolliderBridge
     qDebug() << "Data::setValue [key:" << key << ", value:" << value << "]";
     libraryNEW->insert(key, value);
   }
-  QString Data::getValue_stringNEW(QString key) { return libraryNEW->value(key).toString(); }
+  QString Data::getValue_string(QString key) { return libraryNEW->value(key).toString(); }
+
   //void Data::setValue(DataKey key, QMap<DataKey, QVariant> *value) { library->insert(key, *value); }
   // test
 
@@ -214,18 +181,103 @@ namespace SupercolliderBridge
 
   //////////////////////////////////////////////////////////////////////////////////
 
-  DataProxy::DataProxy() : Data()
+
+
+
+
+  DataNEW::DataNEW()
   {
-    dataType = Type::PROXYSPACE;
+    qDebug() << "DataNEW BUILD -> class:" << typeid(this).name();
+    library = new QMap<QString, QVariant>();
   }
 
-  void DataProxy::setValue(Key key, char* value)
+  DataNEW::DataNEW(QByteArray wrapedData)
   {
-    Data::setValue("tempo", value);
-    qDebug() << "DataProxy::setValue [key:" << key << ", value:" << value << "]";
-    //library->insert(key, value);
-  }
-  QString DataProxy::getValue_string(Key key) { return Data::getValue_stringNEW("tempo"); }
+    library = new QMap<QString, QVariant>();
 
-  DataProxy::~DataProxy()  {  }
+    QString dataMsg = QString::fromUtf8(wrapedData);
+    QStringList dataList = dataMsg.split("||");
+
+    foreach(QString oneLine, dataList)
+    {
+      QStringList args = oneLine.split("|");
+      QString key = args[0];
+      QVariant value = args[2];
+
+      //qDebug() << "\t - line:" << oneLine;
+      //qDebug() << "\t - key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
+
+      // CHYBA V PREVODU NA QVARIANT TYP
+      library->insert(key, value);
+    }
+
+    //qDebug() << "List2:" << list;
+  }
+
+  void DataNEW::setValue(QString key, QVariant value)  { library->insert(key, value); }
+  QVariant DataNEW::getValue(QString key) { return library->value(key); }
+
+  void DataNEW::print()
+  {
+    qDebug() << "DataNEW::print";
+    foreach(QString oneKey, library->keys())
+    {
+      qDebug()
+        << "\t - key:" << oneKey
+        << ", type:" << library->value(oneKey).typeName()
+        << ", value:" << library->value(oneKey).toString();
+    }
+  }
+
+  QByteArray DataNEW::wrap()
+  {
+    QStringList list;
+    QByteArray bArray;
+
+    //qDebug() << "DataNEW::wrap() library keys:" << library->keys();
+    //qDebug() << "DataNEW::wrap() library values:" << library->values();
+
+    foreach(QString oneKey, library->keys())
+    {
+      qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
+      list.append(QString("%1|%2|%3").arg(oneKey, library->value(oneKey).typeName(), library->value(oneKey).toString()));
+
+      bArray.append(QString("%1|%2|%3").arg(
+        oneKey,
+        library->value(oneKey).typeName(),
+        library->value(oneKey).toString()
+        ));
+      if (oneKey != library->keys().at(library->keys().size() - 1)) { bArray.append("||"); }
+    }
+    //qDebug() << "List1:" << list;
+    return bArray;
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////////////
+
+
+  DataProxy::DataProxy() : DataNEW()
+  {
+    const QMetaObject &mo = DataProxy::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+  }
+
+  DataProxy::DataProxy(QByteArray wrapedData) : DataNEW(wrapedData)
+  {
+    const QMetaObject &mo = DataProxy::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+  }
+
+  void DataProxy::setValue(Key key, QVariant value)  { DataNEW::setValue(metaEnum.valueToKey(key), value); }
+
+
+  QString DataProxy::getValue_string(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toString(); }
+  bool DataProxy::getValue_bool(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toBool(); }
+  int DataProxy::getValue_int(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toInt(); }
+  float DataProxy::getValue_double(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toDouble(); }
+  QFont DataProxy::getValue_font(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QFont>(); }
+  QColor DataProxy::getValue_color(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QColor>(); }
+
+
 }

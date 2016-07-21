@@ -23,29 +23,32 @@ namespace QuantIDE
     connect(mNetwork, SIGNAL(actNetworkBooted()), this, SLOT(onNetworkBootDone()));
     connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
 
-
+    
     // TEST DATA WRAPPING
     qDebug("\n\n QuantCore::TEST DATA WRAPPING ////////////////////");
-    Data testData;
-    testData.setValue(USERNAME, "testData user name Jachym");
-    testData.setValue(BOOL_BOOT_INTERPRETR, true);
-    testData.setValue(FONT_CONSOLE, QFont("Consolas", 15));
-    testData.print(USERNAME);
-    QByteArray bArr = testData.wrap();
+    DataProxy dp;
+    dp.setValue(DataProxy::BEATS, 2781);
+    dp.setValue(DataProxy::TEMPO, "160bpm");
+    dp.setValue(DataProxy::PLAYING, true);
+    dp.setValue(DataProxy::color, QColor(230,30,30));
+    dp.setValue(DataProxy::font, QFont("Consolas", 12));
+    dp.setValue(DataProxy::PLAYING, false);
+    dp.setValue(DataProxy::BEATS, 2781.85);
+    //dp.print();
+    QByteArray bArr = dp.wrap();
+    qDebug("\nWRAPING\n");
+    DataProxy testDataReciver(bArr);
+    testDataReciver.print();
 
-    Data testDataReciver(bArr);
-    testDataReciver.print(USERNAME);
     qDebug("QuantCore::TEST DATA WRAPPING KONEC /////////////////////\n\n");
-
+    //qDebug() << "test getValue" << dp.getValue_color(DataProxy::color);
+    
+    //Item item;
+    //qDebug() << item.type();
+    
+    //Container container;
+    
     /*
-    DataCustomize::Key::USERNAME
-    DataProxy::Key::BEATS
-    */
-
-    DataProxy data;
-    data.setValue(DataProxy::TEMPO, "120bpm");
-    qDebug() << "QuantCore::libraryNEW get TEST:" << data.getValue_string(DataProxy::TEMPO);
-   
     QMap<QString, QVariant> lev1;
     QMap<QString, QVariant> lev2;
 
@@ -68,6 +71,7 @@ namespace QuantIDE
         break;
       }
     }
+    */
    
 
    
