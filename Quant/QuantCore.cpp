@@ -153,11 +153,12 @@ namespace QuantIDE
     proxy1->setGeometry(50, 25, 300, 150);
     proxy1->show();
     connect(proxy1, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
+    connect(mNetwork, SIGNAL(actDataSend(QByteArray)), proxy1, SLOT(onDataRecived(QByteArray)));
 
     QuantProxy *proxy2 = new QuantProxy(mCanvan->centralWidget(), this);
     proxy2->setGeometry(400, 25, 300, 150);
     proxy2->show();
-    //connect(proxy2, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
+    connect(proxy2, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
     connect(mNetwork, SIGNAL(actDataSend(QByteArray)), proxy2, SLOT(onDataRecived(QByteArray)));
   }
 
