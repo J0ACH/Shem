@@ -91,9 +91,8 @@ namespace Jui
         timer->start();
 
         oldValue = value->displayText();
-        emit actValueChanged(value->displayText());
+        emit actValueEvaluate(value->displayText());
         value->setFocus();
-        //value->clearFocus();
         //qDebug() << "OldValue" << oldValue;
         isFocused = true;
         this->update();
@@ -102,12 +101,22 @@ namespace Jui
         //qDebug() << "ControlBox Esc";
         //qDebug() << "OldValue" << oldValue;
         value->setText(oldValue);
+        emit actValueChanged(value->displayText());
         value->clearFocus();
         isFocused = false;
         this->update();
         return true;
+        /*
+      default:
+       
+        break;
+        */
       }
     };
+    if (event->type() == QEvent::KeyRelease)
+    {
+      emit actValueChanged(value->displayText());
+    }
 
     if (event->type() == QEvent::MouseButtonRelease)
     {

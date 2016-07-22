@@ -22,12 +22,13 @@ namespace SupercolliderBridge
     void sendCode(QString code);
 
     public slots:
-    void onSendData(Data data);
+    void onSendData(QByteArray data);
     void onDatagramRecived();
 
   signals:
     void actNetworkBooted();
     void actPrint(QString, MessageType type = MessageType::NORMAL);
+    void actDataSend(QByteArray);
     
   private:
     QUdpSocket *mSocket;

@@ -38,8 +38,8 @@ namespace QuantIDE
     canvanNEW->addPanel(networkPanel, "Network", Qt::DockWidgetArea::LeftDockWidgetArea);
 
     core = new QuantCore(canvanNEW);
-    core->addProxySpace();
-    core->addNode("testNode1");
+    // core->addProxySpace();
+    //  core->addNode("testNode1");
 
 
     connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
@@ -106,11 +106,7 @@ namespace QuantIDE
     textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 0, 15, canvanNEW->getStaustBar()->height());
     textServerGroups->setAlign(Qt::AlignCenter);
     textServerGroups->show();
-
-    Button *testButton = new Button(canvanNEW->centralWidget());
-    testButton->setGeometry(150, 50, 200, 50);
-    testButton->setText("testButton");
-    testButton->show();
+    
   }
 
   void QuantNEW::onCustomize(Data data)

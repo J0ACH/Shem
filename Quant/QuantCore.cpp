@@ -23,7 +23,11 @@ namespace QuantIDE
     connect(mNetwork, SIGNAL(actNetworkBooted()), this, SLOT(onNetworkBootDone()));
     connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
 
-    
+    // TESTS
+
+    this->initTestObjects();
+
+    /*
     // TEST DATA WRAPPING
     qDebug("\n\n QuantCore::TEST DATA WRAPPING ////////////////////");
     DataProxy dp;
@@ -48,14 +52,10 @@ namespace QuantIDE
 
     dc.print("customizeTest");
     //dc.toStyleSheet(DataCustomize::COLOR_ACTIVE);
-    
-    
+        
     qDebug() << "test toStyleSheet" << dc.toStyleSheet(DataCustomize::COLOR_ACTIVE);
+    */
     
-    //Item item;
-    //qDebug() << item.type();
-    
-    //Container container;
     
     /*
     QMap<QString, QVariant> lev1;
@@ -147,7 +147,19 @@ namespace QuantIDE
     qDebug("QuantCore::onServerBootDone");
   }
 
+  void QuantCore::initTestObjects()
+  {
+    QuantProxy *proxy1 = new QuantProxy(mCanvan->centralWidget(), this);
+    proxy1->setGeometry(50, 25, 300, 150);
+    proxy1->show();
+    connect(proxy1, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
 
+    QuantProxy *proxy2 = new QuantProxy(mCanvan->centralWidget(), this);
+    proxy2->setGeometry(400, 25, 300, 150);
+    proxy2->show();
+    //connect(proxy2, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
+    connect(mNetwork, SIGNAL(actDataSend(QByteArray)), proxy2, SLOT(onDataRecived(QByteArray)));
+  }
 
 
   void QuantCore::onMyMapSet(QMap <QString, QVariant> map)
@@ -190,6 +202,7 @@ namespace QuantIDE
 
   }
 
+  /*
   void QuantCore::addProxySpace()
   {
     //qDebug() << "Core::addProxySpace mCanvan->getScreen: " << mCanvan->centralWidget()->geometry();
@@ -212,6 +225,7 @@ namespace QuantIDE
 
 
   }
+  */
 
   QuantCore::~QuantCore()
   {

@@ -100,18 +100,19 @@ namespace SupercolliderBridge {
     QString dataMsg = tr("%1||%2").arg(userName, code);
 
     QByteArray datagram(dataMsg.toStdString().c_str());
-    mSocket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
+    //mSocket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
   }
-
-  void UDPServer::onSendData(Data data)
+     
+  void UDPServer::onSendData(QByteArray objectsData)
   {
-    /*
-    QString dataMsg = tr("%1||%2").arg(userName, code);
+   // QString dataMsg = tr("%1||%2").arg(userName, code);
 
-    QByteArray datagram(dataMsg.toStdString().c_str());
-    mSocket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
-    */
+  //  QByteArray datagram(dataMsg.toStdString().c_str());
+    
+    
+    mSocket->writeDatagram(objectsData.data(), objectsData.size(), *broadcastAddress, port);
   }
+    
 
   void UDPServer::onDatagramRecived()
   {
@@ -125,16 +126,23 @@ namespace SupercolliderBridge {
       mSocket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
     }
 
+    DataNEW data(datagram);
+    data.print("UDPServer::onDatagramRecived");
+
+    emit actDataSend(datagram);
+    /*
+
     QString dataMsg = QString::fromUtf8(datagram);
     QStringList data = dataMsg.split("||");
     QString senderName = data[0];
     QString recivedCode = data[1];
 
+      emit actPrint(tr("udpMsg [from %1] -> %2").arg(senderName, recivedCode));
     if (senderName != userName)
     {
-      emit actPrint(tr("udpMsg [from %1] -> %2").arg(senderName, recivedCode));
       this->processDatagram(recivedCode);
     }
+    */
 
   }
 

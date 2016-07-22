@@ -252,7 +252,7 @@ namespace SupercolliderBridge
 
     //qDebug() << "DataNEW::wrap() library keys:" << library->keys();
     //qDebug() << "DataNEW::wrap() library values:" << library->values();
-
+    qDebug() << "DataNEW::wrap()";
     foreach(QString oneKey, library->keys())
     {
       qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
@@ -266,7 +266,7 @@ namespace SupercolliderBridge
       if (oneKey != library->keys().at(library->keys().size() - 1)) { bArray.append("||"); }
     }
     //qDebug() << "List1:" << list;
-    return bArray;
+    return bArray.toStdString().c_str();
   }
 
 

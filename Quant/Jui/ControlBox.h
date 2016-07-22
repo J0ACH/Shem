@@ -53,6 +53,7 @@ namespace Jui
 
   signals:
     void actValueChanged(QString);
+    void actValueEvaluate(QString);
 
   protected:
     void paintEvent(QPaintEvent *event);

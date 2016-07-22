@@ -3,10 +3,10 @@
 
 #include <QWidget>
 #include <QDebug>
-#include <QSignalMapper>
 
 #include "ScBridge.h"
 #include "UDPServer.h"
+#include "Data.h"
 
 #include "Canvan.h"
 #include "QuantObjects.h"
@@ -26,8 +26,9 @@ namespace QuantIDE
     QuantCore(CanvanNEW *canvan);
     ~QuantCore();
 
-    void addProxySpace();
-    void addNode(QString name);
+    void initTestObjects();
+    //void addProxySpace();
+    //void addNode(QString name);
 
     public slots :
     void onCustomize(Data);

@@ -5,9 +5,11 @@
 #include <QDebug>
 #include <QPainter>
 
+#include "Data.h"
 #include "Button.h"
 #include "ControlBox.h"
 
+using namespace SupercolliderBridge;
 using namespace Jui;
 
 namespace QuantIDE
@@ -21,26 +23,32 @@ namespace QuantIDE
     QuantObject(QWidget *parent, QObject *core);
     ~QuantObject();
 
-    QString getMap_string(QString key);
+    //QString getMap_string(QString key);
 
-    void printMap();
+    //void printMap();
 
     public slots :
+    /*
     void onMyMapSet(QString key, QString value);
     void onNetworkMapSet(QString key, QString value);
+    */
+    void onDataRecived(QByteArray);
 
   signals:
+    void actDataSend(QByteArray);
     void actEvaluate(QString code);
-    void actMyMapSet(QMap <QString, QVariant>);
-    void actNetworkMapSet(QMap <QString, QVariant>);
+
+
+   // void actMyMapSet(QMap <QString, QVariant>);
+   // void actNetworkMapSet(QMap <QString, QVariant>);
 
   protected: // protected je viditelna jen detmi, ne z venku
     void paintEvent(QPaintEvent *event);
-    void setMap(QString key, QString value);
+   // void setMap(QString key, QString value);
 
   private:
     QWidget *mCanvan;
-    QMap <QString, QVariant> map;
+    //QMap <QString, QVariant> map;
 
 
 
@@ -57,9 +65,14 @@ namespace QuantIDE
 
     public slots:
     void onBeep();
+    void onControlTEST(QString);
+
+    void onDataRecived(QByteArray);
 
   private:
     Button *testButton;
+    ControlBox *nameBox;
+    DataProxy data;
   };
 
 
