@@ -41,7 +41,16 @@ namespace QuantIDE
     testDataReciver.print();
 
     qDebug("QuantCore::TEST DATA WRAPPING KONEC /////////////////////\n\n");
-    //qDebug() << "test getValue" << dp.getValue_color(DataProxy::color);
+    
+    DataCustomize dc;
+    dc.setValue(DataCustomize::USERNAME, "ja jsem joach");
+    dc.setValue(DataCustomize::BOOL_BOOT_INTERPRETR, 7);
+
+    dc.print("customizeTest");
+    //dc.toStyleSheet(DataCustomize::COLOR_ACTIVE);
+    
+    
+    qDebug() << "test toStyleSheet" << dc.toStyleSheet(DataCustomize::COLOR_ACTIVE);
     
     //Item item;
     //qDebug() << item.type();

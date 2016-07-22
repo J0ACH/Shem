@@ -73,10 +73,33 @@ namespace SupercolliderBridge
 
   };
 
+
   //////////////////////////////////////////////////////////////////////////////////
 
-  class DataCustomize : public Data
+  class DataNEW
   {
+  public:
+    DataNEW();
+    DataNEW(QByteArray);
+
+    void print(QString comment = "");
+    QByteArray wrap();
+
+  protected:
+    void setValue(QString, QVariant);
+    QVariant getValue(QString);
+
+  private:
+    QMap <QString, QVariant> *library;
+  };
+
+  //////////////////////////////////////////////////////////////////////////////////
+
+  class DataCustomize : public DataNEW
+  {
+    Q_GADGET
+      Q_ENUMS(Key)
+
   public:
     enum Key{
       USERNAME,
@@ -87,26 +110,19 @@ namespace SupercolliderBridge
     };
 
     DataCustomize();
-    ~DataCustomize();
-  };
 
-  //////////////////////////////////////////////////////////////////////////////////
+    void setValue(Key, QVariant);
+    QString getValue_string(Key);
+    bool getValue_bool(Key);
+    int getValue_int(Key);
+    float getValue_double(Key);
+    QFont getValue_font(Key);
+    QColor getValue_color(Key);
 
-  class DataNEW
-  {
-  public:
-    DataNEW();
-    DataNEW(QByteArray);
-
-    void print();
-    QByteArray wrap();
-
-  protected:
-    void setValue(QString, QVariant);
-    QVariant getValue(QString);
-
+    QString toStyleSheet(Key);
+    
   private:
-    QMap <QString, QVariant> *library;
+    QMetaEnum metaEnum;
   };
 
   //////////////////////////////////////////////////////////////////////////////////
@@ -122,15 +138,14 @@ namespace SupercolliderBridge
     DataProxy();
     DataProxy(QByteArray);
 
-    void setValue(enum Key, QVariant);
-    
+    void setValue(Key, QVariant);
     QString getValue_string(Key);
     bool getValue_bool(Key);
     int getValue_int(Key);
     float getValue_double(Key);
     QFont getValue_font(Key);
     QColor getValue_color(Key);
-    
+
 
   private:
     QMetaEnum metaEnum;

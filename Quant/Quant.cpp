@@ -182,14 +182,14 @@ namespace QuantIDE
       "QScrollBar::add-line:vertical { border: none; background: none; }"
       "QScrollBar::sub-line:vertical { border: none;	background: none; }"
 
-           "QToolButton { border: 0px; }"
+      "QToolButton { border: 0px; }"
       ;
 
     QString qtStyleSheet_Colors = tr(
       "QTextEdit { color: %3; }"
       "QTextEdit { background-color: %4; }"
       "QTextEdit { selection-background-color: %2; }"
-      
+
       "QLineEdit { color: %3; }"
 
       "QScrollBar:vertical { background: %4; }"
@@ -217,7 +217,7 @@ namespace QuantIDE
       );
 
     qApp->setStyleSheet(qPropertyColors + qPropertyFonts + qtStyleSheet + qtStyleSheet_Colors + qtStyleSeet_Fonts);
-     }
+  }
 
   bool QuantNEW::eventFilter(QObject *target, QEvent *event)
   {
@@ -240,7 +240,7 @@ namespace QuantIDE
     core->deleteLater();
   }
 
-
+  //////////////////////////////////////////////////////////////////////////////////
 
   Quant::Quant(QWidget *parent) : QWidget(parent)
   {
@@ -409,33 +409,9 @@ namespace QuantIDE
   void Quant::onCustomize()
   {
     // qDebug("Quant::onCustomize");
-    QColor colorAppHeaderBackground;
-    QFont fontTextConsole;
+    // QColor colorAppHeaderBackground;
+    //QFont fontTextConsole;
     /*
-    colorAppBackground = customize->getColor("color_shem_AppBackground");
-    colorAppHeaderBackground = customize->getColor("color_shem_AppHeaderBackground");
-    colorPanelBackground = customize->getColor("color_shem_PanelBackground");
-    colorNormal = customize->getColor("color_shem_Normal");
-    colorOver = customize->getColor("color_shem_Over");
-    colorActive = customize->getColor("color_shem_Active");
-    colorText = customize->getColor("color_shem_Text");
-
-    colorMsgNormal = customize->getColor("color_shem_MsgNormal");
-    colorMsgStatus = customize->getColor("color_shem_MsgStatus");
-    colorMsgEvaluate = customize->getColor("color_shem_MsgEvaluate");
-    colorMsgResult = customize->getColor("color_shem_MsgResult");
-    colorMsgError = customize->getColor("color_shem_MsgError");
-    colorMsgWarning = customize->getColor("color_shem_MsgWarning");
-    colorMsgBundle = customize->getColor("color_shem_MsgBundle");
-
-    fontTextBig = customize->getFont("font_shem_TextBig");
-    fontTextSmall = customize->getFont("font_shem_TextSmall");
-    fontTextCode = customize->getFont("font_shem_TextCode");
-    fontTextConsole = customize->getFont("font_shem_TextConsole");
-
-    userName = customize->getString("string_shem_UserName");
-    */
-
     canvan->setColorHeader(colorAppHeaderBackground);
     canvan->setColorNormal(colorNormal);
     canvan->setColorOver(colorOver);
@@ -483,6 +459,7 @@ namespace QuantIDE
     labelServerMeter->setPalette(palete);
     labelServerSynths->setPalette(palete);
     labelServerGroups->setPalette(palete);
+    */
   }
   void Quant::initStyleSheet()
   {

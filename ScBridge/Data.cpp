@@ -172,22 +172,13 @@ namespace SupercolliderBridge
 
   //////////////////////////////////////////////////////////////////////////////////
 
-  DataCustomize::DataCustomize() : Data()
-  {
-    dataType = Type::CUSTOMIZE;
-  }
-
-  DataCustomize::~DataCustomize()  {  }
-
-  //////////////////////////////////////////////////////////////////////////////////
-
 
 
 
 
   DataNEW::DataNEW()
   {
-    qDebug() << "DataNEW BUILD -> class:" << typeid(this).name();
+    //qDebug() << "DataNEW BUILD -> class:" << typeid(this).name();
     library = new QMap<QString, QVariant>();
   }
 
@@ -202,24 +193,49 @@ namespace SupercolliderBridge
     {
       QStringList args = oneLine.split("|");
       QString key = args[0];
-      QVariant value = args[2];
+      QString type = args[1];
+      // args[2] JE VALUE TXT
 
       //qDebug() << "\t - line:" << oneLine;
       //qDebug() << "\t - key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
+      bool typeFound = false;
+      if (type == "QString") { library->insert(key, args[2]); typeFound = true; }
+      else if (type == "int") { library->insert(key, args[2].toInt()); typeFound = true; }
+      else if (type == "double") { library->insert(key, args[2].toDouble()); typeFound = true; }
+      else if (type == "bool") {
+        if (args[2] == "true") { library->insert(key, true); typeFound = true; }
+        else if (args[2] == "false"){ library->insert(key, false); typeFound = true; }
+        else { typeFound = false; }
+      }
+      else if (type == "QColor") { library->insert(key, QColor(args[2])); typeFound = true; }
+      else if (type == "QFont") {
+        QFont font;
+        font.fromString(args[2]);
+        library->insert(key, font);
+        typeFound = true;
+      }
 
-      // CHYBA V PREVODU NA QVARIANT TYP
-      library->insert(key, value);
+      if (!typeFound)
+      {
+        qWarning() << "CHYBA : DataNEW(QByteArray) -> CHYBA V PREVODU NA QVARIANT TYP key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
+        library->insert(key, args[2]);
+      }
     }
-
-    //qDebug() << "List2:" << list;
   }
 
   void DataNEW::setValue(QString key, QVariant value)  { library->insert(key, value); }
-  QVariant DataNEW::getValue(QString key) { return library->value(key); }
-
-  void DataNEW::print()
+  QVariant DataNEW::getValue(QString key)
   {
-    qDebug() << "DataNEW::print";
+    switch (library->value(key).type())
+    {
+    case QVariant::Invalid: return "NaN"; break;
+    default: return library->value(key); break;
+    }
+  }
+
+  void DataNEW::print(QString comment)
+  {
+    qDebug() << "DataNEW::print [" << comment << "]";
     foreach(QString oneKey, library->keys())
     {
       qDebug()
@@ -256,6 +272,50 @@ namespace SupercolliderBridge
 
   //////////////////////////////////////////////////////////////////////////////////
 
+  DataCustomize::DataCustomize() : DataNEW()
+  {
+    const QMetaObject &mo = DataCustomize::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+  }
+
+  void DataCustomize::setValue(Key key, QVariant value)  { DataNEW::setValue(metaEnum.valueToKey(key), value); }
+  QString DataCustomize::getValue_string(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toString(); }
+  bool DataCustomize::getValue_bool(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toBool(); }
+  int DataCustomize::getValue_int(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toInt(); }
+  float DataCustomize::getValue_double(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toDouble(); }
+  QFont DataCustomize::getValue_font(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QFont>(); }
+  QColor DataCustomize::getValue_color(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QColor>(); }
+
+  QString DataCustomize::toStyleSheet(Key key)
+  {
+    QFont font;
+    switch (DataNEW::getValue(metaEnum.valueToKey(key)).type())
+    {
+    case QVariant::Int:
+    case QVariant::Double:
+    case QVariant::String: return this->getValue_string(key);  break;
+    case QVariant::Bool:
+      if (this->getValue_bool(key)) { return "true"; }
+      else { return "false"; }
+      break;
+    case QVariant::Font:
+      font = this->getValue_font(key);
+      return QString("\"%1\"").arg(font.toString());
+      break;
+    case QVariant::Color:
+      return this->getValue_color(key).name();
+      break;
+    default:
+      qDebug() << "CHYBA : DataCustomize::toStyleSheet() NESPECIFIKOVANY TYP ("
+        << "key : " << metaEnum.valueToKey(key)
+        << ", type : " << DataNEW::getValue(metaEnum.valueToKey(key)).type()
+        << ", value : " << this->getValue_string(key);
+      return "NaN";
+      break;
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////
 
   DataProxy::DataProxy() : DataNEW()
   {
@@ -270,14 +330,11 @@ namespace SupercolliderBridge
   }
 
   void DataProxy::setValue(Key key, QVariant value)  { DataNEW::setValue(metaEnum.valueToKey(key), value); }
-
-
   QString DataProxy::getValue_string(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toString(); }
   bool DataProxy::getValue_bool(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toBool(); }
   int DataProxy::getValue_int(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toInt(); }
   float DataProxy::getValue_double(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toDouble(); }
   QFont DataProxy::getValue_font(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QFont>(); }
   QColor DataProxy::getValue_color(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QColor>(); }
-
 
 }
