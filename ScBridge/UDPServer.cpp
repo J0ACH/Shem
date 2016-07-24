@@ -102,17 +102,17 @@ namespace SupercolliderBridge {
     QByteArray datagram(dataMsg.toStdString().c_str());
     //mSocket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
   }
-     
+
   void UDPServer::onSendData(QByteArray objectsData)
   {
-   // QString dataMsg = tr("%1||%2").arg(userName, code);
+    // QString dataMsg = tr("%1||%2").arg(userName, code);
 
-  //  QByteArray datagram(dataMsg.toStdString().c_str());
-    
-    
+    //  QByteArray datagram(dataMsg.toStdString().c_str());
+
+
     mSocket->writeDatagram(objectsData.data(), objectsData.size(), *broadcastAddress, port);
   }
-    
+
 
   void UDPServer::onDatagramRecived()
   {
@@ -125,22 +125,8 @@ namespace SupercolliderBridge {
       datagram.resize(mSocket->pendingDatagramSize());
       mSocket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
     }
-    
-    emit actNetworkDataRecived(datagram);
-    /*
 
-    QString dataMsg = QString::fromUtf8(datagram);
-    QStringList data = dataMsg.split("||");
-    QString senderName = data[0];
-    QString recivedCode = data[1];
-
-      emit actPrint(tr("udpMsg [from %1] -> %2").arg(senderName, recivedCode));
-    if (senderName != userName)
-    {
-      this->processDatagram(recivedCode);
-    }
-    */
-
+    emit actNetDataRecived(datagram);
   }
 
 

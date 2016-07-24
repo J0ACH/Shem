@@ -46,12 +46,14 @@ namespace QuantIDE
     void onServerBootDone();
 
     void onSendData(DataNEW);
-    void onNetworkDataRecived(QByteArray);
+    void onNetDataRecived(QByteArray);
+
+    void onNet_userJoined(DataUser);
+    void onNet_userIsHere(DataUser);
 
     void onEvaluate(QString code);
     void onPrint(QString, MessageType msg = MessageType::NORMAL);
 
-    void networkDataRecived_semaphor(DataUser);
 
   signals:
     void actCoreInitPrepared();
@@ -61,12 +63,8 @@ namespace QuantIDE
     void actServerBooted();
 
     void actPrint(QString, QColor, bool);
-
-    // void actNetworkMapSet();
     void actDataSend(QByteArray);
-   // void actNetworkDataRecived_sendToTarget(DataNEW);
-    void actNetworkDataRecived_sendToTarget(DataUser);
-    //sendDataToTarget
+
 
   private:
     CanvanNEW *mCanvan;
@@ -74,9 +72,14 @@ namespace QuantIDE
     UDPServer *mNetwork;
     Customize *mCustomize;
 
+    QMap<QString, QObject*> networkObjects; // knihovna pro vsechny objekty komunikujici pres sit 
+
     QString userName;
     bool isCoreRunning, isInterpretRunning, isServerRunnig, isNetworkRunning;
     bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
+
+
+
 
     QuantProxy *proxy1, *proxy2;
 
