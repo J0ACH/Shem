@@ -11,7 +11,7 @@ namespace QuantIDE
 
   void QuantObject::onNetworkDataRecived(DataNEW data)
   {
-    qDebug("QuantObject::onDataRecived");
+    qDebug("QuantObject::onNetworkDataRecived");
   }
 
   void QuantObject::paintEvent(QPaintEvent *event)

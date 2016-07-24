@@ -108,12 +108,16 @@ namespace QuantIDE
     qDebug("QuantCore::onNetworkBootDone");
 
     DataUser data;
+    data.setOwener(userName);
+    data.setTargetObject("this");
+    data.setTargetMethod("networkDataRecived_semaphor");
+
     data.setValue(DataUser::NAME, userName);
     data.setValue(DataUser::VERSION, "0.40"); // DODELAT
     data.setValue(DataUser::BOOL_INTERPRETR, isInterpretRunning);
     data.setValue(DataUser::BOOL_SERVER, isServerRunnig);
 
-    this->onSendData(data);
+    emit actDataSend(data.wrap());
   }
   void QuantCore::onInterpretBootDone()
   {
@@ -127,17 +131,17 @@ namespace QuantIDE
 
   void QuantCore::initTestObjects()
   {
-    QuantProxy *proxy1 = new QuantProxy(mCanvan->centralWidget(), this);
+    proxy1 = new QuantProxy(mCanvan->centralWidget(), this);
     proxy1->setGeometry(50, 25, 300, 150);
     proxy1->show();
     connect(proxy1, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
-    connect(this, SIGNAL(actNetworkDataRecived(DataNEW)), proxy1, SLOT(onNetworkDataRecived(DataNEW)));
+    //connect(this, SIGNAL(actDataSend(DataNEW)), proxy1, SLOT(onNetworkDataRecived(DataNEW)));
 
-    QuantProxy *proxy2 = new QuantProxy(mCanvan->centralWidget(), this);
+    proxy2 = new QuantProxy(mCanvan->centralWidget(), this);
     proxy2->setGeometry(400, 25, 300, 150);
     proxy2->show();
     connect(proxy2, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
-    connect(this, SIGNAL(actNetworkDataRecived(DataNEW)), proxy2, SLOT(onNetworkDataRecived(DataNEW)));
+    //connect(this, SIGNAL(actDataSend(DataNEW)), proxy2, SLOT(onNetworkDataRecived(DataNEW)));
   }
 
   void QuantCore::onSendData(DataNEW data)
@@ -149,28 +153,38 @@ namespace QuantIDE
 
   void QuantCore::onNetworkDataRecived(QByteArray msg)
   {
-    if (DataNEW::isFromOtherOwener(msg, userName))
+    //  if (DataNEW::isFromOtherOwener(msg, userName))
+    //  {
+
+    DataProxy dataProxy(msg);
+    QString targetObject = DataNEW::getTarget(msg);
+    QString targetMethod = DataNEW::getMethod(msg);
+    qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+    qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+
+    switch (DataNEW::getType(msg))
     {
-      DataUser dataUser;
-      DataProxy dataProxy;
-
-      switch (DataNEW::getType(msg))
-      {
-      case DataNEW::DataType::USER:
-        dataUser = DataUser(msg);
-        this->onPrint("RECIVED DATA TYPE: USER", MessageType::STATUS);
-        this->onPrint(dataUser.print("QuantCore::onNetworkDataRecived"));
-        break;
-      case DataNEW::DataType::PROXY:
-        dataProxy = DataProxy(msg);
-        this->onPrint("RECIVED DATA TYPE: PROXY", MessageType::STATUS);
-        this->onPrint(dataProxy.print("QuantCore::onNetworkDataRecived"));
-        break;
-      default:
-        break;
-      }
+    case DataNEW::DataType::USER:
+      QMetaObject::invokeMethod(this, "networkDataRecived_semaphor", Qt::AutoConnection, Q_ARG(DataUser, DataUser(msg)));
+      break;
+    case DataNEW::DataType::PROXY:
+      dataProxy = DataProxy(msg);
+      QMetaObject::invokeMethod(proxy1, "onDataRecived", Qt::AutoConnection, Q_ARG(DataProxy, dataProxy));
+      // this->onPrint("RECIVED DATA TYPE: PROXY", MessageType::STATUS);
+      // this->onPrint(dataProxy.print("QuantCore::onNetworkDataRecived"));
+      break;
+    default:
+      break;
     }
+    // }
 
+  }
+
+  void QuantCore::networkDataRecived_semaphor(DataUser data)
+  {
+    qDebug() << "QuantCore::networkDataRecived_semaphor";
+    this->onPrint("RECIVED DATA TYPE: USER", MessageType::STATUS);
+    this->onPrint(data.print("QuantCore::networkDataRecived_semaphor"));
   }
 
   void QuantCore::onEvaluate(QString code)  { mBridge->evaluate(code); }

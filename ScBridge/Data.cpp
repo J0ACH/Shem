@@ -6,7 +6,7 @@ namespace SupercolliderBridge
   Data::Data()
   {
     library = new QMap<DataKey, QVariant>();
-   // libraryNEW = new QMap<QString, QVariant>();
+    // libraryNEW = new QMap<QString, QVariant>();
   }
 
   Data::Data(QByteArray wrapedData)
@@ -41,9 +41,9 @@ namespace SupercolliderBridge
   void Data::setValue(QString key, char* value)
   {
     qDebug() << "Data::setValue [key:" << key << ", value:" << value << "]";
-//    libraryNEW->insert(key, value);
+    //    libraryNEW->insert(key, value);
   }
- // QString Data::getValue_string(QString key) { return libraryNEW->value(key).toString(); }
+  // QString Data::getValue_string(QString key) { return libraryNEW->value(key).toString(); }
 
   //void Data::setValue(DataKey key, QMap<DataKey, QVariant> *value) { library->insert(key, *value); }
   // test
@@ -253,7 +253,17 @@ namespace SupercolliderBridge
   }
 
   void DataNEW::setOwener(QString name)  { header->insert("OWENER", name); }
-  
+  void DataNEW::setType(DataNEW::DataType type)  { header->insert("TYPE", metaEnum_type.valueToKey(type)); }
+  void DataNEW::setTargetObject(char* targetObject)
+  {
+    header->insert("TARGET", targetObject);
+  }
+  void DataNEW::setTargetMethod(char* targetMethod)
+  {
+    header->insert("METHOD", targetMethod);
+  }
+
+
   bool DataNEW::isFromOtherOwener(QByteArray wrapedData, QString myName)
   {
     QString dataMsg = QString::fromUtf8(wrapedData);
@@ -264,14 +274,12 @@ namespace SupercolliderBridge
       if (oneLine.startsWith("HEADER_OWENER"))
       {
         QStringList args = oneLine.split("|");
-        if (args[1] != myName) { return true; } else { break; }
+        if (args[1] != myName) { return true; }
+        else { break; }
       }
     }
     return false;
   }
-
-  void DataNEW::setType(DataNEW::DataType type)  { header->insert("TYPE", metaEnum_type.valueToKey(type)); }
-
   int DataNEW::getType(QByteArray wrapedData)
   {
     const QMetaObject &mo = DataNEW::staticMetaObject;
@@ -289,6 +297,42 @@ namespace SupercolliderBridge
       }
     }
     return -1;
+  }
+
+  const QString DataNEW::getTarget(QByteArray wrapedData)
+  {
+    QString dataMsg = QString::fromUtf8(wrapedData);
+    QStringList dataList = dataMsg.split("||");
+
+    foreach(QString oneLine, dataList)
+    {
+      if (oneLine.startsWith("HEADER_TARGET"))
+      {
+        QStringList args = oneLine.split("|");
+        //qDebug() << "DataNEW::getTarget: " << args[1];
+        return args[1];
+      }
+    }
+    return "";
+  }
+
+  const QString DataNEW::getMethod(QByteArray wrapedData)
+  {
+    QString dataMsg = QString::fromUtf8(wrapedData);
+    QStringList dataList = dataMsg.split("||");
+
+    QString targetObject, targetMethod;
+
+    foreach(QString oneLine, dataList)
+    {
+      if (oneLine.startsWith("HEADER_METHOD"))
+      {
+        QStringList args = oneLine.split("|");
+        //qDebug() << "DataNEW::getMethod: " << args[1];
+        return args[1];
+      }
+    }
+    return "";
   }
 
   void DataNEW::setValue(QString key, QVariant value)  { library->insert(key, value); }

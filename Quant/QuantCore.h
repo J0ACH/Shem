@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include <QDebug>
+#include <QMetaObject>
+#include <QMetaMethod>
+
 
 #include "ScBridge.h"
 #include "UDPServer.h"
@@ -44,10 +47,11 @@ namespace QuantIDE
 
     void onSendData(DataNEW);
     void onNetworkDataRecived(QByteArray);
-    
+
     void onEvaluate(QString code);
     void onPrint(QString, MessageType msg = MessageType::NORMAL);
 
+    void networkDataRecived_semaphor(DataUser);
 
   signals:
     void actCoreInitPrepared();
@@ -60,7 +64,9 @@ namespace QuantIDE
 
     // void actNetworkMapSet();
     void actDataSend(QByteArray);
-    void actNetworkDataRecived(DataNEW);
+   // void actNetworkDataRecived_sendToTarget(DataNEW);
+    void actNetworkDataRecived_sendToTarget(DataUser);
+    //sendDataToTarget
 
   private:
     CanvanNEW *mCanvan;
@@ -71,6 +77,8 @@ namespace QuantIDE
     QString userName;
     bool isCoreRunning, isInterpretRunning, isServerRunnig, isNetworkRunning;
     bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
+
+    QuantProxy *proxy1, *proxy2;
 
     //QMap <QString, QString> library;
     QuantProxy *proxy;
