@@ -23,35 +23,18 @@ namespace QuantIDE
     QuantObject(QWidget *parent, QObject *core);
     ~QuantObject();
 
-    //QString getMap_string(QString key);
-
-    //void printMap();
-
     public slots :
-    /*
-    void onMyMapSet(QString key, QString value);
-    void onNetworkMapSet(QString key, QString value);
-    */
-    void onDataRecived(QByteArray);
+    void onNetworkDataRecived(DataNEW);
 
   signals:
-    void actDataSend(QByteArray);
+    void actDataSend(DataNEW);
     void actEvaluate(QString code);
-
-
-   // void actMyMapSet(QMap <QString, QVariant>);
-   // void actNetworkMapSet(QMap <QString, QVariant>);
 
   protected: // protected je viditelna jen detmi, ne z venku
     void paintEvent(QPaintEvent *event);
-   // void setMap(QString key, QString value);
 
   private:
     QWidget *mCanvan;
-    //QMap <QString, QVariant> map;
-
-
-
   };
 
   // QUANT PROXYSPACE ////////////////////////////////////////////////////////////////
@@ -67,7 +50,7 @@ namespace QuantIDE
     void onBeep();
     void onControlTEST(QString);
 
-    void onDataRecived(QByteArray);
+    void onDataRecived(DataProxy);
 
   private:
     Button *testButton;

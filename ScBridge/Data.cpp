@@ -6,7 +6,7 @@ namespace SupercolliderBridge
   Data::Data()
   {
     library = new QMap<DataKey, QVariant>();
-    libraryNEW = new QMap<QString, QVariant>();
+   // libraryNEW = new QMap<QString, QVariant>();
   }
 
   Data::Data(QByteArray wrapedData)
@@ -41,9 +41,9 @@ namespace SupercolliderBridge
   void Data::setValue(QString key, char* value)
   {
     qDebug() << "Data::setValue [key:" << key << ", value:" << value << "]";
-    libraryNEW->insert(key, value);
+//    libraryNEW->insert(key, value);
   }
-  QString Data::getValue_string(QString key) { return libraryNEW->value(key).toString(); }
+ // QString Data::getValue_string(QString key) { return libraryNEW->value(key).toString(); }
 
   //void Data::setValue(DataKey key, QMap<DataKey, QVariant> *value) { library->insert(key, *value); }
   // test
@@ -179,48 +179,116 @@ namespace SupercolliderBridge
   DataNEW::DataNEW()
   {
     //qDebug() << "DataNEW BUILD -> class:" << typeid(this).name();
+    const QMetaObject &mo = DataCustomize::staticMetaObject;
+    metaEnum_type = mo.enumerator(mo.indexOfEnumerator("DataType"));
+
+    header = new QMap<QString, QString>();
     library = new QMap<QString, QVariant>();
+
+    header->insert("OWENER", "NaN");
+    header->insert("TIME", "NaN");
+    header->insert("TYPE", "NaN");
+    header->insert("TARGET", "NaN");
+    header->insert("METHOD", "NaN");
   }
 
   DataNEW::DataNEW(QByteArray wrapedData)
   {
+    const QMetaObject &mo = DataNEW::staticMetaObject;
+    metaEnum_type = mo.enumerator(mo.indexOfEnumerator("DataType"));
+
+    header = new QMap<QString, QString>();
     library = new QMap<QString, QVariant>();
+
+    QString dataMsg = QString::fromUtf8(wrapedData);
+    QStringList dataList = dataMsg.split("||");
+
+    //qDebug() << "DataNEW(QByteArray)";
+    //qDebug() << "DataNEW(QByteArray) dataMsg:\n" << dataMsg;
+
+    foreach(QString oneLine, dataList)
+    {
+      QStringList args = oneLine.split("|");
+
+      if (args[0].startsWith("HEADER_"))
+      {
+        QString key = args[0].remove(0, 7);
+        QString value = args[1];
+
+        // qDebug() << "HEADER key:" << key << ", value:" << value;
+        header->insert(key, value);
+      }
+      else
+      {
+        QString key = args[0];
+        QString type = args[1];
+        QString value = args[2];
+
+        // qDebug() << "\t - line:" << oneLine;
+        //qDebug() << "\t - key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
+        bool typeFound = false;
+        if (type == "QString") { library->insert(key, value); typeFound = true; }
+        else if (type == "int") { library->insert(key, value.toInt()); typeFound = true; }
+        else if (type == "double") { library->insert(key, value.toDouble()); typeFound = true; }
+        else if (type == "bool") {
+          if (value == "true") { library->insert(key, true); typeFound = true; }
+          else if (value == "false"){ library->insert(key, false); typeFound = true; }
+          else { typeFound = false; }
+        }
+        else if (type == "QColor") { library->insert(key, QColor(value)); typeFound = true; }
+        else if (type == "QFont") {
+          QFont font;
+          font.fromString(value);
+          library->insert(key, font);
+          typeFound = true;
+        }
+
+        if (!typeFound)
+        {
+          qWarning() << "CHYBA : DataNEW(QByteArray) -> CHYBA V PREVODU NA QVARIANT TYP key:" << key << ", type:" << type << ", value:" << value;
+          library->insert(key, value);
+        }
+      }
+    }
+  }
+
+  void DataNEW::setOwener(QString name)  { header->insert("OWENER", name); }
+  
+  bool DataNEW::isFromOtherOwener(QByteArray wrapedData, QString myName)
+  {
+    QString dataMsg = QString::fromUtf8(wrapedData);
+    QStringList dataList = dataMsg.split("||");
+
+    foreach(QString oneLine, dataList)
+    {
+      if (oneLine.startsWith("HEADER_OWENER"))
+      {
+        QStringList args = oneLine.split("|");
+        if (args[1] != myName) { return true; } else { break; }
+      }
+    }
+    return false;
+  }
+
+  void DataNEW::setType(DataNEW::DataType type)  { header->insert("TYPE", metaEnum_type.valueToKey(type)); }
+
+  int DataNEW::getType(QByteArray wrapedData)
+  {
+    const QMetaObject &mo = DataNEW::staticMetaObject;
+    QMetaEnum metaEnum_type = mo.enumerator(mo.indexOfEnumerator("DataType"));
 
     QString dataMsg = QString::fromUtf8(wrapedData);
     QStringList dataList = dataMsg.split("||");
 
     foreach(QString oneLine, dataList)
     {
-      QStringList args = oneLine.split("|");
-      QString key = args[0];
-      QString type = args[1];
-      // args[2] JE VALUE TXT
-
-      //qDebug() << "\t - line:" << oneLine;
-      //qDebug() << "\t - key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
-      bool typeFound = false;
-      if (type == "QString") { library->insert(key, args[2]); typeFound = true; }
-      else if (type == "int") { library->insert(key, args[2].toInt()); typeFound = true; }
-      else if (type == "double") { library->insert(key, args[2].toDouble()); typeFound = true; }
-      else if (type == "bool") {
-        if (args[2] == "true") { library->insert(key, true); typeFound = true; }
-        else if (args[2] == "false"){ library->insert(key, false); typeFound = true; }
-        else { typeFound = false; }
-      }
-      else if (type == "QColor") { library->insert(key, QColor(args[2])); typeFound = true; }
-      else if (type == "QFont") {
-        QFont font;
-        font.fromString(args[2]);
-        library->insert(key, font);
-        typeFound = true;
-      }
-
-      if (!typeFound)
+      if (oneLine.startsWith("HEADER_TYPE"))
       {
-        qWarning() << "CHYBA : DataNEW(QByteArray) -> CHYBA V PREVODU NA QVARIANT TYP key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
-        library->insert(key, args[2]);
+        QStringList args = oneLine.split("|");
+        return metaEnum_type.keyToValue(args[1].toStdString().c_str());
       }
     }
+    return -1;
   }
 
   void DataNEW::setValue(QString key, QVariant value)  { library->insert(key, value); }
@@ -233,16 +301,25 @@ namespace SupercolliderBridge
     }
   }
 
-  void DataNEW::print(QString comment)
+  QString DataNEW::print(QString comment)
   {
-    qDebug() << "DataNEW::print [" << comment << "]";
+    QString txt;
+    txt = "DataNEW::print [" + comment + "]\n";
+    txt += "HEADER\n";
+    foreach(QString oneKey, header->keys())
+    {
+      txt +=
+        "\t - " + oneKey + " : " + header->value(oneKey) + "\n";
+    }
+    txt += "BODY\n";
     foreach(QString oneKey, library->keys())
     {
-      qDebug()
-        << "\t - key:" << oneKey
-        << ", type:" << library->value(oneKey).typeName()
-        << ", value:" << library->value(oneKey).toString();
+      txt +=
+        "\t - key: " + oneKey
+        + ", type: " + library->value(oneKey).typeName()
+        + ", value: " + library->value(oneKey).toString() + "\n";
     }
+    return txt;
   }
 
   QByteArray DataNEW::wrap()
@@ -252,11 +329,21 @@ namespace SupercolliderBridge
 
     //qDebug() << "DataNEW::wrap() library keys:" << library->keys();
     //qDebug() << "DataNEW::wrap() library values:" << library->values();
-    qDebug() << "DataNEW::wrap()";
+
+    foreach(QString oneHeaderKey, header->keys())
+    {
+      bArray.append(QString("HEADER_%1|%2").arg(
+        oneHeaderKey,
+        header->value(oneHeaderKey)
+        ));
+      bArray.append("||");
+      //if (oneHeaderKey != header->keys().at(header->keys().size() - 1)) { bArray.append("||"); }
+    }
+
     foreach(QString oneKey, library->keys())
     {
-      qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
-      list.append(QString("%1|%2|%3").arg(oneKey, library->value(oneKey).typeName(), library->value(oneKey).toString()));
+      // qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
+      // list.append(QString("%1|%2|%3").arg(oneKey, library->value(oneKey).typeName(), library->value(oneKey).toString()));
 
       bArray.append(QString("%1|%2|%3").arg(
         oneKey,
@@ -317,16 +404,46 @@ namespace SupercolliderBridge
 
   //////////////////////////////////////////////////////////////////////////////////
 
+  DataUser::DataUser() : DataNEW()
+  {
+    const QMetaObject &mo = DataUser::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    this->setType(DataNEW::DataType::USER);
+  }
+
+  DataUser::DataUser(QByteArray wrapedData) : DataNEW(wrapedData)
+  {
+    const QMetaObject &mo = DataUser::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    this->setType(DataNEW::DataType::USER);
+  }
+
+  void DataUser::setValue(Key key, QVariant value)  { DataNEW::setValue(metaEnum.valueToKey(key), value); }
+  QString DataUser::getValue_string(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toString(); }
+  bool DataUser::getValue_bool(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toBool(); }
+  int DataUser::getValue_int(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toInt(); }
+  float DataUser::getValue_double(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toDouble(); }
+  QFont DataUser::getValue_font(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QFont>(); }
+  QColor DataUser::getValue_color(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QColor>(); }
+
+  //////////////////////////////////////////////////////////////////////////////////
+
   DataProxy::DataProxy() : DataNEW()
   {
     const QMetaObject &mo = DataProxy::staticMetaObject;
     metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    this->setType(DataNEW::DataType::PROXY);
   }
 
   DataProxy::DataProxy(QByteArray wrapedData) : DataNEW(wrapedData)
   {
     const QMetaObject &mo = DataProxy::staticMetaObject;
     metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    this->setType(DataNEW::DataType::PROXY);
   }
 
   void DataProxy::setValue(Key key, QVariant value)  { DataNEW::setValue(metaEnum.valueToKey(key), value); }

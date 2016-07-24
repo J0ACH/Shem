@@ -65,31 +65,40 @@ namespace SupercolliderBridge
     QString getValue_string(QString);
 
   private:
-    //    enum Key { };
-    //QString senderName;
     QMap <DataKey, QVariant> *library;
-    QMap <QString, QVariant> *libraryNEW;
-
-
   };
-
 
   //////////////////////////////////////////////////////////////////////////////////
 
+
   class DataNEW
   {
+    Q_GADGET
+      Q_ENUMS(DataType)
+
+
   public:
+    enum DataType { CUSTOMIZE, USER, PROXY };
+
     DataNEW();
     DataNEW(QByteArray);
 
-    void print(QString comment = "");
+    QString print(QString comment = "");
     QByteArray wrap();
 
+    void setOwener(QString);
+
+    static bool isFromOtherOwener(QByteArray, QString);
+    static int getType(QByteArray);
+
   protected:
+    void setType(DataType);
     void setValue(QString, QVariant);
     QVariant getValue(QString);
 
   private:
+    QMetaEnum metaEnum_type;
+    QMap <QString, QString> *header;
     QMap <QString, QVariant> *library;
   };
 
@@ -120,7 +129,33 @@ namespace SupercolliderBridge
     QColor getValue_color(Key);
 
     QString toStyleSheet(Key);
-    
+
+  private:
+    QMetaEnum metaEnum;
+  };
+
+  //////////////////////////////////////////////////////////////////////////////////
+
+  class DataUser : public DataNEW
+  {
+    Q_GADGET
+      Q_ENUMS(Key)
+
+  public:
+    enum Key { NAME, VERSION, BOOL_INTERPRETR, BOOL_SERVER };
+
+    DataUser();
+    DataUser(QByteArray);
+
+    void setValue(Key, QVariant);
+    QString getValue_string(Key);
+    bool getValue_bool(Key);
+    int getValue_int(Key);
+    float getValue_double(Key);
+    QFont getValue_font(Key);
+    QColor getValue_color(Key);
+
+
   private:
     QMetaEnum metaEnum;
   };
@@ -133,7 +168,7 @@ namespace SupercolliderBridge
       Q_ENUMS(Key)
 
   public:
-    enum Key { BEATS, TEMPO, PLAYING, color, font };
+    enum Key { BEATS, TEMPO, PLAYING };
 
     DataProxy();
     DataProxy(QByteArray);

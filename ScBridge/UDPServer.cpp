@@ -125,11 +125,8 @@ namespace SupercolliderBridge {
       datagram.resize(mSocket->pendingDatagramSize());
       mSocket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
     }
-
-    DataNEW data(datagram);
-    data.print("UDPServer::onDatagramRecived");
-
-    emit actDataSend(datagram);
+    
+    emit actNetworkDataRecived(datagram);
     /*
 
     QString dataMsg = QString::fromUtf8(datagram);

@@ -16,7 +16,7 @@ using namespace SupercolliderBridge;
 using namespace Jui;
 
 namespace QuantIDE
-{   
+{
 
   class QuantCore : public QObject
   {
@@ -42,10 +42,11 @@ namespace QuantIDE
     void onInterpretBootDone();
     void onServerBootDone();
 
-
-    void onMyMapSet(QMap <QString, QVariant>);
+    void onSendData(DataNEW);
+    void onNetworkDataRecived(QByteArray);
+    
     void onEvaluate(QString code);
-    void onPrint(QString, MessageType);
+    void onPrint(QString, MessageType msg = MessageType::NORMAL);
 
 
   signals:
@@ -57,7 +58,9 @@ namespace QuantIDE
 
     void actPrint(QString, QColor, bool);
 
-    void actNetworkMapSet();
+    // void actNetworkMapSet();
+    void actDataSend(QByteArray);
+    void actNetworkDataRecived(DataNEW);
 
   private:
     CanvanNEW *mCanvan;

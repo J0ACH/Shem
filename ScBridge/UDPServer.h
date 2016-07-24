@@ -28,7 +28,7 @@ namespace SupercolliderBridge
   signals:
     void actNetworkBooted();
     void actPrint(QString, MessageType type = MessageType::NORMAL);
-    void actDataSend(QByteArray);
+    void actNetworkDataRecived(QByteArray);
     
   private:
     QUdpSocket *mSocket;
