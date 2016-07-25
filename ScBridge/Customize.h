@@ -2,7 +2,6 @@
 #define CUSTOMIZE_H
 
 #include "Data.h"
-//#include "ScBridge.h"
 
 #include <QWidget>
 #include <QDir>

@@ -9,7 +9,7 @@ namespace QuantIDE
     connect(this, SIGNAL(actEvaluate(QString)), core, SLOT(onEvaluate(QString)));
   }
 
-  void QuantObject::onNetworkDataRecived(DataNEW data)
+  void QuantObject::onNet_Recived(DataNEW data)
   {
     qDebug("QuantObject::onNetworkDataRecived");
   }
@@ -25,6 +25,70 @@ namespace QuantIDE
 
   QuantObject::~QuantObject() { }
 
+  // QUANT USER ////////////////////////////////////////////////////////////////  
+
+  QuantUser::QuantUser(QWidget *parent, QObject *core) : QuantObject(parent, core)
+  {
+    qDebug("QuantUser init...");
+
+    textName = new Text(this);
+    textName->setGeometry(5, 5, 50, 20);
+
+    testButton = new Button(this);
+    testButton->setGeometry(5, 50, this->width() - 10, 20);
+    testButton->setText("beep");
+    testButton->setStateKeeping(Button::StateKeeping::HOLD);
+    connect(testButton, SIGNAL(pressAct()), this, SLOT(onBeep()));
+
+    nameBox = new ControlBox(this);
+    nameBox->setGeometry(5, 80, 200, 50);
+    nameBox->setLabel("name");
+    nameBox->setValue(data.getValue_string(DataUser::Key::NAME));
+    connect(nameBox, SIGNAL(actValueChanged(QString)), this, SLOT(onControlTEST(QString)));
+    connect(nameBox, SIGNAL(actValueEvaluate(QString)), this, SLOT(onControlTEST(QString)));
+
+  }
+
+  void QuantUser::setName(QString name)
+  {
+    data.setValue(DataUser::Key::NAME, name);
+    textName->setText(name);
+  }
+  QString QuantUser::getName()  { return data.getValue_string(DataUser::Key::NAME); }
+
+  void QuantUser::onBeep()
+  {
+
+    qDebug("QuantUser::onBeep");
+    // emit actEvaluate("().play");
+  }
+
+  void QuantUser::onControlTEST(QString txt)
+  {
+    qDebug("QuantUser::onControlTEST");
+    // data.setValue(DataProxy::TEMPO, txt);
+    emit actDataSend(data);
+  }
+
+  void QuantUser::onNet_Recived(DataUser data)
+  {
+    qDebug("QuantUser::onDataRecived");
+    data.print("QuantUser::onDataRecived");
+
+    // nameBox->setValue(data.getValue_string(DataUser::TEMPO));
+  }
+
+  void QuantUser::paintEvent(QPaintEvent *event)
+  {
+    QuantObject::paintEvent(event);
+
+    QPainter painter(this);
+
+    painter.setPen(QColor(120, 30, 30));
+    //painter.drawText(5, 15, data.getValue_string(DataUser::Key::NAME));
+  }
+
+  QuantUser::~QuantUser() { }
 
   // QUANT PROXYSPACE ////////////////////////////////////////////////////////////////  
 
@@ -33,7 +97,7 @@ namespace QuantIDE
     data.setValue(DataProxy::TEMPO, 127);
 
     qDebug("QuantProxy init...");
-  
+
     testButton = new Button(this);
     testButton->setGeometry(5, 50, this->width() - 10, 20);
     testButton->setText("beep");
@@ -63,7 +127,7 @@ namespace QuantIDE
     emit actDataSend(data);
   }
 
-  void QuantProxy::onDataRecived(DataProxy data)
+  void QuantProxy::onNet_Recived(DataProxy data)
   {
     qDebug("QuantProxy::onDataRecived");
     data.print("QuantProxy::onDataRecived");

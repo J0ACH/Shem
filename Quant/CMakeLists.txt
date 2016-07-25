@@ -53,6 +53,7 @@ SET(Quant_hdr
   Node.h
   ControlEnvelope.h
   CustomizePanel.h
+  NetworkPanel.h
 )
 
 SET(Quant_src 
@@ -63,6 +64,7 @@ SET(Quant_src
   Node.cpp
   ControlEnvelope.cpp
   CustomizePanel.cpp
+  NetworkPanel.cpp
 )
 
 SET(Quant_res 

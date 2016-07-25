@@ -28,7 +28,6 @@ namespace QuantIDE
     ~CustomizePanel();
 
     public slots:
-    void onCustomize(Data);
     void onChangePressed();
     void onSavePressed();
 

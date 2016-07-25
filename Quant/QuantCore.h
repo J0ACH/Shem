@@ -7,13 +7,14 @@
 #include <QMetaMethod>
 
 
+#include "Customize.h"
 #include "ScBridge.h"
 #include "UDPServer.h"
 #include "Data.h"
 
 #include "Canvan.h"
 #include "QuantObjects.h"
-#include "CustomizePanel.h"
+#include "NetworkPanel.h"
 
 using namespace SupercolliderBridge;
 using namespace Jui;
@@ -72,6 +73,7 @@ namespace QuantIDE
     UDPServer *mNetwork;
     Customize *mCustomize;
 
+    QMap<QString, QuantUser*> lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
     QMap<QString, QObject*> networkObjects; // knihovna pro vsechny objekty komunikujici pres sit 
 
     QString userName;

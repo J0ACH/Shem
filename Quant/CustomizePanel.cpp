@@ -91,16 +91,6 @@ namespace QuantIDE
     return QColor(red, green, blue);
   }
 
-  void CustomizePanel::onCustomize(Data data)
-  {
-    boxName->setValue(data.getValue_string(DataKey::USERNAME));
-    boxColorNormal->setValue(data.toString(DataKey::COLOR_NORMAL));
-    boxColorOver->setValue(data.toString(DataKey::COLOR_OVER));
-    boxColorActive->setValue(data.toString(DataKey::COLOR_ACTIVE));
-    boxColorText->setValue(data.toString(DataKey::COLOR_TEXT));
-    boxColorPanelBackground->setValue(data.toString(DataKey::COLOR_PANEL_BACKGROUND));
-  }
-
   Data CustomizePanel::makeData()
   {
     Data data;

@@ -24,7 +24,7 @@ namespace QuantIDE
     ~QuantObject();
 
     public slots :
-    void onNetworkDataRecived(DataNEW);
+    void onNet_Recived(DataNEW);
 
   signals:
     void actDataSend(DataNEW);
@@ -35,6 +35,35 @@ namespace QuantIDE
 
   private:
     QWidget *mCanvan;
+  };
+
+  // QUANT USER ////////////////////////////////////////////////////////////////
+
+  class QuantUser : public QuantObject
+  {
+    Q_OBJECT
+  public:
+    QuantUser(QWidget *parent, QObject *core);
+    ~QuantUser();
+
+    void setName(QString);
+    QString getName();
+
+    public slots:
+    void onBeep();
+    void onControlTEST(QString);
+
+    void onNet_Recived(DataUser);
+
+  protected: // protected je viditelna jen detmi, ne z venku
+    void paintEvent(QPaintEvent *event);
+
+  private:
+    DataUser data;
+
+    Text *textName;
+    Button *testButton;
+    ControlBox *nameBox;
   };
 
   // QUANT PROXYSPACE ////////////////////////////////////////////////////////////////
@@ -50,7 +79,7 @@ namespace QuantIDE
     void onBeep();
     void onControlTEST(QString);
 
-    void onDataRecived(DataProxy);
+    void onNet_Recived(DataProxy);
 
   private:
     Button *testButton;

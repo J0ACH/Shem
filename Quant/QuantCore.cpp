@@ -15,6 +15,10 @@ namespace QuantIDE
     isServerRunnig = false;
     isNetworkRunning = false;
 
+    //networkPanel = new NetworkPanel(this, lib_users);
+
+    //lib_users = new QMap<QString, QuantUser*>();
+
     networkObjects.insert("core", this);
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onInitCore()));
@@ -118,6 +122,13 @@ namespace QuantIDE
     data.setValue(DataUser::BOOL_INTERPRETR, isInterpretRunning);
     data.setValue(DataUser::BOOL_SERVER, isServerRunnig);
 
+    QuantUser *me = new QuantUser(mCanvan->getPanel("Network"), this);
+    me->setName(userName);
+    static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->addProfile(me);
+
+    lib_users.insert(userName, me);
+    //static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->updateProfilesPosition();
+
     this->onSendData(data.wrap());
   }
 
@@ -174,6 +185,14 @@ namespace QuantIDE
 
     this->onPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" has been connected to session", MessageType::STATUS);
 
+    QuantUser *newUser = new QuantUser(mCanvan->getPanel("Network"), this);
+    newUser->setName(data.getValue_string(DataUser::Key::NAME));
+    newUser->show();
+    static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->addProfile(newUser);
+    lib_users.insert(userName, newUser);
+   // lib_users.insert(data.getValue_string(DataUser::Key::NAME), newUser);
+    //static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->updateProfilesPosition();
+
     // odpoved na prihlaseni, jsem zde
     DataUser dataAnswer;
     dataAnswer.setTargetObject("core");
@@ -194,6 +213,13 @@ namespace QuantIDE
     // this->onPrint(data.print("QuantCore::onNet_userIsHere"));
 
     this->onPrint("User \"" + data.getValue_string(DataUser::NAME) + "\"  is already connected", MessageType::STATUS);
+
+    QuantUser *newUser = new QuantUser(mCanvan->getPanel("Network"), this);
+    newUser->setName(data.getValue_string(DataUser::Key::NAME));
+    newUser->show();
+  static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->addProfile(newUser);
+    lib_users.insert(data.getValue_string(DataUser::Key::NAME), newUser);
+//    static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->updateProfilesPosition();
   }
 
 
