@@ -51,10 +51,12 @@ namespace QuantIDE
 
     void onNet_userJoined(DataUser);
     void onNet_userIsHere(DataUser);
+    void onNet_userLeaved(DataUser);
 
     void onEvaluate(QString code);
     void onPrint(QString, MessageType msg = MessageType::NORMAL);
 
+    void onKillNetwork();
 
   signals:
     void actCoreInitPrepared();
@@ -73,14 +75,17 @@ namespace QuantIDE
     UDPServer *mNetwork;
     Customize *mCustomize;
 
-    QMap<QString, QuantUser*> lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
+    NetworkPanel *networkPanel;
+
+    QMap<QString, QuantUser*> *lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
     QMap<QString, QObject*> networkObjects; // knihovna pro vsechny objekty komunikujici pres sit 
 
     QString userName;
     bool isCoreRunning, isInterpretRunning, isServerRunnig, isNetworkRunning;
     bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
 
-
+    void addUser(DataUser);
+    void removeUser(DataUser);
 
 
     QuantProxy *proxy1, *proxy2;

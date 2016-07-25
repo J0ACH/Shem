@@ -47,6 +47,8 @@ namespace Jui
     QColor getColorActive();
     QFont getFont();
 
+    State getState();
+
 
   signals:
     void pressAct(); // bude odstraneno

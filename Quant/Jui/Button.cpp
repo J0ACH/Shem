@@ -58,6 +58,8 @@ namespace Jui
   QColor Button::getColorActive()  { return colorActive; }
   QFont Button::getFont()  { return font; }
 
+  Button::State Button::getState() { return buttonState; }
+
   // bude odstraneno
   void Button::onSwitchOFF()
   {

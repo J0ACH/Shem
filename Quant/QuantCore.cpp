@@ -15,9 +15,10 @@ namespace QuantIDE
     isServerRunnig = false;
     isNetworkRunning = false;
 
-    //networkPanel = new NetworkPanel(this, lib_users);
+    lib_users = new QMap<QString, QuantUser*>();
 
-    //lib_users = new QMap<QString, QuantUser*>();
+    networkPanel = new NetworkPanel(mCanvan, lib_users);
+    mCanvan->addPanel(networkPanel, "Network", Qt::DockWidgetArea::LeftDockWidgetArea);
 
     networkObjects.insert("core", this);
 
@@ -27,10 +28,14 @@ namespace QuantIDE
     connect(mBridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
 
     connect(mNetwork, SIGNAL(actNetworkBooted()), this, SLOT(onNetworkBootDone()));
+    connect(mNetwork, SIGNAL(actNetworkKilled()), this, SLOT(onNetworkKillDone()));
     connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
 
     connect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
     connect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
+
+    connect(networkPanel, SIGNAL(actNetworkConnect()), this, SLOT(onInitNetwork()));
+    connect(networkPanel, SIGNAL(actNetworkDisconnect()), this, SLOT(onKillNetwork()));
 
     // TESTS
 
@@ -89,7 +94,7 @@ namespace QuantIDE
     {
       isCoreRunning = true;
 
-      if (initNetworkOnStart) { mNetwork->initNetwork(userName); }
+      if (initNetworkOnStart) { this->onInitNetwork(); }
       if (initInterpretOnStart) { mBridge->changeInterpretState(); }
     }
   }
@@ -97,6 +102,7 @@ namespace QuantIDE
   void QuantCore::onInitNetwork()
   {
     qDebug("QuantCore::onInitNetwork");
+    mNetwork->onInitNetwork(userName);
   }
 
   void QuantCore::onInitInterpret()
@@ -122,13 +128,26 @@ namespace QuantIDE
     data.setValue(DataUser::BOOL_INTERPRETR, isInterpretRunning);
     data.setValue(DataUser::BOOL_SERVER, isServerRunnig);
 
-    QuantUser *me = new QuantUser(mCanvan->getPanel("Network"), this);
-    me->setName(userName);
-    static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->addProfile(me);
+    this->addUser(data);
+    this->onSendData(data.wrap());
+  }
+  void QuantCore::onKillNetwork()
+  {
+    foreach(QString oneName, lib_users->keys())
+    {
+      //lib_users->value(oneName)->close();
 
-    lib_users.insert(userName, me);
-    //static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->updateProfilesPosition();
+      QuantUser *newUser = lib_users->take(oneName);
+      newUser->deleteLater();
+      networkPanel->updateProfilesPosition();
+    }
 
+    //lib_users->clear();
+
+    DataUser data;
+    data.setTargetObject("core");
+    data.setTargetMethod("onNet_userLeaved");
+    data.setValue(DataUser::NAME, userName);
     this->onSendData(data.wrap());
   }
 
@@ -180,18 +199,9 @@ namespace QuantIDE
   void QuantCore::onNet_userJoined(DataUser data)
   {
     qDebug() << "QuantCore::onNet_userJoined";
-    //this->onPrint("RECIVED DATA TYPE: USER", MessageType::STATUS);
-    // this->onPrint(data.print("QuantCore::onNet_userJoined"));
 
     this->onPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" has been connected to session", MessageType::STATUS);
-
-    QuantUser *newUser = new QuantUser(mCanvan->getPanel("Network"), this);
-    newUser->setName(data.getValue_string(DataUser::Key::NAME));
-    newUser->show();
-    static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->addProfile(newUser);
-    lib_users.insert(userName, newUser);
-   // lib_users.insert(data.getValue_string(DataUser::Key::NAME), newUser);
-    //static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->updateProfilesPosition();
+    this->addUser(data);
 
     // odpoved na prihlaseni, jsem zde
     DataUser dataAnswer;
@@ -209,17 +219,17 @@ namespace QuantIDE
   void QuantCore::onNet_userIsHere(DataUser data)
   {
     qDebug() << "QuantCore::onNet_userIsHere";
-    //this->onPrint("RECIVED DATA TYPE: USER", MessageType::STATUS);
-    // this->onPrint(data.print("QuantCore::onNet_userIsHere"));
 
-    this->onPrint("User \"" + data.getValue_string(DataUser::NAME) + "\"  is already connected", MessageType::STATUS);
+    this->onPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" is already connected", MessageType::STATUS);
+    this->addUser(data);
+  }
 
-    QuantUser *newUser = new QuantUser(mCanvan->getPanel("Network"), this);
-    newUser->setName(data.getValue_string(DataUser::Key::NAME));
-    newUser->show();
-  static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->addProfile(newUser);
-    lib_users.insert(data.getValue_string(DataUser::Key::NAME), newUser);
-//    static_cast<NetworkPanel*>(mCanvan->getPanel("Network"))->updateProfilesPosition();
+  void QuantCore::onNet_userLeaved(DataUser data)
+  {
+    qDebug() << "QuantCore::onNet_userLeaved";
+
+    this->onPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" exit session", MessageType::STATUS);
+    this->removeUser(data);
   }
 
 
@@ -255,6 +265,26 @@ namespace QuantIDE
 
   }
 
+
+  void QuantCore::addUser(DataUser data)
+  {
+    QString name = data.getValue_string(DataUser::Key::NAME);
+
+    QuantUser *newUser = new QuantUser(networkPanel, this);
+    newUser->setName(name);
+    newUser->show();
+
+    lib_users->insert(name, newUser);
+    networkPanel->updateProfilesPosition();
+  }
+  void QuantCore::removeUser(DataUser data)
+  {
+    QString name = data.getValue_string(DataUser::Key::NAME);
+
+    QuantUser *newUser = lib_users->take(name);
+    newUser->close();
+    networkPanel->updateProfilesPosition();
+  }
 
   void QuantCore::initTestObjects()
   {

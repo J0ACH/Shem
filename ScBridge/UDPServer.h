@@ -18,15 +18,17 @@ namespace SupercolliderBridge
     UDPServer(QObject *parent);
     ~UDPServer();
 
-    void initNetwork(QString name);
     void sendCode(QString code);
 
     public slots:
+    void onInitNetwork(QString name);
+       
     void onSendData(QByteArray data);
     void onDatagramRecived();
 
   signals:
     void actNetworkBooted();
+    void actNetworkKilled();
     void actPrint(QString, MessageType type = MessageType::NORMAL);
     void actNetDataRecived(QByteArray);
     

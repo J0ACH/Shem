@@ -29,18 +29,19 @@ namespace QuantIDE
     canvanNEW->setGeometry(10, 10, 1200, 600);
     canvanNEW->show();
     canvanNEW->installEventFilter(this);
-    
-    this->initObjects();
-
-    canvanNEW->addPanel(console, "Console");
-    canvanNEW->addPanel(customizePanel, "Customize");
-    canvanNEW->addPanel(networkPanel, "Network", Qt::DockWidgetArea::LeftDockWidgetArea);
-    canvanNEW->addPanel(timePanel, "Time");
 
     core = new QuantCore(canvanNEW);
 
+    this->initObjects();
+
+
+    canvanNEW->addPanel(console, "Console");
+    canvanNEW->addPanel(customizePanel, "Customize");
+    canvanNEW->addPanel(timePanel, "Time");
+
+
     // core->addProxySpace();
-    //  core->addNode("testNode1");
+    // core->addNode("testNode1");
 
 
     connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
@@ -59,8 +60,6 @@ namespace QuantIDE
   void QuantNEW::initObjects()
   {
     console = new Console();
-    networkPanel = new NetworkPanel();
- //  networkPanel->setVisible(false);
     customizePanel = new CustomizePanel();
     customizePanel->setVisible(false);
     timePanel = new PanelNEW();
@@ -78,12 +77,12 @@ namespace QuantIDE
     panelsBar->getButton("Console")->setState(Button::State::ON);
     connect(console, SIGNAL(actClosed()), panelsBar->getButton("Console"), SLOT(onSwitch()));
 
-    panelsBar->addButton("Network", QImage(":/network_16px.png"), networkPanel, SLOT(onSwitchVisible()));
-    panelsBar->getButton("Network")->setState(Button::State::ON);
-    connect(networkPanel, SIGNAL(actClosed()), panelsBar->getButton("Network"), SLOT(onSwitch()));
-
     panelsBar->addButton("Customize", QImage(":/customize_16px.png"), customizePanel, SLOT(onSwitchVisible()));
     connect(customizePanel, SIGNAL(actClosed()), panelsBar->getButton("Customize"), SLOT(onSwitch()));
+
+    panelsBar->addButton("Network", QImage(":/network_16px.png"), canvanNEW->getPanel("Network"), SLOT(onSwitchVisible()));
+    panelsBar->getButton("Network")->setState(Button::State::ON);
+    connect(canvanNEW->getPanel("Network"), SIGNAL(actClosed()), panelsBar->getButton("Network"), SLOT(onSwitch()));
 
     panelsBar->addButton("Time", QImage(":/network_16px.png"), timePanel, SLOT(onSwitchVisible()));
     connect(timePanel, SIGNAL(actClosed()), panelsBar->getButton("Time"), SLOT(onSwitch()));
@@ -108,7 +107,7 @@ namespace QuantIDE
     textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 0, 15, canvanNEW->getStaustBar()->height());
     textServerGroups->setAlign(Qt::AlignCenter);
     textServerGroups->show();
-    
+
   }
 
   void QuantNEW::onCustomize(Data data)

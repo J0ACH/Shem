@@ -2,7 +2,9 @@
 
 namespace QuantIDE
 {
-  NetworkPanel::NetworkPanel(QWidget *parent) : PanelNEW(parent)
+  NetworkPanel::NetworkPanel(QWidget *parent, QMap<QString, QuantUser*> *lib) :
+    PanelNEW(parent),
+    mProfiles(lib)
   {
     this->setMinimumWidth(400);
     this->initControl();
@@ -21,25 +23,16 @@ namespace QuantIDE
 
     buttonConnect = new Button(this);
     buttonConnect->setText("Connect");
+    buttonConnect->setStateKeeping(Button::StateKeeping::HOLD);
+    buttonConnect->setState(Button::State::ON);
     connect(buttonConnect, SIGNAL(actPressed()), this, SLOT(onConnectPressed()));
   }
-
-
-  void NetworkPanel::addProfile(QuantUser *yourProfile)
-  {
-    profiles.insert(yourProfile->getName(), yourProfile);
-    this->updateProfilesPosition();
-  }
-  void NetworkPanel::removeProfile(QString name)
-  {
-    profiles.remove(name);
-    this->updateProfilesPosition();
-  }
-
 
   void NetworkPanel::onConnectPressed()
   {
     qDebug("NetworkPanel::onConnectPressed()");
+    if (buttonConnect->getState() == Button::State::ON) { emit actNetworkConnect(); }
+    else { emit actNetworkDisconnect(); }
   }
 
 
@@ -62,9 +55,9 @@ namespace QuantIDE
   void NetworkPanel::updateProfilesPosition()
   {
     int noLoop = 0;
-    foreach(QuantUser *oneUser, profiles)
+    foreach(QString oneName, mProfiles->keys())
     {
-      oneUser->setGeometry(10, noLoop * 40 + 30, width() - 20, oneUser->height());
+      mProfiles->value(oneName)->setGeometry(10, noLoop * 40 + 30, width() - 20, 30);
       noLoop++;
     }
   }

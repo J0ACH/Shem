@@ -24,33 +24,30 @@ namespace QuantIDE
     Q_OBJECT
 
   public:
-    NetworkPanel(QWidget *parent = 0);
+    NetworkPanel(QWidget *parent, QMap<QString, QuantUser*> *lib);
     ~NetworkPanel();
 
-    void addProfile(QuantUser *profile);
-    void removeProfile(QString);
+    void updateProfilesPosition();
 
     public slots:
     void onConnectPressed();
 
   signals:
     void actNetworkConnect();
+    void actNetworkDisconnect();
 
   protected:
     void resizeEvent(QResizeEvent *event);
 
   private:
     void initControl();
-    void updateProfilesPosition();
 
     QScrollArea *scrollArea;
     QWidget *scrollWidget;
 
     Button *buttonConnect;
 
-
-    QMap<QString, QuantUser*> profiles;
-    //QList<QuantUser*> profiles;
+    QMap<QString, QuantUser*> *mProfiles;
   };
 }
 

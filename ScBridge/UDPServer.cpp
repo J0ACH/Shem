@@ -13,7 +13,7 @@ namespace SupercolliderBridge {
     connect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
   }
 
-  void UDPServer::initNetwork(QString name)
+  void UDPServer::onInitNetwork(QString name)
   {
     qDebug() << "UDPServer::initNetwork name:" << name;
     emit actPrint("Network init start...", MessageType::STATUS);
@@ -57,7 +57,7 @@ namespace SupercolliderBridge {
 
     this->sendCode(tr("Hi all my name is %1").arg(userName));
   }
-
+  
   bool UDPServer::isConnectedToNet()
   {
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
@@ -94,15 +94,7 @@ namespace SupercolliderBridge {
 
     return result;
   }
-
-  void UDPServer::sendCode(QString code)
-  {
-    QString dataMsg = tr("%1||%2").arg(userName, code);
-
-    QByteArray datagram(dataMsg.toStdString().c_str());
-    //mSocket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
-  }
-
+  
   void UDPServer::onSendData(QByteArray objectsData)
   {
     // QString dataMsg = tr("%1||%2").arg(userName, code);
@@ -112,7 +104,6 @@ namespace SupercolliderBridge {
 
     mSocket->writeDatagram(objectsData.data(), objectsData.size(), *broadcastAddress, port);
   }
-
 
   void UDPServer::onDatagramRecived()
   {
@@ -129,7 +120,13 @@ namespace SupercolliderBridge {
     emit actNetDataRecived(datagram);
   }
 
+  void UDPServer::sendCode(QString code)
+  {
+    QString dataMsg = tr("%1||%2").arg(userName, code);
 
+    QByteArray datagram(dataMsg.toStdString().c_str());
+    //mSocket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
+  }
   void UDPServer::processDatagram(QString code)
   {
     //mBridge->evaluate(code, true);

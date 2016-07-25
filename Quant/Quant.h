@@ -33,7 +33,7 @@ namespace QuantIDE
     ~QuantNEW();
 
     void initObjects();
-    
+
 
     public slots:
     void onCustomize(Data);
@@ -48,14 +48,13 @@ namespace QuantIDE
     CanvanNEW *canvanNEW;
     Console *console;
     CustomizePanel *customizePanel;
-    NetworkPanel *networkPanel;
     PanelNEW  *timePanel;
     Text *textServerMeter, *textServerSynths, *textServerGroups;
     QuantCore *core;
 
     CanvanNEW_ToolBar *controlsBar, *panelsBar;
 
-    
+
   };
 
 
