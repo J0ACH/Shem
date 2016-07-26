@@ -24,40 +24,14 @@ namespace QuantIDE
 
     networkObjects.insert("core", this);
 
-    connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onInitCore()));
+    connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
+    connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
 
-    connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onInterpretBootDone()));
+
     connect(mBridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
 
     // TESTS
-
-    this->initTestObjects();
-
-    /*
-    QMap<QString, QVariant> lev1;
-    QMap<QString, QVariant> lev2;
-
-    lev1.insert("type", "proxy");
-    lev1.insert("object", lev2);
-    lev2.insert("code1", "aaaa");
-    lev2.insert("code2", "bbbb");
-
-    foreach(QString oneKey, lev1.keys())
-    {
-    qDebug() << "TEST MultiMap key:" << oneKey << " value:" << lev1.value(oneKey) << "type: " << lev1.value(oneKey).type();
-
-    switch (lev1.value(oneKey).type())
-    {
-    case QVariant::Map:
-    foreach(QString oneKey2, lev2.keys())
-    {
-    qDebug() << "\t - key2:" << oneKey2 << " value2:" << lev2.value(oneKey2);
-    }
-    break;
-    }
-    }
-    */
-
+    // this->initTestObjects();
   }
 
   void QuantCore::onCustomize(Data data)
@@ -79,38 +53,45 @@ namespace QuantIDE
     emit actCoreInitPrepared(); // ceka na initInterpretOnStart a initServerOnStart
   }
 
-  void QuantCore::onInitCore()
+  // CORE /////////////////////////////////////////
+
+  void QuantCore::onCoreInit()
   {
-    qDebug("QuantCore::onInitCore");
+    // qDebug("QuantCore::onInitCore");
     if (!isCoreRunning)
     {
       isCoreRunning = true;
 
       if (initNetworkOnStart) { this->onNetInit(); }
-      if (initInterpretOnStart) { mBridge->changeInterpretState(); }
+      if (initInterpretOnStart) { this->onInterpretInit(); }
     }
+  }
+  void QuantCore::onCoreKill()
+  {
+    //qDebug("QuantCore::onCoreKill");
+    mBridge->killBridge();
+    mCanvan->onCanvanClose();
   }
 
   // NETWORK /////////////////////////////////////////
 
   void QuantCore::onNetInit()
   {
-    qDebug("QuantCore::onInitNetwork");
-
+    // qDebug("QuantCore::onInitNetwork");
     mNetwork = new UDPServer(this);
 
-    connect(mNetwork, SIGNAL(actNetworkBooted()), this, SLOT(onNetInitDone()));
-    connect(mNetwork, SIGNAL(actNetworkKilled()), this, SLOT(onNetKillDone()));
+    connect(mNetwork, SIGNAL(actInitDone()), this, SLOT(onNetInitDone()));
+    connect(mNetwork, SIGNAL(actKillDone()), this, SLOT(onNetKillDone()));
     connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
     connect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
 
     connect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
 
-    mNetwork->initNetwork(userName);
+    mNetwork->initNetwork();
   }
   void QuantCore::onNetInitDone()
   {
-    qDebug("QuantCore::onNetworkBootDone");
+    // qDebug("QuantCore::onNetworkBootDone");
 
     DataUser data;
     data.setTargetObject("core");
@@ -126,7 +107,7 @@ namespace QuantIDE
   }
   void QuantCore::onNetKill()
   {
-    qDebug("QuantCore::onNetKill");
+    // qDebug("QuantCore::onNetKill");
     foreach(QString oneName, lib_users->keys())
     {
       qDebug() << "QuantCore::onNetKill oneName:" << oneName;
@@ -143,20 +124,56 @@ namespace QuantIDE
     this->onSendData(data.wrap());
 
     mNetwork->killNetwork();
-    mNetwork->~UDPServer();
   }
   void QuantCore::onNetKillDone()
   {
-    qDebug("QuantCore::onNetKillDone");
-    this->onPrint("Network kill done...", MessageType::STATUS);
+    mNetwork->deleteLater();
   }
 
   // INTERPRET /////////////////////////////////////////
 
-  void QuantCore::onInitInterpret()
+  void QuantCore::onInterpretInit()
   {
     qDebug("QuantCore::onInitInterpret");
+
+    if (!isInterpretRunning)
+    {
+      mBridge = new ScBridge(this);
+
+      connect(mBridge, SIGNAL(actInterpretInitDone()), this, SLOT(onInterpretInitDone()));
+      connect(mBridge, SIGNAL(actInterpretKill()), this, SLOT(onInterpretKill()));
+      connect(mBridge, SIGNAL(actInterpretKillDone()), this, SLOT(onInterpretKillDone()));
+
+      connect(mBridge, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
+      this->onPrint("Interpretr init...", MessageType::STATUS);
+    }
+
+    mBridge->changeInterpretState();
   }
+  void QuantCore::onInterpretInitDone()
+  {
+    qDebug("QuantCore::onInterpretBootDone");
+    isInterpretRunning = true;
+    this->onPrint("Interpretr init done...\n", MessageType::STATUS);
+    if (initServerOnStart) { mBridge->changeServerState(); }
+  }
+
+  void QuantCore::onInterpretKill()
+  {
+    qDebug("QuantCore::onInterpretKill");
+    this->onPrint("Interpretr kill...", MessageType::STATUS);
+
+  }
+  void QuantCore::onInterpretKillDone()
+  {
+    qDebug("QuantCore::onInterpretKillDone");
+    this->onPrint("Interpretr kill done...\n", MessageType::STATUS);
+    isInterpretRunning = false;
+
+    mBridge->close();// deleteLater();
+  }
+
+  // SERVER /////////////////////////////////////////
 
   void QuantCore::onInitServer()
   {
@@ -164,11 +181,6 @@ namespace QuantIDE
   }
 
 
-  void QuantCore::onInterpretBootDone()
-  {
-    qDebug("QuantCore::onInterpretBootDone");
-    if (initServerOnStart) { mBridge->changeServerState(); }
-  }
   void QuantCore::onServerBootDone()
   {
     qDebug("QuantCore::onServerBootDone");
@@ -342,7 +354,7 @@ namespace QuantIDE
   QuantCore::~QuantCore()
   {
     qDebug("Core closing...");
-    mBridge->killBridge();
+
     qDebug("Bridge killed...");
   }
 }

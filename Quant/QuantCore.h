@@ -36,8 +36,12 @@ namespace QuantIDE
 
     public slots :
     void onCustomize(Data);
-    void onInitCore();
+    
+    // CORE /////////////////////////////////////////
 
+    void onCoreInit();
+    void onCoreKill();
+    
     // NETWORK /////////////////////////////////////////
 
     void onNetInit();
@@ -47,10 +51,14 @@ namespace QuantIDE
 
     // INTERPRET /////////////////////////////////////////
 
-    void onInitInterpret();
+    void onInterpretInit();
+    void onInterpretInitDone();
+    void onInterpretKill();
+    void onInterpretKillDone();
+    
+    // SERVER /////////////////////////////////////////
     void onInitServer();
 
-    void onInterpretBootDone();
     void onServerBootDone();
 
     void onSendData(DataNEW);
@@ -66,6 +74,7 @@ namespace QuantIDE
 
   signals:
     void actCoreInitPrepared();
+    //void actCoreKillPrepared();
 
     void actNetworkBooted();
     void actInterpretBooted();

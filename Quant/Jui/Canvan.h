@@ -107,9 +107,13 @@ namespace Jui
     QColor getColorBackground();
  
     public slots:
-    void onCanvanClosed();
+    void onEmitClose();
+    void onCanvanClose();
     void onCanvanMaximized();
     void onCanvanMinimized();
+    
+  signals:
+    void actClose();
 
   protected:
     void resizeEvent(QResizeEvent *resizeEvent);

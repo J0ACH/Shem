@@ -9,17 +9,13 @@ namespace SupercolliderBridge {
     qDebug("UDPServer:: new...");
     port = 10000;
     mSocket->bind(QHostAddress::Any, port);
-
     connect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
   }
 
-  void UDPServer::initNetwork(QString name)
+  void UDPServer::initNetwork()
   {
-    qDebug() << "UDPServer::initNetwork name:" << name;
-    emit actPrint("Network init start...", MessageType::STATUS);
-
-    // userName = name;
-    // emit actPrint(tr("Username is set on %1").arg(userName));
+    // qDebug() << "UDPServer::initNetwork";
+    emit actPrint("Network init...", MessageType::STATUS);
 
     if (isConnectedToNet()) { emit actPrint("Network link is estabilished"); }
     else { qDebug("UDP: ERROR! you are not connected to any network.\n"); return; }
@@ -55,7 +51,7 @@ namespace SupercolliderBridge {
     {
       qDebug("UDPServer::initNetwork done...");
       emit actPrint("Network init done...\n", MessageType::STATUS);
-      emit actNetworkBooted();
+      emit actInitDone();
     }
     else
     {
@@ -68,14 +64,15 @@ namespace SupercolliderBridge {
 
   void UDPServer::killNetwork()
   {
-    qDebug("UDPServer:: kill...");
+    //qDebug("UDPServer::illNetwork");
     disconnect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
-
+        
     broadcastAddress->~QHostAddress();
     interface->~QNetworkInterface();
     mSocket->~QUdpSocket();
 
-    emit actNetworkKilled();
+    emit actPrint("Network kill done...\n", MessageType::STATUS);
+    emit actKillDone();
   }
 
   bool UDPServer::isConnectedToNet()
@@ -140,9 +137,5 @@ namespace SupercolliderBridge {
     emit actNetDataRecived(datagram);
   }
 
-  UDPServer::~UDPServer()
-  {
-    // QObject::deleteLater();
-    // QObject::~QObject();
-  };
+  UDPServer::~UDPServer()  { };
 }

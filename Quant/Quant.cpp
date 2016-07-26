@@ -52,6 +52,7 @@ namespace QuantIDE
     connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
 
     connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));
+    
 
     customize->refresh();
 
@@ -67,7 +68,7 @@ namespace QuantIDE
 
     controlsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(controlsBar, Qt::ToolBarArea::BottomToolBarArea);
-    controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), console, SLOT(onSwitchVisible()));
+    controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), core, SLOT(onInterpretInit()));
     controlsBar->addButton("Server", QImage(":/server_16px.png"), console, SLOT(onSwitchVisible()));
 
     panelsBar = new CanvanNEW_ToolBar();

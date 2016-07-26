@@ -194,7 +194,7 @@ namespace QuantIDE
       }
       else
       {
-        mBridge->msgWarningAct(tr("Set duration is too high. Env sum of duration is set back to %1").arg(QString::number(durationBox->getValue_double())));
+        mBridge->actPrint(tr("Set duration is too high. Env sum of duration is set back to %1").arg(QString::number(durationBox->getValue_double())), MessageType::WARNING);
         this->setEnv(previousEnv);
       }
 
@@ -330,7 +330,7 @@ namespace QuantIDE
       else
       {
         durationBox->setValue(QString::number(duration));
-        mBridge->msgWarningAct(tr("Set of duration is lower than the penultimate vertex time. Quant is set back to %1").arg(QString::number(duration)));
+        mBridge->actPrint(tr("Set of duration is lower than the penultimate vertex time. Quant is set back to %1").arg(QString::number(duration)), MessageType::WARNING);
       }
     }
 

@@ -42,7 +42,7 @@ namespace Jui
 
     closeButton = new Button(menuBar);
     closeButton->setIcon(QImage(":/close16.png"), 0);
-    connect(closeButton, SIGNAL(pressAct()), this, SLOT(onCanvanClosed()));
+    connect(closeButton, SIGNAL(pressAct()), this, SLOT(onEmitClose()));
 
     maximizeButton = new Button(menuBar);
     maximizeButton->setIcon(QImage(":/maximize16.png"), 0);
@@ -76,9 +76,11 @@ namespace Jui
 
   void CanvanNEW::setColorBackground(QColor color)  { colorBackground = color; }
   QColor CanvanNEW::getColorBackground() { return colorBackground; }
- 
-  void CanvanNEW::onCanvanClosed()
+
+  void CanvanNEW::onEmitClose()  { emit actClose(); }
+  void CanvanNEW::onCanvanClose()
   {
+    qDebug("CanvanNEW::onCanvanClose");
     this->close();
     this->deleteLater();
   }
@@ -231,14 +233,14 @@ namespace Jui
   }
   Button* CanvanNEW_ToolBar::getButton(QString name)  { return buttonsList.value(name); }
   void CanvanNEW_ToolBar::setColorBackground(QColor color)  { colorBackground = color; }
-  QColor CanvanNEW_ToolBar::getColorBackground() { return colorBackground; } 
+  QColor CanvanNEW_ToolBar::getColorBackground() { return colorBackground; }
   void CanvanNEW_ToolBar::paintEvent(QPaintEvent *event)
   {
     QPainter painter(this);
     painter.fillRect(QRect(1, 1, width() - 2, height() - 2), colorBackground);
 
     // QToolBar::paintEvent(event);
-  } 
+  }
   CanvanNEW_ToolBar::~CanvanNEW_ToolBar() { }
 
   ///////////////////////////////////////////////////////////////////////////

@@ -257,7 +257,7 @@ namespace QuantIDE
         return i;
       };
     }
-    mBridge->msgWarningAct(tr("Array of reserved bus index for node %1 is full").arg(nodeName));
+    mBridge->actPrint(tr("Array of reserved bus index for node %1 is full").arg(nodeName), MessageType::WARNING);
     return startIndex;
   }
 

@@ -11,9 +11,6 @@ namespace SupercolliderBridge
     mTerminationRequested(false),
     mCompiled(false)
   {
-    //udpServer = new UDPServer(this);
-    //udpServer->initSocket();
-
     stateInterpret = StateInterpret::OFF;
     stateServer = StateServer::OFF;
 
@@ -52,9 +49,8 @@ namespace SupercolliderBridge
 
   void ScBridge::killBridge()
   {
-    this->evaluate("Server.killAll", true);
-    this->killInterpreter();
-    emit killBridgeDoneAct();
+    this->evaluate("Server.killAll", false, true);
+    this->evaluate("0.exit", false, true);
   }
 
   void ScBridge::changeInterpretState()
@@ -62,12 +58,12 @@ namespace SupercolliderBridge
     switch (stateInterpret)
     {
     case StateInterpret::OFF:
-      emit interpretBootInitAct();
+      emit actInterpretInit();
       startInterpretr();
       break;
 
     case StateInterpret::RUNNING:
-      emit interpretKillInitAct();
+      emit actInterpretKill();
       killInterpreter();
       break;
     }
@@ -93,6 +89,7 @@ namespace SupercolliderBridge
 
   bool ScBridge::evaluate(QString code, bool print, bool silent)
   {
+    qDebug() << "ScBridge::evaluate " << code;
     bool synced = false;
     silent = false;
 
@@ -106,7 +103,7 @@ namespace SupercolliderBridge
     //answer.append("NaN");
 
     if (state() != QProcess::Running) {
-      emit msgStatusAct(tr("Interpreter is not running!\r\n"));
+      emit actPrint(tr("Interpreter is not running!\r\n"), MessageType::STATUS);
       return false;
     }
 
@@ -121,12 +118,12 @@ namespace SupercolliderBridge
       size_t writtenBytes = write(bytesToWrite);
 
       if (writtenBytes != bytesToWrite.size()) {
-        emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
+        emit actPrint(tr("Error when passing data to interpreter!\r\n"), MessageType::ERROR);
         return false;
       }
 
       char commandChar = silent ? '\x1b' : '\x0c';
-      if (print) { emit msgEvaluateAct(tr("evaluate: %1\r\n").arg(code)); }
+      if (print) { actPrint(tr("evaluate: %1\r\n").arg(code), MessageType::EVAULATE); }
       write(&commandChar, 1);
 
       loop.exec();
@@ -136,7 +133,7 @@ namespace SupercolliderBridge
     durationTime = syncTime - evalTime;
 
     if (print) {
-      emit msgNormalAct(tr("synced [%1 ms]\r\n").arg(QString::number(durationTime)));
+      emit actPrint(tr("synced [%1 ms]\r\n").arg(QString::number(durationTime)));
     }
 
     return true;
@@ -163,14 +160,14 @@ namespace SupercolliderBridge
 
       //this->evaluateCode(command, false, false);
       if (state() != QProcess::Running) {
-        emit msgStatusAct(tr("Interpreter is not running!\r\n"));
+        emit actPrint(tr("Interpreter is not running!\r\n"), MessageType::STATUS);
         return QStringList();
       }
       QByteArray bytesToWrite = command.toUtf8();
       size_t writtenBytes = write(bytesToWrite);
 
       if (writtenBytes != bytesToWrite.size()) {
-        emit msgStatusAct(tr("Error when passing data to interpreter!\r\n"));
+        emit actPrint(tr("Error when passing data to interpreter!\r\n"), MessageType::ERROR);
         return QStringList();
       }
 
@@ -190,11 +187,11 @@ namespace SupercolliderBridge
       {
         txt = answer.toStringList().join(" || ");
       }
-      emit msgResultAct(tr("QA [%1 ms]: %2 = %3\r\n").arg(
+      emit actPrint(tr("QA [%1 ms]: %2 = %3\r\n").arg(
         QString::number(durationTime),
         code,
         txt
-        ));
+        ), MessageType::ANSWER);
     }
 
     return answer;
@@ -214,7 +211,7 @@ namespace SupercolliderBridge
     bool processStarted = QProcess::waitForStarted();
     if (!processStarted)
     {
-      emit msgStatusAct(tr("Failed to start interpreter!"));
+      emit actPrint(tr("Failed to start interpreter!"), MessageType::STATUS);
     }
     else
     {
@@ -228,7 +225,7 @@ namespace SupercolliderBridge
   void ScBridge::killInterpreter()
   {
     if (state() != QProcess::Running) {
-      emit msgStatusAct(tr("Interpreter is not running!"));
+      emit actPrint(tr("Interpreter is not running!"), MessageType::STATUS);
       return;
     }
 
@@ -248,10 +245,10 @@ namespace SupercolliderBridge
 #endif
       bool reallyFinished = waitForFinished(200);
       if (!reallyFinished)
-        emit msgStatusAct(tr("Failed to stop interpreter!"));
+        emit actPrint(tr("Failed to stop interpreter!"), MessageType::STATUS);
       else
       {
-        stateInterpret = StateInterpret::OFF;
+
       }
     }
     mTerminationRequested = false;
@@ -278,7 +275,7 @@ namespace SupercolliderBridge
 
     if (msg.contains("ERROR"))
     {
-      emit msgErrorAct(msg);
+      emit actPrint(msg, MessageType::ERROR);
       /*
       QStringList msgLines = postString.split("\n");
       for (int i = 0; i < msgLines.size(); i = i + 1)
@@ -296,8 +293,8 @@ namespace SupercolliderBridge
       }
       */
     }
-    else if (msg.contains("WARNING")) { emit msgWarningAct(msg); }
-    else if (msg.contains("***")) { emit msgStatusAct(msg); }
+    else if (msg.contains("WARNING")) { emit actPrint(msg, MessageType::WARNING); }
+    else if (msg.contains("***")) { emit actPrint(msg, MessageType::STATUS); }
     else if (msg.contains("->"))
     {
 
@@ -350,10 +347,10 @@ namespace SupercolliderBridge
         //if (msg.startsWith("\r\n"))	{ msg = msg.replace("\r\n", ""); }
         //if (!msg.isEmpty())	{ emit msgResultAct(msg); }
         //emit msgResultAct(tr("%1\r\n").arg(msg));
-        emit msgResultAct(msg);
+        emit actPrint(msg, MessageType::ANSWER);
       }
     }
-    else if (msg.contains("bundle")) { emit msgBundleAct(msg); }
+    else if (msg.contains("bundle")) { emit actPrint(msg, MessageType::BUNDLE); }
     else if (msg.contains("beatFlag"))
     {
       // int beat2 = this->question("p.clock.beats").toString().toInt();
@@ -386,7 +383,7 @@ namespace SupercolliderBridge
       else if (nodeMSG[6].toInt() == 1)
       {
         emit actGroupAdd(nodeMSG[2].toInt());
-       // emit msgBundleAct(tr("group [ %1 ] started").arg(QString::number(nodeID)));
+        // emit msgBundleAct(tr("group [ %1 ] started").arg(QString::number(nodeID)));
       }
     }
     else if (msg.contains("nodeFlag_END"))
@@ -404,13 +401,13 @@ namespace SupercolliderBridge
       else if (nodeMSG[6].toInt() == 1)
       {
         emit actGroupFree(nodeMSG[2].toInt());
-       // emit msgBundleAct(tr("group [ %1 ] end").arg(QString::number(nodeID)));
+        // emit msgBundleAct(tr("group [ %1 ] end").arg(QString::number(nodeID)));
       }
     }
     else {
       //qDebug() << msg;
       if (msg.startsWith("\r\n"))	{ msg = msg.replace("\r\n", ""); }
-      if (!msg.isEmpty())	{ emit msgNormalAct(msg); }
+      if (!msg.isEmpty())	{ emit actPrint(msg); }
     }
   }
 
@@ -433,7 +430,7 @@ namespace SupercolliderBridge
     connect(mIpcSocket, SIGNAL(readyRead()), this, SLOT(onIpcData()));
 
     stateInterpret = StateInterpret::RUNNING;
-    emit interpretBootDoneAct();
+    emit actInterpretInitDone();
   }
 
   void ScBridge::finalizeConnection()
@@ -441,7 +438,8 @@ namespace SupercolliderBridge
     mIpcData.clear();
     mIpcSocket->deleteLater();
     mIpcSocket = NULL;
-    emit interpretKillDoneAct();
+    stateInterpret = StateInterpret::OFF;
+    emit actInterpretKillDone();
   }
 
   void ScBridge::onIpcData()
@@ -511,7 +509,7 @@ namespace SupercolliderBridge
       //qDebug() << "INTROSPECTION" << data;
 
       // DATA O VSECH CLASS PRO SUPERCOLIDER!!!!!!
-     // emit msgStatusAct(tr("INTROSPECTION message: %1").arg(data));
+      // emit msgStatusAct(tr("INTROSPECTION message: %1").arg(data));
     }
     else if (selector == classLibraryRecompiledSelector)
     {

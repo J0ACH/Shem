@@ -16,11 +16,12 @@
 #include <QQueue>
 #include <QTimer>
 
+#include "Data.h"
+
 namespace SupercolliderBridge
 {
   enum class StateInterpret{ OFF, RUNNING };
   enum class StateServer{ OFF, RUNNING };
- // enum class MessageType{ ERROR, WARNING, STATUS, EVAULATE, RESULT, ANSWER };
 
   class ScBridge : public QProcess
   {
@@ -46,7 +47,7 @@ namespace SupercolliderBridge
     void onNewIpcConnection();
     void finalizeConnection();
     void onIpcData();
-    
+
     public slots:
     void killBridge();
     void changeInterpretState();
@@ -55,16 +56,20 @@ namespace SupercolliderBridge
     void onChangeTempo(QString BPM);
 
   signals:
-    void interpretBootInitAct();
-    void interpretBootDoneAct();
-    void interpretKillInitAct();
-    void interpretKillDoneAct();
+    void actInterpretInit();
+    void actInterpretInitDone();
+    void actInterpretKill();
+    void actInterpretKillDone();
 
     void serverBootInitAct();
     void serverBootDoneAct();
     void serverKillInitAct();
     void serverKillDoneAct();
 
+    //void actBridgeKillDone();
+
+    void actPrint(QString, MessageType type = MessageType::NORMAL);
+    /*
     void msgErrorAct(QString const &);
     void msgWarningAct(QString const &);
     void msgNormalAct(QString const &);
@@ -72,6 +77,7 @@ namespace SupercolliderBridge
     void msgEvaluateAct(QString const &);
     void msgResultAct(QString const &);
     void msgBundleAct(QString const &);
+    */
 
     void actSynced();
     void actAnswered();
@@ -84,7 +90,7 @@ namespace SupercolliderBridge
     void actSynthAdd(int ID);
     void actSynthFree(int ID);
 
-    void killBridgeDoneAct();
+    
 
     //void response(const QString & selector, const QString & data);
 
@@ -106,7 +112,7 @@ namespace SupercolliderBridge
 
     void onResponse(const QString & selector, const QString & data);
 
-        //QStringList answer;
+    //QStringList answer;
     QVariant answer;
   };
 

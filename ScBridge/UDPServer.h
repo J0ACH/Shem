@@ -18,7 +18,7 @@ namespace SupercolliderBridge
     UDPServer(QObject *parent);
     ~UDPServer();
 
-    void initNetwork(QString name);
+    void initNetwork();
     void killNetwork();
 
     public slots:
@@ -26,8 +26,8 @@ namespace SupercolliderBridge
     void onDatagramRecived();
 
   signals:
-    void actNetworkBooted();
-    void actNetworkKilled();
+    void actInitDone();
+    void actKillDone();
     void actPrint(QString, MessageType type = MessageType::NORMAL);
     void actNetDataRecived(QByteArray);
 
@@ -37,7 +37,7 @@ namespace SupercolliderBridge
     QHostAddress *broadcastAddress;
 
     int port;
-    QString userName;
+   // QString userName;
 
     void pendingDatagramSize();
     bool isConnectedToNet();
