@@ -57,9 +57,13 @@ namespace QuantIDE
     void onInterpretKillDone();
     
     // SERVER /////////////////////////////////////////
-    void onInitServer();
 
-    void onServerBootDone();
+    void onServerInit();
+    void onServerInitDone();
+    void onServerKill();
+    void onServerKillDone();
+
+   // void onServerBootDone();
 
     void onSendData(DataNEW);
     void onNetDataRecived(QByteArray);

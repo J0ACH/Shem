@@ -69,7 +69,7 @@ namespace QuantIDE
     controlsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(controlsBar, Qt::ToolBarArea::BottomToolBarArea);
     controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), core, SLOT(onInterpretInit()));
-    controlsBar->addButton("Server", QImage(":/server_16px.png"), console, SLOT(onSwitchVisible()));
+    controlsBar->addButton("Server", QImage(":/server_16px.png"), core, SLOT(onServerInit()));
 
     panelsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(panelsBar, Qt::ToolBarArea::BottomToolBarArea);

@@ -101,7 +101,7 @@ namespace QuantIDE
     testButton = new Button(this);
     testButton->setGeometry(5, 50, this->width() - 10, 20);
     testButton->setText("beep");
-    testButton->setStateKeeping(Button::StateKeeping::HOLD);
+    testButton->setStateKeeping(Button::StateKeeping::TOUCH);
     connect(testButton, SIGNAL(pressAct()), this, SLOT(onBeep()));
 
     nameBox = new ControlBox(this);
@@ -117,7 +117,7 @@ namespace QuantIDE
   {
 
     qDebug("QuantProxy::onBeep");
-    // emit actEvaluate("().play");
+    emit actEvaluate("().play");
   }
 
   void QuantProxy::onControlTEST(QString txt)

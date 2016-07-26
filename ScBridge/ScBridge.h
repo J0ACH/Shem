@@ -61,23 +61,12 @@ namespace SupercolliderBridge
     void actInterpretKill();
     void actInterpretKillDone();
 
-    void serverBootInitAct();
-    void serverBootDoneAct();
-    void serverKillInitAct();
-    void serverKillDoneAct();
-
-    //void actBridgeKillDone();
+    void actServerInit();
+    void actServerInitDone();
+    void actServerKill();
+    void actServerKillDone();
 
     void actPrint(QString, MessageType type = MessageType::NORMAL);
-    /*
-    void msgErrorAct(QString const &);
-    void msgWarningAct(QString const &);
-    void msgNormalAct(QString const &);
-    void msgStatusAct(QString const &);
-    void msgEvaluateAct(QString const &);
-    void msgResultAct(QString const &);
-    void msgBundleAct(QString const &);
-    */
 
     void actSynced();
     void actAnswered();
@@ -90,7 +79,7 @@ namespace SupercolliderBridge
     void actSynthAdd(int ID);
     void actSynthFree(int ID);
 
-    
+
 
     //void response(const QString & selector, const QString & data);
 

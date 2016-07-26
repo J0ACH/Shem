@@ -26,12 +26,9 @@ namespace QuantIDE
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
-
-
-    connect(mBridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
-
+    
     // TESTS
-    // this->initTestObjects();
+     this->initTestObjects();
   }
 
   void QuantCore::onCustomize(Data data)
@@ -170,22 +167,42 @@ namespace QuantIDE
     this->onPrint("Interpretr kill done...\n", MessageType::STATUS);
     isInterpretRunning = false;
 
-    mBridge->close();// deleteLater();
+    mBridge->deleteLater();
   }
 
   // SERVER /////////////////////////////////////////
 
-  void QuantCore::onInitServer()
+  void QuantCore::onServerInit()
   {
-    qDebug("QuantCore::onInitServer");
+    qDebug("QuantCore::onServerInit");
+    if (!isServerRunnig)
+    {
+      isServerRunnig = true;
+
+      connect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
+      connect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
+      connect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
+
+      this->onPrint("Server init...", MessageType::STATUS);
+    }
+
+    mBridge->changeServerState();
+  }
+  void QuantCore::onServerInitDone()
+  {
+    qDebug("QuantCore::onServerInitDone");
+    this->onPrint("Server init done...\n", MessageType::STATUS);
+  }
+  void QuantCore::onServerKill()
+  {
+    qDebug("QuantCore::onServerKill");
+  }
+  void QuantCore::onServerKillDone()
+  {
+    qDebug("QuantCore::onServerKillDone");
   }
 
-
-  void QuantCore::onServerBootDone()
-  {
-    qDebug("QuantCore::onServerBootDone");
-  }
-
+  // OTHER /////////////////////////////////////////
 
   void QuantCore::onSendData(DataNEW data)
   {

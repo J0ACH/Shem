@@ -75,13 +75,13 @@ namespace SupercolliderBridge
     switch (stateServer)
     {
     case StateServer::OFF:
-      emit serverBootInitAct();
+      emit actServerInit();
       evaluate("Server.local = Server.default = s;");
       // evaluateCode("s.dumpOSC;");
       evaluate("s.boot;");
       break;
     case StateServer::RUNNING:
-      emit serverKillInitAct();
+      emit actServerKill();
       evaluate("s.quit;");
       break;
     }
@@ -494,12 +494,12 @@ namespace SupercolliderBridge
       if (msg[0] == "- false")
       {
         stateServer = StateServer::OFF;
-        emit serverKillDoneAct();
+        emit actServerKillDone();
       }
       else if (msg[0] == "- true")
       {
         stateServer = StateServer::RUNNING;
-        emit serverBootDoneAct();
+        emit actServerInitDone();
       }
 
       //emit msgStatusAct(tr("STATUS: %1").arg(data));
