@@ -13,13 +13,13 @@ namespace SupercolliderBridge {
     connect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
   }
 
-  void UDPServer::onInitNetwork(QString name)
+  void UDPServer::initNetwork(QString name)
   {
     qDebug() << "UDPServer::initNetwork name:" << name;
     emit actPrint("Network init start...", MessageType::STATUS);
 
-    userName = name;
-    emit actPrint(tr("Username is set on %1").arg(userName));
+    // userName = name;
+    // emit actPrint(tr("Username is set on %1").arg(userName));
 
     if (isConnectedToNet()) { emit actPrint("Network link is estabilished"); }
     else { qDebug("UDP: ERROR! you are not connected to any network.\n"); return; }
@@ -30,7 +30,11 @@ namespace SupercolliderBridge {
       if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
       {
         if (count == 0) { emit actPrint(tr("\t - local IP address: %1").arg(address.toString())); }
-        else { qDebug("UDP WARN: multiple network addresses detected, picking first one"); }
+        else
+        {
+          qDebug("UDP WARN: multiple network addresses detected, picking first one");
+          emit actPrint("Multiple network addresses detected, picking first one", MessageType::WARNING);
+        }
       }
     }
 
@@ -49,15 +53,31 @@ namespace SupercolliderBridge {
 
     if (mSocket->state() == 4)
     {
-      emit actPrint("Network init done...\n", MessageType::STATUS);
       qDebug("UDPServer::initNetwork done...");
+      emit actPrint("Network init done...\n", MessageType::STATUS);
       emit actNetworkBooted();
     }
-    else { qDebug() << "UDP: There is a problem starting the server on port" << port; return; }
+    else
+    {
+      qDebug() << "UDP: There is a problem starting the server on port" << port;
+      emit actPrint(tr("UDP: There is a problem starting the server on port %1").arg(QString::number(port)), MessageType::WARNING);
+      return;
+    }
 
-    this->sendCode(tr("Hi all my name is %1").arg(userName));
   }
-  
+
+  void UDPServer::killNetwork()
+  {
+    qDebug("UDPServer:: kill...");
+    disconnect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
+
+    broadcastAddress->~QHostAddress();
+    interface->~QNetworkInterface();
+    mSocket->~QUdpSocket();
+
+    emit actNetworkKilled();
+  }
+
   bool UDPServer::isConnectedToNet()
   {
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
@@ -94,7 +114,7 @@ namespace SupercolliderBridge {
 
     return result;
   }
-  
+
   void UDPServer::onSendData(QByteArray objectsData)
   {
     // QString dataMsg = tr("%1||%2").arg(userName, code);
@@ -120,17 +140,9 @@ namespace SupercolliderBridge {
     emit actNetDataRecived(datagram);
   }
 
-  void UDPServer::sendCode(QString code)
+  UDPServer::~UDPServer()
   {
-    QString dataMsg = tr("%1||%2").arg(userName, code);
-
-    QByteArray datagram(dataMsg.toStdString().c_str());
-    //mSocket->writeDatagram(datagram.data(), datagram.size(), *broadcastAddress, port);
-  }
-  void UDPServer::processDatagram(QString code)
-  {
-    //mBridge->evaluate(code, true);
-  }
-
-  UDPServer::~UDPServer(){};
+    // QObject::deleteLater();
+    // QObject::~QObject();
+  };
 }

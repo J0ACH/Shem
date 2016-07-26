@@ -18,11 +18,10 @@ namespace SupercolliderBridge
     UDPServer(QObject *parent);
     ~UDPServer();
 
-    void sendCode(QString code);
+    void initNetwork(QString name);
+    void killNetwork();
 
     public slots:
-    void onInitNetwork(QString name);
-       
     void onSendData(QByteArray data);
     void onDatagramRecived();
 
@@ -31,10 +30,9 @@ namespace SupercolliderBridge
     void actNetworkKilled();
     void actPrint(QString, MessageType type = MessageType::NORMAL);
     void actNetDataRecived(QByteArray);
-    
+
   private:
     QUdpSocket *mSocket;
-
     QNetworkInterface *interface;
     QHostAddress *broadcastAddress;
 
@@ -45,7 +43,6 @@ namespace SupercolliderBridge
     bool isConnectedToNet();
     int addressSelector;
     bool hasBroadcast;
-    void processDatagram(QString);
   };
 }
 

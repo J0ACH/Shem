@@ -663,7 +663,7 @@ namespace QuantIDE
   void Quant::onRecivedGlobalCode(QString code)
   {
     bridge->question(code, true);
-    udpServer->sendCode(code);
+//    udpServer->sendCode(code);
   }
 
   Quant::~Quant() { }

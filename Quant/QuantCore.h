@@ -36,13 +36,20 @@ namespace QuantIDE
 
     public slots :
     void onCustomize(Data);
-
     void onInitCore();
-    void onInitNetwork();
+
+    // NETWORK /////////////////////////////////////////
+
+    void onNetInit();
+    void onNetInitDone();
+    void onNetKill();
+    void onNetKillDone();
+
+    // INTERPRET /////////////////////////////////////////
+
     void onInitInterpret();
     void onInitServer();
 
-    void onNetworkBootDone();
     void onInterpretBootDone();
     void onServerBootDone();
 
@@ -56,7 +63,6 @@ namespace QuantIDE
     void onEvaluate(QString code);
     void onPrint(QString, MessageType msg = MessageType::NORMAL);
 
-    void onKillNetwork();
 
   signals:
     void actCoreInitPrepared();
@@ -75,9 +81,9 @@ namespace QuantIDE
     UDPServer *mNetwork;
     Customize *mCustomize;
 
+    QMap<QString, QuantUser*> *lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
     NetworkPanel *networkPanel;
 
-    QMap<QString, QuantUser*> *lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
     QMap<QString, QObject*> networkObjects; // knihovna pro vsechny objekty komunikujici pres sit 
 
     QString userName;

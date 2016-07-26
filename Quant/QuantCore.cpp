@@ -6,7 +6,7 @@ namespace QuantIDE
     QObject(canvan),
     mCanvan(canvan),
     mBridge(new ScBridge(this)),
-    mNetwork(new UDPServer(this))
+    mNetwork(NULL)
   {
     qDebug("Core init...");
 
@@ -19,23 +19,15 @@ namespace QuantIDE
 
     networkPanel = new NetworkPanel(mCanvan, lib_users);
     mCanvan->addPanel(networkPanel, "Network", Qt::DockWidgetArea::LeftDockWidgetArea);
+    connect(networkPanel, SIGNAL(actNetworkConnect()), this, SLOT(onNetInit()));
+    connect(networkPanel, SIGNAL(actNetworkDisconnect()), this, SLOT(onNetKill()));
 
     networkObjects.insert("core", this);
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onInitCore()));
 
-    connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onNetworkBootDone()));
+    connect(mBridge, SIGNAL(interpretBootDoneAct()), this, SLOT(onInterpretBootDone()));
     connect(mBridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
-
-    connect(mNetwork, SIGNAL(actNetworkBooted()), this, SLOT(onNetworkBootDone()));
-    connect(mNetwork, SIGNAL(actNetworkKilled()), this, SLOT(onNetworkKillDone()));
-    connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
-
-    connect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
-    connect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
-
-    connect(networkPanel, SIGNAL(actNetworkConnect()), this, SLOT(onInitNetwork()));
-    connect(networkPanel, SIGNAL(actNetworkDisconnect()), this, SLOT(onKillNetwork()));
 
     // TESTS
 
@@ -94,28 +86,29 @@ namespace QuantIDE
     {
       isCoreRunning = true;
 
-      if (initNetworkOnStart) { this->onInitNetwork(); }
+      if (initNetworkOnStart) { this->onNetInit(); }
       if (initInterpretOnStart) { mBridge->changeInterpretState(); }
     }
   }
 
-  void QuantCore::onInitNetwork()
+  // NETWORK /////////////////////////////////////////
+
+  void QuantCore::onNetInit()
   {
     qDebug("QuantCore::onInitNetwork");
-    mNetwork->onInitNetwork(userName);
-  }
 
-  void QuantCore::onInitInterpret()
-  {
-    qDebug("QuantCore::onInitInterpret");
-  }
+    mNetwork = new UDPServer(this);
 
-  void QuantCore::onInitServer()
-  {
-    qDebug("QuantCore::onInitServer");
-  }
+    connect(mNetwork, SIGNAL(actNetworkBooted()), this, SLOT(onNetInitDone()));
+    connect(mNetwork, SIGNAL(actNetworkKilled()), this, SLOT(onNetKillDone()));
+    connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
+    connect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
 
-  void QuantCore::onNetworkBootDone()
+    connect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
+
+    mNetwork->initNetwork(userName);
+  }
+  void QuantCore::onNetInitDone()
   {
     qDebug("QuantCore::onNetworkBootDone");
 
@@ -131,25 +124,45 @@ namespace QuantIDE
     this->addUser(data);
     this->onSendData(data.wrap());
   }
-  void QuantCore::onKillNetwork()
+  void QuantCore::onNetKill()
   {
+    qDebug("QuantCore::onNetKill");
     foreach(QString oneName, lib_users->keys())
     {
-      //lib_users->value(oneName)->close();
+      qDebug() << "QuantCore::onNetKill oneName:" << oneName;
 
       QuantUser *newUser = lib_users->take(oneName);
-      newUser->deleteLater();
+      newUser->close();
       networkPanel->updateProfilesPosition();
     }
-
-    //lib_users->clear();
 
     DataUser data;
     data.setTargetObject("core");
     data.setTargetMethod("onNet_userLeaved");
     data.setValue(DataUser::NAME, userName);
     this->onSendData(data.wrap());
+
+    mNetwork->killNetwork();
+    mNetwork->~UDPServer();
   }
+  void QuantCore::onNetKillDone()
+  {
+    qDebug("QuantCore::onNetKillDone");
+    this->onPrint("Network kill done...", MessageType::STATUS);
+  }
+
+  // INTERPRET /////////////////////////////////////////
+
+  void QuantCore::onInitInterpret()
+  {
+    qDebug("QuantCore::onInitInterpret");
+  }
+
+  void QuantCore::onInitServer()
+  {
+    qDebug("QuantCore::onInitServer");
+  }
+
 
   void QuantCore::onInterpretBootDone()
   {
