@@ -26,9 +26,9 @@ namespace QuantIDE
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
-    
-    // TESTS
-     this->initTestObjects();
+
+        // TESTS
+    this->initTestObjects();
   }
 
   void QuantCore::onCustomize(Data data)
@@ -142,6 +142,12 @@ namespace QuantIDE
       connect(mBridge, SIGNAL(actInterpretKillDone()), this, SLOT(onInterpretKillDone()));
 
       connect(mBridge, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
+
+      connect(mBridge, SIGNAL(actServerInit()), this, SLOT(onServerInit()));
+      connect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
+      connect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
+      connect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
+
       this->onPrint("Interpretr init...", MessageType::STATUS);
     }
 
@@ -172,34 +178,38 @@ namespace QuantIDE
 
   // SERVER /////////////////////////////////////////
 
+
+  void QuantCore::onServerChangeState()
+  {
+    if (isInterpretRunning)
+    {
+      qDebug("QuantCore::onServerChangeState");
+      mBridge->changeServerState();
+    }
+  }
+
   void QuantCore::onServerInit()
   {
     qDebug("QuantCore::onServerInit");
-    if (!isServerRunnig)
-    {
-      isServerRunnig = true;
-
-      connect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
-      connect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
-      connect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
-
-      this->onPrint("Server init...", MessageType::STATUS);
-    }
-
-    mBridge->changeServerState();
+    this->onPrint("Server init...", MessageType::STATUS);
   }
   void QuantCore::onServerInitDone()
   {
+    isServerRunnig = true;
     qDebug("QuantCore::onServerInitDone");
     this->onPrint("Server init done...\n", MessageType::STATUS);
+
   }
   void QuantCore::onServerKill()
   {
     qDebug("QuantCore::onServerKill");
+    this->onPrint("Server kill...", MessageType::STATUS);
   }
   void QuantCore::onServerKillDone()
   {
+    isServerRunnig = false;
     qDebug("QuantCore::onServerKillDone");
+    this->onPrint("Server kill done...\n", MessageType::STATUS);
   }
 
   // OTHER /////////////////////////////////////////

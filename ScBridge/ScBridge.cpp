@@ -76,12 +76,13 @@ namespace SupercolliderBridge
     {
     case StateServer::OFF:
       emit actServerInit();
+      stateServer = StateServer::RUNNING;
       evaluate("Server.local = Server.default = s;");
-      // evaluateCode("s.dumpOSC;");
       evaluate("s.boot;");
       break;
     case StateServer::RUNNING:
       emit actServerKill();
+      stateServer = StateServer::OFF;
       evaluate("s.quit;");
       break;
     }
@@ -482,27 +483,28 @@ namespace SupercolliderBridge
       // DATA O STAVU SERVERU - msg[0] bool STATE; msg[1] int IP; msg[2] int PORT!!!!!!!!!!!
       QStringList msg = data.split("\n");
 
-      //bool serverRunning;
-      //int ip;
-      //int port;
+      qDebug() << "SERVER msg size: " << msg.size();
+      qDebug() << "SERVER msg[0]: " << msg[0];
+      qDebug() << "SERVER msg[1]: " << msg[1];
+      qDebug() << "SERVER msg[2]: " << msg[2];
+      qDebug() << "SERVER msg[3]: " << msg[3];
 
-      //emit msgStatusAct(tr("SERVER msg size: %1").arg(msg.size()));
-      //emit msgStatusAct(tr("SERVER msg[0]: %1").arg(msg[0]));
       //emit msgStatusAct(tr("SERVER msg[1]: %1").arg(msg[1]));
       //emit msgStatusAct(tr("SERVER msg[2]: %1").arg(msg[2]));
+      // bool initFound = false;
+      //if (msg[0] == "- false" && msg[3] == "- true" && stateServer == StateServer::OFF)
 
-      if (msg[0] == "- false")
+      switch (stateServer)
       {
-        stateServer = StateServer::OFF;
-        emit actServerKillDone();
-      }
-      else if (msg[0] == "- true")
-      {
-        stateServer = StateServer::RUNNING;
+      case StateServer::RUNNING:
+        qDebug() << "SERVER KILL FOUND ";
         emit actServerInitDone();
+        break;
+      case StateServer::OFF:
+        qDebug() << "SERVER INIT FOUND ";
+        emit actServerKillDone();
+        break;
       }
-
-      //emit msgStatusAct(tr("STATUS: %1").arg(data));
     }
     else if (selector == introspectionSelector)
     {
@@ -533,4 +535,5 @@ namespace SupercolliderBridge
 
   ScBridge::~ScBridge() {	}
 }
+
 

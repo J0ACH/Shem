@@ -58,6 +58,7 @@ namespace QuantIDE
     
     // SERVER /////////////////////////////////////////
 
+    void onServerChangeState();
     void onServerInit();
     void onServerInitDone();
     void onServerKill();
