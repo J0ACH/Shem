@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <QProcess>
 #include <QThread>
-//#include <QUuid>
 #include <QtNetwork/QLocalSocket>
 #include <QtNetwork/QLocalServer>
 #include <QBuffer>
@@ -20,19 +19,22 @@
 
 namespace SupercolliderBridge
 {
-  enum class StateInterpret{ OFF, RUNNING };
-  enum class StateServer{ OFF, RUNNING };
+
 
   class ScBridge : public QProcess
   {
     Q_OBJECT
 
   public:
+    enum class StateInterpret { OFF, RUN };
+    enum class StateServer{ OFF, RUN };
+    enum class BridgeProcess{ NaN, INTERPRET_BOOTING, INTERPRET_KILLING, SERVER_BOOTING, SERVER_KILLING };
+
     ScBridge(QObject *parent);
     ~ScBridge();
 
-    StateInterpret stateInterpret;
-    StateServer stateServer;
+    StateInterpret mInterpretState;
+    StateServer mServerState;
 
     QString nextID();
     float tempo;
@@ -88,6 +90,8 @@ namespace SupercolliderBridge
     QLocalSocket *mIpcSocket;
     QString mIpcServerName;
     QByteArray mIpcData;
+
+    BridgeProcess mBridgeProcess;
 
     int lateFlagBreakTime;
     bool mTerminationRequested;
