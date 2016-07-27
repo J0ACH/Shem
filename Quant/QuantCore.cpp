@@ -27,9 +27,24 @@ namespace QuantIDE
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
 
-        // TESTS
-    this->initTestObjects();
+
+    this->initControls();
   }
+
+  void QuantCore::initControls()
+  {
+    proxy1 = new QuantProxy(mCanvan->centralWidget(), this);
+    networkObjects.insert("proxy1", proxy1);
+    proxy1->setGeometry(50, 25, 300, 150);
+    proxy1->show();
+    connect(proxy1, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
+
+    proxy2 = new QuantProxy(mCanvan->centralWidget(), this);
+    proxy2->setGeometry(400, 25, 300, 150);
+    proxy2->show();
+    networkObjects.insert("proxy2", proxy2);
+    connect(proxy2, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
+          }
 
   void QuantCore::onCustomize(Data data)
   {
@@ -49,6 +64,8 @@ namespace QuantIDE
 
     emit actCoreInitPrepared(); // ceka na initInterpretOnStart a initServerOnStart
   }
+
+
 
   // CORE /////////////////////////////////////////
 
@@ -157,10 +174,10 @@ namespace QuantIDE
   {
     qDebug("QuantCore::onInterpretBootDone");
     isInterpretRunning = true;
+    mCanvan->getButtonBar("Bridge")->getButton("Interpretr")->setState(Button::State::ON);
     this->onPrint("Interpretr init done...\n", MessageType::STATUS);
     if (initServerOnStart) { mBridge->changeServerState(); }
   }
-
   void QuantCore::onInterpretKill()
   {
     qDebug("QuantCore::onInterpretKill");
@@ -170,6 +187,7 @@ namespace QuantIDE
   void QuantCore::onInterpretKillDone()
   {
     qDebug("QuantCore::onInterpretKillDone");
+    mCanvan->getButtonBar("Bridge")->getButton("Interpretr")->setState(Button::State::OFF);
     this->onPrint("Interpretr kill done...\n", MessageType::STATUS);
     isInterpretRunning = false;
 
@@ -197,6 +215,7 @@ namespace QuantIDE
   {
     isServerRunnig = true;
     qDebug("QuantCore::onServerInitDone");
+    mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::ON);
     this->onPrint("Server init done...\n", MessageType::STATUS);
 
   }
@@ -209,6 +228,7 @@ namespace QuantIDE
   {
     isServerRunnig = false;
     qDebug("QuantCore::onServerKillDone");
+    mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::OFF);
     this->onPrint("Server kill done...\n", MessageType::STATUS);
   }
 
@@ -338,20 +358,7 @@ namespace QuantIDE
     networkPanel->updateProfilesPosition();
   }
 
-  void QuantCore::initTestObjects()
-  {
-    proxy1 = new QuantProxy(mCanvan->centralWidget(), this);
-    networkObjects.insert("proxy1", proxy1);
-    proxy1->setGeometry(50, 25, 300, 150);
-    proxy1->show();
-    connect(proxy1, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
 
-    proxy2 = new QuantProxy(mCanvan->centralWidget(), this);
-    proxy2->setGeometry(400, 25, 300, 150);
-    proxy2->show();
-    networkObjects.insert("proxy2", proxy2);
-    connect(proxy2, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
-  }
 
   /*
   void QuantCore::addProxySpace()

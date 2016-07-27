@@ -12,7 +12,8 @@ namespace Jui
     tailSize = 30;
     isMoveing = false;
 
-    mapPanels = new QMap<QString, PanelNEW*>;
+    mapPanels = new QMap<QString, PanelNEW*>();
+    mapButtonBars = new QMap<QString, CanvanNEW_ToolBar*>();
 
     colorBackground = QColor(25, 25, 25);
 
@@ -32,7 +33,7 @@ namespace Jui
     statusBar->setFixedHeight(tailSize);
     this->setStatusBar(statusBar);
 
-    fileMenu = new QMenu("file");
+       fileMenu = new QMenu("file");
     fileMenu->installEventFilter(this);
     fileMenu->hide(); // skryte
     //menuBar->addMenu(fileMenu);
@@ -66,10 +67,17 @@ namespace Jui
   }
   QWidget* CanvanNEW::getPanel(QString name)  { return mapPanels->value(name); }
 
-  void CanvanNEW::addButtonBar(CanvanNEW_ToolBar *buttonBar, Qt::ToolBarArea startPosition)
+  void CanvanNEW::addButtonBar(CanvanNEW_ToolBar *buttonBar, QString name, Qt::ToolBarArea startPosition)
   {
     //buttonBar->setAllowedAreas(Qt::ToolBarArea::TopToolBarArea | Qt::ToolBarArea::BottomToolBarArea);
+    
+    mapButtonBars->insert(name, buttonBar);
     this->addToolBar(startPosition, buttonBar);
+  }
+
+  CanvanNEW_ToolBar* CanvanNEW::getButtonBar(QString name)
+  {
+    return mapButtonBars->value(name);
   }
 
   QWidget* CanvanNEW::getStaustBar() { return statusBar; }
@@ -222,11 +230,7 @@ namespace Jui
     button->setToolTip(name);
     button->setIcon(QImage(icon), 0);
     button->setStateKeeping(Button::StateKeeping::HOLD);
-    //button->setColorNormal(QColor(120, 120, 120));
-    //button->setColorOver(QColor(230, 230, 230));
-    //button->setColorActive(QColor(255, 60, 60));
-
-    //connect(button, SIGNAL(pressAct()), reciver, member);
+  
     connect(button, SIGNAL(actPressed()), reciver, member);
 
     buttonsList.insert(name, button);

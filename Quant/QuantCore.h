@@ -30,7 +30,7 @@ namespace QuantIDE
     QuantCore(CanvanNEW *canvan);
     ~QuantCore();
 
-    void initTestObjects();
+    void initControls();
     //void addProxySpace();
     //void addNode(QString name);
 

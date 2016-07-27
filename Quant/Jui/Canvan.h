@@ -11,8 +11,6 @@
 #include <QFontDatabase>
 #include <QMap>
 #include <QDesktopWidget>
-//#include <QBitmap>
-
 
 #include "Console.h"
 #include "Button.h"
@@ -78,10 +76,10 @@ namespace Jui
 
     void setColorBackground(QColor);
     QColor getColorBackground();
-  
-    protected:
+
+  protected:
     void paintEvent(QPaintEvent *event);
-   
+
   private:
     QColor colorBackground;
     QMap<QString, Button*> buttonsList;
@@ -100,18 +98,19 @@ namespace Jui
 
     void addPanel(PanelNEW *panel, QString name, Qt::DockWidgetArea startPosition = Qt::DockWidgetArea::RightDockWidgetArea);
     QWidget* getPanel(QString name);
-    void addButtonBar(CanvanNEW_ToolBar *buttonBar, Qt::ToolBarArea startPosition = Qt::ToolBarArea::BottomToolBarArea);
+    void addButtonBar(CanvanNEW_ToolBar *buttonBar, QString name, Qt::ToolBarArea startPosition = Qt::ToolBarArea::BottomToolBarArea);
+    CanvanNEW_ToolBar* getButtonBar(QString name);
     QWidget* getStaustBar();
 
     void setColorBackground(QColor);
     QColor getColorBackground();
- 
+
     public slots:
     void onEmitClose();
     void onCanvanClose();
     void onCanvanMaximized();
     void onCanvanMinimized();
-    
+
   signals:
     void actClose();
 
@@ -128,6 +127,7 @@ namespace Jui
     CanvanNEW_StatusBar *statusBar;
     QMenu *fileMenu;
     QMap<QString, PanelNEW*> *mapPanels;
+    QMap<QString, CanvanNEW_ToolBar*> *mapButtonBars;
     Button *closeButton, *maximizeButton, *minimizeButton;
 
     bool isMoveing;

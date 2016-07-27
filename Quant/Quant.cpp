@@ -67,12 +67,12 @@ namespace QuantIDE
     timePanel->setVisible(false);
 
     controlsBar = new CanvanNEW_ToolBar();
-    canvanNEW->addButtonBar(controlsBar, Qt::ToolBarArea::BottomToolBarArea);
+    canvanNEW->addButtonBar(controlsBar, "Bridge", Qt::ToolBarArea::BottomToolBarArea);
     controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), core, SLOT(onInterpretInit()));
     controlsBar->addButton("Server", QImage(":/server_16px.png"), core, SLOT(onServerChangeState()));
-
+    
     panelsBar = new CanvanNEW_ToolBar();
-    canvanNEW->addButtonBar(panelsBar, Qt::ToolBarArea::BottomToolBarArea);
+    canvanNEW->addButtonBar(panelsBar, "Panels", Qt::ToolBarArea::BottomToolBarArea);
 
     panelsBar->addButton("Console", QImage(":/console_16px.png"), console, SLOT(onSwitchVisible()));
     panelsBar->getButton("Console")->setState(Button::State::ON);

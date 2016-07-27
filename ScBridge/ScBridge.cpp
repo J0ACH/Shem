@@ -11,7 +11,6 @@ namespace SupercolliderBridge
     mTerminationRequested(false),
     mCompiled(false)
   {
-
     mInterpretState = StateInterpret::OFF;
     mServerState = StateServer::OFF;
     mBridgeProcess = BridgeProcess::NaN;
@@ -75,7 +74,6 @@ namespace SupercolliderBridge
       killInterpreter();
       break;
     }
-
   }
   void ScBridge::changeServerState()
   {
@@ -91,6 +89,7 @@ namespace SupercolliderBridge
       mBridgeProcess = BridgeProcess::SERVER_KILLING;
       emit actServerKill();
       evaluate("s.quit;");
+
       break;
     }
   }
@@ -449,6 +448,9 @@ namespace SupercolliderBridge
     mIpcSocket->deleteLater();
     mIpcSocket = NULL;
 
+    emit actInterpretKillDone();
+    mInterpretState = StateInterpret::OFF;
+    mBridgeProcess = BridgeProcess::NaN;
   }
 
   void ScBridge::onIpcData()
@@ -484,7 +486,7 @@ namespace SupercolliderBridge
     static QString classLibraryRecompiledSelector("classLibraryRecompiled");
     static QString requestCurrentPathSelector("requestCurrentPath");
 
-    qDebug() << "ScBridge::onResponse selector: " << selector;
+   // qDebug() << "ScBridge::onResponse selector: " << selector;
 
     if (selector == serverRunningSelector)
     {
@@ -502,11 +504,6 @@ namespace SupercolliderBridge
       {
         switch (mInterpretState)
         {
-        case StateInterpret::RUN:
-          qDebug() << "SERVER KILL FOUND ";
-          emit actInterpretKillDone();
-          mInterpretState = StateInterpret::OFF;
-          break;
         case StateInterpret::OFF:
           qDebug() << "SERVER INIT FOUND ";
           emit actInterpretInitDone();
