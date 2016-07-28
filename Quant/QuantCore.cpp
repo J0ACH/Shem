@@ -11,8 +11,8 @@ namespace QuantIDE
     qDebug("Core init...");
 
     isCoreRunning = false;
-    isInterpretRunning = false;
-    isServerRunnig = false;
+    //isInterpretRunning = false;
+    //isServerRunnig = false;
     isNetworkRunning = false;
 
     lib_users = new QMap<QString, QuantUser*>();
@@ -44,7 +44,7 @@ namespace QuantIDE
     proxy2->show();
     networkObjects.insert("proxy2", proxy2);
     connect(proxy2, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
-          }
+  }
 
   void QuantCore::onCustomize(Data data)
   {
@@ -113,8 +113,8 @@ namespace QuantIDE
 
     data.setValue(DataUser::NAME, userName);
     data.setValue(DataUser::VERSION, "0.40"); // DODELAT
-    data.setValue(DataUser::BOOL_INTERPRETR, isInterpretRunning);
-    data.setValue(DataUser::BOOL_SERVER, isServerRunnig);
+    data.setValue(DataUser::BOOL_INTERPRETR, mBridge->isInterpretRunning());
+    data.setValue(DataUser::BOOL_SERVER, mBridge->isServerRunning());
 
     this->addUser(data);
     this->onSendData(data.wrap());
@@ -149,11 +149,9 @@ namespace QuantIDE
   void QuantCore::onInterpretInit()
   {
     qDebug("QuantCore::onInitInterpret");
-
-    if (!isInterpretRunning)
+        
+    if (!mBridge->isInterpretRunning())
     {
-      mBridge = new ScBridge(this);
-
       connect(mBridge, SIGNAL(actInterpretInitDone()), this, SLOT(onInterpretInitDone()));
       connect(mBridge, SIGNAL(actInterpretKill()), this, SLOT(onInterpretKill()));
       connect(mBridge, SIGNAL(actInterpretKillDone()), this, SLOT(onInterpretKillDone()));
@@ -173,8 +171,8 @@ namespace QuantIDE
   void QuantCore::onInterpretInitDone()
   {
     qDebug("QuantCore::onInterpretBootDone");
-    isInterpretRunning = true;
     mCanvan->getButtonBar("Bridge")->getButton("Interpretr")->setState(Button::State::ON);
+    mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::OFF);
     this->onPrint("Interpretr init done...\n", MessageType::STATUS);
     if (initServerOnStart) { mBridge->changeServerState(); }
   }
@@ -188,24 +186,31 @@ namespace QuantIDE
   {
     qDebug("QuantCore::onInterpretKillDone");
     mCanvan->getButtonBar("Bridge")->getButton("Interpretr")->setState(Button::State::OFF);
+    mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::FROZEN);
     this->onPrint("Interpretr kill done...\n", MessageType::STATUS);
-    isInterpretRunning = false;
 
-    mBridge->deleteLater();
+    disconnect(mBridge, SIGNAL(actInterpretInitDone()), this, SLOT(onInterpretInitDone()));
+    disconnect(mBridge, SIGNAL(actInterpretKill()), this, SLOT(onInterpretKill()));
+    disconnect(mBridge, SIGNAL(actInterpretKillDone()), this, SLOT(onInterpretKillDone()));
+
+    disconnect(mBridge, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
+
+    disconnect(mBridge, SIGNAL(actServerInit()), this, SLOT(onServerInit()));
+    disconnect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
+    disconnect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
+    disconnect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
   }
 
   // SERVER /////////////////////////////////////////
 
-
   void QuantCore::onServerChangeState()
   {
-    if (isInterpretRunning)
+    if (mBridge->isInterpretRunning())
     {
       qDebug("QuantCore::onServerChangeState");
       mBridge->changeServerState();
     }
   }
-
   void QuantCore::onServerInit()
   {
     qDebug("QuantCore::onServerInit");
@@ -213,11 +218,10 @@ namespace QuantIDE
   }
   void QuantCore::onServerInitDone()
   {
-    isServerRunnig = true;
+    // isServerRunnig = true;
     qDebug("QuantCore::onServerInitDone");
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::ON);
     this->onPrint("Server init done...\n", MessageType::STATUS);
-
   }
   void QuantCore::onServerKill()
   {
@@ -226,7 +230,7 @@ namespace QuantIDE
   }
   void QuantCore::onServerKillDone()
   {
-    isServerRunnig = false;
+    // isServerRunnig = false;
     qDebug("QuantCore::onServerKillDone");
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::OFF);
     this->onPrint("Server kill done...\n", MessageType::STATUS);
@@ -282,8 +286,8 @@ namespace QuantIDE
 
     dataAnswer.setValue(DataUser::NAME, userName);
     dataAnswer.setValue(DataUser::VERSION, "0.40"); // DODELAT
-    dataAnswer.setValue(DataUser::BOOL_INTERPRETR, isInterpretRunning);
-    dataAnswer.setValue(DataUser::BOOL_SERVER, isServerRunnig);
+    dataAnswer.setValue(DataUser::BOOL_INTERPRETR, mBridge->isInterpretRunning());
+    dataAnswer.setValue(DataUser::BOOL_SERVER, mBridge->isServerRunning());
 
     this->onSendData(dataAnswer.wrap());
   }

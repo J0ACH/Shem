@@ -19,13 +19,14 @@ namespace Jui
       Q_PROPERTY(QColor colorNormal READ getColorNormal WRITE setColorNormal)
       Q_PROPERTY(QColor colorOver READ getColorOver WRITE setColorOver)
       Q_PROPERTY(QColor colorActive READ getColorActive WRITE setColorActive)
+      Q_PROPERTY(QColor colorFrozen READ getColorFrozen WRITE setColorFrozen)
       Q_PROPERTY(QFont font READ getFont WRITE setFont)
       
   public:
     Button(QWidget *parent = 0);
     ~Button();
 
-    enum State { OFF, ON };
+    enum State { OFF, ON, FROZEN };
     enum StateDisplay { NORMAL, OVER, PRESSED };
     enum StateKeeping { TOUCH, HOLD, SWITCH };
 
@@ -40,11 +41,13 @@ namespace Jui
     void setColorNormal(QColor);
     void setColorOver(QColor);
     void setColorActive(QColor);
+    void setColorFrozen(QColor);
     void setFont(QFont);
 
     QColor getColorNormal();
     QColor getColorOver();
     QColor getColorActive();
+    QColor getColorFrozen();
     QFont getFont();
 
     State getState();
@@ -74,7 +77,7 @@ namespace Jui
     QString text;
     QFont font;
     QImage icon;
-    QColor colorNormal, colorOver, colorActive;
+    QColor colorNormal, colorOver, colorActive, colorFrozen;
     QColor blendColor(QColor, QColor, qreal);
     QColor penColor, fillColor;
     int iconOffset;

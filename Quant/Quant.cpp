@@ -70,7 +70,8 @@ namespace QuantIDE
     canvanNEW->addButtonBar(controlsBar, "Bridge", Qt::ToolBarArea::BottomToolBarArea);
     controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), core, SLOT(onInterpretInit()));
     controlsBar->addButton("Server", QImage(":/server_16px.png"), core, SLOT(onServerChangeState()));
-    
+    controlsBar->getButton("Server")->setState(Button::State::FROZEN);
+
     panelsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(panelsBar, "Panels", Qt::ToolBarArea::BottomToolBarArea);
 
@@ -117,6 +118,7 @@ namespace QuantIDE
       "Jui--Button {qproperty-colorNormal: %1;}"
       "Jui--Button {qproperty-colorOver: %2;}"
       "Jui--Button {qproperty-colorActive: %3;}"
+      //"Jui--Button {qproperty-colorFrozen: %3;}"
 
       "Jui--CanvanNEW {qproperty-colorBackground: %6;}"
       "Jui--CanvanNEW_MenuBar {qproperty-colorBackground: %5;}"

@@ -204,6 +204,25 @@ namespace SupercolliderBridge
     return answer;
   }
 
+  bool ScBridge::isInterpretRunning()
+  {
+    switch (mInterpretState)
+    {
+    case StateInterpret::OFF: return false; break;
+    case StateInterpret::RUN: return true; break;
+    }
+    return false;
+  }
+  bool ScBridge::isServerRunning()
+  {
+    switch (mServerState)
+    {
+    case StateServer::OFF: return false; break;
+    case StateServer::RUN: return true; break;
+    }
+    return false;
+  }
+
   void ScBridge::startInterpretr()
   {
     QString sclangCommand = "sclang";
@@ -448,9 +467,9 @@ namespace SupercolliderBridge
     mIpcSocket->deleteLater();
     mIpcSocket = NULL;
 
-    emit actInterpretKillDone();
     mInterpretState = StateInterpret::OFF;
     mBridgeProcess = BridgeProcess::NaN;
+    emit actInterpretKillDone();
   }
 
   void ScBridge::onIpcData()
@@ -486,7 +505,7 @@ namespace SupercolliderBridge
     static QString classLibraryRecompiledSelector("classLibraryRecompiled");
     static QString requestCurrentPathSelector("requestCurrentPath");
 
-   // qDebug() << "ScBridge::onResponse selector: " << selector;
+    // qDebug() << "ScBridge::onResponse selector: " << selector;
 
     if (selector == serverRunningSelector)
     {

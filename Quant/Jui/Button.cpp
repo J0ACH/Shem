@@ -17,6 +17,7 @@ namespace Jui
     colorNormal = QColor(120, 120, 120);
     colorOver = QColor(230, 230, 230);
     colorActive = QColor(255, 60, 60);
+    colorFrozen = QColor(60, 60, 60);
 
     iconOffset = 0;
 
@@ -51,11 +52,13 @@ namespace Jui
   void Button::setColorNormal(QColor color){ colorNormal = color; penColor = colorNormal; update(); }
   void Button::setColorOver(QColor color){ colorOver = color; update(); }
   void Button::setColorActive(QColor color){ colorActive = color; update(); }
+  void Button::setColorFrozen(QColor color){ colorFrozen = color; update(); }
   void Button::setFont(QFont f) { font = f;	update(); }
 
   QColor Button::getColorNormal()  { return colorNormal; }
   QColor Button::getColorOver()  { return colorOver; }
   QColor Button::getColorActive()  { return colorActive; }
+  QColor Button::getColorFrozen()  { return colorFrozen; }
   QFont Button::getFont()  { return font; }
 
   Button::State Button::getState() { return buttonState; }
@@ -118,7 +121,9 @@ namespace Jui
     QPainter painter(this);
     painter.setFont(font);
 
-    penColor = blendColor(colorNormal, colorOver, ratio);
+    if (buttonState != State::FROZEN) { penColor = blendColor(colorNormal, colorOver, ratio); }
+    else { penColor = colorFrozen; }
+
     painter.setPen(QPen(penColor, 1));
 
     if (icon.isNull())
@@ -132,7 +137,7 @@ namespace Jui
         fillColor = Qt::transparent;;
         break;
       }
-      painter.fillRect(bounds(), fillColor);
+      if (buttonState != State::FROZEN) { painter.fillRect(bounds(), fillColor); }
 
       QTextOption opt;
       opt.setAlignment(Qt::AlignCenter);
@@ -162,78 +167,89 @@ namespace Jui
 
   void Button::mousePressEvent(QMouseEvent *mouseEvent)
   {
-    isPressed = true;
-
-    switch (buttonState)
+    if (buttonState != State::FROZEN)
     {
-    case OFF: buttonState = ON; /*qDebug("Button STATE(ON)");*/ break;
-    case ON: buttonState = OFF;	/*qDebug("Button STATE(OFF)");*/ break;
-    };
+      isPressed = true;
 
-    buttonDisplay = PRESSED; /*qDebug("Button Display(PRESSED)");*/
+      switch (buttonState)
+      {
+      case OFF: buttonState = ON; /*qDebug("Button STATE(ON)");*/ break;
+      case ON: buttonState = OFF;	/*qDebug("Button STATE(OFF)");*/ break;
+      };
 
-    update();
+      buttonDisplay = PRESSED; /*qDebug("Button Display(PRESSED)");*/
 
-    float time = 1.5;
-    int frames = 10;
-    float stepTime = time / frames;
-    float stemAdd = 1 / frames;
+      update();
 
-    emit pressAct(); // bude odsraneno
-    emit actPressed();
+      float time = 1.5;
+      int frames = 10;
+      float stepTime = time / frames;
+      float stemAdd = 1 / frames;
 
-    mouseEvent->accept();
+      emit pressAct(); // bude odsraneno
+      emit actPressed();
+
+      mouseEvent->accept();
+    }
   }
 
   void Button::mouseReleaseEvent(QMouseEvent *mouseEvent)
   {
-    isPressed = false;
-
-    if (buttonKeeping == TOUCH)
+    if (buttonState != State::FROZEN)
     {
-      //qDebug("Button Keeping(TOUCH)");
+      isPressed = false;
+
+      if (buttonKeeping == TOUCH)
+      {
+        //qDebug("Button Keeping(TOUCH)");
+        switch (buttonState)
+        {
+        case ON: buttonState = OFF;	/*qDebug("Button STATE(OFF)");*/ break;
+        case OFF: buttonState = ON;/* qDebug("Button STATE(ON)");*/ break;
+        };
+      }
+
       switch (buttonState)
       {
-      case ON: buttonState = OFF;	/*qDebug("Button STATE(OFF)");*/ break;
-      case OFF: buttonState = ON;/* qDebug("Button STATE(ON)");*/ break;
-      };
-    }
+      case ON: buttonDisplay = PRESSED; /*qDebug("Button Display(PRESSED)");*/ break;
+      case OFF: buttonDisplay = OVER; /*qDebug("Button Display(OVER)");*/ break;
+      }
 
-    switch (buttonState)
-    {
-    case ON: buttonDisplay = PRESSED; /*qDebug("Button Display(PRESSED)");*/ break;
-    case OFF: buttonDisplay = OVER; /*qDebug("Button Display(OVER)");*/ break;
+      update();
+      mouseEvent->accept();
     }
-
-    update();
-    mouseEvent->accept();
   }
 
   void Button::enterEvent(QEvent *event)
   {
-    timer->stop();
-    timer->setInterval(fadeTimeIn / fps);
-    timer->start();
+    if (buttonState != State::FROZEN)
+    {
+      timer->stop();
+      timer->setInterval(fadeTimeIn / fps);
+      timer->start();
 
-    isOver = true;
-    buttonDisplay = OVER;
+      isOver = true;
+      buttonDisplay = OVER;
+    }
     //qDebug("Button Display(OVER)");
     //qDebug() << tr("Button::enterEvent");
   }
 
   void Button::leaveEvent(QEvent *event)
   {
-    timer->stop();
-    timer->setInterval(fadeTimeOut / fps);
-    timer->start();
-
-    isOver = false;
-    switch (buttonState)
+    if (buttonState != State::FROZEN)
     {
-    case OFF: buttonDisplay = NORMAL; break;
-    case ON: buttonDisplay = PRESSED; break;
-    }
+      timer->stop();
+      timer->setInterval(fadeTimeOut / fps);
+      timer->start();
 
+      isOver = false;
+      switch (buttonState)
+      {
+      case OFF: buttonDisplay = NORMAL; break;
+      case ON: buttonDisplay = PRESSED; break;
+      }
+    }
     //qDebug("Button Display(NORMAL)");
     //qDebug() << tr("Button (%1, icon: %2)::leaveEvent");
   }

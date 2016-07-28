@@ -19,22 +19,13 @@
 
 namespace SupercolliderBridge
 {
-
-
   class ScBridge : public QProcess
   {
     Q_OBJECT
 
   public:
-    enum class StateInterpret { OFF, RUN };
-    enum class StateServer{ OFF, RUN };
-    enum class BridgeProcess{ NaN, INTERPRET_BOOTING, INTERPRET_KILLING, SERVER_BOOTING, SERVER_KILLING };
-
     ScBridge(QObject *parent);
     ~ScBridge();
-
-    StateInterpret mInterpretState;
-    StateServer mServerState;
 
     QString nextID();
     float tempo;
@@ -42,7 +33,10 @@ namespace SupercolliderBridge
     bool evaluate(QString code, bool print = false, bool silent = false);
     QVariant question(QString code, bool print = false);
 
-    void initOSC();
+    bool isInterpretRunning();
+    bool isServerRunning();
+
+    void initOSC(); // bude private
 
     private slots:
     void onReadyRead(void);
@@ -86,11 +80,17 @@ namespace SupercolliderBridge
     //void response(const QString & selector, const QString & data);
 
   private:
+    enum class StateInterpret { OFF, RUN };
+    enum class StateServer{ OFF, RUN };
+    enum class BridgeProcess{ NaN, INTERPRET_BOOTING, INTERPRET_KILLING, SERVER_BOOTING, SERVER_KILLING };
+
     QLocalServer *mIpcServer;
     QLocalSocket *mIpcSocket;
     QString mIpcServerName;
     QByteArray mIpcData;
 
+    StateInterpret mInterpretState;
+    StateServer mServerState;
     BridgeProcess mBridgeProcess;
 
     int lateFlagBreakTime;

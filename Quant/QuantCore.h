@@ -101,7 +101,8 @@ namespace QuantIDE
     QMap<QString, QObject*> networkObjects; // knihovna pro vsechny objekty komunikujici pres sit 
 
     QString userName;
-    bool isCoreRunning, isInterpretRunning, isServerRunnig, isNetworkRunning;
+    //bool isCoreRunning, isInterpretRunning, isServerRunnig, isNetworkRunning;
+    bool isCoreRunning, isNetworkRunning;
     bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
 
     void addUser(DataUser);
