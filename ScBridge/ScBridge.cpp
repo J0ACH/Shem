@@ -89,7 +89,6 @@ namespace SupercolliderBridge
       mBridgeProcess = BridgeProcess::SERVER_KILLING;
       emit actServerKill();
       evaluate("s.quit;");
-
       break;
     }
   }
@@ -455,9 +454,6 @@ namespace SupercolliderBridge
 
     connect(mIpcSocket, SIGNAL(disconnected()), this, SLOT(finalizeConnection()));
     connect(mIpcSocket, SIGNAL(readyRead()), this, SLOT(onIpcData()));
-
-    //  mInterpretState = StateInterpret::RUN;
-    // emit actInterpretInitDone();
   }
 
   void ScBridge::finalizeConnection()
@@ -535,15 +531,15 @@ namespace SupercolliderBridge
       {
         switch (mServerState)
         {
-        case StateServer::RUN:
-          qDebug() << "SERVER KILL FOUND ";
-          emit actServerKillDone();
-          mServerState = StateServer::OFF;
-          break;
         case StateServer::OFF:
           qDebug() << "SERVER INIT FOUND ";
           emit actServerInitDone();
           mServerState = StateServer::RUN;
+          break;
+        case StateServer::RUN:
+          qDebug() << "SERVER KILL FOUND ";
+          emit actServerKillDone();
+          mServerState = StateServer::OFF;
           break;
         }
       }

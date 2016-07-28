@@ -28,15 +28,8 @@ namespace QuantIDE
     ~NetworkPanel();
 
     void updateProfilesPosition();
-
-    public slots:
-    void onConnectPressed();
-
-  signals:
-    void actNetworkConnect();
-    void actNetworkDisconnect();
-
-  protected:
+    
+    protected:
     void resizeEvent(QResizeEvent *event);
 
   private:
@@ -44,8 +37,6 @@ namespace QuantIDE
 
     QScrollArea *scrollArea;
     QWidget *scrollWidget;
-
-    Button *buttonConnect;
 
     QMap<QString, QuantUser*> *mProfiles;
   };

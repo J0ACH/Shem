@@ -6,19 +6,40 @@ namespace SupercolliderBridge {
     QObject(parent),
     mSocket(new QUdpSocket(this))
   {
-    qDebug("UDPServer:: new...");
+    // qDebug("UDPServer:: new...");
+    state = State::OFF;
     port = 10000;
-    mSocket->bind(QHostAddress::Any, port);
-    connect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
+  }
+
+  bool UDPServer::isConnected()
+  {
+    switch (state)
+    {
+    case SupercolliderBridge::UDPServer::State::OFF: return false; break;
+    case SupercolliderBridge::UDPServer::State::CONNECTED: return true; break;
+    }
+    return false;
   }
 
   void UDPServer::initNetwork()
   {
-    // qDebug() << "UDPServer::initNetwork";
+    mSocket->bind(QHostAddress::Any, port);
+    connect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
+
+    //qDebug() << "UDPServer::initNetwork";
     emit actPrint("Network init...", MessageType::STATUS);
 
-    if (isConnectedToNet()) { emit actPrint("Network link is estabilished"); }
-    else { qDebug("UDP: ERROR! you are not connected to any network.\n"); return; }
+    if (isConnectedToNet())
+    {
+      // qDebug("UDP: Network link is estabilished");
+      emit actPrint("Network link is estabilished");
+    }
+    else
+    {
+      //qDebug("UDP: ERROR! you are not connected to any network.\n"); 
+      actPrint("You are not connected to any network", MessageType::ERROR);
+      return;
+    }
 
     int count = 0;
     foreach(const QHostAddress &address, QNetworkInterface::allAddresses())
@@ -28,7 +49,7 @@ namespace SupercolliderBridge {
         if (count == 0) { emit actPrint(tr("\t - local IP address: %1").arg(address.toString())); }
         else
         {
-          qDebug("UDP WARN: multiple network addresses detected, picking first one");
+          //qDebug("UDP WARN: multiple network addresses detected, picking first one");
           emit actPrint("Multiple network addresses detected, picking first one", MessageType::WARNING);
         }
       }
@@ -38,24 +59,27 @@ namespace SupercolliderBridge {
     {
       QString _baddress = interface->addressEntries().at(addressSelector).broadcast().toString();
       broadcastAddress = new QHostAddress(_baddress);
+      // qDebug()<<"UDP: Set broadcast address"<< _baddress;
       emit actPrint(tr("Set broadcast address: %1").arg(_baddress));
     }
     else
     {
-      qDebug("UDP: WARNING: network seems to have no Broadcast support, setting default one");
+      // qDebug("UDP: WARNING: network seems to have no Broadcast support, setting default one");
       broadcastAddress = new QHostAddress("239.0.0.1");
     }
     emit actPrint(tr("Server starting, listening at port: %1").arg(QString::number(port)));
 
+    // qDebug() << "UDP: Set broadcast address" << mSocket->state();
     if (mSocket->state() == 4)
     {
-      qDebug("UDPServer::initNetwork done...");
+      //   qDebug("UDPServer::initNetwork done...");
+      state = State::CONNECTED;
       emit actPrint("Network init done...\n", MessageType::STATUS);
       emit actInitDone();
     }
     else
     {
-      qDebug() << "UDP: There is a problem starting the server on port" << port;
+      //  qDebug() << "UDP: There is a problem starting the server on port" << port;
       emit actPrint(tr("UDP: There is a problem starting the server on port %1").arg(QString::number(port)), MessageType::WARNING);
       return;
     }
@@ -64,19 +88,19 @@ namespace SupercolliderBridge {
 
   void UDPServer::killNetwork()
   {
-    //qDebug("UDPServer::illNetwork");
+    // qDebug("UDPServer::killNetwork");
     disconnect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
-        
-    broadcastAddress->~QHostAddress();
-    interface->~QNetworkInterface();
-    mSocket->~QUdpSocket();
 
+    mSocket->disconnectFromHost(); 
+    
+    state = State::OFF;
     emit actPrint("Network kill done...\n", MessageType::STATUS);
     emit actKillDone();
   }
 
   bool UDPServer::isConnectedToNet()
   {
+    // qDebug("UDPServer::isConnectedToNet");
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
     bool result = false;
 
@@ -105,7 +129,10 @@ namespace SupercolliderBridge {
         }
 
         if (!result)
-          qDebug() << "UDP: interface seems to have no address";
+        {
+          //qDebug() << "UDP: interface seems to have no address";
+          emit actPrint("Network interface seems to have no address", MessageType::WARNING);
+        }
       }
     }
 

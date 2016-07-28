@@ -18,6 +18,8 @@ namespace SupercolliderBridge
     UDPServer(QObject *parent);
     ~UDPServer();
 
+    bool isConnected();
+
     void initNetwork();
     void killNetwork();
 
@@ -32,13 +34,15 @@ namespace SupercolliderBridge
     void actNetDataRecived(QByteArray);
 
   private:
+    enum class State { OFF, CONNECTED };
+
     QUdpSocket *mSocket;
     QNetworkInterface *interface;
     QHostAddress *broadcastAddress;
 
+    State state;
     int port;
-   // QString userName;
-
+   
     void pendingDatagramSize();
     bool isConnectedToNet();
     int addressSelector;

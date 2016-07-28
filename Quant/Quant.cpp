@@ -68,7 +68,8 @@ namespace QuantIDE
 
     controlsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(controlsBar, "Bridge", Qt::ToolBarArea::BottomToolBarArea);
-    controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), core, SLOT(onInterpretInit()));
+    controlsBar->addButton("Network", QImage(":/network_16px.png"), core, SLOT(onNetChangeState()));
+    controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), core, SLOT(onInterpretChangeState()));
     controlsBar->addButton("Server", QImage(":/server_16px.png"), core, SLOT(onServerChangeState()));
     controlsBar->getButton("Server")->setState(Button::State::FROZEN);
 
@@ -82,9 +83,9 @@ namespace QuantIDE
     panelsBar->addButton("Customize", QImage(":/customize_16px.png"), customizePanel, SLOT(onSwitchVisible()));
     connect(customizePanel, SIGNAL(actClosed()), panelsBar->getButton("Customize"), SLOT(onSwitch()));
 
-    panelsBar->addButton("Network", QImage(":/network_16px.png"), canvanNEW->getPanel("Network"), SLOT(onSwitchVisible()));
-    panelsBar->getButton("Network")->setState(Button::State::ON);
-    connect(canvanNEW->getPanel("Network"), SIGNAL(actClosed()), panelsBar->getButton("Network"), SLOT(onSwitch()));
+    panelsBar->addButton("NetworkPanel", QImage(":/network_16px.png"), canvanNEW->getPanel("NetworkPanel"), SLOT(onSwitchVisible()));
+    panelsBar->getButton("NetworkPanel")->setState(Button::State::ON);
+    connect(canvanNEW->getPanel("NetworkPanel"), SIGNAL(actClosed()), panelsBar->getButton("NetworkPanel"), SLOT(onSwitch()));
 
     panelsBar->addButton("Time", QImage(":/network_16px.png"), timePanel, SLOT(onSwitchVisible()));
     connect(timePanel, SIGNAL(actClosed()), panelsBar->getButton("Time"), SLOT(onSwitch()));
@@ -267,7 +268,7 @@ namespace QuantIDE
 
     // CONTROLS
     connect(this, SIGNAL(bootInterpretAct()), bridge, SLOT(changeInterpretState()));
-    connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
+   // connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
     connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
     connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
     connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(onCloseQuant()));
@@ -296,7 +297,7 @@ namespace QuantIDE
     connect(bridge, SIGNAL(interpretKillDoneAct()), this, SLOT(onInterpretKillDone()));
 
     // SERVER actions
-    connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(changeServerState()));
+  //  connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(changeServerState()));
     connect(bridge, SIGNAL(serverBootInitAct()), this, SLOT(onServerBootInit()));
     connect(bridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
     connect(bridge, SIGNAL(serverKillInitAct()), this, SLOT(onServerKillInit()));

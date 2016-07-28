@@ -6,22 +6,18 @@ namespace QuantIDE
     QObject(canvan),
     mCanvan(canvan),
     mBridge(new ScBridge(this)),
-    mNetwork(NULL)
+    mNetwork(new UDPServer(this))
   {
     qDebug("Core init...");
 
     isCoreRunning = false;
-    //isInterpretRunning = false;
-    //isServerRunnig = false;
     isNetworkRunning = false;
 
     lib_users = new QMap<QString, QuantUser*>();
 
     networkPanel = new NetworkPanel(mCanvan, lib_users);
-    mCanvan->addPanel(networkPanel, "Network", Qt::DockWidgetArea::LeftDockWidgetArea);
-    connect(networkPanel, SIGNAL(actNetworkConnect()), this, SLOT(onNetInit()));
-    connect(networkPanel, SIGNAL(actNetworkDisconnect()), this, SLOT(onNetKill()));
-
+    mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+    
     networkObjects.insert("core", this);
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
@@ -50,7 +46,7 @@ namespace QuantIDE
   {
     userName = data.getValue_string(DataKey::USERNAME);
     // qDebug() << "QuantCore::onCustomize userName:" << userName;
-    initNetworkOnStart = true;
+    initNetworkOnStart = false;
     initInterpretOnStart = data.getValue_bool(DataKey::BOOL_BOOT_INTERPRETR);
     initServerOnStart = data.getValue_bool(DataKey::BOOL_BOOT_SERVER);
 
@@ -76,8 +72,8 @@ namespace QuantIDE
     {
       isCoreRunning = true;
 
-      if (initNetworkOnStart) { this->onNetInit(); }
-      if (initInterpretOnStart) { this->onInterpretInit(); }
+      if (initNetworkOnStart) { this->onNetChangeState(); }
+      if (initInterpretOnStart) { this->onInterpretChangeState(); }
     }
   }
   void QuantCore::onCoreKill()
@@ -89,23 +85,42 @@ namespace QuantIDE
 
   // NETWORK /////////////////////////////////////////
 
-  void QuantCore::onNetInit()
+  void QuantCore::onNetChangeState()
   {
-    // qDebug("QuantCore::onInitNetwork");
-    mNetwork = new UDPServer(this);
+    qDebug("QuantCore::onNetChangeState");
+    if (!mNetwork->isConnected())
+    {
+      connect(mNetwork, SIGNAL(actInitDone()), this, SLOT(onNetInitDone()));
+      connect(mNetwork, SIGNAL(actKillDone()), this, SLOT(onNetKillDone()));
+      connect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
+      connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
+      connect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
 
-    connect(mNetwork, SIGNAL(actInitDone()), this, SLOT(onNetInitDone()));
-    connect(mNetwork, SIGNAL(actKillDone()), this, SLOT(onNetKillDone()));
-    connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
-    connect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
+      mNetwork->initNetwork();
+    }
+    else
+    {
+      foreach(QString oneName, lib_users->keys())
+      {
+        qDebug() << "QuantCore::onNetKill oneName:" << oneName;
 
-    connect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
+        QuantUser *newUser = lib_users->take(oneName);
+        newUser->close();
+        networkPanel->updateProfilesPosition();
+      }
 
-    mNetwork->initNetwork();
+      DataUser data;
+      data.setTargetObject("core");
+      data.setTargetMethod("onNet_userLeaved");
+      data.setValue(DataUser::NAME, userName);
+      this->onSendData(data.wrap());
+
+      mNetwork->killNetwork();
+    }
   }
   void QuantCore::onNetInitDone()
   {
-    // qDebug("QuantCore::onNetworkBootDone");
+    qDebug("QuantCore::onNetworkBootDone");
 
     DataUser data;
     data.setTargetObject("core");
@@ -118,59 +133,47 @@ namespace QuantIDE
 
     this->addUser(data);
     this->onSendData(data.wrap());
-  }
-  void QuantCore::onNetKill()
-  {
-    // qDebug("QuantCore::onNetKill");
-    foreach(QString oneName, lib_users->keys())
-    {
-      qDebug() << "QuantCore::onNetKill oneName:" << oneName;
 
-      QuantUser *newUser = lib_users->take(oneName);
-      newUser->close();
-      networkPanel->updateProfilesPosition();
-    }
-
-    DataUser data;
-    data.setTargetObject("core");
-    data.setTargetMethod("onNet_userLeaved");
-    data.setValue(DataUser::NAME, userName);
-    this->onSendData(data.wrap());
-
-    mNetwork->killNetwork();
+    mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::ON);
   }
   void QuantCore::onNetKillDone()
   {
-    mNetwork->deleteLater();
+    qDebug("QuantCore::onNetKillDone");
+
+    disconnect(mNetwork, SIGNAL(actInitDone()), this, SLOT(onNetInitDone()));
+    disconnect(mNetwork, SIGNAL(actKillDone()), this, SLOT(onNetKillDone()));
+    disconnect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
+    disconnect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
+    disconnect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
+    
+    mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::OFF);
   }
 
   // INTERPRET /////////////////////////////////////////
-
-  void QuantCore::onInterpretInit()
+  void QuantCore::onInterpretChangeState()
   {
-    qDebug("QuantCore::onInitInterpret");
-        
+    //qDebug("QuantCore::onInterpretChangeState");
+
     if (!mBridge->isInterpretRunning())
     {
+      connect(mBridge, SIGNAL(actInterpretInit()), this, SLOT(onInterpretInit()));
       connect(mBridge, SIGNAL(actInterpretInitDone()), this, SLOT(onInterpretInitDone()));
       connect(mBridge, SIGNAL(actInterpretKill()), this, SLOT(onInterpretKill()));
       connect(mBridge, SIGNAL(actInterpretKillDone()), this, SLOT(onInterpretKillDone()));
 
       connect(mBridge, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
-
-      connect(mBridge, SIGNAL(actServerInit()), this, SLOT(onServerInit()));
-      connect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
-      connect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
-      connect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
-
-      this->onPrint("Interpretr init...", MessageType::STATUS);
     }
 
     mBridge->changeInterpretState();
   }
+  void QuantCore::onInterpretInit()
+  {
+    //qDebug("QuantCore::onInterpretInit");
+    this->onPrint("Interpretr init...", MessageType::STATUS);
+  }
   void QuantCore::onInterpretInitDone()
   {
-    qDebug("QuantCore::onInterpretBootDone");
+    // qDebug("QuantCore::onInterpretBootDone");
     mCanvan->getButtonBar("Bridge")->getButton("Interpretr")->setState(Button::State::ON);
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::OFF);
     this->onPrint("Interpretr init done...\n", MessageType::STATUS);
@@ -178,27 +181,24 @@ namespace QuantIDE
   }
   void QuantCore::onInterpretKill()
   {
-    qDebug("QuantCore::onInterpretKill");
+    //  qDebug("QuantCore::onInterpretKill");
     this->onPrint("Interpretr kill...", MessageType::STATUS);
 
   }
   void QuantCore::onInterpretKillDone()
   {
-    qDebug("QuantCore::onInterpretKillDone");
+    //  qDebug("QuantCore::onInterpretKillDone");
     mCanvan->getButtonBar("Bridge")->getButton("Interpretr")->setState(Button::State::OFF);
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::FROZEN);
-    this->onPrint("Interpretr kill done...\n", MessageType::STATUS);
 
+    disconnect(mBridge, SIGNAL(actInterpretInit()), this, SLOT(onInterpretInit()));
     disconnect(mBridge, SIGNAL(actInterpretInitDone()), this, SLOT(onInterpretInitDone()));
     disconnect(mBridge, SIGNAL(actInterpretKill()), this, SLOT(onInterpretKill()));
     disconnect(mBridge, SIGNAL(actInterpretKillDone()), this, SLOT(onInterpretKillDone()));
 
     disconnect(mBridge, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
 
-    disconnect(mBridge, SIGNAL(actServerInit()), this, SLOT(onServerInit()));
-    disconnect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
-    disconnect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
-    disconnect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
+    this->onPrint("Interpretr kill done...\n", MessageType::STATUS);
   }
 
   // SERVER /////////////////////////////////////////
@@ -207,32 +207,45 @@ namespace QuantIDE
   {
     if (mBridge->isInterpretRunning())
     {
-      qDebug("QuantCore::onServerChangeState");
+      //  qDebug("QuantCore::onServerChangeState");
+
+      if (!mBridge->isServerRunning())
+      {
+        connect(mBridge, SIGNAL(actServerInit()), this, SLOT(onServerInit()));
+        connect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
+        connect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
+        connect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
+      }
       mBridge->changeServerState();
     }
   }
   void QuantCore::onServerInit()
   {
-    qDebug("QuantCore::onServerInit");
+    //qDebug("QuantCore::onServerInit");
     this->onPrint("Server init...", MessageType::STATUS);
   }
   void QuantCore::onServerInitDone()
   {
-    // isServerRunnig = true;
-    qDebug("QuantCore::onServerInitDone");
+    //  qDebug("QuantCore::onServerInitDone");
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::ON);
     this->onPrint("Server init done...\n", MessageType::STATUS);
   }
   void QuantCore::onServerKill()
   {
-    qDebug("QuantCore::onServerKill");
+    // qDebug("QuantCore::onServerKill");
     this->onPrint("Server kill...", MessageType::STATUS);
+
   }
   void QuantCore::onServerKillDone()
   {
-    // isServerRunnig = false;
-    qDebug("QuantCore::onServerKillDone");
+    // qDebug("QuantCore::onServerKillDone");
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::OFF);
+
+    disconnect(mBridge, SIGNAL(actServerInit()), this, SLOT(onServerInit()));
+    disconnect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
+    disconnect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
+    disconnect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
+
     this->onPrint("Server kill done...\n", MessageType::STATUS);
   }
 

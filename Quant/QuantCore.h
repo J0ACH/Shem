@@ -36,26 +36,26 @@ namespace QuantIDE
 
     public slots :
     void onCustomize(Data);
-    
+
     // CORE /////////////////////////////////////////
 
     void onCoreInit();
     void onCoreKill();
-    
+
     // NETWORK /////////////////////////////////////////
 
-    void onNetInit();
+    void onNetChangeState();
     void onNetInitDone();
-    void onNetKill();
     void onNetKillDone();
 
     // INTERPRET /////////////////////////////////////////
 
+    void onInterpretChangeState();
     void onInterpretInit();
     void onInterpretInitDone();
     void onInterpretKill();
     void onInterpretKillDone();
-    
+
     // SERVER /////////////////////////////////////////
 
     void onServerChangeState();
@@ -64,7 +64,7 @@ namespace QuantIDE
     void onServerKill();
     void onServerKillDone();
 
-   // void onServerBootDone();
+    // void onServerBootDone();
 
     void onSendData(DataNEW);
     void onNetDataRecived(QByteArray);
