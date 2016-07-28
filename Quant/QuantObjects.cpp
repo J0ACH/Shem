@@ -5,7 +5,7 @@ namespace QuantIDE
   QuantObject::QuantObject(QWidget *parent, QObject *core) : QWidget(parent)
   {
     qDebug("QuantObject init...");
-
+    connect(this, SIGNAL(actDataChanged(DataNEW)), core, SLOT(onObjectDataChanged(DataNEW)));
     connect(this, SIGNAL(actEvaluate(QString)), core, SLOT(onEvaluate(QString)));
   }
 
@@ -31,6 +31,9 @@ namespace QuantIDE
   {
     qDebug("QuantUser init...");
 
+    const QMetaObject &mo = DataCustomize::staticMetaObject;
+    metaEnum_targetMethods = mo.enumerator(mo.indexOfEnumerator("TargetMehod"));
+
     textName = new Text(this);
     textName->setGeometry(5, 5, 50, 20);
 
@@ -46,34 +49,28 @@ namespace QuantIDE
     nameBox->setValue(data.getValue_string(DataUser::Key::NAME));
     connect(nameBox, SIGNAL(actValueChanged(QString)), this, SLOT(onControlTEST(QString)));
     connect(nameBox, SIGNAL(actValueEvaluate(QString)), this, SLOT(onControlTEST(QString)));
-
   }
 
   void QuantUser::setName(QString name)
   {
+    qDebug("QuantUser::setName");
     data.setValue(DataUser::Key::NAME, name);
     textName->setText(name);
   }
   QString QuantUser::getName()  { return data.getValue_string(DataUser::Key::NAME); }
 
-  void QuantUser::onBeep()
+  void QuantUser::sendData(TargetMehod targetMethod)
   {
+    data.setTargetObject(this->getName());
+    data.setTargetMethod(tr("onNet_%1").arg(metaEnum_targetMethods.valueToKey(targetMethod)));
 
-    qDebug("QuantUser::onBeep");
-    // emit actEvaluate("().play");
+    emit actDataChanged(data);
   }
 
-  void QuantUser::onControlTEST(QString txt)
+  void QuantUser::onNet_Join(DataUser data)
   {
-    qDebug("QuantUser::onControlTEST");
-    // data.setValue(DataProxy::TEMPO, txt);
-    emit actDataSend(data);
-  }
-
-  void QuantUser::onNet_Recived(DataUser data)
-  {
-    qDebug("QuantUser::onDataRecived");
-    data.print("QuantUser::onDataRecived");
+    qDebug("QuantUser::onNet_Join");
+    data.print("QuantUser::onNet_Join");
 
     // nameBox->setValue(data.getValue_string(DataUser::TEMPO));
   }
@@ -124,7 +121,7 @@ namespace QuantIDE
   {
     qDebug("QuantProxy::onControlTEST");
     data.setValue(DataProxy::TEMPO, txt);
-    emit actDataSend(data);
+//    emit actDataSend(data);
   }
 
   void QuantProxy::onNet_Recived(DataProxy data)

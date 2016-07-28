@@ -258,7 +258,15 @@ namespace SupercolliderBridge
   {
     header->insert("TARGET", targetObject);
   }
+  void DataNEW::setTargetObject(QString targetObject)
+  {
+    header->insert("TARGET", targetObject);
+  }
   void DataNEW::setTargetMethod(char* targetMethod)
+  {
+    header->insert("METHOD", targetMethod);
+  } 
+  void DataNEW::setTargetMethod(QString targetMethod)
   {
     header->insert("METHOD", targetMethod);
   }

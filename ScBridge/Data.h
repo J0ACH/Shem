@@ -88,7 +88,9 @@ namespace SupercolliderBridge
 
     void setOwener(QString);
     void setTargetObject(char*);
+    void setTargetObject(QString);
     void setTargetMethod(char*);
+    void setTargetMethod(QString);
 
     static bool isFromOtherOwener(QByteArray, QString);
     static int getType(QByteArray);

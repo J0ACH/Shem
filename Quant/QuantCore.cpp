@@ -17,8 +17,8 @@ namespace QuantIDE
 
     networkPanel = new NetworkPanel(mCanvan, lib_users);
     mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
-    
-    networkObjects.insert("core", this);
+
+    //networkObjects.insert("core", this);
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
@@ -29,24 +29,26 @@ namespace QuantIDE
 
   void QuantCore::initControls()
   {
-    proxy1 = new QuantProxy(mCanvan->centralWidget(), this);
-    networkObjects.insert("proxy1", proxy1);
-    proxy1->setGeometry(50, 25, 300, 150);
-    proxy1->show();
-    connect(proxy1, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
+    proxy = new QuantProxy(mCanvan->centralWidget(), this);
+    //networkObjects.insert("proxy", proxy);
+    proxy->setGeometry(50, 25, 300, 150);
+    proxy->show();
+    connect(proxy, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
+    /*
 
     proxy2 = new QuantProxy(mCanvan->centralWidget(), this);
     proxy2->setGeometry(400, 25, 300, 150);
     proxy2->show();
     networkObjects.insert("proxy2", proxy2);
     connect(proxy2, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
+    */
   }
 
   void QuantCore::onCustomize(Data data)
   {
     userName = data.getValue_string(DataKey::USERNAME);
     // qDebug() << "QuantCore::onCustomize userName:" << userName;
-    initNetworkOnStart = false;
+    initNetworkOnStart = true;
     initInterpretOnStart = data.getValue_bool(DataKey::BOOL_BOOT_INTERPRETR);
     initServerOnStart = data.getValue_bool(DataKey::BOOL_BOOT_SERVER);
 
@@ -58,10 +60,9 @@ namespace QuantIDE
     colorMsgWarning = data.getValue_color(DataKey::COLOR_MSG_WARNINIG);
     colorMsgBundle = data.getValue_color(DataKey::COLOR_MSG_BUNDLE);
 
+
     emit actCoreInitPrepared(); // ceka na initInterpretOnStart a initServerOnStart
   }
-
-
 
   // CORE /////////////////////////////////////////
 
@@ -87,14 +88,16 @@ namespace QuantIDE
 
   void QuantCore::onNetChangeState()
   {
-    qDebug("QuantCore::onNetChangeState");
+    // qDebug("QuantCore::onNetChangeState");
     if (!mNetwork->isConnected())
     {
       connect(mNetwork, SIGNAL(actInitDone()), this, SLOT(onNetInitDone()));
       connect(mNetwork, SIGNAL(actKillDone()), this, SLOT(onNetKillDone()));
+
       connect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
+      connect(this, SIGNAL(actObjectDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
+
       connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
-      connect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
 
       mNetwork->initNetwork();
     }
@@ -107,49 +110,61 @@ namespace QuantIDE
         QuantUser *newUser = lib_users->take(oneName);
         newUser->close();
         networkPanel->updateProfilesPosition();
+        //newUser->deleteLater();
       }
 
       DataUser data;
       data.setTargetObject("core");
       data.setTargetMethod("onNet_userLeaved");
       data.setValue(DataUser::NAME, userName);
-      this->onSendData(data.wrap());
+      this->onObjectDataChanged(data.wrap());
 
       mNetwork->killNetwork();
     }
   }
   void QuantCore::onNetInitDone()
   {
-    qDebug("QuantCore::onNetworkBootDone");
-
+    // qDebug("QuantCore::onNetworkBootDone");
+    /*
     DataUser data;
-    data.setTargetObject("core");
+    data.setTargetObject(userName);
     data.setTargetMethod("onNet_userJoined");
 
     data.setValue(DataUser::NAME, userName);
     data.setValue(DataUser::VERSION, "0.40"); // DODELAT
     data.setValue(DataUser::BOOL_INTERPRETR, mBridge->isInterpretRunning());
     data.setValue(DataUser::BOOL_SERVER, mBridge->isServerRunning());
+    */
 
-    this->addUser(data);
-    this->onSendData(data.wrap());
+    QuantUser *me = new QuantUser(networkPanel, this);
+    me->setName(userName);
+    me->show();
+
+    lib_users->insert(userName, me);
+    networkPanel->updateProfilesPosition();
+    me->sendData(QuantUser::TargetMehod::JOIN);
+
+
+    //this->addUser(data);
+    //this->onObjectDataChanged(data.wrap());
 
     mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::ON);
   }
   void QuantCore::onNetKillDone()
   {
-    qDebug("QuantCore::onNetKillDone");
+    //qDebug("QuantCore::onNetKillDone");
 
     disconnect(mNetwork, SIGNAL(actInitDone()), this, SLOT(onNetInitDone()));
     disconnect(mNetwork, SIGNAL(actKillDone()), this, SLOT(onNetKillDone()));
     disconnect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
     disconnect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
     disconnect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
-    
+
     mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::OFF);
   }
 
   // INTERPRET /////////////////////////////////////////
+
   void QuantCore::onInterpretChangeState()
   {
     //qDebug("QuantCore::onInterpretChangeState");
@@ -249,40 +264,40 @@ namespace QuantIDE
     this->onPrint("Server kill done...\n", MessageType::STATUS);
   }
 
-  // OTHER /////////////////////////////////////////
+  // OBJECTS /////////////////////////////////////////
 
-  void QuantCore::onSendData(DataNEW data)
+  void QuantCore::onObjectDataChanged(DataNEW data)
   {
     data.setOwener(userName);
     //data.setTime(proxy time); // pridat cas odeslani
 
-    emit actDataSend(data.wrap());
+    emit actObjectDataSend(data.wrap());
   }
 
   void QuantCore::onNetDataRecived(QByteArray msg)
   {
-    if (DataNEW::isFromOtherOwener(msg, userName))
+    // if (DataNEW::isFromOtherOwener(msg, userName))
+    // {
+    QString targetObject = DataNEW::getTarget(msg);
+    QString targetMethod = DataNEW::getMethod(msg);
+    std::string targetMethod_str = targetMethod.toLatin1().constData();
+
+    qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+    qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+
+    switch (DataNEW::getType(msg))
     {
-      QString targetObject = DataNEW::getTarget(msg);
-      QString targetMethod = DataNEW::getMethod(msg);
-      std::string targetMethod_str = targetMethod.toLatin1().constData();
-
-      // qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
-      // qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
-
-      switch (DataNEW::getType(msg))
-      {
-      case DataNEW::DataType::USER:
-        QMetaObject::invokeMethod(networkObjects.value(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
-        break;
-      case DataNEW::DataType::PROXY:
-        QMetaObject::invokeMethod(networkObjects.value(targetObject), targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
-        break;
-      default:
-        break;
-      }
+    case DataNEW::DataType::USER:
+      QMetaObject::invokeMethod(lib_users->value(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
+      //QMetaObject::invokeMethod(networkObjects.value(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
+      break;
+    case DataNEW::DataType::PROXY:
+      QMetaObject::invokeMethod(proxy, targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
+      break;
+    default:
+      break;
     }
-
+    //    }
   }
 
   void QuantCore::onNet_userJoined(DataUser data)
@@ -302,7 +317,7 @@ namespace QuantIDE
     dataAnswer.setValue(DataUser::BOOL_INTERPRETR, mBridge->isInterpretRunning());
     dataAnswer.setValue(DataUser::BOOL_SERVER, mBridge->isServerRunning());
 
-    this->onSendData(dataAnswer.wrap());
+    this->onObjectDataChanged(dataAnswer.wrap());
   }
 
   void QuantCore::onNet_userIsHere(DataUser data)
@@ -321,6 +336,7 @@ namespace QuantIDE
     this->removeUser(data);
   }
 
+  // OTHER /////////////////////////////////////////
 
   void QuantCore::onEvaluate(QString code)  { mBridge->evaluate(code); }
 
