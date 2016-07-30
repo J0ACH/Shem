@@ -80,6 +80,7 @@ namespace QuantIDE
   void QuantCore::onCoreKill()
   {
     //qDebug("QuantCore::onCoreKill");
+    if (mNetwork->isConnected()) { this->onNetChangeState(); }
     mBridge->killBridge();
     mCanvan->onCanvanClose();
   }
@@ -88,7 +89,7 @@ namespace QuantIDE
 
   void QuantCore::onNetChangeState()
   {
-    // qDebug("QuantCore::onNetChangeState");
+    qDebug("QuantCore::onNetChangeState");
     if (!mNetwork->isConnected())
     {
       connect(mNetwork, SIGNAL(actInitDone()), this, SLOT(onNetInitDone()));
@@ -103,38 +104,13 @@ namespace QuantIDE
     }
     else
     {
-      foreach(QString oneName, lib_users->keys())
-      {
-        qDebug() << "QuantCore::onNetKill oneName:" << oneName;
-
-        QuantUser *newUser = lib_users->take(oneName);
-        newUser->close();
-        networkPanel->updateProfilesPosition();
-        //newUser->deleteLater();
-      }
-
-      DataUser data;
-      data.setTargetObject("core");
-      data.setTargetMethod("onNet_userLeaved");
-      data.setValue(DataUser::NAME, userName);
-      this->onObjectDataChanged(data.wrap());
-
+      lib_users->value(userName)->sendData(QuantUser::TargetMethod::UserLeave);
       mNetwork->killNetwork();
     }
   }
   void QuantCore::onNetInitDone()
   {
-    // qDebug("QuantCore::onNetworkBootDone");
-    /*
-    DataUser data;
-    data.setTargetObject(userName);
-    data.setTargetMethod("onNet_userJoined");
-
-    data.setValue(DataUser::NAME, userName);
-    data.setValue(DataUser::VERSION, "0.40"); // DODELAT
-    data.setValue(DataUser::BOOL_INTERPRETR, mBridge->isInterpretRunning());
-    data.setValue(DataUser::BOOL_SERVER, mBridge->isServerRunning());
-    */
+    qDebug("QuantCore::onNetworkBootDone");
 
     QuantUser *me = new QuantUser(networkPanel, this);
     me->setName(userName);
@@ -142,11 +118,7 @@ namespace QuantIDE
 
     lib_users->insert(userName, me);
     networkPanel->updateProfilesPosition();
-    me->sendData(QuantUser::TargetMehod::JOIN);
-
-
-    //this->addUser(data);
-    //this->onObjectDataChanged(data.wrap());
+    me->sendData(QuantUser::TargetMethod::UserJoin);
 
     mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::ON);
   }
@@ -158,9 +130,18 @@ namespace QuantIDE
     disconnect(mNetwork, SIGNAL(actKillDone()), this, SLOT(onNetKillDone()));
     disconnect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
     disconnect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
-    disconnect(this, SIGNAL(actDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
+    disconnect(this, SIGNAL(actObjectDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
 
     mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::OFF);
+
+    foreach(QString oneName, lib_users->keys())
+    {
+      lib_users->value(oneName)->close();
+      lib_users->remove(oneName);
+    }
+    networkPanel->updateProfilesPosition();
+
+    lib_users->clear();
   }
 
   // INTERPRET /////////////////////////////////////////
@@ -276,66 +257,35 @@ namespace QuantIDE
 
   void QuantCore::onNetDataRecived(QByteArray msg)
   {
-    // if (DataNEW::isFromOtherOwener(msg, userName))
-    // {
-    QString targetObject = DataNEW::getTarget(msg);
-    QString targetMethod = DataNEW::getMethod(msg);
-    std::string targetMethod_str = targetMethod.toLatin1().constData();
-
-    qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
-    qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
-
-    switch (DataNEW::getType(msg))
+    if (DataNEW::isFromOtherOwener(msg, userName))
     {
-    case DataNEW::DataType::USER:
-      QMetaObject::invokeMethod(lib_users->value(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
-      //QMetaObject::invokeMethod(networkObjects.value(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
-      break;
-    case DataNEW::DataType::PROXY:
-      QMetaObject::invokeMethod(proxy, targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
-      break;
-    default:
-      break;
+      QString targetObject = DataNEW::getTarget(msg);
+      QString targetMethod = DataNEW::getMethod(msg);
+      std::string targetMethod_str = targetMethod.toLatin1().constData();
+
+      qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+      qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+
+      this->onPrint("QuantCore::onNetworkDataRecived targetObject:" + targetObject, MessageType::NORMAL);
+      this->onPrint("QuantCore::onNetworkDataRecived targetMethod:" + targetMethod, MessageType::NORMAL);
+
+      switch (DataNEW::getType(msg))
+      {
+      case DataNEW::DataType::USER:
+        if (targetMethod == "onNet_UserJoin") { this->addUser(DataUser(msg)); lib_users->value(userName)->sendData(QuantUser::TargetMethod::UserExist); }
+        if (targetMethod == "onNet_UserExist") { this->addUser(DataUser(msg)); }
+        QMetaObject::invokeMethod(lib_users->value(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
+        if (targetMethod == "onNet_UserLeave") { this->removeUser(DataUser(msg)); }
+        break;
+      case DataNEW::DataType::PROXY:
+        QMetaObject::invokeMethod(proxy, targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
+        break;
+      default:
+        break;
+      }
     }
-    //    }
   }
-
-  void QuantCore::onNet_userJoined(DataUser data)
-  {
-    qDebug() << "QuantCore::onNet_userJoined";
-
-    this->onPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" has been connected to session", MessageType::STATUS);
-    this->addUser(data);
-
-    // odpoved na prihlaseni, jsem zde
-    DataUser dataAnswer;
-    dataAnswer.setTargetObject("core");
-    dataAnswer.setTargetMethod("onNet_userIsHere");
-
-    dataAnswer.setValue(DataUser::NAME, userName);
-    dataAnswer.setValue(DataUser::VERSION, "0.40"); // DODELAT
-    dataAnswer.setValue(DataUser::BOOL_INTERPRETR, mBridge->isInterpretRunning());
-    dataAnswer.setValue(DataUser::BOOL_SERVER, mBridge->isServerRunning());
-
-    this->onObjectDataChanged(dataAnswer.wrap());
-  }
-
-  void QuantCore::onNet_userIsHere(DataUser data)
-  {
-    qDebug() << "QuantCore::onNet_userIsHere";
-
-    this->onPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" is already connected", MessageType::STATUS);
-    this->addUser(data);
-  }
-
-  void QuantCore::onNet_userLeaved(DataUser data)
-  {
-    qDebug() << "QuantCore::onNet_userLeaved";
-
-    this->onPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" exit session", MessageType::STATUS);
-    this->removeUser(data);
-  }
-
+ 
   // OTHER /////////////////////////////////////////
 
   void QuantCore::onEvaluate(QString code)  { mBridge->evaluate(code); }
@@ -375,19 +325,25 @@ namespace QuantIDE
   {
     QString name = data.getValue_string(DataUser::Key::NAME);
 
-    QuantUser *newUser = new QuantUser(networkPanel, this);
-    newUser->setName(name);
-    newUser->show();
+    if (!lib_users->contains(name))
+    {
+      QuantUser *newUser = new QuantUser(networkPanel, this);
+      newUser->setName(name);
+      newUser->show();
 
-    lib_users->insert(name, newUser);
+      lib_users->insert(name, newUser);
+    }
     networkPanel->updateProfilesPosition();
   }
   void QuantCore::removeUser(DataUser data)
   {
     QString name = data.getValue_string(DataUser::Key::NAME);
 
-    QuantUser *newUser = lib_users->take(name);
-    newUser->close();
+    if (lib_users->contains(name))
+    {
+      lib_users->value(name)->close();
+      lib_users->remove(name);
+    }
     networkPanel->updateProfilesPosition();
   }
 

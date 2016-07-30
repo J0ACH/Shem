@@ -2,17 +2,17 @@
 
 namespace QuantIDE
 {
-  QuantObject::QuantObject(QWidget *parent, QObject *core) : QWidget(parent)
+  QuantObject::QuantObject(QWidget *parent, QObject *core) :
+    QWidget(parent),
+    mCanvan(parent),
+    mCore(core)
   {
     qDebug("QuantObject init...");
-    connect(this, SIGNAL(actDataChanged(DataNEW)), core, SLOT(onObjectDataChanged(DataNEW)));
+      connect(this, SIGNAL(actDataChanged(DataNEW)), core, SLOT(onObjectDataChanged(DataNEW)));
     connect(this, SIGNAL(actEvaluate(QString)), core, SLOT(onEvaluate(QString)));
+    connect(this, SIGNAL(actPrint(QString, MessageType)), core, SLOT(onPrint(QString, MessageType)));
   }
 
-  void QuantObject::onNet_Recived(DataNEW data)
-  {
-    qDebug("QuantObject::onNetworkDataRecived");
-  }
 
   void QuantObject::paintEvent(QPaintEvent *event)
   {
@@ -28,27 +28,20 @@ namespace QuantIDE
   // QUANT USER ////////////////////////////////////////////////////////////////  
 
   QuantUser::QuantUser(QWidget *parent, QObject *core) : QuantObject(parent, core)
+
   {
     qDebug("QuantUser init...");
 
-    const QMetaObject &mo = DataCustomize::staticMetaObject;
-    metaEnum_targetMethods = mo.enumerator(mo.indexOfEnumerator("TargetMehod"));
+    const QMetaObject &mo = QuantUser::staticMetaObject;
+    metaEnum_targetMethods = mo.enumerator(mo.indexOfEnumerator("TargetMethod"));
 
     textName = new Text(this);
     textName->setGeometry(5, 5, 50, 20);
 
-    testButton = new Button(this);
-    testButton->setGeometry(5, 50, this->width() - 10, 20);
-    testButton->setText("beep");
-    testButton->setStateKeeping(Button::StateKeeping::HOLD);
-    connect(testButton, SIGNAL(pressAct()), this, SLOT(onBeep()));
-
-    nameBox = new ControlBox(this);
-    nameBox->setGeometry(5, 80, 200, 50);
-    nameBox->setLabel("name");
-    nameBox->setValue(data.getValue_string(DataUser::Key::NAME));
-    connect(nameBox, SIGNAL(actValueChanged(QString)), this, SLOT(onControlTEST(QString)));
-    connect(nameBox, SIGNAL(actValueEvaluate(QString)), this, SLOT(onControlTEST(QString)));
+    testBox = new ControlBox(this);
+    testBox->setGeometry(100, 5, 250, 20);
+    testBox->setLabel("test");
+    connect(testBox, SIGNAL(actValueChanged(QString)), this, SLOT(onTestChanged(QString)));
   }
 
   void QuantUser::setName(QString name)
@@ -59,21 +52,42 @@ namespace QuantIDE
   }
   QString QuantUser::getName()  { return data.getValue_string(DataUser::Key::NAME); }
 
-  void QuantUser::sendData(TargetMehod targetMethod)
+  void QuantUser::sendData(TargetMethod targetMethod)
   {
+    QString target = tr("onNet_%1").arg(metaEnum_targetMethods.valueToKey(targetMethod));
     data.setTargetObject(this->getName());
-    data.setTargetMethod(tr("onNet_%1").arg(metaEnum_targetMethods.valueToKey(targetMethod)));
+    data.setTargetMethod(target);
 
     emit actDataChanged(data);
   }
 
-  void QuantUser::onNet_Join(DataUser data)
+  void QuantUser::onTestChanged(QString txt)
   {
-    qDebug("QuantUser::onNet_Join");
-    data.print("QuantUser::onNet_Join");
-
-    // nameBox->setValue(data.getValue_string(DataUser::TEMPO));
+    qDebug("QuantUser::onTestChanged");
+    data.setValue(DataUser::Key::VERSION, txt);
+    this->sendData(TargetMethod::UserTest);
   }
+
+  void QuantUser::onNet_UserJoin(DataUser data)
+  {
+    emit actPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" has been connected to session", MessageType::STATUS);
+  }
+  void QuantUser::onNet_UserExist(DataUser data)
+  {
+    testBox->setValue(data.getValue_string(DataUser::Key::VERSION));
+    emit actPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" is already connected", MessageType::STATUS);
+  }
+  void QuantUser::onNet_UserLeave(DataUser data)
+  {
+    emit actPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" leave session", MessageType::STATUS);
+    //disconnect(this, SIGNAL(actDataChanged(DataNEW)), mCore, SLOT(onObjectDataChanged(DataNEW)));
+  }
+  void QuantUser::onNet_UserTest(DataUser data)
+  {
+    testBox->setValue(data.getValue_string(DataUser::Key::VERSION));
+    //emit actPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" leave session", MessageType::STATUS);
+  }
+
 
   void QuantUser::paintEvent(QPaintEvent *event)
   {
@@ -121,7 +135,7 @@ namespace QuantIDE
   {
     qDebug("QuantProxy::onControlTEST");
     data.setValue(DataProxy::TEMPO, txt);
-//    emit actDataSend(data);
+    //    emit actDataSend(data);
   }
 
   void QuantProxy::onNet_Recived(DataProxy data)

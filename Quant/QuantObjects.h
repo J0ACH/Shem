@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QPainter>
 
+
 #include "Data.h"
 #include "Button.h"
 #include "ControlBox.h"
@@ -22,19 +23,19 @@ namespace QuantIDE
   public:
     QuantObject(QWidget *parent, QObject *core);
     ~QuantObject();
-
-    public slots :
-    void onNet_Recived(DataNEW);
-
+    
   signals:
     void actDataChanged(DataNEW);
     void actEvaluate(QString code);
+    void actPrint(QString, MessageType);
 
   protected: // protected je viditelna jen detmi, ne z venku
     void paintEvent(QPaintEvent *event);
+    QWidget *mCanvan;
+    QObject *mCore;
 
   private:
-    QWidget *mCanvan;
+
   };
 
   // QUANT USER ////////////////////////////////////////////////////////////////
@@ -42,11 +43,11 @@ namespace QuantIDE
   class QuantUser : public QuantObject
   {
     Q_OBJECT
-      Q_ENUMS(TargetMehod)
+      Q_ENUMS(TargetMethod)
 
   public:
 
-    enum TargetMehod { JOIN, LEAVE };
+    enum TargetMethod { UserJoin, UserExist, UserLeave, UserTest };
 
     QuantUser(QWidget *parent, QObject *core);
     ~QuantUser();
@@ -54,10 +55,13 @@ namespace QuantIDE
     void setName(QString);
     QString getName();
 
-    void sendData(TargetMehod targetMethod);
-    
+    void sendData(TargetMethod targetMethod);
+
     public slots:
-    void onNet_Join(DataUser);
+    void onNet_UserJoin(DataUser);
+    void onNet_UserExist(DataUser);
+    void onNet_UserLeave(DataUser);
+    void onNet_UserTest(DataUser);
 
   protected: // protected je viditelna jen detmi, ne z venku
     void paintEvent(QPaintEvent *event);
@@ -66,10 +70,11 @@ namespace QuantIDE
     DataUser data;
     QMetaEnum metaEnum_targetMethods;
 
-
     Text *textName;
-    Button *testButton;
-    ControlBox *nameBox;
+    ControlBox *testBox;
+
+    private slots:
+    void onTestChanged(QString);
   };
 
   // QUANT PROXYSPACE ////////////////////////////////////////////////////////////////

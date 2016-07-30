@@ -69,10 +69,6 @@ namespace QuantIDE
     void onObjectDataChanged(DataNEW);
     void onNetDataRecived(QByteArray);
 
-    void onNet_userJoined(DataUser);
-    void onNet_userIsHere(DataUser);
-    void onNet_userLeaved(DataUser);
-
     // OTHERS /////////////////////////////////////////
 
     void onEvaluate(QString code);
@@ -102,29 +98,18 @@ namespace QuantIDE
     QuantProxy *proxy;
     QMap<QString, QuantUser*> *lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
 
-   // QMap<QString, QObject*> networkObjects; // knihovna pro vsechny objekty komunikujici pres sit 
-    
+    // QMap<QString, QObject*> networkObjects; // knihovna pro vsechny objekty komunikujici pres sit 
+
     NetworkPanel *networkPanel;
 
     QString userName;
-    //bool isCoreRunning, isInterpretRunning, isServerRunnig, isNetworkRunning;
+
     bool isCoreRunning, isNetworkRunning;
     bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
 
     void addUser(DataUser);
     void removeUser(DataUser);
 
-
-    //QuantProxy *proxy1, *proxy2;
-
-    //QMap <QString, QString> library;
-    //QMap <QString, QuantNode> nodeLibrary;
-    //QMap <QString, QuantControl> controloLibrary;
-    //QMap <QString, QuantBus> busLibrary;
-
-    //PanelNEW *networkPanel;
-    //PanelNEW *proxyPanel;
-    //QMap <QString, QuantNode> library;
 
     QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgAnswer, colorMsgError, colorMsgWarning, colorMsgBundle;
 
