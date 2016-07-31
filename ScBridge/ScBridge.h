@@ -22,8 +22,12 @@ namespace SupercolliderBridge
   class ScBridge : public QProcess
   {
     Q_OBJECT
+      Q_ENUMS(FlagType)
 
   public:
+
+    enum FlagType { ServerStatus, NecoJineho };
+
     ScBridge(QObject *parent);
     ~ScBridge();
 
@@ -83,6 +87,7 @@ namespace SupercolliderBridge
     enum class StateInterpret { OFF, RUN };
     enum class StateServer{ OFF, RUN };
     enum class BridgeProcess{ NaN, INTERPRET_BOOTING, INTERPRET_KILLING, SERVER_BOOTING, SERVER_KILLING };
+    
 
     QLocalServer *mIpcServer;
     QLocalSocket *mIpcSocket;
@@ -93,6 +98,7 @@ namespace SupercolliderBridge
     StateServer mServerState;
     BridgeProcess mBridgeProcess;
 
+
     int lateFlagBreakTime;
     bool mTerminationRequested;
     QDateTime mTerminationRequestTime;
@@ -101,7 +107,9 @@ namespace SupercolliderBridge
     void startInterpretr();
     void killInterpreter();
 
+    QMetaEnum metaEnum_flagType;
     void msgFilter(QString msg);
+    void msgFilterNEW(QString msg);
 
     void onResponse(const QString & selector, const QString & data);
 

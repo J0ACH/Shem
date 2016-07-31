@@ -149,7 +149,7 @@ namespace SupercolliderBridge
       Q_ENUMS(Key)
 
   public:
-    enum Key { NAME, VERSION, BOOL_INTERPRETR, BOOL_SERVER };
+    enum Key { NAME, SERVER_METER, SERVER_CNTGROUPS, SERVER_CNTSYNTHS };
 
     DataUser();
     DataUser(QByteArray);

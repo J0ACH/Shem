@@ -51,8 +51,7 @@ namespace QuantIDE
     connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
     connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
 
-    connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));
-    
+    connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));    
 
     customize->refresh();
 
@@ -89,28 +88,6 @@ namespace QuantIDE
 
     panelsBar->addButton("Time", QImage(":/network_16px.png"), timePanel, SLOT(onSwitchVisible()));
     connect(timePanel, SIGNAL(actClosed()), panelsBar->getButton("Time"), SLOT(onSwitch()));
-
-    textServerMeter = new Text(canvanNEW->getStaustBar());
-    textServerMeter->setText("NaN");
-    textServerMeter->setToolTip("CPU");
-    textServerMeter->setGeometry(canvanNEW->getStaustBar()->width() - 270, 0, 40, canvanNEW->getStaustBar()->height());
-    textServerMeter->setAlign(Qt::AlignCenter);
-    textServerMeter->show();
-
-    textServerSynths = new Text(canvanNEW->getStaustBar());
-    textServerSynths->setText("0");
-    textServerSynths->setToolTip("numSynths");
-    textServerSynths->setGeometry(canvanNEW->getStaustBar()->width() - 220, 0, 15, canvanNEW->getStaustBar()->height());
-    textServerSynths->setAlign(Qt::AlignCenter);
-    textServerSynths->show();
-
-    textServerGroups = new Text(canvanNEW->getStaustBar());
-    textServerGroups->setText("0");
-    textServerGroups->setToolTip("numGroups");
-    textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 0, 15, canvanNEW->getStaustBar()->height());
-    textServerGroups->setAlign(Qt::AlignCenter);
-    textServerGroups->show();
-
   }
 
   void QuantNEW::onCustomize(Data data)
@@ -227,9 +204,9 @@ namespace QuantIDE
       if (event->type() == QEvent::Resize)
       {
         //qDebug("QuantNEW::resizeEvent");
-        textServerMeter->setGeometry(canvanNEW->getStaustBar()->width() - 270, 5, 40, 25);
-        textServerSynths->setGeometry(canvanNEW->getStaustBar()->width() - 220, 5, 15, 25);
-        textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 5, 15, 25);
+      //  textServerMeter->setGeometry(canvanNEW->getStaustBar()->width() - 270, 5, 40, 25);
+      //  textServerSynths->setGeometry(canvanNEW->getStaustBar()->width() - 220, 5, 15, 25);
+      //  textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 5, 15, 25);
       }
     }
     return QObject::eventFilter(target, event);

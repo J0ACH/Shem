@@ -49,7 +49,7 @@ namespace QuantIDE
     Console *console;
     CustomizePanel *customizePanel;
     PanelNEW  *timePanel;
-    Text *textServerMeter, *textServerSynths, *textServerGroups;
+   // Text *textServerMeter, *textServerSynths, *textServerGroups;
     QuantCore *core;
 
     CanvanNEW_ToolBar *controlsBar, *panelsBar;

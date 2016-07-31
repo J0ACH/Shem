@@ -15,6 +15,9 @@ namespace SupercolliderBridge
     mServerState = StateServer::OFF;
     mBridgeProcess = BridgeProcess::NaN;
 
+    const QMetaObject &mo = ScBridge::staticMetaObject;
+    metaEnum_flagType = mo.enumerator(mo.indexOfEnumerator("FlagType"));
+
     lateFlagBreakTime = 500;
     tempo = 1;
     beat = 0;
@@ -26,6 +29,17 @@ namespace SupercolliderBridge
   void ScBridge::initOSC()
   {
     //qDebug("OSCtest start");
+
+    QString oscFunc =
+      "("
+      "OSCdef.newMatching(\\SC_status, { | msg, time, addr, recvPort |"
+      "(\"ServerStatus||\" + msg).postln; "
+      "}, '/status.reply', Server.default.addr );"
+      ")";
+
+    this->evaluate(oscFunc);
+
+    /*
     QString oscFunc = "(";
 
     oscFunc += "OSCdef.newMatching(\\SC_status,";
@@ -46,6 +60,7 @@ namespace SupercolliderBridge
     oscFunc += ")";
 
     this->evaluate(oscFunc);
+    */
   }
 
   void ScBridge::killBridge()
@@ -291,7 +306,53 @@ namespace SupercolliderBridge
     QString postString = QString::fromUtf8(out);
 
     //qDebug() << "onReadyRead" << postString;
-    this->msgFilter(postString);
+    //  this->msgFilter(postString);
+    this->msgFilterNEW(postString);
+  }
+
+  void ScBridge::msgFilterNEW(QString msg)
+  {
+    //QStringList msgType = msg.split("||");
+    QStringList data = msg.split(QRegExp("\\W\\D+"), QString::SkipEmptyParts);
+    //qDebug() << "msg" << msg;
+    //qDebug() << "msgType size" << msgType.size();
+    QString type;
+    //    QStringList data;
+    if (data.size() > 1)
+    {
+      type = data[0];
+      data.removeAt(0);
+    }
+    //qDebug() << "msgType" << data;
+    //qDebug() << "msgData" << data;
+
+
+    QStringList statusData;
+
+    switch (metaEnum_flagType.keysToValue(type.toUtf8().constData()))
+    {
+    case ScBridge::FlagType::ServerStatus:
+      //qDebug() << "ScBridge::msgFilterNEW -> ServerStatus";
+      //qDebug() << "msgData" << data;
+
+      statusData.append(data[6]); // serverPeak
+      statusData.append(data[2]); // cntSynths
+      statusData.append(data[3]); // cntGroups
+
+      emit actServerStatus(statusData);
+      break;
+
+    default:
+      qDebug() << "ScBridge::msgFilterNEW -> DEFAULT";
+      qDebug() << "msgData" << data;
+      if (!data.isEmpty())
+      {
+        emit actPrint(msg, MessageType::NORMAL);
+      }
+      break;
+    }
+
+    //qDebug() << "ScBridge::msgFilterNEW type: " << type << "msgType.Size: " << msgType.size();
   }
 
   void ScBridge::msgFilter(QString msg)

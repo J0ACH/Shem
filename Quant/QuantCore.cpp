@@ -42,6 +42,28 @@ namespace QuantIDE
     networkObjects.insert("proxy2", proxy2);
     connect(proxy2, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
     */
+
+
+    textServerMeter = new Text(mCanvan->getStaustBar());
+    textServerMeter->setText("NaN");
+    textServerMeter->setToolTip("CPU");
+    textServerMeter->setGeometry(mCanvan->getStaustBar()->width() - 270, 0, 40, mCanvan->getStaustBar()->height());
+    textServerMeter->setAlign(Qt::AlignCenter);
+    textServerMeter->show();
+
+    textServerSynths = new Text(mCanvan->getStaustBar());
+    textServerSynths->setText("0");
+    textServerSynths->setToolTip("numSynths");
+    textServerSynths->setGeometry(mCanvan->getStaustBar()->width() - 220, 0, 15, mCanvan->getStaustBar()->height());
+    textServerSynths->setAlign(Qt::AlignCenter);
+    textServerSynths->show();
+
+    textServerGroups = new Text(mCanvan->getStaustBar());
+    textServerGroups->setText("0");
+    textServerGroups->setToolTip("numGroups");
+    textServerGroups->setGeometry(mCanvan->getStaustBar()->width() - 200, 0, 15, mCanvan->getStaustBar()->height());
+    textServerGroups->setAlign(Qt::AlignCenter);
+    textServerGroups->show();
   }
 
   void QuantCore::onCustomize(Data data)
@@ -211,6 +233,8 @@ namespace QuantIDE
         connect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
         connect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
         connect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
+        connect(mBridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
+        connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
       }
       mBridge->changeServerState();
     }
@@ -225,6 +249,8 @@ namespace QuantIDE
     //  qDebug("QuantCore::onServerInitDone");
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::ON);
     this->onPrint("Server init done...\n", MessageType::STATUS);
+
+    mBridge->initOSC();
   }
   void QuantCore::onServerKill()
   {
@@ -241,8 +267,23 @@ namespace QuantIDE
     disconnect(mBridge, SIGNAL(actServerInitDone()), this, SLOT(onServerInitDone()));
     disconnect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
     disconnect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
+    disconnect(mBridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
+    disconnect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
 
     this->onPrint("Server kill done...\n", MessageType::STATUS);
+  }
+  void QuantCore::onServerStatus(QStringList data)
+  {
+    //qDebug() << "QuantCore::onServerStatus: " << data;
+    float peakCPU = data[0].toFloat();
+
+    textServerMeter->setText(tr("%1 %").arg(QString::number(peakCPU, 'f', 2)));
+    textServerSynths->setText(data[1]);
+    textServerGroups->setText(data[2]);
+
+    textServerMeter->update();
+    textServerSynths->update();
+    textServerGroups->update();
   }
 
   // OBJECTS /////////////////////////////////////////
@@ -285,7 +326,7 @@ namespace QuantIDE
       }
     }
   }
- 
+
   // OTHER /////////////////////////////////////////
 
   void QuantCore::onEvaluate(QString code)  { mBridge->evaluate(code); }
@@ -373,6 +414,8 @@ namespace QuantIDE
 
   }
   */
+
+
 
   QuantCore::~QuantCore()
   {

@@ -63,6 +63,7 @@ namespace QuantIDE
     void onServerInitDone();
     void onServerKill();
     void onServerKillDone();
+    void onServerStatus(QStringList);
 
     // OBJECTS /////////////////////////////////////////
 
@@ -98,9 +99,9 @@ namespace QuantIDE
     QuantProxy *proxy;
     QMap<QString, QuantUser*> *lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
 
-    // QMap<QString, QObject*> networkObjects; // knihovna pro vsechny objekty komunikujici pres sit 
-
     NetworkPanel *networkPanel;
+
+    Text *textServerMeter, *textServerSynths, *textServerGroups;
 
     QString userName;
 

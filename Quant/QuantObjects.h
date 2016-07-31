@@ -47,7 +47,7 @@ namespace QuantIDE
 
   public:
 
-    enum TargetMethod { UserJoin, UserExist, UserLeave, UserTest };
+    enum TargetMethod { UserJoin, UserExist, UserLeave, UserServerStatus };
 
     QuantUser(QWidget *parent, QObject *core);
     ~QuantUser();
@@ -62,19 +62,23 @@ namespace QuantIDE
     void onNet_UserExist(DataUser);
     void onNet_UserLeave(DataUser);
     void onNet_UserTest(DataUser);
+    void onNet_UserServerStatus(DataUser);
+
+    void onServerStatus(QStringList);
 
   protected: // protected je viditelna jen detmi, ne z venku
     void paintEvent(QPaintEvent *event);
 
   private:
-    DataUser data;
+    DataUser userData;
     QMetaEnum metaEnum_targetMethods;
 
     Text *textName;
-    ControlBox *testBox;
+    Text *textServerMeter, *textServerSynths, *textServerGroups;
+    //ControlBox *testBox;
 
     private slots:
-    void onTestChanged(QString);
+    //void onTestChanged(QString);
   };
 
   // QUANT PROXYSPACE ////////////////////////////////////////////////////////////////
