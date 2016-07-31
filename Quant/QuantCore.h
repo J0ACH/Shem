@@ -15,6 +15,7 @@
 #include "Canvan.h"
 #include "QuantObjects.h"
 #include "NetworkPanel.h"
+#include "TimePanel.h"
 
 using namespace SupercolliderBridge;
 using namespace Jui;
@@ -31,6 +32,7 @@ namespace QuantIDE
     ~QuantCore();
 
     void initControls();
+    //void initProxy();
     //void addProxySpace();
     //void addNode(QString name);
 
@@ -72,7 +74,7 @@ namespace QuantIDE
 
     // OTHERS /////////////////////////////////////////
 
-    void onEvaluate(QString code);
+    void onEvaluate(QString code, bool print = false);
     void onPrint(QString, MessageType msg = MessageType::NORMAL);
 
 
@@ -100,6 +102,7 @@ namespace QuantIDE
     QMap<QString, QuantUser*> *lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
 
     NetworkPanel *networkPanel;
+    TimePanel *timePanel;
 
     Text *textServerMeter, *textServerSynths, *textServerGroups;
 

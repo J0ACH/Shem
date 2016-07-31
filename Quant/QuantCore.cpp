@@ -14,11 +14,12 @@ namespace QuantIDE
     isNetworkRunning = false;
 
     lib_users = new QMap<QString, QuantUser*>();
-
     networkPanel = new NetworkPanel(mCanvan, lib_users);
     mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
 
-    //networkObjects.insert("core", this);
+    proxy = NULL;
+    timePanel = new TimePanel(mCanvan);
+    mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
@@ -29,21 +30,6 @@ namespace QuantIDE
 
   void QuantCore::initControls()
   {
-    proxy = new QuantProxy(mCanvan->centralWidget(), this);
-    //networkObjects.insert("proxy", proxy);
-    proxy->setGeometry(50, 25, 300, 150);
-    proxy->show();
-    connect(proxy, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
-    /*
-
-    proxy2 = new QuantProxy(mCanvan->centralWidget(), this);
-    proxy2->setGeometry(400, 25, 300, 150);
-    proxy2->show();
-    networkObjects.insert("proxy2", proxy2);
-    connect(proxy2, SIGNAL(actDataSend(DataNEW)), this, SLOT(onSendData(DataNEW)));
-    */
-
-
     textServerMeter = new Text(mCanvan->getStaustBar());
     textServerMeter->setText("NaN");
     textServerMeter->setToolTip("CPU");
@@ -116,10 +102,8 @@ namespace QuantIDE
     {
       connect(mNetwork, SIGNAL(actInitDone()), this, SLOT(onNetInitDone()));
       connect(mNetwork, SIGNAL(actKillDone()), this, SLOT(onNetKillDone()));
-
       connect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
       connect(this, SIGNAL(actObjectDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
-
       connect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
 
       mNetwork->initNetwork();
@@ -148,6 +132,9 @@ namespace QuantIDE
     if (mBridge->isServerRunning())
     {
       connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
+
+      proxy->setBPM(proxy->getBPM()); // PROBLEM - JE TU JEN PRO ZPOMALENI PRED DOTAZEM NA EXISTENCI PROXY, PROC????
+      proxy->sendData(QuantProxy::TargetMethod::ProxyExist);
     }
 
     mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::ON);
@@ -159,8 +146,8 @@ namespace QuantIDE
     disconnect(mNetwork, SIGNAL(actInitDone()), this, SLOT(onNetInitDone()));
     disconnect(mNetwork, SIGNAL(actKillDone()), this, SLOT(onNetKillDone()));
     disconnect(mNetwork, SIGNAL(actNetDataRecived(QByteArray)), this, SLOT(onNetDataRecived(QByteArray)));
-    disconnect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
     disconnect(this, SIGNAL(actObjectDataSend(QByteArray)), mNetwork, SLOT(onSendData(QByteArray)));
+    disconnect(mNetwork, SIGNAL(actPrint(QString, MessageType)), this, SLOT(onPrint(QString, MessageType)));
 
     mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::OFF);
 
@@ -257,17 +244,30 @@ namespace QuantIDE
   }
   void QuantCore::onServerInitDone()
   {
-    //  qDebug("QuantCore::onServerInitDone");
+    // POZOR - PROBEHNE 2X - CHYBA ZE SERVERU A VOLANI SERVER.DEFAULT A SERVER.BOOT
+    qDebug("QuantCore::onServerInitDone");
+
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::ON);
     this->onPrint("Server init done...\n", MessageType::STATUS);
 
+    if (proxy == NULL)
+    {
+      proxy = new QuantProxy(mCanvan->getPanel("TimePanel"), this);
+      proxy->setGeometry(10, 30, mCanvan->getPanel("TimePanel")->width() - 20, 150);
+      proxy->show();
+      timePanel->insertProxy(proxy);
+
+      proxy->sendData(QuantProxy::TargetMethod::ProxyExist);
+    }
     mBridge->initOSC();
   }
   void QuantCore::onServerKill()
   {
-    // qDebug("QuantCore::onServerKill");
+    qDebug("QuantCore::onServerKill");
     this->onPrint("Server kill...", MessageType::STATUS);
 
+    proxy->deleteLater();
+    proxy = NULL;
   }
   void QuantCore::onServerKillDone()
   {
@@ -311,12 +311,18 @@ namespace QuantIDE
 
   void QuantCore::onObjectDataChanged(DataNEW data)
   {
-    data.setOwener(userName);
+    data.setSender(userName);
     //data.setTime(proxy time); // pridat cas odeslani
+
+    /*
+    if (DataNEW::getType(data.wrap()) != DataNEW::DataType::USER)
+    {
+    //this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
+    }
+    */
 
     emit actObjectDataSend(data.wrap());
   }
-
   void QuantCore::onNetDataRecived(QByteArray msg)
   {
     if (DataNEW::isFromOtherOwener(msg, userName))
@@ -325,11 +331,11 @@ namespace QuantIDE
       QString targetMethod = DataNEW::getMethod(msg);
       std::string targetMethod_str = targetMethod.toLatin1().constData();
 
-      qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
-      qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+      //  qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+      //  qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
 
-      //this->onPrint("QuantCore::onNetworkDataRecived targetObject:" + targetObject, MessageType::NORMAL);
-      //this->onPrint("QuantCore::onNetworkDataRecived targetMethod:" + targetMethod, MessageType::NORMAL);
+      //if (DataNEW::getType(msg) != DataNEW::DataType::USER)
+      //  this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
 
       switch (DataNEW::getType(msg))
       {
@@ -350,8 +356,7 @@ namespace QuantIDE
 
   // OTHER /////////////////////////////////////////
 
-  void QuantCore::onEvaluate(QString code)  { mBridge->evaluate(code); }
-
+  void QuantCore::onEvaluate(QString code, bool print)  { mBridge->evaluate(code, print); }
   void QuantCore::onPrint(QString message, MessageType type)
   {
     switch (type)
@@ -381,6 +386,20 @@ namespace QuantIDE
     }
 
   }
+
+  /*
+  void QuantCore::initProxy()
+  {
+  QString code;
+  code =
+  "p = ProxySpace.push(s).makeTempoClock;"
+  "p.clock.tempo_(60 / 60);";
+
+  this->onEvaluate(code);
+  }
+  */
+
+
 
 
   void QuantCore::addUser(DataUser data)

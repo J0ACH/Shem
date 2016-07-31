@@ -34,12 +34,9 @@ namespace QuantIDE
 
     this->initObjects();
 
-
     canvanNEW->addPanel(console, "Console");
     canvanNEW->addPanel(customizePanel, "Customize");
-    canvanNEW->addPanel(timePanel, "Time");
-
-
+    
     // core->addProxySpace();
     // core->addNode("testNode1");
 
@@ -62,8 +59,6 @@ namespace QuantIDE
     console = new Console();
     customizePanel = new CustomizePanel();
     customizePanel->setVisible(false);
-    timePanel = new PanelNEW();
-    timePanel->setVisible(false);
 
     controlsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(controlsBar, "Bridge", Qt::ToolBarArea::BottomToolBarArea);
@@ -86,8 +81,9 @@ namespace QuantIDE
     panelsBar->getButton("NetworkPanel")->setState(Button::State::ON);
     connect(canvanNEW->getPanel("NetworkPanel"), SIGNAL(actClosed()), panelsBar->getButton("NetworkPanel"), SLOT(onSwitch()));
 
-    panelsBar->addButton("Time", QImage(":/network_16px.png"), timePanel, SLOT(onSwitchVisible()));
-    connect(timePanel, SIGNAL(actClosed()), panelsBar->getButton("Time"), SLOT(onSwitch()));
+    panelsBar->addButton("TimePanel", QImage(":/network_16px.png"), canvanNEW->getPanel("TimePanel"), SLOT(onSwitchVisible()));
+    panelsBar->getButton("TimePanel")->setState(Button::State::ON);
+    connect(canvanNEW->getPanel("TimePanel"), SIGNAL(actClosed()), panelsBar->getButton("TimePanel"), SLOT(onSwitch()));
   }
 
   void QuantNEW::onCustomize(Data data)
@@ -196,7 +192,7 @@ namespace QuantIDE
 
     qApp->setStyleSheet(qPropertyColors + qPropertyFonts + qtStyleSheet + qtStyleSheet_Colors + qtStyleSeet_Fonts);
   }
-
+  /*
   bool QuantNEW::eventFilter(QObject *target, QEvent *event)
   {
     if (target == canvanNEW)
@@ -211,6 +207,7 @@ namespace QuantIDE
     }
     return QObject::eventFilter(target, event);
   }
+  */
 
   QuantNEW::~QuantNEW()
   {

@@ -252,25 +252,13 @@ namespace SupercolliderBridge
     }
   }
 
-  void DataNEW::setOwener(QString name)  { header->insert("OWENER", name); }
+  void DataNEW::setSender(QString name)  { header->insert("OWENER", name); }
+  QString DataNEW::getSender()  { return header->value("OWENER", "NaN"); }
   void DataNEW::setType(DataNEW::DataType type)  { header->insert("TYPE", metaEnum_type.valueToKey(type)); }
-  void DataNEW::setTargetObject(char* targetObject)
-  {
-    header->insert("TARGET", targetObject);
-  }
-  void DataNEW::setTargetObject(QString targetObject)
-  {
-    header->insert("TARGET", targetObject);
-  }
-  void DataNEW::setTargetMethod(char* targetMethod)
-  {
-    header->insert("METHOD", targetMethod);
-  } 
-  void DataNEW::setTargetMethod(QString targetMethod)
-  {
-    header->insert("METHOD", targetMethod);
-  }
-
+  void DataNEW::setTargetObject(char* targetObject)  { header->insert("TARGET", targetObject); }
+  void DataNEW::setTargetObject(QString targetObject)  { header->insert("TARGET", targetObject); }
+  void DataNEW::setTargetMethod(char* targetMethod)  { header->insert("METHOD", targetMethod); }
+  void DataNEW::setTargetMethod(QString targetMethod)  { header->insert("METHOD", targetMethod); }
 
   bool DataNEW::isFromOtherOwener(QByteArray wrapedData, QString myName)
   {
@@ -306,6 +294,7 @@ namespace SupercolliderBridge
     }
     return -1;
   }
+
 
   const QString DataNEW::getTarget(QByteArray wrapedData)
   {

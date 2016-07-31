@@ -41,15 +41,15 @@ namespace QuantIDE
 
   protected:
     //void resizeEvent(QResizeEvent *resizeEvent);
-    bool eventFilter(QObject *target, QEvent *event);
+   // bool eventFilter(QObject *target, QEvent *event);
 
   private:
     Customize *customize;
     CanvanNEW *canvanNEW;
     Console *console;
     CustomizePanel *customizePanel;
-    PanelNEW  *timePanel;
-   // Text *textServerMeter, *textServerSynths, *textServerGroups;
+//    PanelNEW  *timePanel;
+  
     QuantCore *core;
 
     CanvanNEW_ToolBar *controlsBar, *panelsBar;

@@ -86,11 +86,13 @@ namespace SupercolliderBridge
     QString print(QString comment = "");
     QByteArray wrap();
 
-    void setOwener(QString);
+    void setSender(QString);
     void setTargetObject(char*);
     void setTargetObject(QString);
     void setTargetMethod(char*);
     void setTargetMethod(QString);
+
+    QString getSender();
 
     static bool isFromOtherOwener(QByteArray, QString);
     static int getType(QByteArray);
@@ -175,7 +177,7 @@ namespace SupercolliderBridge
       Q_ENUMS(Key)
 
   public:
-    enum Key { BEATS, TEMPO, PLAYING };
+    enum Key { BEATS, BPM };
 
     DataProxy();
     DataProxy(QByteArray);

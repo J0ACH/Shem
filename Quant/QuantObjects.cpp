@@ -9,7 +9,7 @@ namespace QuantIDE
   {
     qDebug("QuantObject init...");
     connect(this, SIGNAL(actDataChanged(DataNEW)), core, SLOT(onObjectDataChanged(DataNEW)));
-    connect(this, SIGNAL(actEvaluate(QString)), core, SLOT(onEvaluate(QString)));
+    connect(this, SIGNAL(actEvaluate(QString, bool)), core, SLOT(onEvaluate(QString, bool)));
     connect(this, SIGNAL(actPrint(QString, MessageType)), core, SLOT(onPrint(QString, MessageType)));
   }
 
@@ -37,7 +37,7 @@ namespace QuantIDE
 
     textName = new Text(this);
     textName->setGeometry(5, 5, 150, 20);
-    
+
     textServerMeter = new Text(this);
     textServerMeter->setText("NaN");
     textServerMeter->setToolTip("CPU");
@@ -152,7 +152,7 @@ namespace QuantIDE
 
     textServerMeter->setGeometry(this->width() - 120, 5, 40, 20);
     textServerSynths->setGeometry(this->width() - 70, 5, 20, 20);
-      textServerGroups->setGeometry(this->width() - 40, 5, 20, 20);
+    textServerGroups->setGeometry(this->width() - 40, 5, 20, 20);
   }
 
   QuantUser::~QuantUser() { }
@@ -161,45 +161,94 @@ namespace QuantIDE
 
   QuantProxy::QuantProxy(QWidget *parent, QObject *core) : QuantObject(parent, core)
   {
-    data.setValue(DataProxy::TEMPO, 127);
+    const QMetaObject &mo = QuantProxy::staticMetaObject;
+    metaEnum_targetMethods = mo.enumerator(mo.indexOfEnumerator("TargetMethod"));
+
+    proxyData.setValue(DataProxy::BPM, 60);
 
     qDebug("QuantProxy init...");
 
     testButton = new Button(this);
-    testButton->setGeometry(5, 50, this->width() - 10, 20);
+    testButton->setGeometry(5, 10, this->width() - 10, 20);
     testButton->setText("beep");
     testButton->setStateKeeping(Button::StateKeeping::TOUCH);
-    connect(testButton, SIGNAL(pressAct()), this, SLOT(onBeep()));
+    //connect(testButton, SIGNAL(pressAct()), this, SLOT(onBeep()));
 
-    nameBox = new ControlBox(this);
-    nameBox->setGeometry(5, 80, 200, 50);
-    nameBox->setLabel("tempo");
-    nameBox->setValue(data.getValue_string(DataProxy::TEMPO));
-    connect(nameBox, SIGNAL(actValueChanged(QString)), this, SLOT(onControlTEST(QString)));
-    connect(nameBox, SIGNAL(actValueEvaluate(QString)), this, SLOT(onControlTEST(QString)));
+    tempoBox = new ControlBox(this);
+    //tempoBox->setGeometry(5, 80, 200, 50);
+    tempoBox->setLabel("BPM");
+    tempoBox->setLabelSize(50);
+    tempoBox->setValue(proxyData.getValue_string(DataProxy::BPM));
+    //connect(tempoBox, SIGNAL(actValueChanged(QString)), this, SLOT(onTempoChanged(QString)));
+    connect(tempoBox, SIGNAL(actValueEvaluate(QString)), this, SLOT(onTempoChanged(QString)));
+
+    this->initProxy();
+  }
+
+  void QuantProxy::initProxy()
+  {
+    QString code;
+    code =
+      "p = ProxySpace.push(s).makeTempoClock;"
+      "p.clock.tempo_(60 / 60);";
+
+    emit actEvaluate(code);
+  }
+
+  void QuantProxy::setBPM(int bpm)
+  {
+    proxyData.setValue(DataProxy::BPM, bpm);
+    tempoBox->setValue(QString::number(bpm));
+    tempoBox->update();
+    emit actEvaluate(tr("p.clock.tempo_(%1 / 60);").arg(QString::number(bpm)), true);
+  }
+  int QuantProxy::getBPM()
+  {
+    return proxyData.getValue_int(DataProxy::BPM);
+  }
+  double QuantProxy::getTempo()
+  {
+    return proxyData.getValue_int(DataProxy::BPM) / 60.0;
+  }
+  
+  void QuantProxy::sendData(TargetMethod targetMethod)
+  {
+    QString target = tr("onNet_%1").arg(metaEnum_targetMethods.valueToKey(targetMethod));
+    //proxyData.setTargetObject(this->getName());
+    proxyData.setTargetMethod(target);
+
+    // emit actPrint("QuantProxy::sendData to target: " + target, MessageType::WARNING);
+    emit actDataChanged(proxyData);
+  }
+
+  void QuantProxy::onNet_ProxyExist(DataProxy data)
+  {
+    qDebug("QuantProxy::onNet_ProxyTempo");
+    emit actPrint("User \"" + data.getSender() + "\" task for existing proxyspace", MessageType::STATUS);
+    this->sendData(QuantProxy::TargetMethod::ProxyTempo);
+  }
+
+  void QuantProxy::onNet_ProxyTempo(DataProxy data)
+  {
+    qDebug("QuantProxy::onNet_ProxyTempo");
+    emit actPrint("Copying proxyspace from \"" + data.getSender() + "\"", MessageType::STATUS);
+    emit actPrint(data.print(), MessageType::NORMAL);
+    this->setBPM(data.getValue_int(DataProxy::BPM));;
 
   }
 
-  void QuantProxy::onBeep()
-  {
 
-    qDebug("QuantProxy::onBeep");
-    emit actEvaluate("().play");
+  void QuantProxy::onTempoChanged(QString bpmTxt)
+  {
+    this->setBPM(bpmTxt.toInt());
+    this->sendData(QuantProxy::TargetMethod::ProxyTempo);
   }
 
-  void QuantProxy::onControlTEST(QString txt)
+  void QuantProxy::resizeEvent(QResizeEvent *event)
   {
-    qDebug("QuantProxy::onControlTEST");
-    data.setValue(DataProxy::TEMPO, txt);
-    //    emit actDataSend(data);
-  }
+    QuantObject::resizeEvent(event);
 
-  void QuantProxy::onNet_Recived(DataProxy data)
-  {
-    qDebug("QuantProxy::onDataRecived");
-    data.print("QuantProxy::onDataRecived");
-
-    nameBox->setValue(data.getValue_string(DataProxy::TEMPO));
+    tempoBox->setGeometry(5, 50, this->width() - 10, 30);
   }
 
   QuantProxy::~QuantProxy() { }

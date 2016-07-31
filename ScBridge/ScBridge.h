@@ -79,8 +79,6 @@ namespace SupercolliderBridge
     void actSynthAdd(int ID);
     void actSynthFree(int ID);
 
-
-
     //void response(const QString & selector, const QString & data);
 
   private:

@@ -26,13 +26,14 @@ namespace QuantIDE
 
   signals:
     void actDataChanged(DataNEW);
-    void actEvaluate(QString code);
+    void actEvaluate(QString code, bool print = false);
     void actPrint(QString, MessageType);
 
   protected: // protected je viditelna jen detmi, ne z venku
     void paintEvent(QPaintEvent *event);
     QWidget *mCanvan;
     QObject *mCore;
+    QMetaEnum metaEnum_targetMethods;
 
   private:
 
@@ -78,7 +79,7 @@ namespace QuantIDE
 
   private:
     DataUser userData;
-    QMetaEnum metaEnum_targetMethods;
+    //QMetaEnum metaEnum_targetMethods;
 
     Text *textName;
     Text *textServerMeter, *textServerSynths, *textServerGroups;
@@ -92,20 +93,37 @@ namespace QuantIDE
   class QuantProxy : public QuantObject
   {
     Q_OBJECT
+      Q_ENUMS(TargetMethod)
+
   public:
+
+    enum TargetMethod { ProxyExist, ProxyTempo };
+
     QuantProxy(QWidget *parent, QObject *core);
     ~QuantProxy();
 
-    public slots:
-    void onBeep();
-    void onControlTEST(QString);
+    void initProxy();
 
-    void onNet_Recived(DataProxy);
+    void setBPM(int);
+    int getBPM();
+    double getTempo();
+
+    void sendData(TargetMethod targetMethod);
+
+    public slots:
+    void onNet_ProxyExist(DataProxy);
+    void onNet_ProxyTempo(DataProxy);
+
+  protected: // protected je viditelna jen detmi, ne z venku
+    void resizeEvent(QResizeEvent *event);
 
   private:
     Button *testButton;
-    ControlBox *nameBox;
-    DataProxy data;
+    ControlBox *tempoBox;
+    DataProxy proxyData;
+
+    private slots:
+    void onTempoChanged(QString);
   };
 
 

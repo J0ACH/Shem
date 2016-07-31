@@ -28,12 +28,12 @@ namespace SupercolliderBridge
 
   void ScBridge::initOSC()
   {
-    //qDebug("OSCtest start");
+    qDebug() << "ScBridge::initOSC";
 
     QString oscFunc =
       "("
       "OSCdef.newMatching(\\SC_status, { | msg, time, addr, recvPort |"
-      "(\"ServerStatus||\" + msg).postln; "
+      "(\"ServerStatus\" ++ msg).postln; "
       "}, '/status.reply', Server.default.addr );"
       ")";
 
@@ -96,9 +96,10 @@ namespace SupercolliderBridge
     {
     case StateServer::OFF:
       emit actServerInit();
-      evaluate("Server.local = Server.default = s;");
-      mBridgeProcess = BridgeProcess::SERVER_BOOTING; // musi byt az po definici Server.local
-      evaluate("s.boot;");
+      //evaluate("Server.local = Server.default = s;");
+      mBridgeProcess = BridgeProcess::SERVER_BOOTING; // musi byt az po definici Server.local -> CHYBA!!!! onResponde probehne 2x
+      evaluate("Server.local = Server.default = s; s.boot");
+      //evaluate("s.boot;");
       break;
     case StateServer::RUN:
       mBridgeProcess = BridgeProcess::SERVER_KILLING;
@@ -343,10 +344,10 @@ namespace SupercolliderBridge
       break;
 
     default:
-      qDebug() << "ScBridge::msgFilterNEW -> DEFAULT";
-      qDebug() << "msgData" << data;
       if (!data.isEmpty())
       {
+        qDebug() << "ScBridge::msgFilterNEW -> DEFAULT";
+        qDebug() << "msgData" << data;
         emit actPrint(msg, MessageType::NORMAL);
       }
       break;
@@ -581,7 +582,7 @@ namespace SupercolliderBridge
         switch (mInterpretState)
         {
         case StateInterpret::OFF:
-          qDebug() << "SERVER INIT FOUND ";
+          qDebug() << "INTERPRET INIT FOUND ";
           emit actInterpretInitDone();
           mInterpretState = StateInterpret::RUN;
           break;
