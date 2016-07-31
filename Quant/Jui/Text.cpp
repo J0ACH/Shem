@@ -12,6 +12,7 @@ namespace Jui
   }
 
   void Text::setText(QString txt) { text = txt; }
+  QString Text::getText() { return text; }
 
   void Text::setAlign(Qt::Alignment alignment)  { align = alignment; }
   

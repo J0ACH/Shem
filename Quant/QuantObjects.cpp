@@ -36,34 +36,26 @@ namespace QuantIDE
     metaEnum_targetMethods = mo.enumerator(mo.indexOfEnumerator("TargetMethod"));
 
     textName = new Text(this);
-    textName->setGeometry(5, 5, 50, 20);
+    textName->setGeometry(5, 5, 150, 20);
     
-    /*
-    testBox = new ControlBox(this);
-    testBox->setGeometry(100, 5, 250, 20);
-    testBox->setLabel("test");
-    connect(testBox, SIGNAL(actValueChanged(QString)), this, SLOT(onTestChanged(QString)));
-    */
-
-
     textServerMeter = new Text(this);
     textServerMeter->setText("NaN");
     textServerMeter->setToolTip("CPU");
-    textServerMeter->setGeometry(70, 5, 80, 20);
+    textServerMeter->setGeometry(this->width() - 170, 5, 40, 20);
     textServerMeter->setAlign(Qt::AlignCenter);
     textServerMeter->show();
 
     textServerSynths = new Text(this);
     textServerSynths->setText("0");
     textServerSynths->setToolTip("numSynths");
-    textServerSynths->setGeometry(150, 5, 50, 20);
+    textServerSynths->setGeometry(this->width() - 120, 5, 20, 20);
     textServerSynths->setAlign(Qt::AlignCenter);
     textServerSynths->show();
 
     textServerGroups = new Text(this);
     textServerGroups->setText("0");
     textServerGroups->setToolTip("numGroups");
-    textServerGroups->setGeometry(210, 5, 50, 20);
+    textServerGroups->setGeometry(this->width() - 90, 5, 20, 20);
     textServerGroups->setAlign(Qt::AlignCenter);
     textServerGroups->show();
 
@@ -71,11 +63,32 @@ namespace QuantIDE
 
   void QuantUser::setName(QString name)
   {
-    qDebug("QuantUser::setName");
     userData.setValue(DataUser::Key::NAME, name);
     textName->setText(name);
   }
+  void QuantUser::setServerMeter(QString value)
+  {
+    userData.setValue(DataUser::Key::SERVER_METER, value);
+    textServerMeter->setText(value);
+    textServerMeter->update();
+  }
+  void QuantUser::setServerSynth(QString value)
+  {
+    userData.setValue(DataUser::Key::SERVER_CNTSYNTHS, value);
+    textServerSynths->setText(value);
+    textServerSynths->update();
+  }
+  void QuantUser::setServerGroup(QString value)
+  {
+    userData.setValue(DataUser::Key::SERVER_CNTGROUPS, value);
+    textServerGroups->setText(value);
+    textServerGroups->update();
+  }
+
   QString QuantUser::getName()  { return userData.getValue_string(DataUser::Key::NAME); }
+  QString QuantUser::getServerMeter() { return userData.getValue_string(DataUser::Key::SERVER_METER); }
+  QString QuantUser::getServerSynth() { return userData.getValue_string(DataUser::Key::SERVER_CNTSYNTHS); }
+  QString QuantUser::getServerGroup() { return userData.getValue_string(DataUser::Key::SERVER_CNTGROUPS); }
 
   void QuantUser::sendData(TargetMethod targetMethod)
   {
@@ -85,39 +98,31 @@ namespace QuantIDE
 
     emit actDataChanged(userData);
   }
-  /*
-  void QuantUser::onTestChanged(QString txt)
-  {
-    qDebug("QuantUser::onTestChanged");
-    data.setValue(DataUser::Key::VERSION, txt);
-    this->sendData(TargetMethod::UserTest);
-  }
-  */
-
-  
 
   void QuantUser::onNet_UserJoin(DataUser data)
   {
     emit actPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" has been connected to session", MessageType::STATUS);
+    this->setServerMeter(data.getValue_string(DataUser::Key::SERVER_METER));
+    this->setServerSynth(data.getValue_string(DataUser::Key::SERVER_CNTSYNTHS));
+    this->setServerGroup(data.getValue_string(DataUser::Key::SERVER_CNTGROUPS));
   }
   void QuantUser::onNet_UserExist(DataUser data)
   {
-    //testBox->setValue(data.getValue_string(DataUser::Key::VERSION));
     emit actPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" is already connected", MessageType::STATUS);
+    this->setServerMeter(data.getValue_string(DataUser::Key::SERVER_METER));
+    this->setServerSynth(data.getValue_string(DataUser::Key::SERVER_CNTSYNTHS));
+    this->setServerGroup(data.getValue_string(DataUser::Key::SERVER_CNTGROUPS));
   }
   void QuantUser::onNet_UserLeave(DataUser data)
   {
     emit actPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" leave session", MessageType::STATUS);
     //disconnect(this, SIGNAL(actDataChanged(DataNEW)), mCore, SLOT(onObjectDataChanged(DataNEW)));
   }
-  void QuantUser::onNet_UserTest(DataUser data)
+  void QuantUser::onNet_UserServerStatus(DataUser data)
   {
-    //testBox->setValue(data.getValue_string(DataUser::Key::VERSION));
-    //emit actPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" leave session", MessageType::STATUS);
-  }
-  void QuantUser::onNet_UserServerStatus(DataUser)
-  {
-
+    this->setServerMeter(data.getValue_string(DataUser::Key::SERVER_METER));
+    this->setServerSynth(data.getValue_string(DataUser::Key::SERVER_CNTSYNTHS));
+    this->setServerGroup(data.getValue_string(DataUser::Key::SERVER_CNTGROUPS));
   }
 
   void QuantUser::onServerStatus(QStringList data)
@@ -125,17 +130,9 @@ namespace QuantIDE
     float peakCPU = data[0].toFloat();
     QString peakTXT = tr("%1 %").arg(QString::number(peakCPU, 'f', 2));
 
-    textServerMeter->setText(peakTXT);
-    textServerSynths->setText(data[1]);
-    textServerGroups->setText(data[2]);
-
-    textServerMeter->update();
-    textServerSynths->update();
-    textServerGroups->update();
-
-    userData.setValue(DataUser::Key::SERVER_METER, peakTXT);
-    userData.setValue(DataUser::Key::SERVER_CNTSYNTHS, data[1]);
-    userData.setValue(DataUser::Key::SERVER_CNTGROUPS, data[2]);
+    this->setServerMeter(peakTXT);
+    this->setServerSynth(data[1]);
+    this->setServerGroup(data[2]);
 
     this->sendData(TargetMethod::UserServerStatus);
   }
@@ -148,6 +145,14 @@ namespace QuantIDE
 
     painter.setPen(QColor(120, 30, 30));
     //painter.drawText(5, 15, data.getValue_string(DataUser::Key::NAME));
+  }
+  void QuantUser::resizeEvent(QResizeEvent *event)
+  {
+    QuantObject::resizeEvent(event);
+
+    textServerMeter->setGeometry(this->width() - 120, 5, 40, 20);
+    textServerSynths->setGeometry(this->width() - 70, 5, 20, 20);
+      textServerGroups->setGeometry(this->width() - 40, 5, 20, 20);
   }
 
   QuantUser::~QuantUser() { }

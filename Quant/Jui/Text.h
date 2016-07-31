@@ -18,6 +18,7 @@ namespace Jui
     ~Text();
 
     void setText(QString);
+    QString getText();
     void setAlign(Qt::Alignment alignment);
 
     void setColorText(QColor);

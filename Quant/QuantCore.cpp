@@ -136,11 +136,19 @@ namespace QuantIDE
 
     QuantUser *me = new QuantUser(networkPanel, this);
     me->setName(userName);
+    me->setServerMeter(textServerMeter->getText());
+    me->setServerSynth(textServerSynths->getText());
+    me->setServerGroup(textServerGroups->getText());
     me->show();
 
     lib_users->insert(userName, me);
     networkPanel->updateProfilesPosition();
     me->sendData(QuantUser::TargetMethod::UserJoin);
+
+    if (mBridge->isServerRunning())
+    {
+      connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
+    }
 
     mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::ON);
   }
@@ -234,7 +242,10 @@ namespace QuantIDE
         connect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
         connect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
         connect(mBridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
-        connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
+        if (mNetwork->isConnected())
+        {
+          connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
+        }
       }
       mBridge->changeServerState();
     }
@@ -269,6 +280,16 @@ namespace QuantIDE
     disconnect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
     disconnect(mBridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
     disconnect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
+
+    textServerMeter->setText("NaN");
+    textServerSynths->setText("0");
+    textServerGroups->setText("0");
+
+    lib_users->value(userName)->setServerMeter("NaN");
+    lib_users->value(userName)->setServerSynth("0");
+    lib_users->value(userName)->setServerGroup("0");
+
+    lib_users->value(userName)->sendData(QuantUser::TargetMethod::UserServerStatus);
 
     this->onPrint("Server kill done...\n", MessageType::STATUS);
   }
@@ -307,8 +328,8 @@ namespace QuantIDE
       qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
       qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
 
-      this->onPrint("QuantCore::onNetworkDataRecived targetObject:" + targetObject, MessageType::NORMAL);
-      this->onPrint("QuantCore::onNetworkDataRecived targetMethod:" + targetMethod, MessageType::NORMAL);
+      //this->onPrint("QuantCore::onNetworkDataRecived targetObject:" + targetObject, MessageType::NORMAL);
+      //this->onPrint("QuantCore::onNetworkDataRecived targetMethod:" + targetMethod, MessageType::NORMAL);
 
       switch (DataNEW::getType(msg))
       {

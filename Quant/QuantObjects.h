@@ -23,7 +23,7 @@ namespace QuantIDE
   public:
     QuantObject(QWidget *parent, QObject *core);
     ~QuantObject();
-    
+
   signals:
     void actDataChanged(DataNEW);
     void actEvaluate(QString code);
@@ -53,7 +53,14 @@ namespace QuantIDE
     ~QuantUser();
 
     void setName(QString);
+    void setServerMeter(QString);
+    void setServerSynth(QString);
+    void setServerGroup(QString);
+
     QString getName();
+    QString getServerMeter();
+    QString getServerSynth();
+    QString getServerGroup();
 
     void sendData(TargetMethod targetMethod);
 
@@ -61,13 +68,13 @@ namespace QuantIDE
     void onNet_UserJoin(DataUser);
     void onNet_UserExist(DataUser);
     void onNet_UserLeave(DataUser);
-    void onNet_UserTest(DataUser);
     void onNet_UserServerStatus(DataUser);
 
     void onServerStatus(QStringList);
 
   protected: // protected je viditelna jen detmi, ne z venku
     void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
   private:
     DataUser userData;
@@ -75,7 +82,6 @@ namespace QuantIDE
 
     Text *textName;
     Text *textServerMeter, *textServerSynths, *textServerGroups;
-    //ControlBox *testBox;
 
     private slots:
     //void onTestChanged(QString);
