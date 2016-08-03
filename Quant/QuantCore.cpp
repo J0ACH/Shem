@@ -28,6 +28,33 @@ namespace QuantIDE
     this->initControls();
   }
 
+  QuantCore::QuantCore(CanvanNEW *canvan, QString appName, int sendPort, int listenPort) :
+    QObject(canvan),
+    mCanvan(canvan),
+    mBridge(new ScBridge(this)),
+    mNetwork(new UDPServer(this, sendPort, listenPort))
+  {
+    userName = appName;
+
+    isCoreRunning = false;
+    isNetworkRunning = false;
+
+    lib_users = new QMap<QString, QuantUser*>();
+    networkPanel = new NetworkPanel(mCanvan, lib_users);
+    mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+
+    proxy = NULL;
+    timePanel = new TimePanel(mCanvan);
+    timePanel->setVisible(false);
+    mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+
+    connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
+    connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
+
+    colorMsgNormal = QColor(120, 120, 120);
+    this->initControls();
+  }
+
   void QuantCore::initControls()
   {
     textServerMeter = new Text(mCanvan->getStaustBar());

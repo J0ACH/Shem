@@ -29,6 +29,7 @@ namespace QuantIDE
 
   public:
     QuantCore(CanvanNEW *canvan);
+    QuantCore(CanvanNEW *canvan, QString appName, int sendPort, int listenPort);
     ~QuantCore();
 
     void initControls();
