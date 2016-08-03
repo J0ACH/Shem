@@ -5,7 +5,11 @@ int main(int argc, char** argv){
 
   QApplication app(argc, argv);
 
-  QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0);
+  //QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0);
+
+  QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0, "UserA", 10000, 10001, 10);
+
+  QuantIDE::QuantNEW *win2 = new QuantIDE::QuantNEW(0, "UserB", 10001, 10000, 520);
 
   /*
   QuantIDE::Quant *win = new QuantIDE::Quant();
@@ -36,10 +40,9 @@ namespace QuantIDE
 
     canvanNEW->addPanel(console, "Console");
     canvanNEW->addPanel(customizePanel, "Customize");
-    
-    // core->addProxySpace();
-    // core->addNode("testNode1");
 
+    connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));
+    // core->initControls();
 
     connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
     connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));
@@ -48,10 +51,39 @@ namespace QuantIDE
     connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
     connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
 
-    connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));    
+    customize->refresh();
+  }
+
+  QuantNEW::QuantNEW(QObject *parent, QString userName, int sendPort, int listenPort, int appPosY) : QObject(parent)
+  {
+    QFontDatabase::addApplicationFont(":/fontText.ttf");
+    QFontDatabase::addApplicationFont(":/fontConsole.ttf");
+
+    customize = new Customize(this);
+
+    canvanNEW = new CanvanNEW();
+    canvanNEW->setGeometry(10, appPosY, 1000, 500);
+    canvanNEW->show();
+    canvanNEW->installEventFilter(this);
+
+    core = new QuantCore(canvanNEW, userName, sendPort, listenPort);
+
+    this->initObjects();
+
+    canvanNEW->addPanel(console, "Console");
+    canvanNEW->addPanel(customizePanel, "Customize");
+
+    connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));
+    // core->initControls();
+
+    connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
+    connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));
+
+    connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onCustomize(Data)));
+    connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
+    connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
 
     customize->refresh();
-
   }
 
   void QuantNEW::initObjects()

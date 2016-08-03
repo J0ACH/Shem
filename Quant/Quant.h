@@ -30,6 +30,7 @@ namespace QuantIDE
 
   public:
     QuantNEW(QObject *parent);
+    QuantNEW(QObject *parent, QString userName, int sendPort, int listenPort, int appPosY)
     ~QuantNEW();
 
     void initObjects();
