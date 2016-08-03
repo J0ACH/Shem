@@ -114,6 +114,8 @@ namespace QuantIDE
     void onNet_ProxyExist(DataProxy);
     void onNet_ProxyTempo(DataProxy);
 
+    void onBeep();
+
   protected: // protected je viditelna jen detmi, ne z venku
     void resizeEvent(QResizeEvent *event);
 

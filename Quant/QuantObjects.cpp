@@ -172,7 +172,7 @@ namespace QuantIDE
     testButton->setGeometry(5, 10, this->width() - 10, 20);
     testButton->setText("beep");
     testButton->setStateKeeping(Button::StateKeeping::TOUCH);
-    //connect(testButton, SIGNAL(pressAct()), this, SLOT(onBeep()));
+    connect(testButton, SIGNAL(pressAct()), this, SLOT(onBeep()));
 
     tempoBox = new ControlBox(this);
     //tempoBox->setGeometry(5, 80, 200, 50);
@@ -237,6 +237,10 @@ namespace QuantIDE
 
   }
 
+  void QuantProxy::onBeep()
+  {
+    emit actEvaluate("().play;", true);
+  }
 
   void QuantProxy::onTempoChanged(QString bpmTxt)
   {
