@@ -8,7 +8,16 @@ namespace SupercolliderBridge {
   {
     // qDebug("UDPServer:: new...");
     state = State::OFF;
-    port = 10000;
+    sendPort = listenPort = 10000;
+  }
+  UDPServer::UDPServer(QObject *parent, int send_port, int listen_port) :
+    QObject(parent),
+    mSocket(new QUdpSocket(this))
+  {
+    // qDebug("UDPServer:: new...");
+    state = State::OFF;
+    sendPort = send_port;
+    listenPort = listen_port;
   }
 
   bool UDPServer::isConnected()
@@ -23,7 +32,7 @@ namespace SupercolliderBridge {
 
   void UDPServer::initNetwork()
   {
-    mSocket->bind(QHostAddress::Any, port);
+    mSocket->bind(QHostAddress::Any, listenPort);
     connect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
 
     //qDebug() << "UDPServer::initNetwork";
@@ -67,7 +76,7 @@ namespace SupercolliderBridge {
       // qDebug("UDP: WARNING: network seems to have no Broadcast support, setting default one");
       broadcastAddress = new QHostAddress("239.0.0.1");
     }
-    emit actPrint(tr("Server starting, listening at port: %1").arg(QString::number(port)));
+    emit actPrint(tr("Server starting, listening at port: %1").arg(QString::number(listenPort)));
 
     // qDebug() << "UDP: Set broadcast address" << mSocket->state();
     if (mSocket->state() == 4)
@@ -80,7 +89,7 @@ namespace SupercolliderBridge {
     else
     {
       //  qDebug() << "UDP: There is a problem starting the server on port" << port;
-      emit actPrint(tr("UDP: There is a problem starting the server on port %1").arg(QString::number(port)), MessageType::WARNING);
+      emit actPrint(tr("UDP: There is a problem starting the server on port %1").arg(QString::number(listenPort)), MessageType::WARNING);
       return;
     }
 
@@ -91,8 +100,8 @@ namespace SupercolliderBridge {
     // qDebug("UDPServer::killNetwork");
     disconnect(mSocket, SIGNAL(readyRead()), this, SLOT(onDatagramRecived()));
 
-    mSocket->disconnectFromHost(); 
-    
+    mSocket->disconnectFromHost();
+
     state = State::OFF;
     emit actPrint("Network kill done...\n", MessageType::STATUS);
     emit actKillDone();
@@ -141,12 +150,7 @@ namespace SupercolliderBridge {
 
   void UDPServer::onSendData(QByteArray objectsData)
   {
-    // QString dataMsg = tr("%1||%2").arg(userName, code);
-
-    //  QByteArray datagram(dataMsg.toStdString().c_str());
-
-
-    mSocket->writeDatagram(objectsData.data(), objectsData.size(), *broadcastAddress, port);
+    mSocket->writeDatagram(objectsData.data(), objectsData.size(), *broadcastAddress, sendPort);
   }
 
   void UDPServer::onDatagramRecived()
@@ -166,3 +170,4 @@ namespace SupercolliderBridge {
 
   UDPServer::~UDPServer()  { };
 }
+

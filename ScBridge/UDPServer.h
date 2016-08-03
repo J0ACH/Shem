@@ -16,6 +16,7 @@ namespace SupercolliderBridge
 
   public:
     UDPServer(QObject *parent);
+    UDPServer(QObject *parent, int send_port, int listen_port);
     ~UDPServer();
 
     bool isConnected();
@@ -41,8 +42,8 @@ namespace SupercolliderBridge
     QHostAddress *broadcastAddress;
 
     State state;
-    int port;
-   
+    int sendPort, listenPort;
+
     void pendingDatagramSize();
     bool isConnectedToNet();
     int addressSelector;
