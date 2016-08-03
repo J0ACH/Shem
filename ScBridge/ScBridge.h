@@ -28,7 +28,7 @@ namespace SupercolliderBridge
 
     enum FlagType { ServerStatus, NecoJineho };
 
-    ScBridge(QObject *parent);
+    ScBridge(QObject *parent, QString userName);
     ~ScBridge();
 
     QString nextID();

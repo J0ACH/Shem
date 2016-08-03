@@ -208,45 +208,48 @@ namespace SupercolliderBridge
 
     foreach(QString oneLine, dataList)
     {
-      QStringList args = oneLine.split("|");
-
-      if (args[0].startsWith("HEADER_"))
+      if (!oneLine.isEmpty())
       {
-        QString key = args[0].remove(0, 7);
-        QString value = args[1];
+        QStringList args = oneLine.split("|");
 
-        // qDebug() << "HEADER key:" << key << ", value:" << value;
-        header->insert(key, value);
-      }
-      else
-      {
-        QString key = args[0];
-        QString type = args[1];
-        QString value = args[2];
-
-        // qDebug() << "\t - line:" << oneLine;
-        //qDebug() << "\t - key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
-        bool typeFound = false;
-        if (type == "QString") { library->insert(key, value); typeFound = true; }
-        else if (type == "int") { library->insert(key, value.toInt()); typeFound = true; }
-        else if (type == "double") { library->insert(key, value.toDouble()); typeFound = true; }
-        else if (type == "bool") {
-          if (value == "true") { library->insert(key, true); typeFound = true; }
-          else if (value == "false"){ library->insert(key, false); typeFound = true; }
-          else { typeFound = false; }
-        }
-        else if (type == "QColor") { library->insert(key, QColor(value)); typeFound = true; }
-        else if (type == "QFont") {
-          QFont font;
-          font.fromString(value);
-          library->insert(key, font);
-          typeFound = true;
-        }
-
-        if (!typeFound)
+        if (args[0].startsWith("HEADER_"))
         {
-          qWarning() << "CHYBA : DataNEW(QByteArray) -> CHYBA V PREVODU NA QVARIANT TYP key:" << key << ", type:" << type << ", value:" << value;
-          library->insert(key, value);
+          QString key = args[0].remove(0, 7);
+          QString value = args[1];
+
+          // qDebug() << "HEADER key:" << key << ", value:" << value;
+          header->insert(key, value);
+        }
+        else
+        {
+          QString key = args[0];
+          QString type = args[1];
+          QString value = args[2];
+
+          // qDebug() << "\t - line:" << oneLine;
+          //qDebug() << "\t - key:" << args[0] << ", type:" << args[1] << ", value:" << args[2];
+          bool typeFound = false;
+          if (type == "QString") { library->insert(key, value); typeFound = true; }
+          else if (type == "int") { library->insert(key, value.toInt()); typeFound = true; }
+          else if (type == "double") { library->insert(key, value.toDouble()); typeFound = true; }
+          else if (type == "bool") {
+            if (value == "true") { library->insert(key, true); typeFound = true; }
+            else if (value == "false"){ library->insert(key, false); typeFound = true; }
+            else { typeFound = false; }
+          }
+          else if (type == "QColor") { library->insert(key, QColor(value)); typeFound = true; }
+          else if (type == "QFont") {
+            QFont font;
+            font.fromString(value);
+            library->insert(key, font);
+            typeFound = true;
+          }
+
+          if (!typeFound)
+          {
+            qWarning() << "CHYBA : DataNEW(QByteArray) -> CHYBA V PREVODU NA QVARIANT TYP key:" << key << ", type:" << type << ", value:" << value;
+            library->insert(key, value);
+          }
         }
       }
     }

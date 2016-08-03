@@ -6,9 +6,10 @@ namespace SupercolliderBridge {
     QObject(parent),
     mSocket(new QUdpSocket(this))
   {
-    // qDebug("UDPServer:: new...");
+     qDebug("UDPServer:: new...");
     state = State::OFF;
-    sendPort = listenPort = 10000;
+    sendPort = 10000;
+    listenPort = 10000;
   }
   UDPServer::UDPServer(QObject *parent, int send_port, int listen_port) :
     QObject(parent),

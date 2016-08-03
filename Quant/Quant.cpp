@@ -5,12 +5,12 @@ int main(int argc, char** argv){
 
   QApplication app(argc, argv);
 
-  //QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0);
-
+#if _DEBUG
   QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0, "UserA", 10000, 10001, 10);
-
   QuantIDE::QuantNEW *win2 = new QuantIDE::QuantNEW(0, "UserB", 10001, 10000, 520);
-
+#else
+  QuantIDE::QuantNEW *win = new QuantIDE::QuantNEW(0);
+#endif
   /*
   QuantIDE::Quant *win = new QuantIDE::Quant();
   win->setGeometry(50, 50, 1400, 700);
@@ -33,7 +33,6 @@ namespace QuantIDE
     canvanNEW->setGeometry(10, 10, 1200, 600);
     canvanNEW->show();
     canvanNEW->installEventFilter(this);
-
     core = new QuantCore(canvanNEW);
 
     this->initObjects();
@@ -52,6 +51,8 @@ namespace QuantIDE
     connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
 
     customize->refresh();
+    /*
+    */
   }
 
   QuantNEW::QuantNEW(QObject *parent, QString userName, int sendPort, int listenPort, int appPosY) : QObject(parent)
@@ -227,17 +228,17 @@ namespace QuantIDE
   /*
   bool QuantNEW::eventFilter(QObject *target, QEvent *event)
   {
-    if (target == canvanNEW)
-    {
-      if (event->type() == QEvent::Resize)
-      {
-        //qDebug("QuantNEW::resizeEvent");
-      //  textServerMeter->setGeometry(canvanNEW->getStaustBar()->width() - 270, 5, 40, 25);
-      //  textServerSynths->setGeometry(canvanNEW->getStaustBar()->width() - 220, 5, 15, 25);
-      //  textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 5, 15, 25);
-      }
-    }
-    return QObject::eventFilter(target, event);
+  if (target == canvanNEW)
+  {
+  if (event->type() == QEvent::Resize)
+  {
+  //qDebug("QuantNEW::resizeEvent");
+  //  textServerMeter->setGeometry(canvanNEW->getStaustBar()->width() - 270, 5, 40, 25);
+  //  textServerSynths->setGeometry(canvanNEW->getStaustBar()->width() - 220, 5, 15, 25);
+  //  textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 5, 15, 25);
+  }
+  }
+  return QObject::eventFilter(target, event);
   }
   */
 
@@ -254,7 +255,7 @@ namespace QuantIDE
 
     customize = new Customize(this);
     canvan = new Canvan(this);
-    bridge = new ScBridge(this);
+    bridge = new ScBridge(this, "");
     // udpServer = new UDPServer(this, bridge);
 
     //customize->initConfig();
@@ -274,7 +275,7 @@ namespace QuantIDE
 
     // CONTROLS
     connect(this, SIGNAL(bootInterpretAct()), bridge, SLOT(changeInterpretState()));
-   // connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
+    // connect(this, SIGNAL(bootServerAct()), bridge, SLOT(changeServerState()));
     connect(canvan, SIGNAL(resizeScreenAct()), this, SLOT(fitGeometry()));
     connect(canvan, SIGNAL(closeAct()), bridge, SLOT(killBridge()));
     connect(bridge, SIGNAL(killBridgeDoneAct()), this, SLOT(onCloseQuant()));
@@ -303,7 +304,7 @@ namespace QuantIDE
     connect(bridge, SIGNAL(interpretKillDoneAct()), this, SLOT(onInterpretKillDone()));
 
     // SERVER actions
-  //  connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(changeServerState()));
+    //  connect(buttServer, SIGNAL(pressAct()), bridge, SLOT(changeServerState()));
     connect(bridge, SIGNAL(serverBootInitAct()), this, SLOT(onServerBootInit()));
     connect(bridge, SIGNAL(serverBootDoneAct()), this, SLOT(onServerBootDone()));
     connect(bridge, SIGNAL(serverKillInitAct()), this, SLOT(onServerKillInit()));
@@ -673,7 +674,7 @@ namespace QuantIDE
   void Quant::onRecivedGlobalCode(QString code)
   {
     bridge->question(code, true);
-//    udpServer->sendCode(code);
+    //    udpServer->sendCode(code);
   }
 
   Quant::~Quant() { }

@@ -5,7 +5,7 @@ namespace QuantIDE
   QuantCore::QuantCore(CanvanNEW *canvan) :
     QObject(canvan),
     mCanvan(canvan),
-    mBridge(new ScBridge(this)),
+    mBridge(new ScBridge(this, "_normal")),
     mNetwork(new UDPServer(this))
   {
     qDebug("Core init...");
@@ -31,7 +31,7 @@ namespace QuantIDE
   QuantCore::QuantCore(CanvanNEW *canvan, QString appName, int sendPort, int listenPort) :
     QObject(canvan),
     mCanvan(canvan),
-    mBridge(new ScBridge(this)),
+    mBridge(new ScBridge(this, "_" + appName)),
     mNetwork(new UDPServer(this, sendPort, listenPort))
   {
     userName = appName;
@@ -81,7 +81,9 @@ namespace QuantIDE
 
   void QuantCore::onCustomize(Data data)
   {
+#if (!_DEBUG)
     userName = data.getValue_string(DataKey::USERNAME);
+#endif
     // qDebug() << "QuantCore::onCustomize userName:" << userName;
     initNetworkOnStart = true;
     initInterpretOnStart = data.getValue_bool(DataKey::BOOL_BOOT_INTERPRETR);

@@ -3,11 +3,11 @@
 namespace SupercolliderBridge
 {
 
-  ScBridge::ScBridge(QObject * parent) :
+  ScBridge::ScBridge(QObject * parent, QString userName) :
     QProcess(parent),
     mIpcServer(new QLocalServer(this)),
     mIpcSocket(NULL),
-    mIpcServerName("SCBridge_" + QString::number(QCoreApplication::applicationPid())),
+    mIpcServerName("SCBridge_" + QString::number(QCoreApplication::applicationPid()) + userName),
     mTerminationRequested(false),
     mCompiled(false)
   {
@@ -99,6 +99,7 @@ namespace SupercolliderBridge
       //evaluate("Server.local = Server.default = s;");
       mBridgeProcess = BridgeProcess::SERVER_BOOTING; // musi byt az po definici Server.local -> CHYBA!!!! onResponde probehne 2x
       evaluate("Server.local = Server.default = s; s.boot");
+      //evaluate("s.boot");
       //evaluate("s.boot;");
       break;
     case StateServer::RUN:
@@ -240,6 +241,8 @@ namespace SupercolliderBridge
 
   void ScBridge::startInterpretr()
   {
+    emit actPrint(tr("ScBridge::startInterpretr %1").arg(mIpcServerName), MessageType::STATUS);
+
     QString sclangCommand = "sclang";
     QString configFile;
 
