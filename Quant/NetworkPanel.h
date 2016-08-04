@@ -27,6 +27,7 @@ namespace QuantIDE
     NetworkPanel(QWidget *parent, QMap<QString, QuantUser*> *lib);
     ~NetworkPanel();
 
+    QWidget* getScrollWidget();
     void updateProfilesPosition();
     
     protected:

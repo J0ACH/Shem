@@ -20,7 +20,7 @@ namespace QuantIDE
     proxy = NULL;
     timePanel = new TimePanel(mCanvan);
     mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
-
+    
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
 
@@ -147,7 +147,7 @@ namespace QuantIDE
   {
     qDebug("QuantCore::onNetworkBootDone");
 
-    QuantUser *me = new QuantUser(networkPanel, this);
+    QuantUser *me = new QuantUser(networkPanel->getScrollWidget(), this);
     me->setName(userName);
     me->setServerMeter(textServerMeter->getText());
     me->setServerSynth(textServerSynths->getText());
@@ -279,6 +279,7 @@ namespace QuantIDE
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::ON);
     this->onPrint("Server init done...\n", MessageType::STATUS);
 
+    qDebug() << "QuantCore::onServerInitDone ISNULL:" << (proxy == NULL);
     if (proxy == NULL)
     {
       proxy = new QuantProxy(mCanvan->getPanel("TimePanel"), this);
@@ -437,7 +438,7 @@ namespace QuantIDE
 
     if (!lib_users->contains(name))
     {
-      QuantUser *newUser = new QuantUser(networkPanel, this);
+      QuantUser *newUser = new QuantUser(networkPanel->getScrollWidget(), this);
       newUser->setName(name);
       newUser->show();
 
@@ -456,8 +457,12 @@ namespace QuantIDE
     }
     networkPanel->updateProfilesPosition();
   }
+  /*
+  void QuantCore::setProxySpace(DataProxy)
+  {
 
-
+  }
+  */
 
   /*
   void QuantCore::addProxySpace()

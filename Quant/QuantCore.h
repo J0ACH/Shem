@@ -34,7 +34,6 @@ namespace QuantIDE
 
     void initControls();
     //void initProxy();
-    //void addProxySpace();
     //void addNode(QString name);
 
     public slots :
@@ -115,6 +114,8 @@ namespace QuantIDE
     void addUser(DataUser);
     void removeUser(DataUser);
 
+   // void setProxySpace(DataProxy);
+    
 
     QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgAnswer, colorMsgError, colorMsgWarning, colorMsgBundle;
 

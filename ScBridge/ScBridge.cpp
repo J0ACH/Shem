@@ -98,9 +98,8 @@ namespace SupercolliderBridge
       emit actServerInit();
       //evaluate("Server.local = Server.default = s;");
       mBridgeProcess = BridgeProcess::SERVER_BOOTING; // musi byt az po definici Server.local -> CHYBA!!!! onResponde probehne 2x
-      evaluate("Server.local = Server.default = s; s.boot");
-      //evaluate("s.boot");
-      //evaluate("s.boot;");
+     // evaluate("Server.local = Server.default = s; s.boot;");
+      evaluate("s.boot;");
       break;
     case StateServer::RUN:
       mBridgeProcess = BridgeProcess::SERVER_KILLING;
@@ -349,8 +348,8 @@ namespace SupercolliderBridge
     default:
       if (!data.isEmpty())
       {
-        qDebug() << "ScBridge::msgFilterNEW -> DEFAULT";
-        qDebug() << "msgData" << data;
+       // qDebug() << "ScBridge::msgFilterNEW -> DEFAULT";
+      //  qDebug() << "msgData" << data;
         emit actPrint(msg, MessageType::NORMAL);
       }
       break;

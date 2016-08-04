@@ -225,27 +225,27 @@ namespace QuantIDE
   {
     qDebug("QuantProxy::onNet_ProxyTempo");
     emit actPrint("User \"" + data.getSender() + "\" task for existing proxyspace", MessageType::STATUS);
-    this->sendData(QuantProxy::TargetMethod::ProxyTempo);
+    emit actPrint(data.print("QuantProxy::onNet_ProxyExist"), MessageType::NORMAL);
+    this->sendData(QuantProxy::TargetMethod::ProxySet);
   }
 
-  void QuantProxy::onNet_ProxyTempo(DataProxy data)
+  void QuantProxy::onNet_ProxySet(DataProxy data)
   {
     qDebug("QuantProxy::onNet_ProxyTempo");
     emit actPrint("Copying proxyspace from \"" + data.getSender() + "\"", MessageType::STATUS);
-    emit actPrint(data.print(), MessageType::NORMAL);
-    this->setBPM(data.getValue_int(DataProxy::BPM));;
-
+    emit actPrint(data.print("QuantProxy::onNet_ProxyTempo"), MessageType::NORMAL);
+    this->setBPM(data.getValue_int(DataProxy::BPM));
+  }
+  
+  void QuantProxy::onTempoChanged(QString bpmTxt)
+  {
+    this->setBPM(bpmTxt.toInt());
+    this->sendData(QuantProxy::TargetMethod::ProxySet);
   }
 
   void QuantProxy::onBeep()
   {
     emit actEvaluate("().play;", true);
-  }
-
-  void QuantProxy::onTempoChanged(QString bpmTxt)
-  {
-    this->setBPM(bpmTxt.toInt());
-    this->sendData(QuantProxy::TargetMethod::ProxyTempo);
   }
 
   void QuantProxy::resizeEvent(QResizeEvent *event)

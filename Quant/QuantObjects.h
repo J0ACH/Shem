@@ -97,7 +97,7 @@ namespace QuantIDE
 
   public:
 
-    enum TargetMethod { ProxyExist, ProxyTempo };
+    enum TargetMethod { ProxyExist, ProxySet };
 
     QuantProxy(QWidget *parent, QObject *core);
     ~QuantProxy();
@@ -112,9 +112,8 @@ namespace QuantIDE
 
     public slots:
     void onNet_ProxyExist(DataProxy);
-    void onNet_ProxyTempo(DataProxy);
+    void onNet_ProxySet(DataProxy);
 
-    void onBeep();
 
   protected: // protected je viditelna jen detmi, ne z venku
     void resizeEvent(QResizeEvent *event);
@@ -126,6 +125,7 @@ namespace QuantIDE
 
     private slots:
     void onTempoChanged(QString);
+    void onBeep();
   };
 
 

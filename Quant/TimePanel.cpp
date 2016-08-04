@@ -7,7 +7,7 @@ namespace QuantIDE
     mProxy(NULL)
   {
     this->setMinimumWidth(400);
-    this->setMinimumHeight(300);
+    this->setMinimumHeight(150);
     this->initControl();
   }
 

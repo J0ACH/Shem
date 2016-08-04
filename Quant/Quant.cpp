@@ -51,8 +51,7 @@ namespace QuantIDE
     connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
 
     customize->refresh();
-    /*
-    */
+    
   }
 
   QuantNEW::QuantNEW(QObject *parent, QString userName, int sendPort, int listenPort, int appPosY) : QObject(parent)
@@ -115,7 +114,7 @@ namespace QuantIDE
     connect(canvanNEW->getPanel("NetworkPanel"), SIGNAL(actClosed()), panelsBar->getButton("NetworkPanel"), SLOT(onSwitch()));
 
     panelsBar->addButton("TimePanel", QImage(":/network_16px.png"), canvanNEW->getPanel("TimePanel"), SLOT(onSwitchVisible()));
-    panelsBar->getButton("TimePanel")->setState(Button::State::ON);
+    panelsBar->getButton("TimePanel")->setState(Button::State::OFF);
     connect(canvanNEW->getPanel("TimePanel"), SIGNAL(actClosed()), panelsBar->getButton("TimePanel"), SLOT(onSwitch()));
   }
 

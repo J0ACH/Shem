@@ -17,34 +17,41 @@ namespace QuantIDE
 
     scrollWidget = new QWidget(this);
     scrollWidget->setStyleSheet("background-color: rgba(0,0,0,0)");
-    scrollWidget->setGeometry(0, 0, 300, 1000);
+    scrollWidget->setGeometry(0, 0, scrollArea->width(), 1000);
 
     scrollArea->setWidget(scrollWidget);
-    }
- 
+  }
+
+  QWidget* NetworkPanel::getScrollWidget()  { return scrollWidget; }
 
   void NetworkPanel::resizeEvent(QResizeEvent *event)
   {
-    scrollArea->setGeometry(10, 130, width() - 20, height() - 170);
+    scrollArea->setGeometry(10, 30, width() - 20, height() - 40);
     scrollWidget->setFixedWidth(scrollArea->width() - 10);
 
     this->updateProfilesPosition();
-
-    scrollWidget->setFixedHeight(310); // end of scroll
-
     PanelNEW::resizeEvent(event);
   }
 
   void NetworkPanel::updateProfilesPosition()
   {
     int noLoop = 0;
+    int endY = 0;
     foreach(QString oneName, mProfiles->keys())
     {
-      mProfiles->value(oneName)->setGeometry(10, noLoop * 40 + 30, width() - 20, 30);
+      int originY = noLoop * (mProfiles->value(oneName)->height() + 10) + 10;
+      int heightY = mProfiles->value(oneName)->height();
+      mProfiles->value(oneName)->setGeometry(
+        10,
+        originY,
+        scrollArea->width() - 30,
+        heightY
+        );
+      endY = originY + heightY;
       noLoop++;
     }
+    scrollWidget->setFixedHeight(endY + 10);
   }
-
 
   NetworkPanel::~NetworkPanel() { }
 }
