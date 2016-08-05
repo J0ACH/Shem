@@ -141,6 +141,8 @@ namespace QuantIDE
       "Jui--ControlBox {qproperty-colorOver: %2;}"
       "Jui--ControlBox {qproperty-colorActive: %3;}"
       "Jui--ControlBox {qproperty-colorText: %4;}"
+
+      "QuantIDE--Library {qproperty-colorBackground: %8;}"
       ).arg(
       data.toStyleSheet(DataKey::COLOR_NORMAL),
       data.toStyleSheet(DataKey::COLOR_OVER),

@@ -56,7 +56,7 @@ namespace QuantIDE
 
     enum TargetMethod { UserJoin, UserExist, UserLeave, UserServerStatus };
 
-    QuantUser(QWidget *parent, QObject *core);
+        QuantUser(QWidget *parent, QObject *core);
     ~QuantUser();
 
     void setName(QString);

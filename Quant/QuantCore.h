@@ -99,10 +99,10 @@ namespace QuantIDE
 
     // LIBRARIES /////////////////////////////////////////
 
-    Library lib_usersNEW;
+    Library *lib_users;  // knihovna prihlasenych hracu pro komunikujici pres sit 
 
     QuantProxy *proxy;
-    QMap<QString, QuantUser*> *lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
+    
 
     NetworkPanel *networkPanel;
     TimePanel *timePanel;
@@ -114,10 +114,7 @@ namespace QuantIDE
     bool isCoreRunning, isNetworkRunning;
     bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
 
-    void addUser(DataUser);
-    void removeUser(DataUser);
-
-   // void setProxySpace(DataProxy);
+    // void setProxySpace(DataProxy);
     
 
     QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgAnswer, colorMsgError, colorMsgWarning, colorMsgBundle;

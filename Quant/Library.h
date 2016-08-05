@@ -6,17 +6,15 @@
 #include <QWidget>
 #include <QPainter>
 #include <QDebug>
-#include <QScrollArea>
-
 
 using namespace Jui;
-using namespace SupercolliderBridge;
 
 namespace QuantIDE
 {
   class Library : public QWidget
   {
     Q_OBJECT
+      Q_PROPERTY(QColor colorBackground READ getColorBackground WRITE setColorBackground)
 
   public:
     Library(QWidget *parent, QObject *core);
@@ -25,16 +23,20 @@ namespace QuantIDE
     void addObject(QuantObject* obj);
     void addObject(DataNEW data);
 
+    void removeObject(QString name);
     void removeObject(DataNEW data);
+
+    QList<QString> keys();
 
     QuantUser* getUser(QString name);
     QuantUser* getUser(DataUser data);
-
-    void display(QWidget *parent = 0);
-
+    
     void updateObjectPosition();
 
-  protected:
+    void setColorBackground(QColor color);
+    QColor getColorBackground();
+
+    protected:
     void resizeEvent(QResizeEvent *event);
     void paintEvent(QPaintEvent *event);
 
@@ -43,6 +45,8 @@ namespace QuantIDE
     QMap<QString, QuantObject*> lib;
 
     bool containObject(DataNEW data);
+
+    QColor colorBackground;
   };
 }
 

@@ -28,7 +28,7 @@ namespace QuantIDE
 
   // QUANT USER ////////////////////////////////////////////////////////////////  
 
-  QuantUser::QuantUser(QWidget *parent, QObject *core) : QuantObject(parent, core)
+   QuantUser::QuantUser(QWidget *parent, QObject *core) : QuantObject(parent, core)
   {
     qDebug("QuantUser init...");
 
@@ -62,6 +62,7 @@ namespace QuantIDE
     textServerGroups->show();
 
   }
+  
 
   void QuantUser::setName(QString name)
   {

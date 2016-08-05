@@ -6,17 +6,18 @@ namespace QuantIDE
     QObject(canvan),
     mCanvan(canvan),
     mBridge(new ScBridge(this, "_normal")),
-    mNetwork(new UDPServer(this)),
-    lib_usersNEW(0, this)
+    mNetwork(new UDPServer(this))
   {
     qDebug("Core init...");
 
     isCoreRunning = false;
     isNetworkRunning = false;
 
-    lib_users = new QMap<QString, QuantUser*>();
-    networkPanel = new NetworkPanel(mCanvan, lib_users);
+
+    networkPanel = new NetworkPanel(mCanvan);
     mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+    lib_users = new Library(networkPanel, this);
+    networkPanel->setScrollWidget(lib_users);
 
     proxy = NULL;
     timePanel = new TimePanel(mCanvan);
@@ -33,17 +34,18 @@ namespace QuantIDE
     QObject(canvan),
     mCanvan(canvan),
     mBridge(new ScBridge(this, "_" + appName)),
-    mNetwork(new UDPServer(this, sendPort, listenPort)),
-    lib_usersNEW(0, this)
+    mNetwork(new UDPServer(this, sendPort, listenPort))
   {
     userName = appName;
 
     isCoreRunning = false;
     isNetworkRunning = false;
 
-    lib_users = new QMap<QString, QuantUser*>();
-    networkPanel = new NetworkPanel(mCanvan, lib_users);
+
+    networkPanel = new NetworkPanel(mCanvan);
     mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+    lib_users = new Library(networkPanel, this);
+    networkPanel->setScrollWidget(lib_users);
 
     proxy = NULL;
     timePanel = new TimePanel(mCanvan);
@@ -79,9 +81,6 @@ namespace QuantIDE
     textServerGroups->setGeometry(mCanvan->getStaustBar()->width() - 200, 0, 15, mCanvan->getStaustBar()->height());
     textServerGroups->setAlign(Qt::AlignCenter);
     textServerGroups->show();
-
-    // lib_usersNEW = Library(0, this);
-    lib_usersNEW.display();
   }
 
   void QuantCore::onCustomize(Data data)
@@ -144,7 +143,7 @@ namespace QuantIDE
     }
     else
     {
-      lib_users->value(userName)->sendData(QuantUser::TargetMethod::UserLeave);
+      lib_users->getUser(userName)->sendData(QuantUser::TargetMethod::UserLeave);
       mNetwork->killNetwork();
     }
   }
@@ -152,22 +151,18 @@ namespace QuantIDE
   {
     qDebug("QuantCore::onNetworkBootDone");
 
-    QuantUser *me = new QuantUser(networkPanel->getScrollWidget(), this);
+    QuantUser *me = new QuantUser(0, this);
     me->setName(userName);
     me->setServerMeter(textServerMeter->getText());
     me->setServerSynth(textServerSynths->getText());
     me->setServerGroup(textServerGroups->getText());
-    me->show();
+    lib_users->addObject(me);
 
-    lib_usersNEW.addObject(me);
-
-    // lib_users->insert(userName, me);
-    // networkPanel->updateProfilesPosition();
     me->sendData(QuantUser::TargetMethod::UserJoin);
 
     if (mBridge->isServerRunning())
     {
-      connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
+      connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->getUser(userName), SLOT(onServerStatus(QStringList)));
 
       proxy->setBPM(proxy->getBPM()); // PROBLEM - JE TU JEN PRO ZPOMALENI PRED DOTAZEM NA EXISTENCI PROXY, PROC????
       proxy->sendData(QuantProxy::TargetMethod::ProxyExist);
@@ -189,12 +184,8 @@ namespace QuantIDE
 
     foreach(QString oneName, lib_users->keys())
     {
-      lib_users->value(oneName)->close();
-      lib_users->remove(oneName);
+      lib_users->removeObject(oneName);
     }
-    networkPanel->updateProfilesPosition();
-
-    lib_users->clear();
   }
 
   // INTERPRET /////////////////////////////////////////
@@ -267,7 +258,7 @@ namespace QuantIDE
         connect(mBridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
         if (mNetwork->isConnected())
         {
-          connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
+          connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->getUser(userName), SLOT(onServerStatus(QStringList)));
         }
       }
       mBridge->changeServerState();
@@ -316,17 +307,17 @@ namespace QuantIDE
     disconnect(mBridge, SIGNAL(actServerKill()), this, SLOT(onServerKill()));
     disconnect(mBridge, SIGNAL(actServerKillDone()), this, SLOT(onServerKillDone()));
     disconnect(mBridge, SIGNAL(actServerStatus(QStringList)), this, SLOT(onServerStatus(QStringList)));
-    disconnect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->value(userName), SLOT(onServerStatus(QStringList)));
+    disconnect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->getUser(userName), SLOT(onServerStatus(QStringList)));
 
     textServerMeter->setText("NaN");
     textServerSynths->setText("0");
     textServerGroups->setText("0");
 
-    lib_users->value(userName)->setServerMeter("NaN");
-    lib_users->value(userName)->setServerSynth("0");
-    lib_users->value(userName)->setServerGroup("0");
+    lib_users->getUser(userName)->setServerMeter("NaN");
+    lib_users->getUser(userName)->setServerSynth("0");
+    lib_users->getUser(userName)->setServerGroup("0");
 
-    lib_users->value(userName)->sendData(QuantUser::TargetMethod::UserServerStatus);
+    lib_users->getUser(userName)->sendData(QuantUser::TargetMethod::UserServerStatus);
 
     this->onPrint("Server kill done...\n", MessageType::STATUS);
   }
@@ -377,18 +368,12 @@ namespace QuantIDE
       switch (DataNEW::getType(msg))
       {
       case DataNEW::DataType::USER:
-        // lib_usersNEW.addObject(DataUser(msg));
+        // lib_users.addObject(DataUser(msg));
 
-        if (targetMethod == "onNet_UserJoin") { lib_usersNEW.addObject(DataUser(msg)); lib_usersNEW.getUser(userName)->sendData(QuantUser::TargetMethod::UserExist); }
-        if (targetMethod == "onNet_UserExist") { lib_usersNEW.addObject(DataUser(msg)); lib_usersNEW.getUser(DataUser(msg)); }
-        QMetaObject::invokeMethod(lib_usersNEW.getUser(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
-        if (targetMethod == "onNet_UserLeave") { lib_usersNEW.removeObject(DataUser(msg)); }
-        /*
-        if (targetMethod == "onNet_UserJoin") { this->addUser(DataUser(msg)); lib_users->value(userName)->sendData(QuantUser::TargetMethod::UserExist); }
-        if (targetMethod == "onNet_UserExist") { this->addUser(DataUser(msg)); }
-        QMetaObject::invokeMethod(lib_users->value(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
-        if (targetMethod == "onNet_UserLeave") { this->removeUser(DataUser(msg)); }
-        */
+        if (targetMethod == "onNet_UserJoin") { lib_users->addObject(DataUser(msg)); lib_users->getUser(userName)->sendData(QuantUser::TargetMethod::UserExist); }
+        if (targetMethod == "onNet_UserExist") { lib_users->addObject(DataUser(msg)); lib_users->getUser(DataUser(msg)); }
+        QMetaObject::invokeMethod(lib_users->getUser(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
+        if (targetMethod == "onNet_UserLeave") { lib_users->removeObject(DataUser(msg)); }
         break;
       case DataNEW::DataType::PROXY:
         QMetaObject::invokeMethod(proxy, targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
@@ -447,32 +432,6 @@ namespace QuantIDE
 
 
 
-  void QuantCore::addUser(DataUser data)
-  {
-    QString name = data.getValue_string(DataUser::Key::NAME);
-
-    if (!lib_users->contains(name))
-    {
-      QuantUser *newUser = new QuantUser(networkPanel->getScrollWidget(), this);
-      newUser->setName(name);
-      newUser->show();
-
-      //lib_users->insert(name, newUser);
-      lib_usersNEW.addObject(newUser);
-    }
-    //networkPanel->updateProfilesPosition();
-  }
-  void QuantCore::removeUser(DataUser data)
-  {
-    QString name = data.getValue_string(DataUser::Key::NAME);
-
-    if (lib_users->contains(name))
-    {
-      lib_users->value(name)->close();
-      lib_users->remove(name);
-    }
-    networkPanel->updateProfilesPosition();
-  }
   /*
   void QuantCore::setProxySpace(DataProxy)
   {

@@ -6,21 +6,25 @@ namespace QuantIDE
     QWidget(parent),
     mCore(core)
   {
-
+    this->setGeometry(0, 0, 150, 150);
   }
+
+  QList<QString> Library::keys()  { return lib.keys(); }
+
+  void Library::setColorBackground(QColor color) { colorBackground = color; }
+  QColor Library::getColorBackground() { return colorBackground; }
 
   void Library::addObject(QuantObject *obj)
   {
     obj->setParent(this);
     obj->show();
-    obj->setGeometry(10, 10, width() - 20, 100);
 
     QString name;
     switch (obj->getType())
     {
     case QuantObject::ObjectType::USER:
       name = static_cast<QuantUser*>(obj)->getName();
-      // qDebug() << "JSEM OBJECT USER :" << name;
+      // qDebug() << "Library::addObject JSEM OBJECT USER :" << name;
       lib.insert(name, obj);
       this->updateObjectPosition();
       break;
@@ -40,7 +44,7 @@ namespace QuantIDE
       {
         DataUser userData(data);
         QString name(userData.getValue_string(DataUser::Key::NAME));
-        qDebug() << "JSEM OBJECT USER from DATA :" << name;
+        // qDebug() << "Library::addObject JSEM OBJECT USER from DATA :" << name;
 
         QuantUser *newUser = new QuantUser(this, mCore);
         newUser->setName(name);
@@ -52,16 +56,26 @@ namespace QuantIDE
     this->updateObjectPosition();
   }
 
+  void Library::removeObject(QString name)
+  {
+    lib.value(name)->close();
+    lib.value(name)->deleteLater();
+    lib.remove(name);
+
+    this->updateObjectPosition();
+  }
+
   void Library::removeObject(DataNEW data)
   {
     switch (data.getType())
     {
     case DataNEW::DataType::USER:
-      if (!this->containObject(data))
+      if (this->containObject(data))
       {
         DataUser userData(data);
         QString name(userData.getValue_string(DataUser::Key::NAME));
         lib.value(name)->close();
+        lib.value(name)->deleteLater();
         lib.remove(name);
       }
     }
@@ -92,35 +106,23 @@ namespace QuantIDE
     return false;
   }
 
-  void Library::display(QWidget *parent)
-  {
-    this->setParent(parent);
-    this->setGeometry(50, 50, 300, 300);
-    this->show();
-  }
-
   void Library::updateObjectPosition()
   {
-    // int noLoop = 0;
-    // int endY = 0;
     int gapSize = 10;
     int lastObjOriginY = gapSize;
 
     foreach(QuantObject *obj, lib)
     {
-      // int originY = noLoop * (obj->height() + 10) + 10;
-      // int heightY = obj->height();
+
       obj->setGeometry(
         10,
         lastObjOriginY,
         width() - 30,
         obj->height()
         );
-      // endY = originY + heightY;
       lastObjOriginY += obj->height() + gapSize;
-      // noLoop++;
     }
-    this->setFixedHeight(lastObjOriginY + gapSize);
+    this->setFixedHeight(lastObjOriginY);
   }
 
   void Library::resizeEvent(QResizeEvent *event)
@@ -135,7 +137,7 @@ namespace QuantIDE
   void Library::paintEvent(QPaintEvent *event)
   {
     QPainter painter(this);
-    painter.fillRect(0, 0, width(), height(), QColor(60, 60, 60));
+    painter.fillRect(0, 0, width(), height(), colorBackground);
   }
 
   Library::~Library() { }
