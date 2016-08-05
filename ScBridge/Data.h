@@ -93,17 +93,20 @@ namespace SupercolliderBridge
     void setTargetMethod(QString);
 
     QString getSender();
-
+    int getType();
+    QVariant getValue(QString);
+    
     static bool isFromOtherOwener(QByteArray, QString);
     static int getType(QByteArray);
-    
+
     static const QString getTarget(QByteArray);
+    QString getTarget();
     static const QString getMethod(QByteArray);
+    QString getMethod();
 
   protected:
     void setType(DataType);
     void setValue(QString, QVariant);
-    QVariant getValue(QString);
 
   private:
     QMetaEnum metaEnum_type;
@@ -155,6 +158,7 @@ namespace SupercolliderBridge
 
     DataUser();
     DataUser(QByteArray);
+    DataUser(DataNEW);
 
     void setValue(Key, QVariant);
     QString getValue_string(Key);

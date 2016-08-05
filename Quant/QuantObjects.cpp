@@ -13,6 +13,7 @@ namespace QuantIDE
     connect(this, SIGNAL(actPrint(QString, MessageType)), core, SLOT(onPrint(QString, MessageType)));
   }
 
+  int QuantObject::getType() { return objectType; }
 
   void QuantObject::paintEvent(QPaintEvent *event)
   {
@@ -28,9 +29,10 @@ namespace QuantIDE
   // QUANT USER ////////////////////////////////////////////////////////////////  
 
   QuantUser::QuantUser(QWidget *parent, QObject *core) : QuantObject(parent, core)
-
   {
     qDebug("QuantUser init...");
+
+    objectType = QuantObject::ObjectType::USER;
 
     const QMetaObject &mo = QuantUser::staticMetaObject;
     metaEnum_targetMethods = mo.enumerator(mo.indexOfEnumerator("TargetMethod"));
@@ -161,6 +163,8 @@ namespace QuantIDE
 
   QuantProxy::QuantProxy(QWidget *parent, QObject *core) : QuantObject(parent, core)
   {
+    objectType = QuantObject::ObjectType::PROXY;
+
     const QMetaObject &mo = QuantProxy::staticMetaObject;
     metaEnum_targetMethods = mo.enumerator(mo.indexOfEnumerator("TargetMethod"));
 
@@ -210,7 +214,7 @@ namespace QuantIDE
   {
     return proxyData.getValue_int(DataProxy::BPM) / 60.0;
   }
-  
+
   void QuantProxy::sendData(TargetMethod targetMethod)
   {
     QString target = tr("onNet_%1").arg(metaEnum_targetMethods.valueToKey(targetMethod));
@@ -236,7 +240,7 @@ namespace QuantIDE
     emit actPrint(data.print("QuantProxy::onNet_ProxyTempo"), MessageType::NORMAL);
     this->setBPM(data.getValue_int(DataProxy::BPM));
   }
-  
+
   void QuantProxy::onTempoChanged(QString bpmTxt)
   {
     this->setBPM(bpmTxt.toInt());

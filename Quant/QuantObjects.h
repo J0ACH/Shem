@@ -21,8 +21,12 @@ namespace QuantIDE
     Q_OBJECT
 
   public:
+    enum ObjectType { USER, PROXY };
+
     QuantObject(QWidget *parent, QObject *core);
     ~QuantObject();
+
+    int getType();
 
   signals:
     void actDataChanged(DataNEW);
@@ -34,6 +38,8 @@ namespace QuantIDE
     QWidget *mCanvan;
     QObject *mCore;
     QMetaEnum metaEnum_targetMethods;
+
+    ObjectType objectType;
 
   private:
 

@@ -55,6 +55,7 @@ SET(Quant_hdr
   CustomizePanel.h
   NetworkPanel.h
   TimePanel.h
+  Library.h
 )
 
 SET(Quant_src 
@@ -67,6 +68,7 @@ SET(Quant_src
   CustomizePanel.cpp
   NetworkPanel.cpp
   TimePanel.cpp
+  Library.cpp
 )
 
 SET(Quant_res 

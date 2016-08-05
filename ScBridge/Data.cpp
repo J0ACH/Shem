@@ -191,7 +191,6 @@ namespace SupercolliderBridge
     header->insert("TARGET", "NaN");
     header->insert("METHOD", "NaN");
   }
-
   DataNEW::DataNEW(QByteArray wrapedData)
   {
     const QMetaObject &mo = DataNEW::staticMetaObject;
@@ -297,7 +296,10 @@ namespace SupercolliderBridge
     }
     return -1;
   }
-
+  int DataNEW::getType()
+  {
+    return metaEnum_type.keyToValue(header->value("TYPE").toStdString().c_str());
+  }
 
   const QString DataNEW::getTarget(QByteArray wrapedData)
   {
@@ -315,6 +317,7 @@ namespace SupercolliderBridge
     }
     return "";
   }
+  QString DataNEW::getTarget()  { return header->value("TARGET", "NaN"); }
 
   const QString DataNEW::getMethod(QByteArray wrapedData)
   {
@@ -334,6 +337,7 @@ namespace SupercolliderBridge
     }
     return "";
   }
+  QString DataNEW::getMethod()  { return header->value("METHOD", "NaN"); }
 
   void DataNEW::setValue(QString key, QVariant value)  { library->insert(key, value); }
   QVariant DataNEW::getValue(QString key)
@@ -462,6 +466,22 @@ namespace SupercolliderBridge
     metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
 
     this->setType(DataNEW::DataType::USER);
+  }
+
+  DataUser::DataUser(DataNEW data)
+  {
+    const QMetaObject &mo = DataUser::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    if (data.getType() == DataNEW::DataType::USER)
+    {
+      this->setType(DataNEW::DataType::USER);
+      this->setSender(data.getSender());
+      this->setTargetObject(data.getTarget());
+      this->setTargetMethod(data.getMethod());
+
+      this->setValue(DataUser::Key::NAME, data.getValue(metaEnum.valueToKey(DataUser::Key::NAME)));
+    }
   }
 
   void DataUser::setValue(Key key, QVariant value)  { DataNEW::setValue(metaEnum.valueToKey(key), value); }

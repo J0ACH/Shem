@@ -14,6 +14,7 @@
 
 #include "Canvan.h"
 #include "QuantObjects.h"
+#include "Library.h"
 #include "NetworkPanel.h"
 #include "TimePanel.h"
 
@@ -97,6 +98,8 @@ namespace QuantIDE
     Customize *mCustomize;
 
     // LIBRARIES /////////////////////////////////////////
+
+    Library lib_usersNEW;
 
     QuantProxy *proxy;
     QMap<QString, QuantUser*> *lib_users; // knihovna prihlasenych hracu pro komunikujici pres sit 
