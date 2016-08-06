@@ -60,9 +60,7 @@ namespace QuantIDE
     textServerGroups->setGeometry(this->width() - 90, 5, 20, 20);
     textServerGroups->setAlign(Qt::AlignCenter);
     textServerGroups->show();
-
-  }
-  
+  }  
 
   void QuantUser::setName(QString name)
   {
@@ -174,7 +172,7 @@ namespace QuantIDE
     qDebug("QuantProxy init...");
 
     testButton = new Button(this);
-    testButton->setGeometry(5, 10, this->width() - 10, 20);
+    //testButton->setGeometry(5, 10, this->width() - 10, 20);
     testButton->setText("beep");
     testButton->setStateKeeping(Button::StateKeeping::TOUCH);
     connect(testButton, SIGNAL(pressAct()), this, SLOT(onBeep()));
@@ -256,7 +254,8 @@ namespace QuantIDE
   void QuantProxy::resizeEvent(QResizeEvent *event)
   {
     QuantObject::resizeEvent(event);
-
+    
+    testButton->setGeometry(5, 10, this->width() - 10, 20);
     tempoBox->setGeometry(5, 50, this->width() - 10, 30);
   }
 

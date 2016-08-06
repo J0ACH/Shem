@@ -14,7 +14,7 @@
 #include "Edges.h"
 #include "CodeEditor.h"
 #include "CustomizePanel.h"
-#include "NetworkPanel.h"
+//#include "NetworkPanel.h"
 
 #include "NodePanel.h"
 #include "Node.h"

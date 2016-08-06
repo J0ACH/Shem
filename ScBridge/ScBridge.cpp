@@ -589,6 +589,7 @@ namespace SupercolliderBridge
           mInterpretState = StateInterpret::RUN;
           break;
         }
+        mBridgeProcess = BridgeProcess::NaN;
       }
 
       if (mBridgeProcess == BridgeProcess::SERVER_BOOTING || mBridgeProcess == BridgeProcess::SERVER_KILLING)
@@ -606,9 +607,9 @@ namespace SupercolliderBridge
           mServerState = StateServer::OFF;
           break;
         }
+      mBridgeProcess = BridgeProcess::NaN;
       }
 
-      mBridgeProcess = BridgeProcess::NaN;
     }
     else if (selector == introspectionSelector)
     {

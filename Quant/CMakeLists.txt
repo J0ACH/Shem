@@ -49,11 +49,11 @@ SET(Quant_hdr
   Quant.h
   QuantCore.h
   QuantObjects.h
+  QuantPanels.h
   NodePanel.h
   Node.h
   ControlEnvelope.h
   CustomizePanel.h
-  NetworkPanel.h
   TimePanel.h
   Library.h
 )
@@ -62,11 +62,11 @@ SET(Quant_src
   Quant.cpp
   QuantCore.cpp
   QuantObjects.cpp
+  QuantPanels.cpp
   NodePanel.cpp
   Node.cpp
   ControlEnvelope.cpp
   CustomizePanel.cpp
-  NetworkPanel.cpp
   TimePanel.cpp
   Library.cpp
 )

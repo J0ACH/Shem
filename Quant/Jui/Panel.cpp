@@ -83,7 +83,7 @@ namespace Jui
   ///////////////////////////////////////////////////////////////////////////
 
   // nize bude odstraneno
-
+  
   Panel::Panel(QWidget *parent) : QWidget(parent)
   {
     //this->setParent(parent);
@@ -108,7 +108,6 @@ namespace Jui
 
     edges = new Edges(this);
   }
-
   /*
   void Panel::onConfigData(QMap<QString, QVariant*> config)
   {
@@ -152,7 +151,8 @@ namespace Jui
   //update();
   }
   */
-
+  
+  
   void Panel::setTitle(QString name) { title = name; }
 
   void Panel::setColorBackground(QColor color) { colorPanelBackground = color; update(); }
@@ -221,4 +221,5 @@ namespace Jui
   {
 
   }
+  
 }

@@ -1,3 +1,4 @@
+/*
 #ifndef TIMEPANEL_H
 #define TIMEPANEL_H
 
@@ -43,4 +44,4 @@ namespace QuantIDE
 }
 
 #endif // TIMEPANEL_H
-
+*/

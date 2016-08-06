@@ -1,3 +1,4 @@
+/*
 #include "TimePanel.h"
 
 namespace QuantIDE
@@ -43,3 +44,4 @@ namespace QuantIDE
 
   TimePanel::~TimePanel() { }
 }
+*/

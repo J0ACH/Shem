@@ -30,6 +30,8 @@ namespace QuantIDE
 
     QuantUser* getUser(QString name);
     QuantUser* getUser(DataUser data);
+
+    QuantProxy* getProxy();
     
     void updateObjectPosition();
 
@@ -44,7 +46,9 @@ namespace QuantIDE
     QObject *mCore;
     QMap<QString, QuantObject*> lib;
 
+    bool containObject(QString name);
     bool containObject(DataNEW data);
+
 
     QColor colorBackground;
   };

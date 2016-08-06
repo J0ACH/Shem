@@ -79,7 +79,7 @@ namespace Jui
 
   // nize bude odstraneno
 
-
+  
   class Panel : public QWidget
   {
     Q_OBJECT
@@ -121,6 +121,7 @@ namespace Jui
 
 
   };
+  
 
 
 

@@ -13,9 +13,10 @@
 #include "Data.h"
 
 #include "Canvan.h"
-#include "QuantObjects.h"
 #include "Library.h"
-#include "NetworkPanel.h"
+#include "QuantObjects.h"
+#include "QuantPanels.h"
+//#include "NetworkPanel.h"
 #include "TimePanel.h"
 
 using namespace SupercolliderBridge;
@@ -100,12 +101,13 @@ namespace QuantIDE
     // LIBRARIES /////////////////////////////////////////
 
     Library *lib_users;  // knihovna prihlasenych hracu pro komunikujici pres sit 
-
-    QuantProxy *proxy;
+    Library *lib_proxy;
+    //QuantProxy *proxy;
     
 
     NetworkPanel *networkPanel;
-    TimePanel *timePanel;
+    NetworkPanel *timePanel;
+    //TimePanel *timePanel;
 
     Text *textServerMeter, *textServerSynths, *textServerGroups;
 

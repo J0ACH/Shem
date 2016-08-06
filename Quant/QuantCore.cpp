@@ -16,12 +16,18 @@ namespace QuantIDE
 
     networkPanel = new NetworkPanel(mCanvan);
     mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
-    lib_users = new Library(networkPanel, this);
-    networkPanel->setScrollWidget(lib_users);
 
-    proxy = NULL;
-    timePanel = new TimePanel(mCanvan);
+    // proxy = NULL;
+    //timePanel = new TimePanel(mCanvan);
+    timePanel = new NetworkPanel(mCanvan);
     mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+
+    lib_users = new Library(networkPanel, this);
+    lib_proxy = new Library(timePanel, this);
+
+    networkPanel->setScrollWidget(lib_users);
+    timePanel->setScrollWidget(lib_proxy);
+
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
@@ -41,16 +47,20 @@ namespace QuantIDE
     isCoreRunning = false;
     isNetworkRunning = false;
 
-
     networkPanel = new NetworkPanel(mCanvan);
     mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
-    lib_users = new Library(networkPanel, this);
-    networkPanel->setScrollWidget(lib_users);
 
-    proxy = NULL;
-    timePanel = new TimePanel(mCanvan);
+    //    proxy = NULL;
+    //timePanel = new TimePanel(mCanvan);
+    timePanel = new NetworkPanel(mCanvan);
     timePanel->setVisible(false);
     mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+
+    lib_users = new Library(networkPanel, this);
+    lib_proxy = new Library(timePanel, this);
+
+    networkPanel->setScrollWidget(lib_users);
+    timePanel->setScrollWidget(lib_proxy);
 
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
@@ -164,8 +174,8 @@ namespace QuantIDE
     {
       connect(mBridge, SIGNAL(actServerStatus(QStringList)), lib_users->getUser(userName), SLOT(onServerStatus(QStringList)));
 
-      proxy->setBPM(proxy->getBPM()); // PROBLEM - JE TU JEN PRO ZPOMALENI PRED DOTAZEM NA EXISTENCI PROXY, PROC????
-      proxy->sendData(QuantProxy::TargetMethod::ProxyExist);
+      lib_proxy->getProxy()->setBPM(lib_proxy->getProxy()->getBPM()); // PROBLEM - JE TU JEN PRO ZPOMALENI PRED DOTAZEM NA EXISTENCI PROXY, PROC????
+      lib_proxy->getProxy()->sendData(QuantProxy::TargetMethod::ProxyExist);
     }
 
     mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::ON);
@@ -275,27 +285,31 @@ namespace QuantIDE
     qDebug("QuantCore::onServerInitDone");
 
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::ON);
-    this->onPrint("Server init done...\n", MessageType::STATUS);
-
-    qDebug() << "QuantCore::onServerInitDone ISNULL:" << (proxy == NULL);
-    if (proxy == NULL)
-    {
-      proxy = new QuantProxy(mCanvan->getPanel("TimePanel"), this);
-      proxy->setGeometry(10, 30, mCanvan->getPanel("TimePanel")->width() - 20, 150);
-      proxy->show();
-      timePanel->insertProxy(proxy);
-
-      proxy->sendData(QuantProxy::TargetMethod::ProxyExist);
-    }
+    
     mBridge->initOSC();
+
+    // qDebug() << "QuantCore::onServerInitDone ISNULL:" << (proxy == NULL);
+    //if (lib_proxy->conta)
+    //{
+    QuantProxy *proxy = new QuantProxy(0, this);
+    proxy->setGeometry(10, 30, mCanvan->getPanel("TimePanel")->width() - 20, 150);
+    //proxy->show();
+    //timePanel->insertProxy(proxy);
+    lib_proxy->addObject(proxy);
+    lib_proxy->getProxy()->sendData(QuantProxy::TargetMethod::ProxyExist);
+    
+    this->onPrint("Server init done...\n", MessageType::STATUS);
+    // }
   }
   void QuantCore::onServerKill()
   {
     qDebug("QuantCore::onServerKill");
     this->onPrint("Server kill...", MessageType::STATUS);
 
-    proxy->deleteLater();
-    proxy = NULL;
+    lib_proxy->removeObject("proxy");
+
+    //proxy->deleteLater();
+    //proxy = NULL;
   }
   void QuantCore::onServerKillDone()
   {
@@ -368,15 +382,21 @@ namespace QuantIDE
       switch (DataNEW::getType(msg))
       {
       case DataNEW::DataType::USER:
-        // lib_users.addObject(DataUser(msg));
-
-        if (targetMethod == "onNet_UserJoin") { lib_users->addObject(DataUser(msg)); lib_users->getUser(userName)->sendData(QuantUser::TargetMethod::UserExist); }
-        if (targetMethod == "onNet_UserExist") { lib_users->addObject(DataUser(msg)); lib_users->getUser(DataUser(msg)); }
+        if (targetMethod == "onNet_UserJoin")
+        {
+          lib_users->addObject(DataUser(msg));
+          lib_users->getUser(userName)->sendData(QuantUser::TargetMethod::UserExist);
+        }
+        if (targetMethod == "onNet_UserExist")
+        {
+          lib_users->addObject(DataUser(msg));
+          lib_users->getUser(DataUser(msg));
+        }
         QMetaObject::invokeMethod(lib_users->getUser(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
         if (targetMethod == "onNet_UserLeave") { lib_users->removeObject(DataUser(msg)); }
         break;
       case DataNEW::DataType::PROXY:
-        QMetaObject::invokeMethod(proxy, targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
+        QMetaObject::invokeMethod(lib_proxy->getProxy(), targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
         break;
       default:
         break;
@@ -416,20 +436,6 @@ namespace QuantIDE
     }
 
   }
-
-  /*
-  void QuantCore::initProxy()
-  {
-  QString code;
-  code =
-  "p = ProxySpace.push(s).makeTempoClock;"
-  "p.clock.tempo_(60 / 60);";
-
-  this->onEvaluate(code);
-  }
-  */
-
-
 
 
   /*

@@ -26,15 +26,18 @@ namespace QuantIDE
       name = static_cast<QuantUser*>(obj)->getName();
       // qDebug() << "Library::addObject JSEM OBJECT USER :" << name;
       lib.insert(name, obj);
-      this->updateObjectPosition();
       break;
     case QuantObject::ObjectType::PROXY:
+      if (!this->containObject("proxy"))
+      {
+        qDebug() << "Library::addObject JSEM OBJECT PROXY";
+        lib.insert("proxy", obj);
+      }
       break;
     }
 
     this->updateObjectPosition();
   }
-
   void Library::addObject(DataNEW data)
   {
     switch (data.getType())
@@ -64,7 +67,6 @@ namespace QuantIDE
 
     this->updateObjectPosition();
   }
-
   void Library::removeObject(DataNEW data)
   {
     switch (data.getType())
@@ -86,13 +88,15 @@ namespace QuantIDE
   {
     return static_cast<QuantUser*>(lib.value(name, NULL));
   }
-
   QuantUser* Library::getUser(DataUser data)
   {
     QString name(data.getValue_string(DataUser::Key::NAME));
     return static_cast<QuantUser*>(lib.value(name, NULL));
   }
 
+  QuantProxy* Library::getProxy() { return static_cast<QuantProxy*>(lib.value("proxy", NULL)); }
+
+  bool Library::containObject(QString name)  { return lib.contains(name); }
   bool Library::containObject(DataNEW data)
   {
     switch (data.getType())
