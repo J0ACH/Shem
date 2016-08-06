@@ -98,7 +98,7 @@ namespace SupercolliderBridge
       emit actServerInit();
       //evaluate("Server.local = Server.default = s;");
       mBridgeProcess = BridgeProcess::SERVER_BOOTING; // musi byt az po definici Server.local -> CHYBA!!!! onResponde probehne 2x
-     // evaluate("Server.local = Server.default = s; s.boot;");
+      // evaluate("Server.local = Server.default = s; s.boot;");
       evaluate("s.boot;");
       break;
     case StateServer::RUN:
@@ -348,8 +348,8 @@ namespace SupercolliderBridge
     default:
       if (!data.isEmpty())
       {
-       // qDebug() << "ScBridge::msgFilterNEW -> DEFAULT";
-      //  qDebug() << "msgData" << data;
+        // qDebug() << "ScBridge::msgFilterNEW -> DEFAULT";
+        //  qDebug() << "msgData" << data;
         emit actPrint(msg, MessageType::NORMAL);
       }
       break;
@@ -571,13 +571,13 @@ namespace SupercolliderBridge
     {
       // DATA O STAVU SERVERU - msg[0] bool STATE; msg[1] int IP; msg[2] int PORT!!!!!!!!!!!
       QStringList msg = data.split("\n");
-      /*
+
       qDebug() << "SERVER msg size: " << msg.size();
       qDebug() << "SERVER msg[0]: " << msg[0];
       qDebug() << "SERVER msg[1]: " << msg[1];
       qDebug() << "SERVER msg[2]: " << msg[2];
       qDebug() << "SERVER msg[3]: " << msg[3];
-      */
+
 
       if (mBridgeProcess == BridgeProcess::INTERPRET_BOOTING || mBridgeProcess == BridgeProcess::INTERPRET_KILLING)
       {
@@ -598,8 +598,11 @@ namespace SupercolliderBridge
         {
         case StateServer::OFF:
           qDebug() << "SERVER INIT FOUND ";
-          emit actServerInitDone();
-          mServerState = StateServer::RUN;
+          if (mServerState == StateServer::OFF)
+          {
+            emit actServerInitDone();
+            mServerState = StateServer::RUN;
+          }
           break;
         case StateServer::RUN:
           qDebug() << "SERVER KILL FOUND ";
@@ -607,7 +610,7 @@ namespace SupercolliderBridge
           mServerState = StateServer::OFF;
           break;
         }
-      mBridgeProcess = BridgeProcess::NaN;
+        mBridgeProcess = BridgeProcess::NaN;
       }
 
     }
