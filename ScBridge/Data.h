@@ -78,7 +78,7 @@ namespace SupercolliderBridge
 
 
   public:
-    enum DataType { CUSTOMIZE, USER, PROXY };
+    enum DataType { CUSTOMIZE, USER, PROXY, NODE };
 
     DataNEW();
     DataNEW(QByteArray);
@@ -195,6 +195,29 @@ namespace SupercolliderBridge
     QColor getValue_color(Key);
 
 
+  private:
+    QMetaEnum metaEnum;
+  };
+
+  class DataNode : public DataNEW
+  {
+    Q_GADGET
+      Q_ENUMS(Key)
+
+  public:
+    enum Key { NAME, SOURCE };
+
+    DataNode();
+    DataNode(QByteArray);
+
+    void setValue(Key, QVariant);
+    QString getValue_string(Key);
+    bool getValue_bool(Key);
+    int getValue_int(Key);
+    float getValue_double(Key);
+    QFont getValue_font(Key);
+    QColor getValue_color(Key);
+    
   private:
     QMetaEnum metaEnum;
   };

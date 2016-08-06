@@ -33,6 +33,7 @@ namespace QuantIDE
     canvanNEW->setGeometry(10, 10, 1200, 600);
     canvanNEW->show();
     canvanNEW->installEventFilter(this);
+
     core = new QuantCore(canvanNEW);
 
     this->initObjects();
@@ -116,6 +117,10 @@ namespace QuantIDE
     panelsBar->addButton("TimePanel", QImage(":/network_16px.png"), canvanNEW->getPanel("TimePanel"), SLOT(onSwitchVisible()));
     panelsBar->getButton("TimePanel")->setState(Button::State::OFF);
     connect(canvanNEW->getPanel("TimePanel"), SIGNAL(actClosed()), panelsBar->getButton("TimePanel"), SLOT(onSwitch()));
+
+    panelsBar->addButton("NodePanel", QImage(":/network_16px.png"), canvanNEW->getPanel("NodePanel"), SLOT(onSwitchVisible()));
+    panelsBar->getButton("NodePanel")->setState(Button::State::ON);
+    connect(canvanNEW->getPanel("NodePanel"), SIGNAL(actClosed()), panelsBar->getButton("NodePanel"), SLOT(onSwitch()));
   }
 
   void QuantNEW::onCustomize(Data data)
@@ -226,23 +231,7 @@ namespace QuantIDE
 
     qApp->setStyleSheet(qPropertyColors + qPropertyFonts + qtStyleSheet + qtStyleSheet_Colors + qtStyleSeet_Fonts);
   }
-  /*
-  bool QuantNEW::eventFilter(QObject *target, QEvent *event)
-  {
-  if (target == canvanNEW)
-  {
-  if (event->type() == QEvent::Resize)
-  {
-  //qDebug("QuantNEW::resizeEvent");
-  //  textServerMeter->setGeometry(canvanNEW->getStaustBar()->width() - 270, 5, 40, 25);
-  //  textServerSynths->setGeometry(canvanNEW->getStaustBar()->width() - 220, 5, 15, 25);
-  //  textServerGroups->setGeometry(canvanNEW->getStaustBar()->width() - 200, 5, 15, 25);
-  }
-  }
-  return QObject::eventFilter(target, event);
-  }
-  */
-
+ 
   QuantNEW::~QuantNEW()
   {
     qDebug("Quant closing...");

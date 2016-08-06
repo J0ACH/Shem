@@ -13,16 +13,13 @@ using namespace Jui;
 
 namespace QuantIDE
 {
-
-  // NETWORK PANEL //////////////////////////////////////////////////////////////////////////////////////
-
-  class NetworkPanel : public PanelNEW
+  class QuantPanel : public PanelNEW
   {
     Q_OBJECT
 
   public:
-    NetworkPanel(QWidget *parent);
-    ~NetworkPanel();
+    QuantPanel(QWidget *parent);
+    ~QuantPanel();
 
     void setScrollWidget(QWidget*);
     QWidget* getScrollWidget();
@@ -33,34 +30,6 @@ namespace QuantIDE
   private:
     QScrollArea *scrollArea;
   };
-
-  // TIME PANEL //////////////////////////////////////////////////////////////////////////////////////
-
-  class TimePanel : public PanelNEW
-  {
-    Q_OBJECT
-
-  public:
-    TimePanel(QWidget *parent);
-    ~TimePanel();
-
-    //void insertProxy(QuantProxy*);
-
-    void setScrollWidget(QWidget*);
-
-
-  protected:
-    void resizeEvent(QResizeEvent *event);
-
-  private:
-    //    void initControl();
-
-    QScrollArea *scrollArea;
-    //  QWidget *scrollWidget;
-
-    //QuantProxy *mProxy;
-  };
-
 }
 
 #endif // QUANTPANELS

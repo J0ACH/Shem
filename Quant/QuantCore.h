@@ -16,8 +16,6 @@
 #include "Library.h"
 #include "QuantObjects.h"
 #include "QuantPanels.h"
-//#include "NetworkPanel.h"
-#include "TimePanel.h"
 
 using namespace SupercolliderBridge;
 using namespace Jui;
@@ -35,9 +33,7 @@ namespace QuantIDE
     ~QuantCore();
 
     void initControls();
-    //void initProxy();
-    //void addNode(QString name);
-
+    
     public slots :
     void onCustomize(Data);
 
@@ -100,14 +96,14 @@ namespace QuantIDE
 
     // LIBRARIES /////////////////////////////////////////
 
+    QuantPanel *networkPanel;
+    QuantPanel *timePanel;
+    QuantPanel *nodePanel;
+    
     Library *lib_users;  // knihovna prihlasenych hracu pro komunikujici pres sit 
     Library *lib_proxy;
-    //QuantProxy *proxy;
+    Library *lib_nodes;
     
-
-    NetworkPanel *networkPanel;
-    NetworkPanel *timePanel;
-    //TimePanel *timePanel;
 
     Text *textServerMeter, *textServerSynths, *textServerGroups;
 
@@ -115,10 +111,7 @@ namespace QuantIDE
 
     bool isCoreRunning, isNetworkRunning;
     bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
-
-    // void setProxySpace(DataProxy);
     
-
     QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgAnswer, colorMsgError, colorMsgWarning, colorMsgBundle;
 
   };

@@ -344,7 +344,7 @@ namespace SupercolliderBridge
   {
     switch (library->value(key).type())
     {
-    case QVariant::Invalid: return "NaN"; break;
+    case QVariant::Invalid: return "null"; break;
     default: return library->value(key); break;
     }
   }
@@ -517,5 +517,31 @@ namespace SupercolliderBridge
   float DataProxy::getValue_double(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toDouble(); }
   QFont DataProxy::getValue_font(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QFont>(); }
   QColor DataProxy::getValue_color(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QColor>(); }
+
+  //////////////////////////////////////////////////////////////////////////////////
+
+  DataNode::DataNode() : DataNEW()
+  {
+    const QMetaObject &mo = DataNode::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    this->setType(DataNEW::DataType::NODE);
+  }
+
+  DataNode::DataNode(QByteArray wrapedData) : DataNEW(wrapedData)
+  {
+    const QMetaObject &mo = DataNode::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    this->setType(DataNEW::DataType::NODE);
+  }
+
+  void DataNode::setValue(Key key, QVariant value)  { DataNEW::setValue(metaEnum.valueToKey(key), value); }
+  QString DataNode::getValue_string(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toString(); }
+  bool DataNode::getValue_bool(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toBool(); }
+  int DataNode::getValue_int(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toInt(); }
+  float DataNode::getValue_double(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toDouble(); }
+  QFont DataNode::getValue_font(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QFont>(); }
+  QColor DataNode::getValue_color(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).value<QColor>(); }
 
 }

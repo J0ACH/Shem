@@ -32,6 +32,9 @@ namespace QuantIDE
     QuantUser* getUser(DataUser data);
 
     QuantProxy* getProxy();
+        
+    QuantNode* getNode(QString name);
+    QuantNode* getNode(DataUser data);
     
     void updateObjectPosition();
 

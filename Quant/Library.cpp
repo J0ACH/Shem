@@ -30,8 +30,15 @@ namespace QuantIDE
     case QuantObject::ObjectType::PROXY:
       if (!this->containObject("proxy"))
       {
-        qDebug() << "Library::addObject JSEM OBJECT PROXY";
+   //     qDebug() << "Library::addObject JSEM OBJECT PROXY";
         lib.insert("proxy", obj);
+      }
+      break;
+    case QuantObject::ObjectType::NODE:
+      if (!this->containObject("testNode"))
+      {
+        //     qDebug() << "Library::addObject JSEM OBJECT PROXY";
+        lib.insert("testNode", obj);
       }
       break;
     }
@@ -95,6 +102,16 @@ namespace QuantIDE
   }
 
   QuantProxy* Library::getProxy() { return static_cast<QuantProxy*>(lib.value("proxy", NULL)); }
+
+  QuantNode* Library::getNode(QString name)
+  {
+    return static_cast<QuantNode*>(lib.value(name, NULL));
+  }
+  QuantNode* Library::getNode(DataUser data)
+  {
+    QString name(data.getValue_string(DataUser::Key::NAME));
+    return static_cast<QuantNode*>(lib.value(name, NULL));
+  }
 
   bool Library::containObject(QString name)  { return lib.contains(name); }
   bool Library::containObject(DataNEW data)

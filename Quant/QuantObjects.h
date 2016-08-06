@@ -21,7 +21,7 @@ namespace QuantIDE
     Q_OBJECT
 
   public:
-    enum ObjectType { USER, PROXY };
+    enum ObjectType { USER, PROXY, NODE };
 
     QuantObject(QWidget *parent, QObject *core);
     ~QuantObject();
@@ -140,14 +140,33 @@ namespace QuantIDE
   class QuantNode : public QuantObject
   {
     Q_OBJECT
+      Q_ENUMS(TargetMethod)
   public:
+
+    enum TargetMethod { NodeExist, NodeSet, NodeEvaluate };
+
     QuantNode(QWidget *parent, QObject *core);
     ~QuantNode();
 
-    void setName(QString);
+    void setSource(QString);
+
+    void sendData(TargetMethod targetMethod);
+
+    public slots:
+    void onNet_NodeExist(DataNode);
+    void onNet_NodeSet(DataNode);
+    void onNet_NodeEvaluate(DataNode);
+
+  protected: // protected je viditelna jen detmi, ne z venku
+    void resizeEvent(QResizeEvent *event);
 
   private:
-    ControlBox *nameBox;
+    DataNode nodeData;
+    ControlBox *sourceBox;
+
+    private slots:
+    void onSourceChanged(QString);
+    void onSourceEvaluate(QString);
   };
 
 

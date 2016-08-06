@@ -54,7 +54,6 @@ SET(Quant_hdr
   Node.h
   ControlEnvelope.h
   CustomizePanel.h
-  TimePanel.h
   Library.h
 )
 
@@ -67,7 +66,6 @@ SET(Quant_src
   Node.cpp
   ControlEnvelope.cpp
   CustomizePanel.cpp
-  TimePanel.cpp
   Library.cpp
 )
 

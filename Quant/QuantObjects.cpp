@@ -28,7 +28,7 @@ namespace QuantIDE
 
   // QUANT USER ////////////////////////////////////////////////////////////////  
 
-   QuantUser::QuantUser(QWidget *parent, QObject *core) : QuantObject(parent, core)
+  QuantUser::QuantUser(QWidget *parent, QObject *core) : QuantObject(parent, core)
   {
     qDebug("QuantUser init...");
 
@@ -60,7 +60,7 @@ namespace QuantIDE
     textServerGroups->setGeometry(this->width() - 90, 5, 20, 20);
     textServerGroups->setAlign(Qt::AlignCenter);
     textServerGroups->show();
-  }  
+  }
 
   void QuantUser::setName(QString name)
   {
@@ -254,7 +254,7 @@ namespace QuantIDE
   void QuantProxy::resizeEvent(QResizeEvent *event)
   {
     QuantObject::resizeEvent(event);
-    
+
     testButton->setGeometry(5, 10, this->width() - 10, 20);
     tempoBox->setGeometry(5, 50, this->width() - 10, 30);
   }
@@ -265,18 +265,88 @@ namespace QuantIDE
 
   QuantNode::QuantNode(QWidget *parent, QObject *core) : QuantObject(parent, core)
   {
+    objectType = QuantObject::ObjectType::NODE;
+
+    const QMetaObject &mo = QuantNode::staticMetaObject;
+    metaEnum_targetMethods = mo.enumerator(mo.indexOfEnumerator("TargetMethod"));
+
     qDebug("QuantNode init...");
 
-    nameBox = new ControlBox(this);
-    nameBox->setGeometry(5, 50, 90, 20);
-    nameBox->setLabel("name");
+    sourceBox = new ControlBox(this);
+    sourceBox->setGeometry(5, 50, 90, 20);
+    sourceBox->setLabel("name");
     // nameBox->setValue(this->getMap_string("name"));
+
+    connect(sourceBox, SIGNAL(actValueChanged(QString)), this, SLOT(onSourceChanged(QString)));
+    connect(sourceBox, SIGNAL(actValueEvaluate(QString)), this, SLOT(onSourceEvaluate(QString)));
   }
-  void QuantNode::setName(QString name)
+
+  void QuantNode::setSource(QString code)
   {
-    // this->setMap("name", name);
-    // nameBox->setValue(this->getMap_string("name"));
+    qDebug() << "QuantNode::setSource" << code;
+
+    nodeData.setValue(DataNode::SOURCE, code);
+    sourceBox->setValue(code);
+    sourceBox->update();
+    //emit actEvaluate(code, true);
   }
+
+  void QuantNode::sendData(TargetMethod targetMethod)
+  {
+    QString target = tr("onNet_%1").arg(metaEnum_targetMethods.valueToKey(targetMethod));
+    nodeData.setTargetObject("testNode");
+    nodeData.setTargetMethod(target);
+
+    // emit actPrint("QuantProxy::sendData to target: " + target, MessageType::WARNING);
+    emit actDataChanged(nodeData);
+  }
+
+  void QuantNode::onNet_NodeExist(DataNode data)
+  {
+    qDebug("QuantNode::onNet_NodeExist");
+    emit actPrint("User \"" + data.getSender() + "\" task for existing node", MessageType::STATUS);
+    emit actPrint(data.print("QuantNode::onNet_NodeExist"), MessageType::NORMAL);
+    this->sendData(QuantNode::TargetMethod::NodeSet);
+  }
+
+  void QuantNode::onNet_NodeSet(DataNode data)
+  {
+    qDebug() << "QuantNode::onNet_NodeSet key SOURCE:" << data.getValue_string(DataNode::Key::SOURCE);
+    qDebug() << data.print("QuantNode::onNet_NodeSet");
+    emit actPrint("Copying node from \"" + data.getSender() + "\"", MessageType::STATUS);
+    emit actPrint(data.print("QuantNode::onNet_NodeSet"), MessageType::NORMAL);
+    this->setSource(data.getValue_string(DataNode::Key::SOURCE));
+  }
+
+  void QuantNode::onNet_NodeEvaluate(DataNode data)
+  {
+    qDebug() << "QuantNode::onNet_NodeSet key SOURCE:" << data.getValue_string(DataNode::Key::SOURCE);
+    qDebug() << data.print("QuantNode::onNet_NodeEvaluate");
+    //emit actPrint("Copying node from \"" + data.getSender() + "\"", MessageType::STATUS);
+    emit actPrint(data.print("QuantNode::onNet_NodeEvaluate"), MessageType::NORMAL);
+    //this->setSource(data.getValue_string(DataNode::Key::SOURCE));
+    this->setSource(data.getValue_string(DataNode::Key::SOURCE));
+    emit actEvaluate(data.getValue_string(DataNode::Key::SOURCE), true);
+  }
+
+  void QuantNode::onSourceChanged(QString sourceTxt)
+  {
+    this->setSource(sourceTxt);
+    this->sendData(QuantNode::TargetMethod::NodeSet);
+  }
+  void QuantNode::onSourceEvaluate(QString sourceTxt)
+  {
+    emit actEvaluate(sourceTxt);
+    this->setSource(sourceTxt);
+    this->sendData(QuantNode::TargetMethod::NodeEvaluate);
+  }
+
+  void QuantNode::resizeEvent(QResizeEvent *event)
+  {
+    QuantObject::resizeEvent(event);
+    sourceBox->setGeometry(5, 5, this->width() - 10, 100);
+  }
+
   QuantNode::~QuantNode() { }
 
   // QUANT CONTROLS ////////////////////////////////////////////////////////////////

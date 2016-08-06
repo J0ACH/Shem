@@ -13,25 +13,8 @@ namespace QuantIDE
     isCoreRunning = false;
     isNetworkRunning = false;
 
-
-    networkPanel = new NetworkPanel(mCanvan);
-    mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
-
-    // proxy = NULL;
-    //timePanel = new TimePanel(mCanvan);
-    timePanel = new NetworkPanel(mCanvan);
-    mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
-
-    lib_users = new Library(networkPanel, this);
-    lib_proxy = new Library(timePanel, this);
-
-    networkPanel->setScrollWidget(lib_users);
-    timePanel->setScrollWidget(lib_proxy);
-
-
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
-
 
     this->initControls();
   }
@@ -47,21 +30,6 @@ namespace QuantIDE
     isCoreRunning = false;
     isNetworkRunning = false;
 
-    networkPanel = new NetworkPanel(mCanvan);
-    mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
-
-    //    proxy = NULL;
-    //timePanel = new TimePanel(mCanvan);
-    timePanel = new NetworkPanel(mCanvan);
-    timePanel->setVisible(false);
-    mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
-
-    lib_users = new Library(networkPanel, this);
-    lib_proxy = new Library(timePanel, this);
-
-    networkPanel->setScrollWidget(lib_users);
-    timePanel->setScrollWidget(lib_proxy);
-
     connect(this, SIGNAL(actCoreInitPrepared()), this, SLOT(onCoreInit()));
     connect(mCanvan, SIGNAL(actClose()), this, SLOT(onCoreKill()));
 
@@ -71,6 +39,24 @@ namespace QuantIDE
 
   void QuantCore::initControls()
   {
+    networkPanel = new QuantPanel(mCanvan);
+    mCanvan->addPanel(networkPanel, "NetworkPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+
+    timePanel = new QuantPanel(mCanvan);
+    timePanel->setVisible(false);
+    mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+
+    nodePanel = new QuantPanel(mCanvan);
+    mCanvan->addPanel(nodePanel, "NodePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+
+    lib_users = new Library(networkPanel, this);
+    lib_proxy = new Library(timePanel, this);
+    lib_nodes = new Library(nodePanel, this);
+
+    networkPanel->setScrollWidget(lib_users);
+    timePanel->setScrollWidget(lib_proxy);
+    nodePanel->setScrollWidget(lib_nodes);
+
     textServerMeter = new Text(mCanvan->getStaustBar());
     textServerMeter->setText("NaN");
     textServerMeter->setToolTip("CPU");
@@ -281,25 +267,21 @@ namespace QuantIDE
   }
   void QuantCore::onServerInitDone()
   {
-    // POZOR - PROBEHNE 2X - CHYBA ZE SERVERU A VOLANI SERVER.DEFAULT A SERVER.BOOT
     qDebug("QuantCore::onServerInitDone");
-
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::ON);
-    
+
     mBridge->initOSC();
 
-    // qDebug() << "QuantCore::onServerInitDone ISNULL:" << (proxy == NULL);
-    //if (lib_proxy->conta)
-    //{
     QuantProxy *proxy = new QuantProxy(0, this);
-    proxy->setGeometry(10, 30, mCanvan->getPanel("TimePanel")->width() - 20, 150);
-    //proxy->show();
-    //timePanel->insertProxy(proxy);
+    proxy->setGeometry(10, 30, 30, 150);
     lib_proxy->addObject(proxy);
     lib_proxy->getProxy()->sendData(QuantProxy::TargetMethod::ProxyExist);
-    
+
+    QuantNode *testNode = new QuantNode(0, this);
+    testNode->setGeometry(10, 30, 30, 100);
+    lib_nodes->addObject(testNode);
+
     this->onPrint("Server init done...\n", MessageType::STATUS);
-    // }
   }
   void QuantCore::onServerKill()
   {
@@ -356,19 +338,19 @@ namespace QuantIDE
     data.setSender(userName);
     //data.setTime(proxy time); // pridat cas odeslani
 
-    /*
+
     if (DataNEW::getType(data.wrap()) != DataNEW::DataType::USER)
     {
-    //this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
+      this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
     }
-    */
+
 
     emit actObjectDataSend(data.wrap());
   }
   void QuantCore::onNetDataRecived(QByteArray msg)
   {
-   // QString sender = DataNEW::(msg);
-  //  qDebug() << "QuantCore::onNetworkDataRecived msgOwner: " << ;
+    // QString sender = DataNEW::(msg);
+    //  qDebug() << "QuantCore::onNetworkDataRecived msgOwner: " << ;
 
     if (DataNEW::isFromOtherOwener(msg, userName))
     {
@@ -376,8 +358,8 @@ namespace QuantIDE
       QString targetMethod = DataNEW::getMethod(msg);
       std::string targetMethod_str = targetMethod.toLatin1().constData();
 
-    //   qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
-   //     qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+     // qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+    //  qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
 
       //if (DataNEW::getType(msg) != DataNEW::DataType::USER)
       //  this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
@@ -400,6 +382,11 @@ namespace QuantIDE
         break;
       case DataNEW::DataType::PROXY:
         QMetaObject::invokeMethod(lib_proxy->getProxy(), targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
+        break;
+      case DataNEW::DataType::NODE:
+        qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+        qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+        QMetaObject::invokeMethod(lib_nodes->getNode(targetObject), targetMethod_str.c_str(), Q_ARG(DataNode, DataNode(msg)));
         break;
       default:
         break;
@@ -439,41 +426,6 @@ namespace QuantIDE
     }
 
   }
-
-
-  /*
-  void QuantCore::setProxySpace(DataProxy)
-  {
-
-  }
-  */
-
-  /*
-  void QuantCore::addProxySpace()
-  {
-  //qDebug() << "Core::addProxySpace mCanvan->getScreen: " << mCanvan->centralWidget()->geometry();
-  QuantProxy *proxy = new QuantProxy(mCanvan->getPanel("Time"), this);
-  proxy->setGeometry(50, 25, 100, 100);
-  proxy->show();
-
-  //mCanvan->update();
-
-  //proxy->setName("testProxy");
-  }
-
-  void QuantCore::addNode(QString name)
-  {
-
-  QuantNode *testNode = new QuantNode(mCanvan->centralWidget(), this);
-  testNode->setGeometry(50, 150, 100, 100);
-  testNode->show();
-  testNode->setName(name);
-
-
-  }
-  */
-
-
 
   QuantCore::~QuantCore()
   {
