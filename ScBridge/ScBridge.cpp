@@ -553,7 +553,10 @@ namespace SupercolliderBridge
 
       mIpcData.remove(0, receivedData.pos());
 
-      onResponse(selector, message);
+      if (mBridgeProcess != BridgeProcess::NaN)
+      {
+        onResponse(selector, message);
+      }
       //emit response(selector, message);
     }
   }
@@ -571,16 +574,46 @@ namespace SupercolliderBridge
     {
       // DATA O STAVU SERVERU - msg[0] bool STATE; msg[1] int IP; msg[2] int PORT!!!!!!!!!!!
       QStringList msg = data.split("\n");
-
+      /*
       qDebug() << "SERVER msg size: " << msg.size();
       qDebug() << "SERVER msg[0]: " << msg[0];
       qDebug() << "SERVER msg[1]: " << msg[1];
       qDebug() << "SERVER msg[2]: " << msg[2];
       qDebug() << "SERVER msg[3]: " << msg[3];
+      */
 
+      switch (mBridgeProcess)
+      {
+      case SupercolliderBridge::ScBridge::BridgeProcess::NaN:
+        qDebug() << "ScBridge::onResponse mBridgeProcess: NaN";
+        break;
+      case SupercolliderBridge::ScBridge::BridgeProcess::INTERPRET_BOOTING:
+        qDebug() << "ScBridge::onResponse mBridgeProcess: INTERPRET_BOOTING";
+        break;
+      case SupercolliderBridge::ScBridge::BridgeProcess::INTERPRET_KILLING:
+        qDebug() << "ScBridge::onResponse mBridgeProcess: INTERPRET_KILLING";
+        break;
+      case SupercolliderBridge::ScBridge::BridgeProcess::SERVER_BOOTING:
+        qDebug() << "ScBridge::onResponse mBridgeProcess: SERVER_BOOTING";
+        break;
+      case SupercolliderBridge::ScBridge::BridgeProcess::SERVER_KILLING:
+        qDebug() << "ScBridge::onResponse mBridgeProcess: SERVER_KILLING";
+        break;
+      }
+
+      switch (mServerState)
+      {
+      case SupercolliderBridge::ScBridge::StateServer::OFF:
+        qDebug() << "ScBridge::onResponse mServerState: OFF";
+        break;
+      case SupercolliderBridge::ScBridge::StateServer::RUN:
+        qDebug() << "ScBridge::onResponse mServerState: RUN";
+        break;
+      }
 
       if (mBridgeProcess == BridgeProcess::INTERPRET_BOOTING || mBridgeProcess == BridgeProcess::INTERPRET_KILLING)
       {
+        mBridgeProcess = BridgeProcess::NaN;
         switch (mInterpretState)
         {
         case StateInterpret::OFF:
@@ -589,28 +622,28 @@ namespace SupercolliderBridge
           mInterpretState = StateInterpret::RUN;
           break;
         }
-        mBridgeProcess = BridgeProcess::NaN;
       }
 
       if (mBridgeProcess == BridgeProcess::SERVER_BOOTING || mBridgeProcess == BridgeProcess::SERVER_KILLING)
       {
+        mBridgeProcess = BridgeProcess::NaN;
         switch (mServerState)
         {
+
         case StateServer::OFF:
+                   mServerState = StateServer::RUN;
           qDebug() << "SERVER INIT FOUND ";
-          if (mServerState == StateServer::OFF)
-          {
-            emit actServerInitDone();
-            mServerState = StateServer::RUN;
-          }
-          break;
+          emit actServerInitDone();
+                 break;
+
         case StateServer::RUN:
           qDebug() << "SERVER KILL FOUND ";
-          emit actServerKillDone();
           mServerState = StateServer::OFF;
+          emit actServerKillDone();
           break;
+
         }
-        mBridgeProcess = BridgeProcess::NaN;
+        //mBridgeProcess = BridgeProcess::NaN;
       }
 
     }

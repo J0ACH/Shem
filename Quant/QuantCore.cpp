@@ -376,8 +376,8 @@ namespace QuantIDE
       QString targetMethod = DataNEW::getMethod(msg);
       std::string targetMethod_str = targetMethod.toLatin1().constData();
 
-       qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
-        qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+    //   qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+   //     qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
 
       //if (DataNEW::getType(msg) != DataNEW::DataType::USER)
       //  this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
