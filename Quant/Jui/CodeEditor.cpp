@@ -122,6 +122,8 @@ namespace Jui
         QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
         quint32 modifers = eventKey->nativeModifiers();
 
+        emit actValueChanged(this->toPlainText());
+
         switch (eventKey->key())
         {
         case Qt::Key::Key_Return:
@@ -138,6 +140,9 @@ namespace Jui
 
             emit evaluateAct();
             emit sendText(this->toPlainText());
+
+            emit actValueEvaluate(this->toPlainText());
+
 
             qDebug() << "KeyEvent: Ctrl+ENTER PRESSED (modifer" << eventKey->modifiers() << ")";
             event->accept();
@@ -166,7 +171,7 @@ namespace Jui
     QColor fillColor = activeColor;
     fillColor.setAlpha(backgroundAlpha);
     painter.fillRect(bounds, fillColor);
-    
+
     if (this->hasFocus()) { painter.setPen(activeColor); }
     else { painter.setPen(QColor(120, 120, 120)); }
 

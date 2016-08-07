@@ -9,6 +9,7 @@
 #include "Data.h"
 #include "Button.h"
 #include "ControlBox.h"
+#include "CodeEditor.h"
 
 using namespace SupercolliderBridge;
 using namespace Jui;
@@ -162,7 +163,8 @@ namespace QuantIDE
 
   private:
     DataNode nodeData;
-    ControlBox *sourceBox;
+    //ControlBox *sourceBox;
+    CodeEditor *sourceBox;
 
     private slots:
     void onSourceChanged(QString);

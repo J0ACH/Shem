@@ -24,10 +24,17 @@ namespace Jui
 		void setFontCode(QFont);
 
 	public slots:
-		void fitTextFormat();
+ 
+   //void setCode(QString text);
+	
+   void fitTextFormat();
 		void alphaUpdate();
 
-	signals:
+signals:
+  void actValueChanged(QString);
+  void actValueEvaluate(QString);
+  
+  // bude odstraneno
 		void evaluateAct();
 		void sendText(QString);
 				

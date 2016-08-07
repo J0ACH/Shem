@@ -338,11 +338,12 @@ namespace QuantIDE
     data.setSender(userName);
     //data.setTime(proxy time); // pridat cas odeslani
 
-
+    /*
     if (DataNEW::getType(data.wrap()) != DataNEW::DataType::USER)
     {
       this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
     }
+    */
 
 
     emit actObjectDataSend(data.wrap());

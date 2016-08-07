@@ -272,9 +272,10 @@ namespace QuantIDE
 
     qDebug("QuantNode init...");
 
-    sourceBox = new ControlBox(this);
+    //sourceBox = new ControlBox(this);
+    sourceBox = new CodeEditor(this);
     sourceBox->setGeometry(5, 50, 90, 20);
-    sourceBox->setLabel("name");
+    //sourceBox->setLabel("name");
     // nameBox->setValue(this->getMap_string("name"));
 
     connect(sourceBox, SIGNAL(actValueChanged(QString)), this, SLOT(onSourceChanged(QString)));
@@ -284,7 +285,7 @@ namespace QuantIDE
   void QuantNode::setSource(QString code)
   {
     qDebug() << "QuantNode::setSource" << code;
-    sourceBox->setValue(code);
+    sourceBox->setText(code);
     sourceBox->update();
 
     nodeData.setValue(DataNode::SOURCE, code);
@@ -303,8 +304,8 @@ namespace QuantIDE
   void QuantNode::onNet_NodeExist(DataNode data)
   {
     qDebug("QuantNode::onNet_NodeExist");
-    emit actPrint("User \"" + data.getSender() + "\" task for existing node", MessageType::STATUS);
-    emit actPrint(data.print("QuantNode::onNet_NodeExist"), MessageType::NORMAL);
+  //  emit actPrint("User \"" + data.getSender() + "\" task for existing node", MessageType::STATUS);
+    // emit actPrint(data.print("QuantNode::onNet_NodeExist"), MessageType::NORMAL);
     this->sendData(QuantNode::TargetMethod::NodeSet);
   }
 
@@ -313,7 +314,7 @@ namespace QuantIDE
     qDebug() << "QuantNode::onNet_NodeSet key SOURCE:" << data.getValue_string(DataNode::Key::SOURCE);
     qDebug() << data.print("QuantNode::onNet_NodeSet");
     //emit actPrint("Copying node from \"" + data.getSender() + "\"", MessageType::STATUS);
-    emit actPrint(data.print("QuantNode::onNet_NodeSet"), MessageType::NORMAL);
+    //emit actPrint(data.print("QuantNode::onNet_NodeSet"), MessageType::NORMAL);
     this->setSource(data.getValue_string(DataNode::Key::SOURCE));
   }
 
@@ -322,16 +323,14 @@ namespace QuantIDE
     qDebug() << "QuantNode::onNet_NodeSet key SOURCE:" << data.getValue_string(DataNode::Key::SOURCE);
     qDebug() << data.print("QuantNode::onNet_NodeEvaluate");
     //emit actPrint("Copying node from \"" + data.getSender() + "\"", MessageType::STATUS);
-    emit actPrint(data.print("QuantNode::onNet_NodeEvaluate"), MessageType::NORMAL);
+    //emit actPrint(data.print("QuantNode::onNet_NodeEvaluate"), MessageType::NORMAL);
     this->setSource(data.getValue_string(DataNode::Key::SOURCE));
-    
+
     emit actEvaluate(data.getValue_string(DataNode::Key::SOURCE), true);
   }
 
   void QuantNode::onSourceChanged(QString sourceTxt)
   {
-
-    //this->setSource(sourceTxt);
     nodeData.setValue(DataNode::SOURCE, sourceTxt);
     this->sendData(QuantNode::TargetMethod::NodeSet);
   }
@@ -339,14 +338,13 @@ namespace QuantIDE
   {
     nodeData.setValue(DataNode::SOURCE, sourceTxt);
     emit actEvaluate(sourceTxt);
-  //  this->setSource(sourceTxt);
     this->sendData(QuantNode::TargetMethod::NodeEvaluate);
   }
 
   void QuantNode::resizeEvent(QResizeEvent *event)
   {
     QuantObject::resizeEvent(event);
-    sourceBox->setGeometry(5, 5, this->width() - 10, 100);
+    sourceBox->setGeometry(5, 5, this->width() - 10, 90);
   }
 
   QuantNode::~QuantNode() { }
