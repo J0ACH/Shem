@@ -284,11 +284,10 @@ namespace QuantIDE
   void QuantNode::setSource(QString code)
   {
     qDebug() << "QuantNode::setSource" << code;
-
-    nodeData.setValue(DataNode::SOURCE, code);
     sourceBox->setValue(code);
     sourceBox->update();
-    //emit actEvaluate(code, true);
+
+    nodeData.setValue(DataNode::SOURCE, code);
   }
 
   void QuantNode::sendData(TargetMethod targetMethod)
@@ -313,7 +312,7 @@ namespace QuantIDE
   {
     qDebug() << "QuantNode::onNet_NodeSet key SOURCE:" << data.getValue_string(DataNode::Key::SOURCE);
     qDebug() << data.print("QuantNode::onNet_NodeSet");
-    emit actPrint("Copying node from \"" + data.getSender() + "\"", MessageType::STATUS);
+    //emit actPrint("Copying node from \"" + data.getSender() + "\"", MessageType::STATUS);
     emit actPrint(data.print("QuantNode::onNet_NodeSet"), MessageType::NORMAL);
     this->setSource(data.getValue_string(DataNode::Key::SOURCE));
   }
@@ -324,20 +323,23 @@ namespace QuantIDE
     qDebug() << data.print("QuantNode::onNet_NodeEvaluate");
     //emit actPrint("Copying node from \"" + data.getSender() + "\"", MessageType::STATUS);
     emit actPrint(data.print("QuantNode::onNet_NodeEvaluate"), MessageType::NORMAL);
-    //this->setSource(data.getValue_string(DataNode::Key::SOURCE));
     this->setSource(data.getValue_string(DataNode::Key::SOURCE));
+    
     emit actEvaluate(data.getValue_string(DataNode::Key::SOURCE), true);
   }
 
   void QuantNode::onSourceChanged(QString sourceTxt)
   {
-    this->setSource(sourceTxt);
+
+    //this->setSource(sourceTxt);
+    nodeData.setValue(DataNode::SOURCE, sourceTxt);
     this->sendData(QuantNode::TargetMethod::NodeSet);
   }
   void QuantNode::onSourceEvaluate(QString sourceTxt)
   {
+    nodeData.setValue(DataNode::SOURCE, sourceTxt);
     emit actEvaluate(sourceTxt);
-    this->setSource(sourceTxt);
+  //  this->setSource(sourceTxt);
     this->sendData(QuantNode::TargetMethod::NodeEvaluate);
   }
 
