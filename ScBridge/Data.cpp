@@ -413,6 +413,18 @@ namespace SupercolliderBridge
     metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
   }
 
+  QStringList DataCustomize::keys()
+  {
+    QStringList keys;
+    for (int i = 0; i < metaEnum.keyCount(); i++)
+    {
+      keys.append(metaEnum.valueToKey(i));
+    }
+    return keys;
+  }
+
+  QString DataCustomize::key2string(Key key)  { return metaEnum.valueToKey(key); }
+
   void DataCustomize::setValue(Key key, QVariant value)  { DataNEW::setValue(metaEnum.valueToKey(key), value); }
   QString DataCustomize::getValue_string(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toString(); }
   bool DataCustomize::getValue_bool(Key key) { return DataNEW::getValue(metaEnum.valueToKey(key)).toBool(); }

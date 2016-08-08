@@ -26,13 +26,18 @@ namespace SupercolliderBridge
     void onModify(Data);
     void onSave(Data);
 
+   // void onModify(DataNEW);
+  //  void onSave(DataNEW);
+
   signals:
     void actDataChanged(Data);
+  //  void actDataChanged(DataNEW);
     void actCustomizeChanged(Customize*);
 
   private:
     QFile *configFile;
     Data library;
+    DataCustomize dataCustomize;
     QMap<DataKey, QString> configFileKeys;
 
     void configFileAssocciation();
@@ -41,9 +46,8 @@ namespace SupercolliderBridge
     void readConfigFileNEW();
     void postprocessingLibrary();
     void writeConfigFileNEW();
-  };
 
-
+      };
 }
 
 #endif // CUSTOMIZE

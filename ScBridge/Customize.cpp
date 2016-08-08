@@ -12,6 +12,9 @@ namespace SupercolliderBridge
     this->postprocessingLibrary();
     this->writeConfigFileNEW();
 
+    qDebug() << dataCustomize.print("Customize done LIBRARY_NEW");
+    qDebug() << "Key2String: " << dataCustomize.key2string(DataCustomize::Key::BOOL_TEXT_ANTIALIASING);
+
     emit actDataChanged(library);
   }
 
@@ -60,6 +63,37 @@ namespace SupercolliderBridge
 
   void Customize::defaultLibrary()
   {
+    
+    dataCustomize.setValue(DataCustomize::USERNAME, "");
+
+    dataCustomize.setValue(DataCustomize::COLOR_APP_HEADER, QColor(40, 40, 40));
+    dataCustomize.setValue(DataCustomize::COLOR_APP_BACKGROUND, QColor(20, 20, 20));
+    dataCustomize.setValue(DataCustomize::COLOR_PANEL_HEADER, QColor(30, 30, 30));
+    dataCustomize.setValue(DataCustomize::COLOR_PANEL_BACKGROUND, QColor(25, 25, 25));
+    dataCustomize.setValue(DataCustomize::COLOR_NORMAL, QColor(120, 120, 120));
+    dataCustomize.setValue(DataCustomize::COLOR_OVER, QColor(255, 255, 255));
+    dataCustomize.setValue(DataCustomize::COLOR_ACTIVE, QColor(70, 140, 210));
+    dataCustomize.setValue(DataCustomize::COLOR_TEXT, QColor(230, 230, 230));
+
+    dataCustomize.setValue(DataCustomize::COLOR_MSG_NORMAL, QColor(70, 70, 70));
+    dataCustomize.setValue(DataCustomize::COLOR_MSG_STATUS, QColor(230, 230, 230));
+    dataCustomize.setValue(DataCustomize::COLOR_MSG_EVALUATE, QColor(170, 230, 230));
+    dataCustomize.setValue(DataCustomize::COLOR_MSG_ANSWER, QColor(170, 200, 160));
+    dataCustomize.setValue(DataCustomize::COLOR_MSG_ERROR, QColor(230, 30, 30));
+    dataCustomize.setValue(DataCustomize::COLOR_MSG_WARNINIG, QColor(230, 130, 30));
+    dataCustomize.setValue(DataCustomize::COLOR_MSG_BUNDLE, QColor(170, 160, 20));
+
+    dataCustomize.setValue(DataCustomize::BOOL_TEXT_ANTIALIASING, true);
+    dataCustomize.setValue(DataCustomize::FONT_BIG, QFont("Univers Condensed", 13));
+    dataCustomize.setValue(DataCustomize::FONT_SMALL, QFont("Univers Condensed", 10));
+    dataCustomize.setValue(DataCustomize::FONT_CODE, QFont("Consolas", 8));
+    dataCustomize.setValue(DataCustomize::FONT_CONSOLE, QFont("Univers 57 Condensed", 9));
+
+    dataCustomize.setValue(DataCustomize::BOOL_BOOT_INTERPRETR, false);
+    dataCustomize.setValue(DataCustomize::BOOL_BOOT_SERVER, false);
+
+    // bude odstraneno ////////////////////////////
+
     library.setValue(DataKey::USERNAME, "");
 
     library.setValue(DataKey::COLOR_APP_HEADER, QColor(40, 40, 40));
@@ -87,6 +121,9 @@ namespace SupercolliderBridge
 
     library.setValue(DataKey::BOOL_BOOT_INTERPRETR, false);
     library.setValue(DataKey::BOOL_BOOT_SERVER, false);
+
+    
+
   }
 
   void Customize::readConfigFileNEW()
@@ -109,7 +146,7 @@ namespace SupercolliderBridge
       QString key = lineParts[0].remove(" ");
       QStringList args = lineParts[1].split(",");
 
-      if (key.startsWith("color"))
+      if (key.startsWith("COLOR"))
       {
         //qDebug() << "ConfigDataTyp: color";
         bool isColor = true;
@@ -128,7 +165,7 @@ namespace SupercolliderBridge
           continue;
         }
       }
-      if (key.startsWith("font"))
+      if (key.startsWith("FONT"))
       {
         //qDebug() << "ConfigDataTyp: font";
         bool isFont = true;
@@ -147,7 +184,7 @@ namespace SupercolliderBridge
           continue;
         }
       }
-      if (key.startsWith("bool"))
+      if (key.startsWith("BOOL"))
       {
         //qDebug() << "ConfigDataTyp: bool";
         QString value = args[0].remove(" ");
@@ -205,12 +242,20 @@ namespace SupercolliderBridge
   {
     configFile->open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(configFile);
-
+    
     foreach(DataKey oneKey, configFileKeys.keys())
     {
       //qDebug() << "Customize::writeConfigFileNEW()"<< configFileKeys.value(oneKey) << "=" << library.toString(oneKey);
       out << configFileKeys.value(oneKey) << " = " << library.toString(oneKey) << "\n";
     }
+    
+    /*
+    foreach(QString oneKey, dataCustomize.keys())
+    {
+      qDebug() << "Customize::writeConfigFileNEW()" << oneKey << " = " << dataCustomize.getValue(oneKey).toString();
+      out << oneKey << " = " << dataCustomize.getValue(oneKey).toString() << "\n";
+    }
+    */
 
     configFile->close();
   }
