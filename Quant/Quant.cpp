@@ -42,19 +42,13 @@ namespace QuantIDE
     canvanNEW->addPanel(customizePanel, "Customize");
 
     connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));
-    // core->initControls();
+    
+    connect(customize, SIGNAL(actDataChanged(DataCustomize)), this, SLOT(onCustomize(DataCustomize)));
+    connect(customize, SIGNAL(actDataChanged(DataCustomize)), core, SLOT(onCustomize(DataCustomize)));
 
- //   connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
-    connect(customize, SIGNAL(actDataChanged2(DataCustomize)), this, SLOT(onCustomize2(DataCustomize)));
-   // connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));// bude odsraneno
-    connect(customize, SIGNAL(actDataChanged2(DataCustomize)), core, SLOT(onCustomize2(DataCustomize)));
-
-    //connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onCustomize(Data))); // bude odsraneno
-    connect(customize, SIGNAL(actDataChanged2(DataCustomize)), customizePanel, SLOT(onCustomize2(DataCustomize)));
-    //connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
-    connect(customizePanel, SIGNAL(actChangeConfirmed2(DataCustomize)), customize, SLOT(onModify2(DataCustomize)));
-   // connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
-    connect(customizePanel, SIGNAL(actSaveConfirmed2(DataCustomize)), customize, SLOT(onSave2(DataCustomize)));
+    connect(customize, SIGNAL(actDataChanged(DataCustomize)), customizePanel, SLOT(onCustomize(DataCustomize)));
+    connect(customizePanel, SIGNAL(actChangeConfirmed(DataCustomize)), customize, SLOT(onModify(DataCustomize)));
+    connect(customizePanel, SIGNAL(actSaveConfirmed(DataCustomize)), customize, SLOT(onSave(DataCustomize)));
 
     customize->refresh();
   }
@@ -83,7 +77,7 @@ namespace QuantIDE
 
     connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
     connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));
-  //  connect(customize, SIGNAL(actDataChanged2(DataCustomize)), core, SLOT(onCustomize2(DataCustomize)));
+    //  connect(customize, SIGNAL(actDataChanged2(DataCustomize)), core, SLOT(onCustomize2(DataCustomize)));
 
     connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onCustomize(Data)));
     connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
@@ -128,7 +122,7 @@ namespace QuantIDE
     connect(canvanNEW->getPanel("NodePanel"), SIGNAL(actClosed()), panelsBar->getButton("NodePanel"), SLOT(onSwitch()));
   }
 
-  void QuantNEW::onCustomize2(DataCustomize data)
+  void QuantNEW::onCustomize(DataCustomize data)
   {
     QString qPropertyColors = tr(
       "Jui--Button {qproperty-colorNormal: %1;}"
@@ -238,7 +232,7 @@ namespace QuantIDE
   }
 
 
-
+  /*
   void QuantNEW::onCustomize(Data data)
   {
     QString qPropertyColors = tr(
@@ -347,6 +341,7 @@ namespace QuantIDE
 
     qApp->setStyleSheet(qPropertyColors + qPropertyFonts + qtStyleSheet + qtStyleSheet_Colors + qtStyleSeet_Fonts);
   }
+  */
 
   QuantNEW::~QuantNEW()
   {

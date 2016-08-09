@@ -48,32 +48,32 @@ namespace QuantIDE
     boxName = new ControlBox(scrollWidget);
     boxName->setLabel("userName");
     boxName->setLabelSize(150);
-    connect(boxName, SIGNAL(actValueChanged(QString)), this, SLOT(onChangePressed()));
+    connect(boxName, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
 
     boxColorNormal = new ControlBox(scrollWidget);
     boxColorNormal->setLabel("normal");
     boxColorNormal->setLabelSize(150);
-    connect(boxColorNormal, SIGNAL(actValueChanged(QString)), this, SLOT(onChangePressed()));
+    connect(boxColorNormal, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
 
     boxColorOver = new ControlBox(scrollWidget);
     boxColorOver->setLabel("over");
     boxColorOver->setLabelSize(150);
-    connect(boxColorOver, SIGNAL(actValueChanged(QString)), this, SLOT(onChangePressed()));
+    connect(boxColorOver, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
 
     boxColorActive = new ControlBox(scrollWidget);
     boxColorActive->setLabel("active");
     boxColorActive->setLabelSize(150);
-    connect(boxColorActive, SIGNAL(actValueChanged(QString)), this, SLOT(onChangePressed()));
+    connect(boxColorActive, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
 
     boxColorText = new ControlBox(scrollWidget);
     boxColorText->setLabel("text");
     boxColorText->setLabelSize(150);
-    connect(boxColorText, SIGNAL(actValueChanged(QString)), this, SLOT(onChangePressed()));
+    connect(boxColorText, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
 
     boxColorPanelBackground = new ControlBox(scrollWidget);
     boxColorPanelBackground->setLabel("background");
     boxColorPanelBackground->setLabelSize(150);
-    connect(boxColorPanelBackground, SIGNAL(actValueChanged(QString)), this, SLOT(onChangePressed()));
+    connect(boxColorPanelBackground, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
   }
 
   QString CustomizePanel::color2String(QColor color)
@@ -94,43 +94,7 @@ namespace QuantIDE
     return QColor(red, green, blue);
   }
 
-  Data CustomizePanel::makeData()
-  {
-    Data data;
-    // bude nahrazeno hodnotami dole, az budou pridana na panel
-    data.setValue(DataKey::COLOR_APP_HEADER, QColor(40, 40, 40));
-    data.setValue(DataKey::COLOR_APP_BACKGROUND, QColor(20, 20, 20));
-    data.setValue(DataKey::COLOR_PANEL_HEADER, QColor(30, 30, 30));
-
-    data.setValue(DataKey::COLOR_MSG_NORMAL, QColor(70, 70, 70));
-    data.setValue(DataKey::COLOR_MSG_STATUS, QColor(230, 230, 230));
-    data.setValue(DataKey::COLOR_MSG_EVALUATE, QColor(170, 230, 230));
-    data.setValue(DataKey::COLOR_MSG_ANSWER, QColor(170, 200, 160));
-    data.setValue(DataKey::COLOR_MSG_ERROR, QColor(230, 30, 30));
-    data.setValue(DataKey::COLOR_MSG_WARNINIG, QColor(230, 130, 30));
-    data.setValue(DataKey::COLOR_MSG_BUNDLE, QColor(170, 160, 20));
-
-    data.setValue(DataKey::BOOL_TEXT_ANTIALIASING, true);
-    data.setValue(DataKey::FONT_BIG, QFont("Univers Condensed", 13));
-    data.setValue(DataKey::FONT_SMALL, QFont("Univers Condensed", 10));
-    data.setValue(DataKey::FONT_CODE, QFont("Consolas", 8));
-    data.setValue(DataKey::FONT_CONSOLE, QFont("Univers 57 Condensed", 9));
-
-    data.setValue(DataKey::BOOL_BOOT_INTERPRETR, false);
-    data.setValue(DataKey::BOOL_BOOT_SERVER, false);
-    ////////////////////////////////////////
-
-    data.setValue(DataKey::USERNAME, boxName->getValue_string());
-    data.setValue(DataKey::COLOR_NORMAL, this->string2Color(boxColorNormal->getValue_string()));
-    data.setValue(DataKey::COLOR_OVER, this->string2Color(boxColorOver->getValue_string()));
-    data.setValue(DataKey::COLOR_ACTIVE, this->string2Color(boxColorActive->getValue_string()));
-    data.setValue(DataKey::COLOR_TEXT, this->string2Color(boxColorText->getValue_string()));
-
-    data.setValue(DataKey::COLOR_PANEL_BACKGROUND, this->string2Color(boxColorPanelBackground->getValue_string()));
-    return data;
-  }
-
-  void CustomizePanel::onCustomize2(DataCustomize data)
+  void CustomizePanel::onCustomize(DataCustomize data)
   {
     customizeData = data;
 
@@ -144,7 +108,7 @@ namespace QuantIDE
       boxColorText->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_TEXT)));
 
       boxColorPanelBackground->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_PANEL_BACKGROUND)));
-      
+
       firstOnCustomizeFillBoxes = false;
     }
   }
@@ -152,21 +116,18 @@ namespace QuantIDE
   void CustomizePanel::onChangePressed()
   {
     // qDebug("CustomizePanel::onChangePressed()");
-    //emit actChangeConfirmed(this->makeData());
 
     customizeData.setValue(DataCustomize::Key::USERNAME, boxName->getValue_string());
 
     customizeData.setValue(DataCustomize::Key::COLOR_PANEL_BACKGROUND, this->string2Color(boxColorPanelBackground->getValue_string()));
 
     qDebug() << customizeData.print("CustomizePanel::onChangePressed");
-    emit actChangeConfirmed2(customizeData);
+    emit actChangeConfirmed(customizeData);
   }
   void CustomizePanel::onSavePressed()
   {
     // qDebug("CustomizePanel::onSavePressed()");
-    //emit actSaveConfirmed(this->makeData());
-
-    emit actSaveConfirmed2(customizeData);
+    emit actSaveConfirmed(customizeData);
   }
 
   void CustomizePanel::resizeEvent(QResizeEvent *event)

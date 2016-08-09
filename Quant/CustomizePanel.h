@@ -28,15 +28,13 @@ namespace QuantIDE
     ~CustomizePanel();
 
     public slots:
-    void onCustomize2(DataCustomize);
+    void onCustomize(DataCustomize);
     void onChangePressed();
     void onSavePressed();
 
   signals:
-   // void actChangeConfirmed(Data);
-    void actChangeConfirmed2(DataCustomize);
-   // void actSaveConfirmed(Data);
-    void actSaveConfirmed2(DataCustomize);
+    void actChangeConfirmed(DataCustomize);
+    void actSaveConfirmed(DataCustomize);
 
   protected:
     void resizeEvent(QResizeEvent *event);
@@ -45,8 +43,7 @@ namespace QuantIDE
     void initControl();
     QString color2String(QColor);
     QColor string2Color(QString);
-    Data makeData();
-
+    
     QScrollArea *scrollArea;
     QWidget *scrollWidget;
 

@@ -272,7 +272,6 @@ namespace QuantIDE
 
     qDebug("QuantNode init...");
 
-    //sourceBox = new ControlBox(this);
     sourceBox = new CodeEditor(this);
     sourceBox->setGeometry(5, 50, 90, 20);
     //sourceBox->setLabel("name");
@@ -304,7 +303,7 @@ namespace QuantIDE
   void QuantNode::onNet_NodeExist(DataNode data)
   {
     qDebug("QuantNode::onNet_NodeExist");
-  //  emit actPrint("User \"" + data.getSender() + "\" task for existing node", MessageType::STATUS);
+    //  emit actPrint("User \"" + data.getSender() + "\" task for existing node", MessageType::STATUS);
     // emit actPrint(data.print("QuantNode::onNet_NodeExist"), MessageType::NORMAL);
     this->sendData(QuantNode::TargetMethod::NodeSet);
   }

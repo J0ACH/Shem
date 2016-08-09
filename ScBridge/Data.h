@@ -10,6 +10,7 @@
 
 namespace SupercolliderBridge
 {
+  /**/
   enum DataKey {
     USERNAME,
     BOOL_BOOT_INTERPRETR, BOOL_BOOT_SERVER, BOOL_TEXT_ANTIALIASING,

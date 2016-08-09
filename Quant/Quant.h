@@ -36,8 +36,8 @@ namespace QuantIDE
     void initObjects();
     
     public slots:
-    void onCustomize(Data);
-    void onCustomize2(DataCustomize);
+    //void onCustomize(Data);
+    void onCustomize(DataCustomize);
    
   private:
     Customize *customize;

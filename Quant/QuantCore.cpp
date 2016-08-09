@@ -78,7 +78,7 @@ namespace QuantIDE
     textServerGroups->setAlign(Qt::AlignCenter);
     textServerGroups->show();
   }
-
+  /*
   void QuantCore::onCustomize(Data data)
   {
 #if (!_DEBUG)
@@ -101,8 +101,9 @@ namespace QuantIDE
 
     emit actCoreInitPrepared(); // ceka na initInterpretOnStart a initServerOnStart
   }
+  */
 
-  void QuantCore::onCustomize2(DataCustomize data)
+  void QuantCore::onCustomize(DataCustomize data)
   {
     userName = data.getValue_string(DataCustomize::Key::USERNAME);
     qDebug() << "QuantCore::onCustomize2 userName:" << userName;
