@@ -75,25 +75,6 @@ namespace QuantIDE
     boxColorPanelBackground->setLabelSize(150);
     connect(boxColorPanelBackground, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
   }
-
-  QString CustomizePanel::color2String(QColor color)
-  {
-    return tr("%1, %2, %3").arg(
-      QString::number(color.red()),
-      QString::number(color.green()),
-      QString::number(color.blue())
-      );
-  }
-  QColor CustomizePanel::string2Color(QString colTxt)
-  {
-    QStringList txtColors = colTxt.split(",");
-    int red = txtColors[0].remove(" ").toInt();
-    int green = txtColors[1].remove(" ").toInt();
-    int blue = txtColors[2].remove(" ").toInt();
-
-    return QColor(red, green, blue);
-  }
-
   void CustomizePanel::onCustomize(DataCustomize data)
   {
     customizeData = data;
@@ -168,5 +149,24 @@ namespace QuantIDE
 
     PanelNEW::resizeEvent(event);
   }
+
+  QString CustomizePanel::color2String(QColor color)
+  {
+    return tr("%1, %2, %3").arg(
+      QString::number(color.red()),
+      QString::number(color.green()),
+      QString::number(color.blue())
+      );
+  }
+  QColor CustomizePanel::string2Color(QString colTxt)
+  {
+    QStringList txtColors = colTxt.split(",");
+    int red = txtColors[0].remove(" ").toInt();
+    int green = txtColors[1].remove(" ").toInt();
+    int blue = txtColors[2].remove(" ").toInt();
+
+    return QColor(red, green, blue);
+  }
+
   CustomizePanel::~CustomizePanel() { }
 }

@@ -24,7 +24,7 @@ namespace QuantIDE
         void addObject(QByteArray msg);
 
     void removeObject(QString name);
-    void removeObject(DataNEW data);
+    void removeObject(Data data);
 
     QList<QString> keys();
 
@@ -50,7 +50,7 @@ namespace QuantIDE
     QMap<QString, QuantObject*> lib;
 
     bool containObject(QString name);
-    bool containObject(DataNEW data);
+    bool containObject(Data data);
 
 
     QColor colorBackground;

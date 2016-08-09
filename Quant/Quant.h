@@ -14,7 +14,6 @@
 #include "Edges.h"
 #include "CodeEditor.h"
 #include "CustomizePanel.h"
-//#include "NetworkPanel.h"
 
 #include "NodePanel.h"
 #include "Node.h"
@@ -34,17 +33,16 @@ namespace QuantIDE
     ~QuantNEW();
 
     void initObjects();
-    
+
     public slots:
-    //void onCustomize(Data);
     void onCustomize(DataCustomize);
-   
+
   private:
     Customize *customize;
     CanvanNEW *canvanNEW;
     Console *console;
     CustomizePanel *customizePanel;
-    
+
     QuantCore *core;
 
     CanvanNEW_ToolBar *controlsBar, *panelsBar;

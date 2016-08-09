@@ -8,7 +8,7 @@ namespace QuantIDE
     mCore(core)
   {
     qDebug("QuantObject init...");
-    connect(this, SIGNAL(actDataChanged(DataNEW)), core, SLOT(onObjectDataChanged(DataNEW)));
+    connect(this, SIGNAL(actDataChanged(Data)), core, SLOT(onObjectDataChanged(Data)));
     connect(this, SIGNAL(actEvaluate(QString, bool)), core, SLOT(onEvaluate(QString, bool)));
     connect(this, SIGNAL(actPrint(QString, MessageType)), core, SLOT(onPrint(QString, MessageType)));
   }
@@ -117,7 +117,7 @@ namespace QuantIDE
   void QuantUser::onNet_UserLeave(DataUser data)
   {
     emit actPrint("User \"" + data.getValue_string(DataUser::NAME) + "\" leave session", MessageType::STATUS);
-    //disconnect(this, SIGNAL(actDataChanged(DataNEW)), mCore, SLOT(onObjectDataChanged(DataNEW)));
+    //disconnect(this, SIGNAL(actDataChanged(Data)), mCore, SLOT(onObjectDataChanged(Data)));
   }
   void QuantUser::onNet_UserServerStatus(DataUser data)
   {

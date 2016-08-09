@@ -68,7 +68,7 @@ namespace QuantIDE
 
     // OBJECTS /////////////////////////////////////////
 
-    void onObjectDataChanged(DataNEW);
+    void onObjectDataChanged(Data);
     void onNetDataRecived(QByteArray);
 
     // OTHERS /////////////////////////////////////////

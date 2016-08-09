@@ -30,7 +30,7 @@ namespace QuantIDE
     int getType();
 
   signals:
-    void actDataChanged(DataNEW);
+    void actDataChanged(Data);
     void actEvaluate(QString code, bool print = false);
     void actPrint(QString, MessageType);
 

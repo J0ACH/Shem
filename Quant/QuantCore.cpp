@@ -78,34 +78,12 @@ namespace QuantIDE
     textServerGroups->setAlign(Qt::AlignCenter);
     textServerGroups->show();
   }
-  /*
-  void QuantCore::onCustomize(Data data)
-  {
-#if (!_DEBUG)
-    userName = data.getValue_string(DataKey::USERNAME);
-#endif
-
-    qDebug() << "QuantCore::onCustomize userName:" << userName;
-    initNetworkOnStart = true;
-    initInterpretOnStart = data.getValue_bool(DataKey::BOOL_BOOT_INTERPRETR);
-    initServerOnStart = data.getValue_bool(DataKey::BOOL_BOOT_SERVER);
-
-    colorMsgNormal = data.getValue_color(DataKey::COLOR_MSG_NORMAL);
-    colorMsgStatus = data.getValue_color(DataKey::COLOR_MSG_STATUS);
-    colorMsgEvaluate = data.getValue_color(DataKey::COLOR_MSG_EVALUATE);
-    colorMsgAnswer = data.getValue_color(DataKey::COLOR_MSG_ANSWER);
-    colorMsgError = data.getValue_color(DataKey::COLOR_MSG_ERROR);
-    colorMsgWarning = data.getValue_color(DataKey::COLOR_MSG_WARNINIG);
-    colorMsgBundle = data.getValue_color(DataKey::COLOR_MSG_BUNDLE);
-
-
-    emit actCoreInitPrepared(); // ceka na initInterpretOnStart a initServerOnStart
-  }
-  */
 
   void QuantCore::onCustomize(DataCustomize data)
   {
+#if (!_DEBUG)
     userName = data.getValue_string(DataCustomize::Key::USERNAME);
+#endif
     qDebug() << "QuantCore::onCustomize2 userName:" << userName;
 
     initNetworkOnStart = true;
@@ -356,13 +334,13 @@ namespace QuantIDE
 
   // OBJECTS /////////////////////////////////////////
 
-  void QuantCore::onObjectDataChanged(DataNEW data)
+  void QuantCore::onObjectDataChanged(Data data)
   {
     data.setSender(userName);
     //data.setTime(proxy time); // pridat cas odeslani
 
     /*
-    if (DataNEW::getType(data.wrap()) != DataNEW::DataType::USER)
+    if (Data::getType(data.wrap()) != Data::DataType::USER)
     {
     this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
     }
@@ -373,24 +351,24 @@ namespace QuantIDE
   }
   void QuantCore::onNetDataRecived(QByteArray msg)
   {
-    // QString sender = DataNEW::(msg);
+    // QString sender = Data::(msg);
     //  qDebug() << "QuantCore::onNetworkDataRecived msgOwner: " << ;
 
-    if (DataNEW::isFromOtherOwener(msg, userName))
+    if (Data::isFromOtherOwener(msg, userName))
     {
-      QString targetObject = DataNEW::getTarget(msg);
-      QString targetMethod = DataNEW::getMethod(msg);
+      QString targetObject = Data::getTarget(msg);
+      QString targetMethod = Data::getMethod(msg);
       std::string targetMethod_str = targetMethod.toLatin1().constData();
 
       // qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
       //  qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
 
-      //if (DataNEW::getType(msg) != DataNEW::DataType::USER)
+      //if (Data::getType(msg) != Data::DataType::USER)
       //  this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
 
-      switch (DataNEW::getType(msg))
+      switch (Data::getType(msg))
       {
-      case DataNEW::DataType::USER:
+      case Data::DataType::USER:
         if (targetMethod == "onNet_UserJoin")
         {
           lib_users->addObject(msg);
@@ -404,10 +382,10 @@ namespace QuantIDE
         QMetaObject::invokeMethod(lib_users->getUser(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
         if (targetMethod == "onNet_UserLeave") { lib_users->removeObject(DataUser(msg)); }
         break;
-      case DataNEW::DataType::PROXY:
+      case Data::DataType::PROXY:
         QMetaObject::invokeMethod(lib_proxy->getProxy(), targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
         break;
-      case DataNEW::DataType::NODE:
+      case Data::DataType::NODE:
         qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
         qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
         QMetaObject::invokeMethod(lib_nodes->getNode(targetObject), targetMethod_str.c_str(), Q_ARG(DataNode, DataNode(msg)));

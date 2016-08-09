@@ -48,9 +48,9 @@ namespace QuantIDE
   void Library::addObject(QByteArray msg)
   {
 
-    switch (DataNEW::getType(msg))
+    switch (Data::getType(msg))
     {
-    case DataNEW::DataType::USER:
+    case Data::DataType::USER:
       //DataUser
       DataUser userData(msg);
       if (!this->containObject(userData))
@@ -76,11 +76,11 @@ namespace QuantIDE
 
     this->updateObjectPosition();
   }
-  void Library::removeObject(DataNEW data)
+  void Library::removeObject(Data data)
   {
     switch (data.getType())
     {
-    case DataNEW::DataType::USER:
+    case Data::DataType::USER:
       if (this->containObject(data))
       {
         DataUser userData(data);
@@ -116,11 +116,11 @@ namespace QuantIDE
   }
 
   bool Library::containObject(QString name)  { return lib.contains(name); }
-  bool Library::containObject(DataNEW data)
+  bool Library::containObject(Data data)
   {
     switch (data.getType())
     {
-    case DataNEW::DataType::USER:
+    case Data::DataType::USER:
       //DataUser userData(data);
       QString name = DataUser(data).getValue_string(DataUser::Key::NAME);
       return lib.contains(name);
