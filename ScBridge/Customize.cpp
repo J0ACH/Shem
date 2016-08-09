@@ -6,19 +6,22 @@ namespace SupercolliderBridge
   {
     QString path = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
     this->initConfigFile(path);
-    this->configFileAssocciation();
+    // this->configFileAssocciation();
     this->defaultLibrary();
     this->readConfigFileNEW();
+    this->readConfigFile2();
     this->postprocessingLibrary();
     this->writeConfigFileNEW();
+    this->writeConfigFile2();
 
     qDebug() << dataCustomize.print("Customize done LIBRARY_NEW");
     qDebug() << "Key2String: " << dataCustomize.key2string(DataCustomize::Key::BOOL_TEXT_ANTIALIASING);
 
+    emit actDataChanged2(dataCustomize);
     emit actDataChanged(library);
   }
 
-  void Customize::refresh()  { emit actCustomizeChanged(this); emit actDataChanged(library); }
+  void Customize::refresh()  { emit actCustomizeChanged(this); emit actDataChanged(library); emit actDataChanged2(dataCustomize); }
 
   void Customize::initConfigFile(QString systemExtensionDir)
   {
@@ -28,6 +31,7 @@ namespace SupercolliderBridge
     configDir.setPath(QDir::fromNativeSeparators(tr("%1/Shem").arg(systemExtensionDir)));
 
     configFile = new QFile(tr("%1/ShemConfig.txt").arg(configDir.path()));
+    configFile2 = new QFile(tr("%1/ShemConfig2.txt").arg(configDir.path()));
   }
 
   void Customize::configFileAssocciation()
@@ -63,7 +67,7 @@ namespace SupercolliderBridge
 
   void Customize::defaultLibrary()
   {
-    
+
     dataCustomize.setValue(DataCustomize::USERNAME, "");
 
     dataCustomize.setValue(DataCustomize::COLOR_APP_HEADER, QColor(40, 40, 40));
@@ -121,9 +125,21 @@ namespace SupercolliderBridge
 
     library.setValue(DataKey::BOOL_BOOT_INTERPRETR, false);
     library.setValue(DataKey::BOOL_BOOT_SERVER, false);
+  }
 
-    
+  void Customize::readConfigFile2()
+  {
+    configFile2->open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream in(configFile2);
+    QString txt;
+    while (!in.atEnd())
+    {
+      QString line = in.readLine();
+      txt += line;
+    }
 
+    if (!txt.isEmpty()) { dataCustomize = DataCustomize(txt.toUtf8()); }
+    configFile2->close();
   }
 
   void Customize::readConfigFileNEW()
@@ -213,11 +229,21 @@ namespace SupercolliderBridge
   void Customize::postprocessingLibrary()
   {
     // SET USERNAME BY SYSTEM
+    /*
     QString userName = library.getValue_string(DataKey::USERNAME);
     if (userName.isEmpty())
     {
+    userName = qgetenv("USERNAME");
+    library.setValue(DataKey::USERNAME, userName);
+    dataCustomize.setValue(DataCustomize::Key::USERNAME, userName);
+    }
+    */
+    QString userName = dataCustomize.getValue_string(DataCustomize::Key::USERNAME);
+    if (userName.isEmpty())
+    {
       userName = qgetenv("USERNAME");
-      library.setValue(DataKey::USERNAME, userName);
+      // library.setValue(DataKey::USERNAME, userName); // bude odstraneno
+      dataCustomize.setValue(DataCustomize::Key::USERNAME, userName);
     }
 
     // ANTIALIAS FONTS
@@ -238,22 +264,32 @@ namespace SupercolliderBridge
     }
   }
 
+  void Customize::writeConfigFile2()
+  {
+    configFile2->open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(configFile2);
+
+    out << dataCustomize.wrap();
+
+    configFile2->close();
+  }
+
   void Customize::writeConfigFileNEW()
   {
     configFile->open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(configFile);
-    
+
     foreach(DataKey oneKey, configFileKeys.keys())
     {
       //qDebug() << "Customize::writeConfigFileNEW()"<< configFileKeys.value(oneKey) << "=" << library.toString(oneKey);
       out << configFileKeys.value(oneKey) << " = " << library.toString(oneKey) << "\n";
     }
-    
+
     /*
     foreach(QString oneKey, dataCustomize.keys())
     {
-      qDebug() << "Customize::writeConfigFileNEW()" << oneKey << " = " << dataCustomize.getValue(oneKey).toString();
-      out << oneKey << " = " << dataCustomize.getValue(oneKey).toString() << "\n";
+    qDebug() << "Customize::writeConfigFileNEW()" << oneKey << " = " << dataCustomize.getValue(oneKey).toString();
+    out << oneKey << " = " << dataCustomize.getValue(oneKey).toString() << "\n";
     }
     */
 
@@ -265,11 +301,23 @@ namespace SupercolliderBridge
     library = data;
     emit actDataChanged(library);
   }
+
+  void Customize::onModify2(DataCustomize data)
+  {
+    dataCustomize = data;
+    emit actDataChanged2(dataCustomize);
+  }
   void Customize::onSave(Data data)
   {
     library = data;
     this->writeConfigFileNEW();
     emit actDataChanged(library);
+  }
+  void Customize::onSave2(DataCustomize data)
+  {
+    dataCustomize = data;
+    this->writeConfigFile2();
+    //emit actDataChanged2(dataCustomize);
   }
 
   Customize::~Customize() { }

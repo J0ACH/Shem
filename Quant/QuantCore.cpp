@@ -84,7 +84,8 @@ namespace QuantIDE
 #if (!_DEBUG)
     userName = data.getValue_string(DataKey::USERNAME);
 #endif
-    // qDebug() << "QuantCore::onCustomize userName:" << userName;
+
+    qDebug() << "QuantCore::onCustomize userName:" << userName;
     initNetworkOnStart = true;
     initInterpretOnStart = data.getValue_bool(DataKey::BOOL_BOOT_INTERPRETR);
     initServerOnStart = data.getValue_bool(DataKey::BOOL_BOOT_SERVER);
@@ -96,6 +97,27 @@ namespace QuantIDE
     colorMsgError = data.getValue_color(DataKey::COLOR_MSG_ERROR);
     colorMsgWarning = data.getValue_color(DataKey::COLOR_MSG_WARNINIG);
     colorMsgBundle = data.getValue_color(DataKey::COLOR_MSG_BUNDLE);
+
+
+    emit actCoreInitPrepared(); // ceka na initInterpretOnStart a initServerOnStart
+  }
+
+  void QuantCore::onCustomize2(DataCustomize data)
+  {
+    userName = data.getValue_string(DataCustomize::Key::USERNAME);
+    qDebug() << "QuantCore::onCustomize2 userName:" << userName;
+
+    initNetworkOnStart = true;
+    initInterpretOnStart = data.getValue_bool(DataCustomize::Key::BOOL_BOOT_INTERPRETR);
+    initServerOnStart = data.getValue_bool(DataCustomize::Key::BOOL_BOOT_SERVER);
+
+    colorMsgNormal = data.getValue_color(DataCustomize::Key::COLOR_MSG_NORMAL);
+    colorMsgStatus = data.getValue_color(DataCustomize::Key::COLOR_MSG_STATUS);
+    colorMsgEvaluate = data.getValue_color(DataCustomize::Key::COLOR_MSG_EVALUATE);
+    colorMsgAnswer = data.getValue_color(DataCustomize::Key::COLOR_MSG_ANSWER);
+    colorMsgError = data.getValue_color(DataCustomize::Key::COLOR_MSG_ERROR);
+    colorMsgWarning = data.getValue_color(DataCustomize::Key::COLOR_MSG_WARNINIG);
+    colorMsgBundle = data.getValue_color(DataCustomize::Key::COLOR_MSG_BUNDLE);
 
 
     emit actCoreInitPrepared(); // ceka na initInterpretOnStart a initServerOnStart
@@ -341,7 +363,7 @@ namespace QuantIDE
     /*
     if (DataNEW::getType(data.wrap()) != DataNEW::DataType::USER)
     {
-      this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
+    this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
     }
     */
 
@@ -359,8 +381,8 @@ namespace QuantIDE
       QString targetMethod = DataNEW::getMethod(msg);
       std::string targetMethod_str = targetMethod.toLatin1().constData();
 
-     // qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
-    //  qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+      // qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+      //  qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
 
       //if (DataNEW::getType(msg) != DataNEW::DataType::USER)
       //  this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
@@ -370,12 +392,12 @@ namespace QuantIDE
       case DataNEW::DataType::USER:
         if (targetMethod == "onNet_UserJoin")
         {
-          lib_users->addObject(DataUser(msg));
+          lib_users->addObject(msg);
           lib_users->getUser(userName)->sendData(QuantUser::TargetMethod::UserExist);
         }
         if (targetMethod == "onNet_UserExist")
         {
-          lib_users->addObject(DataUser(msg));
+          lib_users->addObject(msg);
           lib_users->getUser(DataUser(msg));
         }
         QMetaObject::invokeMethod(lib_users->getUser(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));

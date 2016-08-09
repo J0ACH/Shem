@@ -413,7 +413,19 @@ namespace SupercolliderBridge
     metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
   }
 
-  QStringList DataCustomize::keys()
+  DataCustomize::DataCustomize(QByteArray wrapedData) : DataNEW(wrapedData)
+  {
+    const QMetaObject &mo = DataCustomize::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    DataNEW::DataNEW(wrapedData);
+
+    this->setType(DataNEW::DataType::CUSTOMIZE);
+
+    this->print("DataCustomize(QByteArray wrapedData)");
+  }
+
+   QStringList DataCustomize::keys()
   {
     QStringList keys;
     for (int i = 0; i < metaEnum.keyCount(); i++)
@@ -491,8 +503,6 @@ namespace SupercolliderBridge
       this->setSender(data.getSender());
       this->setTargetObject(data.getTarget());
       this->setTargetMethod(data.getMethod());
-
-      this->setValue(DataUser::Key::NAME, data.getValue(metaEnum.valueToKey(DataUser::Key::NAME)));
     }
   }
 

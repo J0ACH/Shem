@@ -44,15 +44,19 @@ namespace QuantIDE
     connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));
     // core->initControls();
 
-    connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
-    connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));
+ //   connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
+    connect(customize, SIGNAL(actDataChanged2(DataCustomize)), this, SLOT(onCustomize2(DataCustomize)));
+   // connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));// bude odsraneno
+    connect(customize, SIGNAL(actDataChanged2(DataCustomize)), core, SLOT(onCustomize2(DataCustomize)));
 
-    connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onCustomize(Data)));
-    connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
-    connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
+    //connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onCustomize(Data))); // bude odsraneno
+    connect(customize, SIGNAL(actDataChanged2(DataCustomize)), customizePanel, SLOT(onCustomize2(DataCustomize)));
+    //connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
+    connect(customizePanel, SIGNAL(actChangeConfirmed2(DataCustomize)), customize, SLOT(onModify2(DataCustomize)));
+   // connect(customizePanel, SIGNAL(actSaveConfirmed(Data)), customize, SLOT(onSave(Data)));
+    connect(customizePanel, SIGNAL(actSaveConfirmed2(DataCustomize)), customize, SLOT(onSave2(DataCustomize)));
 
     customize->refresh();
-    
   }
 
   QuantNEW::QuantNEW(QObject *parent, QString userName, int sendPort, int listenPort, int appPosY) : QObject(parent)
@@ -79,6 +83,7 @@ namespace QuantIDE
 
     connect(customize, SIGNAL(actDataChanged(Data)), this, SLOT(onCustomize(Data)));
     connect(customize, SIGNAL(actDataChanged(Data)), core, SLOT(onCustomize(Data)));
+  //  connect(customize, SIGNAL(actDataChanged2(DataCustomize)), core, SLOT(onCustomize2(DataCustomize)));
 
     connect(customize, SIGNAL(actDataChanged(Data)), customizePanel, SLOT(onCustomize(Data)));
     connect(customizePanel, SIGNAL(actChangeConfirmed(Data)), customize, SLOT(onModify(Data)));
@@ -122,6 +127,117 @@ namespace QuantIDE
     panelsBar->getButton("NodePanel")->setState(Button::State::ON);
     connect(canvanNEW->getPanel("NodePanel"), SIGNAL(actClosed()), panelsBar->getButton("NodePanel"), SLOT(onSwitch()));
   }
+
+  void QuantNEW::onCustomize2(DataCustomize data)
+  {
+    QString qPropertyColors = tr(
+      "Jui--Button {qproperty-colorNormal: %1;}"
+      "Jui--Button {qproperty-colorOver: %2;}"
+      "Jui--Button {qproperty-colorActive: %3;}"
+      //"Jui--Button {qproperty-colorFrozen: %3;}"
+
+      "Jui--CanvanNEW {qproperty-colorBackground: %6;}"
+      "Jui--CanvanNEW_MenuBar {qproperty-colorBackground: %5;}"
+      "Jui--CanvanNEW_StatusBar {qproperty-colorBackground: %5;}"
+      "Jui--CanvanNEW_ToolBar {qproperty-colorBackground: %7;}"
+
+      "Jui--PanelNEW {qproperty-colorHeader: %7;}"
+      "Jui--PanelNEW {qproperty-colorBackground: %8;}"
+      "Jui--PanelNEW {qproperty-colorTitle: %4;}"
+
+      "Jui--Text {qproperty-colorText: %4;}"
+
+      "Jui--ControlBox {qproperty-colorNormal: %1;}"
+      "Jui--ControlBox {qproperty-colorOver: %2;}"
+      "Jui--ControlBox {qproperty-colorActive: %3;}"
+      "Jui--ControlBox {qproperty-colorText: %4;}"
+
+      "QuantIDE--Library {qproperty-colorBackground: %8;}"
+      ).arg(
+      data.toStyleSheet(DataCustomize::Key::COLOR_NORMAL),
+      data.toStyleSheet(DataCustomize::Key::COLOR_OVER),
+      data.toStyleSheet(DataCustomize::Key::COLOR_ACTIVE),
+      data.toStyleSheet(DataCustomize::Key::COLOR_TEXT),
+
+      data.toStyleSheet(DataCustomize::Key::COLOR_APP_HEADER),
+      data.toStyleSheet(DataCustomize::Key::COLOR_APP_BACKGROUND),
+      data.toStyleSheet(DataCustomize::Key::COLOR_PANEL_HEADER),
+      data.toStyleSheet(DataCustomize::Key::COLOR_PANEL_BACKGROUND)
+      );
+
+    QString qPropertyFonts = tr(
+      "Jui--PanelNEW {qproperty-fontTitle: %2;}"
+      "Jui--PanelNEW {qproperty-fontBig: %1;}"
+      "Jui--PanelNEW {qproperty-fontSmall: %2;}"
+
+      "Jui--Console {qproperty-fontConsole: %3;}"
+
+      "Jui--Text {qproperty-font: %2;}"
+
+      "Jui--Button {qproperty-font: %2;}"
+      "Jui--ControlBox {qproperty-font: %2;}"
+      ).arg(
+      data.toStyleSheet(DataCustomize::Key::FONT_BIG),
+      data.toStyleSheet(DataCustomize::Key::FONT_SMALL),
+      data.toStyleSheet(DataCustomize::Key::FONT_CONSOLE)
+      );
+
+    QString qtStyleSheet =
+      "QMenuBar { background-color: rgba(0,0,0,0); }"
+
+      "QLineEdit { background-color: rgba(0,0,0,0); border: none;}"
+
+      "QScrollArea { background-color: rgba(0,0,0,0); }"
+
+      "QScrollBar:vertical { width: 4px; }"
+      "QScrollBar:horizontal { height: 4px; }"
+      "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }"
+      "QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }"
+      "QScrollBar::right-arrow:horizontal, QScrollBar::left-arrow:horizontal {	border: none; background: none;	color: none; }"
+      "QScrollBar::top-arrow:vertical, QScrollBar::bottom-arrow:vertical {	border: none; background: none;	color: none; }"
+      "QScrollBar::add-line:horizontal { border: none; background: none; }"
+      "QScrollBar::sub-line:horizontal { border: none;	background: none; }"
+      "QScrollBar::add-line:vertical { border: none; background: none; }"
+      "QScrollBar::sub-line:vertical { border: none;	background: none; }"
+
+      "QToolButton { border: 0px; }"
+      ;
+
+    QString qtStyleSheet_Colors = tr(
+      "QTextEdit { color: %3; }"
+      "QTextEdit { background-color: %4; }"
+      "QTextEdit { selection-background-color: %2; }"
+
+      "QLineEdit { color: %3; }"
+
+      "QScrollBar:vertical { background: %4; }"
+      "QScrollBar:horizontal { background: %4; }"
+      "QScrollBar::handle:vertical{	background: %1;	min-height: 40px; }"
+      "QScrollBar::handle:horizontal{ background: %1; min-height: 40px; }"
+
+      //"QTabBar::tab{ background: %4; border: 1px solid %1; border-bottom-color: %3}"
+
+      "QToolTip { color: %3; }"
+      "QToolTip { background-color: %4; }"
+      "QToolTip { border: 1px solid %1; }"
+      ).arg(
+      data.toStyleSheet(DataCustomize::Key::COLOR_NORMAL),
+      data.toStyleSheet(DataCustomize::Key::COLOR_ACTIVE),
+      data.toStyleSheet(DataCustomize::Key::COLOR_TEXT),
+
+      data.toStyleSheet(DataCustomize::Key::COLOR_PANEL_BACKGROUND)
+      );
+
+    QString qtStyleSeet_Fonts = tr(
+      "QToolTip { font: %1; }"
+      ).arg(
+      data.toStyleSheet(DataCustomize::Key::FONT_SMALL)
+      );
+
+    qApp->setStyleSheet(qPropertyColors + qPropertyFonts + qtStyleSheet + qtStyleSheet_Colors + qtStyleSeet_Fonts);
+  }
+
+
 
   void QuantNEW::onCustomize(Data data)
   {
@@ -231,7 +347,7 @@ namespace QuantIDE
 
     qApp->setStyleSheet(qPropertyColors + qPropertyFonts + qtStyleSheet + qtStyleSheet_Colors + qtStyleSeet_Fonts);
   }
- 
+
   QuantNEW::~QuantNEW()
   {
     qDebug("Quant closing...");

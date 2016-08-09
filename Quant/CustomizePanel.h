@@ -28,12 +28,15 @@ namespace QuantIDE
     ~CustomizePanel();
 
     public slots:
+    void onCustomize2(DataCustomize);
     void onChangePressed();
     void onSavePressed();
 
   signals:
-    void actChangeConfirmed(Data);
-    void actSaveConfirmed(Data);
+   // void actChangeConfirmed(Data);
+    void actChangeConfirmed2(DataCustomize);
+   // void actSaveConfirmed(Data);
+    void actSaveConfirmed2(DataCustomize);
 
   protected:
     void resizeEvent(QResizeEvent *event);
@@ -53,6 +56,10 @@ namespace QuantIDE
     ControlBox *boxColorNormal, *boxColorOver, *boxColorActive, *boxColorText;
     ControlBox *boxColorPanelBackground;
     Button *buttonSave;
+
+    DataCustomize customizeData;
+
+    bool firstOnCustomizeFillBoxes;
   };
 }
 

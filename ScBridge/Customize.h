@@ -24,18 +24,20 @@ namespace SupercolliderBridge
 
     public slots:
     void onModify(Data);
+    void onModify2(DataCustomize);
     void onSave(Data);
+    void onSave2(DataCustomize);
 
-   // void onModify(DataNEW);
-  //  void onSave(DataNEW);
+    // void onModify(DataNEW);
+    //  void onSave(DataNEW);
 
   signals:
     void actDataChanged(Data);
-  //  void actDataChanged(DataNEW);
+    void actDataChanged2(DataCustomize);
     void actCustomizeChanged(Customize*);
 
   private:
-    QFile *configFile;
+    QFile *configFile, *configFile2;
     Data library;
     DataCustomize dataCustomize;
     QMap<DataKey, QString> configFileKeys;
@@ -44,10 +46,11 @@ namespace SupercolliderBridge
     void initConfigFile(QString systemExtensionDir);
     void defaultLibrary();
     void readConfigFileNEW();
+    void readConfigFile2();
     void postprocessingLibrary();
     void writeConfigFileNEW();
-
-      };
+    void writeConfigFile2();
+  };
 }
 
 #endif // CUSTOMIZE

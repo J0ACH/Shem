@@ -36,6 +36,7 @@ namespace QuantIDE
     
     public slots :
     void onCustomize(Data);
+    void onCustomize2(DataCustomize);
 
     // CORE /////////////////////////////////////////
 

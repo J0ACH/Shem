@@ -21,7 +21,7 @@ namespace QuantIDE
     ~Library();
 
     void addObject(QuantObject* obj);
-    void addObject(DataNEW data);
+        void addObject(QByteArray msg);
 
     void removeObject(QString name);
     void removeObject(DataNEW data);

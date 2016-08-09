@@ -30,7 +30,7 @@ namespace QuantIDE
     case QuantObject::ObjectType::PROXY:
       if (!this->containObject("proxy"))
       {
-   //     qDebug() << "Library::addObject JSEM OBJECT PROXY";
+        //     qDebug() << "Library::addObject JSEM OBJECT PROXY";
         lib.insert("proxy", obj);
       }
       break;
@@ -45,14 +45,16 @@ namespace QuantIDE
 
     this->updateObjectPosition();
   }
-  void Library::addObject(DataNEW data)
+  void Library::addObject(QByteArray msg)
   {
-    switch (data.getType())
+
+    switch (DataNEW::getType(msg))
     {
     case DataNEW::DataType::USER:
-      if (!this->containObject(data))
+      //DataUser
+      DataUser userData(msg);
+      if (!this->containObject(userData))
       {
-        DataUser userData(data);
         QString name(userData.getValue_string(DataUser::Key::NAME));
         // qDebug() << "Library::addObject JSEM OBJECT USER from DATA :" << name;
 
