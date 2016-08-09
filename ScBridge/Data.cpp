@@ -251,7 +251,8 @@ namespace SupercolliderBridge
     this->print("DataCustomize(QByteArray wrapedData)");
   }
 
-   QStringList DataCustomize::keys()
+
+  QStringList DataCustomize::keys()
   {
     QStringList keys;
     for (int i = 0; i < metaEnum.keyCount(); i++)
@@ -259,6 +260,31 @@ namespace SupercolliderBridge
       keys.append(metaEnum.valueToKey(i));
     }
     return keys;
+  }
+
+
+  const QStringList DataCustomize::allKeys()
+  {
+    QStringList answ;
+    const QMetaObject &mo = DataCustomize::staticMetaObject;
+    QMetaEnum metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    for (int i = 0; i < metaEnum.keyCount(); ++i)
+    {
+      answ.append(metaEnum.valueToKey(i));
+    }
+    return answ;
+  }
+
+  QList<QVariant> DataCustomize::values()
+  {
+    QList<QVariant> answ;
+
+    for (int i = 0; i < metaEnum.keyCount(); ++i)
+    {
+      answ.append(this->getValue(metaEnum.valueToKey(i)));
+    }
+    return answ;
   }
 
   QString DataCustomize::key2string(Key key)  { return metaEnum.valueToKey(key); }

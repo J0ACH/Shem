@@ -49,6 +49,22 @@ namespace QuantIDE
     boxName->setLabel("userName");
     boxName->setLabelSize(150);
     connect(boxName, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
+    /*
+    boxBootNetwork = new ControlBox(scrollWidget);
+    boxBootNetwork->setLabel("bootNetwork");
+    boxBootNetwork->setLabelSize(150);
+    connect(boxBootNetwork, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
+
+    boxBootInterpret = new ControlBox(scrollWidget);
+    boxBootInterpret->setLabel("bootInterpret");
+    boxBootInterpret->setLabelSize(150);
+    connect(boxBootInterpret, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
+
+    boxBootServer = new ControlBox(scrollWidget);
+    boxBootServer->setLabel("bootServer");
+    boxBootServer->setLabelSize(150);
+    connect(boxBootServer, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
+    */
 
     boxColorNormal = new ControlBox(scrollWidget);
     boxColorNormal->setLabel("normal");
@@ -70,24 +86,68 @@ namespace QuantIDE
     boxColorText->setLabelSize(150);
     connect(boxColorText, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
 
+    boxColorAppHeader = new ControlBox(scrollWidget);
+    boxColorAppHeader->setLabel("AppHeader");
+    boxColorAppHeader->setLabelSize(150);
+    connect(boxColorAppHeader, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
+
+    boxColorAppBackground = new ControlBox(scrollWidget);
+    boxColorAppBackground->setLabel("AppBackground");
+    boxColorAppBackground->setLabelSize(150);
+    connect(boxColorAppBackground, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
+
+    boxColorPanelHeader = new ControlBox(scrollWidget);
+    boxColorPanelHeader->setLabel("header");
+    boxColorPanelHeader->setLabelSize(150);
+    connect(boxColorPanelHeader, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
+
     boxColorPanelBackground = new ControlBox(scrollWidget);
     boxColorPanelBackground->setLabel("background");
     boxColorPanelBackground->setLabelSize(150);
     connect(boxColorPanelBackground, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
+
+
   }
   void CustomizePanel::onCustomize(DataCustomize data)
   {
     customizeData = data;
 
+    /*
+    foreach(QString oneKey, DataCustomize::keys2())
+    {
+    qDebug() << "ENUM keys:" << oneKey;
+    }
+
+    foreach(QVariant oneValue, customizeData.values())
+    {
+    qDebug() << "ENUM values:" << oneValue;
+    qDebug() << "ENUM type:" << oneValue.typeName();
+    //qDebug() << "ENUM value:" << metaEnum.value(i);
+    }
+
+    for (int i = 0; i < customizeData.values().size(); i++)
+    {
+    qDebug() << "CustomizePanel::onCustomize KEYS:" << DataCustomize::allKeys()[i];
+    qDebug() << "ENUM values:" << customizeData.values()[i] << "type : " << customizeData.values()[i].typeName();
+    //qDebug() << "ENUM keys:" << DataCustomize::allKeys()[i] << "values:" << customizeData.values()[i] << "type : " << customizeData.values()[i].typeName();
+    }
+    */
+
     if (firstOnCustomizeFillBoxes)
     {
       boxName->setValue(data.getValue_string(DataCustomize::Key::USERNAME));
+    //  boxBootInterpret->setValue(QString::number(data.getValue_bool(DataCustomize::Key::BOOL_BOOT_INTERPRETR)));
+    //  boxBootServer->setValue(QString::number(data.getValue_bool(DataCustomize::Key::BOOL_BOOT_SERVER)));
 
       boxColorNormal->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_NORMAL)));
       boxColorOver->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_OVER)));
       boxColorActive->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_ACTIVE)));
       boxColorText->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_TEXT)));
 
+      boxColorAppHeader->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_APP_HEADER)));
+      boxColorAppBackground->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_APP_BACKGROUND)));
+
+      boxColorPanelHeader->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_PANEL_HEADER)));
       boxColorPanelBackground->setValue(this->color2String(data.getValue_color(DataCustomize::Key::COLOR_PANEL_BACKGROUND)));
 
       firstOnCustomizeFillBoxes = false;
@@ -98,8 +158,17 @@ namespace QuantIDE
   {
     // qDebug("CustomizePanel::onChangePressed()");
 
-    customizeData.setValue(DataCustomize::Key::USERNAME, boxName->getValue_string());
+    customizeData.setValue(DataCustomize::Key::USERNAME, boxName->getValue_string()); // PREPIS USERNAME ZPUSOBUJE PAD APP !!!!!!!!!!!!
 
+    customizeData.setValue(DataCustomize::Key::COLOR_NORMAL, this->string2Color(boxColorNormal->getValue_string()));
+    customizeData.setValue(DataCustomize::Key::COLOR_OVER, this->string2Color(boxColorOver->getValue_string()));
+    customizeData.setValue(DataCustomize::Key::COLOR_ACTIVE, this->string2Color(boxColorActive->getValue_string()));
+    customizeData.setValue(DataCustomize::Key::COLOR_TEXT, this->string2Color(boxColorText->getValue_string()));
+
+    customizeData.setValue(DataCustomize::Key::COLOR_APP_HEADER, this->string2Color(boxColorAppHeader->getValue_string()));
+    customizeData.setValue(DataCustomize::Key::COLOR_APP_BACKGROUND, this->string2Color(boxColorAppBackground->getValue_string()));
+
+    customizeData.setValue(DataCustomize::Key::COLOR_PANEL_HEADER, this->string2Color(boxColorPanelHeader->getValue_string()));
     customizeData.setValue(DataCustomize::Key::COLOR_PANEL_BACKGROUND, this->string2Color(boxColorPanelBackground->getValue_string()));
 
     qDebug() << customizeData.print("CustomizePanel::onChangePressed");
@@ -134,18 +203,22 @@ namespace QuantIDE
     boxColorOver->setGeometry(20, 175, width() - 30, 20);
     boxColorActive->setGeometry(20, 205, width() - 30, 20);
     boxColorText->setGeometry(20, 235, width() - 30, 20);
+    boxColorAppHeader->setGeometry(20, 265, width() - 30, 20);
+    boxColorAppBackground->setGeometry(20, 295, width() - 30, 20);
 
-    subTextPanels->setGeometry(20, 275, width() - 30, 20);
-    boxColorPanelBackground->setGeometry(20, 305, width() - 30, 20);
+
+    subTextPanels->setGeometry(20, 335, width() - 30, 20);
+    boxColorPanelBackground->setGeometry(20, 365, width() - 30, 20);
+    boxColorPanelHeader->setGeometry(20, 395, width() - 30, 20);
 
 
-    subTextMsg->setGeometry(20, 345, width() - 30, 20);
+    subTextMsg->setGeometry(20, 445, width() - 30, 20);
 
     /////////////////////////////
-    textFont->setGeometry(5, 385, width() - 20, 20);
+    textFont->setGeometry(5, 485, width() - 20, 20);
 
 
-    scrollWidget->setFixedHeight(410); // end of scroll
+    scrollWidget->setFixedHeight(510); // end of scroll
 
     PanelNEW::resizeEvent(event);
   }

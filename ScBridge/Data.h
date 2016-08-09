@@ -83,8 +83,12 @@ namespace SupercolliderBridge
     QString toStyleSheet(Key);
 
     QStringList keys();
+    static const QStringList allKeys();
+    QList<QVariant> DataCustomize::values();
+    
     QString key2string(Key);
 
+    
   private:
     QMetaEnum metaEnum;
   };
