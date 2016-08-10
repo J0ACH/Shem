@@ -272,20 +272,21 @@ namespace QuantIDE
 
     qDebug("QuantNode init...");
 
-    sourceBox = new CodeEditor(this);
-    sourceBox->setGeometry(5, 50, 90, 20);
+    codeSource = new CodeEditor(this);
+    codeSource->setGeometry(5, 50, 90, 20);
     //sourceBox->setLabel("name");
     // nameBox->setValue(this->getMap_string("name"));
 
-    connect(sourceBox, SIGNAL(actValueChanged(QString)), this, SLOT(onSourceChanged(QString)));
-    connect(sourceBox, SIGNAL(actValueEvaluate(QString)), this, SLOT(onSourceEvaluate(QString)));
+    connect(codeSource, SIGNAL(actValueChanged(QString)), this, SLOT(onSourceChanged(QString)));
+    connect(codeSource, SIGNAL(actValueEvaluate(QString)), this, SLOT(onSourceEvaluate(QString)));
+    connect(codeSource, SIGNAL(actCursorMoved(int)), this, SLOT(onSourceCursorMoved(int)));
   }
 
   void QuantNode::setSource(QString code)
   {
     qDebug() << "QuantNode::setSource" << code;
-    sourceBox->setText(code);
-    sourceBox->update();
+    codeSource->setText(code);
+    codeSource->update();
 
     nodeData.setValue(DataNode::SOURCE, code);
   }
@@ -328,6 +329,14 @@ namespace QuantIDE
     emit actEvaluate(data.getValue_string(DataNode::Key::SOURCE), true);
   }
 
+  void QuantNode::onNet_NodeDisplay(DataNode data)
+  {
+    nodeData.setValue(DataNode::Key::SOURCE_CURSOR, data.getValue_int(DataNode::Key::SOURCE_CURSOR));
+
+    qDebug() << "QuantNode::onNet_NodeDisplay SOURCE_CURSOR:" << data.getValue_int(DataNode::Key::SOURCE_CURSOR);
+    //codeSource->setTe
+  }
+
   void QuantNode::onSourceChanged(QString sourceTxt)
   {
     nodeData.setValue(DataNode::SOURCE, sourceTxt);
@@ -339,11 +348,17 @@ namespace QuantIDE
     emit actEvaluate(sourceTxt);
     this->sendData(QuantNode::TargetMethod::NodeEvaluate);
   }
-
+  void QuantNode::onSourceCursorMoved(int position)
+  {
+    qDebug("QuantNode::onSourceCursorMoved");
+    nodeData.setValue(DataNode::SOURCE_CURSOR, position);
+    this->sendData(QuantNode::TargetMethod::NodeDisplay);
+  }
+ 
   void QuantNode::resizeEvent(QResizeEvent *event)
   {
     QuantObject::resizeEvent(event);
-    sourceBox->setGeometry(5, 5, this->width() - 10, 90);
+    codeSource->setGeometry(5, 5, this->width() - 10, 90);
   }
 
   QuantNode::~QuantNode() { }

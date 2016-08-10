@@ -142,7 +142,7 @@ namespace SupercolliderBridge
       Q_ENUMS(Key)
 
   public:
-    enum Key { NAME, SOURCE };
+    enum Key { NAME, SOURCE, SOURCE_CURSOR };
 
     DataNode();
     DataNode(QByteArray);

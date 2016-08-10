@@ -5,7 +5,6 @@
 #include <QDebug>
 #include <QPainter>
 
-
 #include "Data.h"
 #include "Button.h"
 #include "ControlBox.h"
@@ -135,7 +134,6 @@ namespace QuantIDE
     void onBeep();
   };
 
-
   // QUANT NODEPROXY ////////////////////////////////////////////////////////////////
 
   class QuantNode : public QuantObject
@@ -144,33 +142,33 @@ namespace QuantIDE
       Q_ENUMS(TargetMethod)
   public:
 
-    enum TargetMethod { NodeExist, NodeSet, NodeEvaluate };
+    enum TargetMethod { NodeExist, NodeSet, NodeEvaluate, NodeDisplay };
 
     QuantNode(QWidget *parent, QObject *core);
     ~QuantNode();
 
     void setSource(QString);
-
+    
     void sendData(TargetMethod targetMethod);
 
     public slots:
     void onNet_NodeExist(DataNode);
     void onNet_NodeSet(DataNode);
     void onNet_NodeEvaluate(DataNode);
+    void onNet_NodeDisplay(DataNode);
 
   protected: // protected je viditelna jen detmi, ne z venku
     void resizeEvent(QResizeEvent *event);
 
   private:
     DataNode nodeData;
-    //ControlBox *sourceBox;
-    CodeEditor *sourceBox;
+    CodeEditor *codeSource;
 
     private slots:
     void onSourceChanged(QString);
     void onSourceEvaluate(QString);
+    void onSourceCursorMoved(int);
   };
-
 
   // QUANT CONTROLS ////////////////////////////////////////////////////////////////
 

@@ -24,7 +24,7 @@ namespace Jui
 
     testSecondCursor = new QTextCursor(this->document());
     testSecondCursorRect = QRect(0, 0, 10, 10);
-    
+
     connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
     connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
   }
@@ -125,7 +125,7 @@ namespace Jui
         QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
         quint32 modifers = eventKey->nativeModifiers();
 
-        
+
 
         switch (eventKey->key())
         {
@@ -171,7 +171,7 @@ namespace Jui
         emit actValueChanged(this->toPlainText());
         qDebug() << "KeyEvent: cursor pos:" << cursorPosition;
         qDebug() << "KeyEvent: cursor RECT:" << this->cursorRect();
-        
+
         qDebug() << "KeyEvent: cursor 2ND pos:" << testSecondCursor->position();
         qDebug() << "KeyEvent: cursor 2NP RECT:" << this->cursorRect(*testSecondCursor);
       }
@@ -183,7 +183,6 @@ namespace Jui
 
   void CodeEditor::paintEvent(QPaintEvent *event)
   {
-
     QPainter painter(viewport());
     QRect bounds = QRect(0, 0, viewport()->width() - 1, viewport()->height() - 1);
     QColor fillColor = activeColor;
@@ -196,13 +195,16 @@ namespace Jui
     painter.drawLine(0, 0, width(), 0);
     painter.drawLine(0, height() - 1, width(), height() - 1);
 
-    painter.setPen(QPen(QColor(90, 40, 40),3));
-    painter.drawLine(testSecondCursorRect.topLeft().x(), testSecondCursorRect.topLeft().y(), testSecondCursorRect.bottomLeft().x(), testSecondCursorRect.bottomLeft().y());
+    // second cursor test
+    painter.setPen(QPen(QColor(90, 40, 40), 3));
+    painter.drawLine(
+      testSecondCursorRect.topLeft().x(),
+      testSecondCursorRect.topLeft().y(),
+      testSecondCursorRect.bottomLeft().x(),
+      testSecondCursorRect.bottomLeft().y()
+      );
 
     QTextEdit::paintEvent(event);
-    //QTextEdit::paintEvent(event);
-    //painter.drawRect(testSecondCursorRect);
-    //painter.fillRect(testSecondCursorRect, QColor(220, 120, 120));
   }
 
   void CodeEditor::alphaUpdate()
