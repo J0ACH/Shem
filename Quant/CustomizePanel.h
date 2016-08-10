@@ -46,7 +46,7 @@ namespace QuantIDE
     QString font2String(QFont);
     QColor string2Color(QString);
     QFont string2Font(QString);
-    
+
     QScrollArea *scrollArea;
     QWidget *scrollWidget;
 
@@ -57,21 +57,11 @@ namespace QuantIDE
     ControlBox *boxColorAppHeader, *boxColorAppBackground;
     ControlBox *boxColorPanelHeader, *boxColorPanelBackground;
     ControlBox *boxFontAntialias, *boxFontBig, *boxFontSmall, *boxFontConsole, *boxFontCode;
+    // ControlBox *boxMsgNormal, *boxMsgStatus, *boxMsgEvaluate, *boxMsgAnswer, *boxMsgError, *boxMsgWarninig, *boxMsgBundle;
     Button *buttonSave;
 
     DataCustomize customizeData;
-         };
+  };
 }
 
 #endif // CUSTOMIZEPANEL_H
-
-/*
-dataCustomize.setValue(DataCustomize::COLOR_MSG_NORMAL, QColor(70, 70, 70));
-dataCustomize.setValue(DataCustomize::COLOR_MSG_STATUS, QColor(230, 230, 230));
-dataCustomize.setValue(DataCustomize::COLOR_MSG_EVALUATE, QColor(170, 230, 230));
-dataCustomize.setValue(DataCustomize::COLOR_MSG_ANSWER, QColor(170, 200, 160));
-dataCustomize.setValue(DataCustomize::COLOR_MSG_ERROR, QColor(230, 30, 30));
-dataCustomize.setValue(DataCustomize::COLOR_MSG_WARNINIG, QColor(230, 130, 30));
-dataCustomize.setValue(DataCustomize::COLOR_MSG_BUNDLE, QColor(170, 160, 20));
-
-*/

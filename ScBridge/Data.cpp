@@ -237,7 +237,6 @@ namespace SupercolliderBridge
     const QMetaObject &mo = DataCustomize::staticMetaObject;
     metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
   }
-
   DataCustomize::DataCustomize(QByteArray wrapedData) : Data(wrapedData)
   {
     const QMetaObject &mo = DataCustomize::staticMetaObject;
@@ -247,47 +246,6 @@ namespace SupercolliderBridge
 
     this->setType(Data::DataType::CUSTOMIZE);
   }
-
-  // ????????
-
-  QStringList DataCustomize::keys()
-  {
-    QStringList keys;
-    for (int i = 0; i < metaEnum.keyCount(); i++)
-    {
-      keys.append(metaEnum.valueToKey(i));
-    }
-    return keys;
-  }
-
-  const QStringList DataCustomize::allKeys()
-  {
-    QStringList answ;
-    const QMetaObject &mo = DataCustomize::staticMetaObject;
-    QMetaEnum metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
-
-    for (int i = 0; i < metaEnum.keyCount(); ++i)
-    {
-      answ.append(metaEnum.valueToKey(i));
-    }
-    return answ;
-  }
-
-  QList<QVariant> DataCustomize::values()
-  {
-    QList<QVariant> answ;
-
-    for (int i = 0; i < metaEnum.keyCount(); ++i)
-    {
-      answ.append(this->getValue(metaEnum.valueToKey(i)));
-    }
-    return answ;
-  }
-
-  QString DataCustomize::key2string(Key key)  { return metaEnum.valueToKey(key); }
-
-  // ????????
-
 
   void DataCustomize::setValue(Key key, QVariant value)  { Data::setValue(metaEnum.valueToKey(key), value); }
   QString DataCustomize::getValue_string(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toString(); }
@@ -335,7 +293,6 @@ namespace SupercolliderBridge
 
     this->setType(Data::DataType::USER);
   }
-
   DataUser::DataUser(QByteArray wrapedData) : Data(wrapedData)
   {
     const QMetaObject &mo = DataUser::staticMetaObject;
@@ -343,7 +300,6 @@ namespace SupercolliderBridge
 
     this->setType(Data::DataType::USER);
   }
-
   DataUser::DataUser(Data data)
   {
     const QMetaObject &mo = DataUser::staticMetaObject;
@@ -375,7 +331,6 @@ namespace SupercolliderBridge
 
     this->setType(Data::DataType::PROXY);
   }
-
   DataProxy::DataProxy(QByteArray wrapedData) : Data(wrapedData)
   {
     const QMetaObject &mo = DataProxy::staticMetaObject;
@@ -389,8 +344,6 @@ namespace SupercolliderBridge
   bool DataProxy::getValue_bool(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toBool(); }
   int DataProxy::getValue_int(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toInt(); }
   float DataProxy::getValue_double(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toDouble(); }
-  QFont DataProxy::getValue_font(Key key) { return Data::getValue(metaEnum.valueToKey(key)).value<QFont>(); }
-  QColor DataProxy::getValue_color(Key key) { return Data::getValue(metaEnum.valueToKey(key)).value<QColor>(); }
 
   //////////////////////////////////////////////////////////////////////////////////
 
@@ -401,7 +354,6 @@ namespace SupercolliderBridge
 
     this->setType(Data::DataType::NODE);
   }
-
   DataNode::DataNode(QByteArray wrapedData) : Data(wrapedData)
   {
     const QMetaObject &mo = DataNode::staticMetaObject;
@@ -415,7 +367,5 @@ namespace SupercolliderBridge
   bool DataNode::getValue_bool(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toBool(); }
   int DataNode::getValue_int(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toInt(); }
   float DataNode::getValue_double(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toDouble(); }
-  QFont DataNode::getValue_font(Key key) { return Data::getValue(metaEnum.valueToKey(key)).value<QFont>(); }
-  QColor DataNode::getValue_color(Key key) { return Data::getValue(metaEnum.valueToKey(key)).value<QColor>(); }
 
 }

@@ -11,7 +11,7 @@ namespace Jui
     align = Qt::AlignVCenter | Qt::AlignLeft; 
   }
 
-  void Text::setText(QString txt) { text = txt; }
+  void Text::setText(QString txt) { text = txt; this->update(); }
   QString Text::getText() { return text; }
 
   void Text::setAlign(Qt::Alignment alignment)  { align = alignment; }

@@ -105,6 +105,8 @@ namespace QuantIDE
     boxColorPanelBackground->setLabelSize(150);
     connect(boxColorPanelBackground, SIGNAL(actValueEvaluate(QString)), this, SLOT(onChangePressed()));
 
+    // MSG ////////////////////////////////////////
+
     // FONTS ////////////////////////////////////////
 
     boxFontAntialias = new ControlBox(scrollWidget);
@@ -136,27 +138,6 @@ namespace QuantIDE
   void CustomizePanel::onCustomize(DataCustomize data)
   {
     customizeData = data;
-
-    /*
-    foreach(QString oneKey, DataCustomize::keys2())
-    {
-    qDebug() << "ENUM keys:" << oneKey;
-    }
-
-    foreach(QVariant oneValue, customizeData.values())
-    {
-    qDebug() << "ENUM values:" << oneValue;
-    qDebug() << "ENUM type:" << oneValue.typeName();
-    //qDebug() << "ENUM value:" << metaEnum.value(i);
-    }
-
-    for (int i = 0; i < customizeData.values().size(); i++)
-    {
-    qDebug() << "CustomizePanel::onCustomize KEYS:" << DataCustomize::allKeys()[i];
-    qDebug() << "ENUM values:" << customizeData.values()[i] << "type : " << customizeData.values()[i].typeName();
-    //qDebug() << "ENUM keys:" << DataCustomize::allKeys()[i] << "values:" << customizeData.values()[i] << "type : " << customizeData.values()[i].typeName();
-    }
-    */
 
     boxName->setValue(data.getValue_string(DataCustomize::Key::USERNAME));
     boxBootNetwork->setValue(data.toStyleSheet(DataCustomize::Key::BOOL_BOOT_NETWORK));

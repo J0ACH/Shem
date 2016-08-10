@@ -10,50 +10,56 @@
 
 namespace Jui
 {
-	enum class HighLights { CLASS, CONTROL, NODE, DIGIT };
 
-	class CodeEditor : public QTextEdit
-	{
-		Q_OBJECT
+  class CodeEditor : public QTextEdit
+  {
+    Q_OBJECT
 
-	public:
-		CodeEditor(QWidget *parent);
-		~CodeEditor();
+  public:
+    CodeEditor(QWidget *parent);
+    ~CodeEditor();
 
-		void setBackground(const QColor &);
-		void setFontCode(QFont);
 
-	public slots:
- 
-   //void setCode(QString text);
-	
-   void fitTextFormat();
-		void alphaUpdate();
+    void setBackground(const QColor &);
+    void setFontCode(QFont);
 
-signals:
-  void actValueChanged(QString);
-  void actValueEvaluate(QString);
-  
-  // bude odstraneno
-		void evaluateAct();
-		void sendText(QString);
-				
-	protected:
-		virtual bool eventFilter(QObject * watched, QEvent * event);
-		void paintEvent(QPaintEvent *paintEvent);
+    public slots:
 
-	private:
+    //void setCode(QString text);
 
-		int fadeTimeOut;
-		int fps;
-		int backgroundAlpha;
-		QTimer *timer;
+    void fitTextFormat();
+    void alphaUpdate();
 
-		QColor normalColor, overColor, activeColor;
+  signals:
+    void actValueChanged(QString);
+    void actValueEvaluate(QString);
+    void actCursorMoved(int);
 
-		QList<QList<QVariant>*> regexpText(HighLights type);
-		void highlightText(int, int, QTextCharFormat);
-	};
+    // bude odstraneno
+    void evaluateAct();
+    void sendText(QString);
+
+  protected:
+    virtual bool eventFilter(QObject * watched, QEvent * event);
+    void paintEvent(QPaintEvent *paintEvent);
+
+  private:
+    enum HighLights { CLASS, CONTROL, NODE, DIGIT };
+
+    int cursorPosition;
+    QTextCursor *testSecondCursor;
+    QRect testSecondCursorRect;
+
+    int fadeTimeOut;
+    int fps;
+    int backgroundAlpha;
+    QTimer *timer;
+
+    QColor normalColor, overColor, activeColor;
+
+    QList<QList<QVariant>*> regexpText(HighLights type);
+    void highlightText(int, int, QTextCharFormat);
+  };
 
 }
 #endif // CONSOLE_H

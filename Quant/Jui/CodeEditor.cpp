@@ -22,6 +22,9 @@ namespace Jui
     fps = 25;
     timer = new QTimer(this);
 
+    testSecondCursor = new QTextCursor(this->document());
+    testSecondCursorRect = QRect(0, 0, 10, 10);
+    
     connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
     connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
   }
@@ -46,22 +49,22 @@ namespace Jui
     QString regexpRule;
     switch (typeHighLight)
     {
-    case Jui::HighLights::CLASS:
+    case HighLights::CLASS:
       regexpRule = "\\b[A-Z]\\w*";
       format.setFontWeight(QFont::Normal);
       format.setForeground(QBrush(QColor(180, 180, 180)));
       break;
-    case Jui::HighLights::CONTROL:
+    case HighLights::CONTROL:
       regexpRule = "\\\\\\w*";
       format.setFontWeight(QFont::DemiBold);
       format.setForeground(QBrush(QColor(20, 180, 240)));
       break;
-    case Jui::HighLights::NODE:
+    case HighLights::NODE:
       regexpRule = "~\\w+";
       format.setFontWeight(QFont::Normal);
       format.setForeground(QBrush(Qt::green));
       break;
-    case Jui::HighLights::DIGIT:
+    case HighLights::DIGIT:
       format.setFontWeight(QFont::Normal);
       regexpRule = "\\b((\\d+(\\.\\d+)?([eE][-+]?\\d+)?(pi)?)|pi)\\b";
       format.setForeground(QBrush(QColor(20, 110, 180)));
@@ -122,7 +125,7 @@ namespace Jui
         QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
         quint32 modifers = eventKey->nativeModifiers();
 
-        emit actValueChanged(this->toPlainText());
+        
 
         switch (eventKey->key())
         {
@@ -157,7 +160,21 @@ namespace Jui
           break;
         }
       }
+      if (event->type() == QEvent::KeyRelease)
+      {
+        cursorPosition = this->textCursor().position();
+        testSecondCursor->setPosition(cursorPosition - 5);
+        testSecondCursorRect = this->cursorRect(*testSecondCursor);
+        this->update();
 
+        emit actCursorMoved(cursorPosition);
+        emit actValueChanged(this->toPlainText());
+        qDebug() << "KeyEvent: cursor pos:" << cursorPosition;
+        qDebug() << "KeyEvent: cursor RECT:" << this->cursorRect();
+        
+        qDebug() << "KeyEvent: cursor 2ND pos:" << testSecondCursor->position();
+        qDebug() << "KeyEvent: cursor 2NP RECT:" << this->cursorRect(*testSecondCursor);
+      }
     };
 
     event->ignore();
@@ -166,6 +183,7 @@ namespace Jui
 
   void CodeEditor::paintEvent(QPaintEvent *event)
   {
+
     QPainter painter(viewport());
     QRect bounds = QRect(0, 0, viewport()->width() - 1, viewport()->height() - 1);
     QColor fillColor = activeColor;
@@ -178,7 +196,13 @@ namespace Jui
     painter.drawLine(0, 0, width(), 0);
     painter.drawLine(0, height() - 1, width(), height() - 1);
 
+    painter.setPen(QPen(QColor(90, 40, 40),3));
+    painter.drawLine(testSecondCursorRect.topLeft().x(), testSecondCursorRect.topLeft().y(), testSecondCursorRect.bottomLeft().x(), testSecondCursorRect.bottomLeft().y());
+
     QTextEdit::paintEvent(event);
+    //QTextEdit::paintEvent(event);
+    //painter.drawRect(testSecondCursorRect);
+    //painter.fillRect(testSecondCursorRect, QColor(220, 120, 120));
   }
 
   void CodeEditor::alphaUpdate()

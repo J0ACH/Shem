@@ -18,7 +18,6 @@ namespace QuantIDE
 
     this->initControls();
   }
-
   QuantCore::QuantCore(CanvanNEW *canvan, QString appName, int sendPort, int listenPort) :
     QObject(canvan),
     mCanvan(canvan),

@@ -81,13 +81,6 @@ namespace SupercolliderBridge
     QColor getValue_color(Key);
 
     QString toStyleSheet(Key);
-
-    QStringList keys();
-    static const QStringList allKeys();
-    QList<QVariant> DataCustomize::values();
-    
-    QString key2string(Key);
-
     
   private:
     QMetaEnum metaEnum;
@@ -138,10 +131,7 @@ namespace SupercolliderBridge
     bool getValue_bool(Key);
     int getValue_int(Key);
     float getValue_double(Key);
-    QFont getValue_font(Key);
-    QColor getValue_color(Key);
-
-
+    
   private:
     QMetaEnum metaEnum;
   };
@@ -162,9 +152,7 @@ namespace SupercolliderBridge
     bool getValue_bool(Key);
     int getValue_int(Key);
     float getValue_double(Key);
-    QFont getValue_font(Key);
-    QColor getValue_color(Key);
-
+    
   private:
     QMetaEnum metaEnum;
   };
