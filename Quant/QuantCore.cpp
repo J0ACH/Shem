@@ -84,9 +84,9 @@ namespace QuantIDE
 #if (!_DEBUG)
     userName = data.getValue_string(DataCustomize::Key::USERNAME);
 #endif
-    qDebug() << "QuantCore::onCustomize2 userName:" << userName;
+    qDebug() << "QuantCore::onCustomize userName:" << userName;
 
-    initNetworkOnStart = true;
+    initNetworkOnStart = data.getValue_bool(DataCustomize::Key::BOOL_BOOT_NETWORK);
     initInterpretOnStart = data.getValue_bool(DataCustomize::Key::BOOL_BOOT_INTERPRETR);
     initServerOnStart = data.getValue_bool(DataCustomize::Key::BOOL_BOOT_SERVER);
 
@@ -100,6 +100,11 @@ namespace QuantIDE
 
 
     emit actCoreInitPrepared(); // ceka na initInterpretOnStart a initServerOnStart
+  }
+  void QuantCore::onChangeUserName(DataCustomize data)
+  {
+    if (mNetwork->isConnected()) { this->onNetChangeState(); }
+    this->onCustomize(data);
   }
 
   // CORE /////////////////////////////////////////
@@ -214,7 +219,7 @@ namespace QuantIDE
     mCanvan->getButtonBar("Bridge")->getButton("Interpretr")->setState(Button::State::ON);
     mCanvan->getButtonBar("Bridge")->getButton("Server")->setState(Button::State::OFF);
     this->onPrint("Interpretr init done...\n", MessageType::STATUS);
-    if (initServerOnStart) { mBridge->changeServerState(); }
+    if (initServerOnStart) { this->onServerChangeState(); }
   }
   void QuantCore::onInterpretKill()
   {

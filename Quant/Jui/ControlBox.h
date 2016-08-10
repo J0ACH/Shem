@@ -33,6 +33,7 @@ namespace Jui
     QString getValue_string();
     int getValue_int();
     double getValue_double();
+    bool getValue_bool(); 
 
     void setColorNormal(QColor);
     void setColorOver(QColor);

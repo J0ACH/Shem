@@ -45,6 +45,11 @@ namespace Jui
   QString ControlBox::getValue_string()  { return value->displayText(); }
   int ControlBox::getValue_int()  { return value->displayText().toInt(); }
   double ControlBox::getValue_double()  { return value->displayText().toDouble(); }
+  bool ControlBox::getValue_bool()
+  {
+    if (value->displayText() == "true") { return true; }
+    else { return false; }
+  };
 
   void ControlBox::setColorNormal(QColor color) { colorNormal = color; }
   void ControlBox::setColorOver(QColor color) { colorOver = color; }
@@ -108,9 +113,9 @@ namespace Jui
         return true;
         /*
       default:
-       
-        break;
-        */
+
+      break;
+      */
       }
     };
     if (event->type() == QEvent::KeyRelease)

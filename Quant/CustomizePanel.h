@@ -35,6 +35,7 @@ namespace QuantIDE
   signals:
     void actChangeConfirmed(DataCustomize);
     void actSaveConfirmed(DataCustomize);
+    void actUserNameChanged(DataCustomize);
 
   protected:
     void resizeEvent(QResizeEvent *event);
@@ -42,7 +43,9 @@ namespace QuantIDE
   private:
     void initControl();
     QString color2String(QColor);
+    QString font2String(QFont);
     QColor string2Color(QString);
+    QFont string2Font(QString);
     
     QScrollArea *scrollArea;
     QWidget *scrollWidget;
@@ -53,12 +56,11 @@ namespace QuantIDE
     ControlBox *boxColorNormal, *boxColorOver, *boxColorActive, *boxColorText;
     ControlBox *boxColorAppHeader, *boxColorAppBackground;
     ControlBox *boxColorPanelHeader, *boxColorPanelBackground;
+    ControlBox *boxFontAntialias, *boxFontBig, *boxFontSmall, *boxFontConsole, *boxFontCode;
     Button *buttonSave;
 
     DataCustomize customizeData;
-
-    bool firstOnCustomizeFillBoxes;
-  };
+         };
 }
 
 #endif // CUSTOMIZEPANEL_H
@@ -72,11 +74,4 @@ dataCustomize.setValue(DataCustomize::COLOR_MSG_ERROR, QColor(230, 30, 30));
 dataCustomize.setValue(DataCustomize::COLOR_MSG_WARNINIG, QColor(230, 130, 30));
 dataCustomize.setValue(DataCustomize::COLOR_MSG_BUNDLE, QColor(170, 160, 20));
 
-dataCustomize.setValue(DataCustomize::BOOL_TEXT_ANTIALIASING, true);
-dataCustomize.setValue(DataCustomize::FONT_BIG, QFont("Univers Condensed", 13));
-dataCustomize.setValue(DataCustomize::FONT_SMALL, QFont("Univers Condensed", 10));
-dataCustomize.setValue(DataCustomize::FONT_CODE, QFont("Consolas", 8));
-dataCustomize.setValue(DataCustomize::FONT_CONSOLE, QFont("Univers 57 Condensed", 9));
-
-dataCustomize.setValue(DataCustomize::BOOL_BOOT_INTERPRETR, false);
-dataCustomize.setValue(DataCustomize::BOOL_BOOT_SERVER, false);*/
+*/

@@ -217,7 +217,6 @@ namespace SupercolliderBridge
     foreach(QString oneKey, library->keys())
     {
       // qDebug() << "\t - key:" << oneKey << ", type:" << library->value(oneKey).typeName() << ", value:" << library->value(oneKey).toString();
-      // list.append(QString("%1|%2|%3").arg(oneKey, library->value(oneKey).typeName(), library->value(oneKey).toString()));
 
       bArray.append(QString("%1|%2|%3").arg(
         oneKey,
@@ -226,7 +225,7 @@ namespace SupercolliderBridge
         ));
       if (oneKey != library->keys().at(library->keys().size() - 1)) { bArray.append("||"); }
     }
-    //qDebug() << "List1:" << list;
+
     return bArray.toStdString().c_str();
   }
 
@@ -247,10 +246,9 @@ namespace SupercolliderBridge
     Data::Data(wrapedData);
 
     this->setType(Data::DataType::CUSTOMIZE);
-
-    this->print("DataCustomize(QByteArray wrapedData)");
   }
 
+  // ????????
 
   QStringList DataCustomize::keys()
   {
@@ -261,7 +259,6 @@ namespace SupercolliderBridge
     }
     return keys;
   }
-
 
   const QStringList DataCustomize::allKeys()
   {
@@ -288,6 +285,9 @@ namespace SupercolliderBridge
   }
 
   QString DataCustomize::key2string(Key key)  { return metaEnum.valueToKey(key); }
+
+  // ????????
+
 
   void DataCustomize::setValue(Key key, QVariant value)  { Data::setValue(metaEnum.valueToKey(key), value); }
   QString DataCustomize::getValue_string(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toString(); }

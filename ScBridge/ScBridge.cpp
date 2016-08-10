@@ -617,8 +617,8 @@ namespace SupercolliderBridge
         {
         case StateInterpret::OFF:
           qDebug() << "INTERPRET INIT FOUND ";
-          emit actInterpretInitDone();
           mInterpretState = StateInterpret::RUN;
+          emit actInterpretInitDone();
           break;
         }
       }

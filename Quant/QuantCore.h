@@ -33,10 +33,11 @@ namespace QuantIDE
     ~QuantCore();
 
     void initControls();
-    
+
     public slots :
-    //void onCustomize(Data);
     void onCustomize(DataCustomize);
+    void onChangeUserName(DataCustomize);
+
 
     // CORE /////////////////////////////////////////
 
@@ -100,11 +101,11 @@ namespace QuantIDE
     QuantPanel *networkPanel;
     QuantPanel *timePanel;
     QuantPanel *nodePanel;
-    
+
     Library *lib_users;  // knihovna prihlasenych hracu pro komunikujici pres sit 
     Library *lib_proxy;
     Library *lib_nodes;
-    
+
 
     Text *textServerMeter, *textServerSynths, *textServerGroups;
 
@@ -112,7 +113,7 @@ namespace QuantIDE
 
     bool isCoreRunning, isNetworkRunning;
     bool initNetworkOnStart, initInterpretOnStart, initServerOnStart;
-    
+
     QColor colorMsgNormal, colorMsgStatus, colorMsgEvaluate, colorMsgAnswer, colorMsgError, colorMsgWarning, colorMsgBundle;
 
   };

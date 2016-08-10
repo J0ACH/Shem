@@ -10,7 +10,7 @@ namespace SupercolliderBridge
     this->readConfigFile();
     this->postprocessingData();
     this->writeConfigFile();
-    
+
     emit actDataChanged(dataCustomize);
   }
 
@@ -53,6 +53,7 @@ namespace SupercolliderBridge
     dataCustomize.setValue(DataCustomize::FONT_CODE, QFont("Consolas", 8));
     dataCustomize.setValue(DataCustomize::FONT_CONSOLE, QFont("Univers 57 Condensed", 9));
 
+    dataCustomize.setValue(DataCustomize::BOOL_BOOT_NETWORK, false);
     dataCustomize.setValue(DataCustomize::BOOL_BOOT_INTERPRETR, false);
     dataCustomize.setValue(DataCustomize::BOOL_BOOT_SERVER, false);
   }
@@ -83,23 +84,30 @@ namespace SupercolliderBridge
     }
 
     // ANTIALIAS FONTS
-    /*
-    foreach(DataKey oneKey, configFileKeys.keys())
+    QFont fontBig = dataCustomize.getValue_font(DataCustomize::Key::FONT_BIG);
+    QFont fontSmall = dataCustomize.getValue_font(DataCustomize::Key::FONT_SMALL);
+    QFont fontConsole = dataCustomize.getValue_font(DataCustomize::Key::FONT_CONSOLE);
+    QFont fontCode = dataCustomize.getValue_font(DataCustomize::Key::FONT_CODE);
+
+    if (dataCustomize.getValue_bool(DataCustomize::Key::BOOL_TEXT_ANTIALIASING))
     {
-      if (configFileKeys.value(oneKey).startsWith("font"))
-      {
-        QFont font = library.getValue_font(oneKey);
-        if (library.getValue_bool(DataKey::BOOL_TEXT_ANTIALIASING))
-        {
-          font.setStyleStrategy(QFont::PreferAntialias);
-        }
-        else
-        {
-          font.setStyleStrategy(QFont::NoAntialias);
-        }
-      }
+      fontBig.setStyleStrategy(QFont::PreferAntialias);
+      fontSmall.setStyleStrategy(QFont::PreferAntialias);
+      fontConsole.setStyleStrategy(QFont::PreferAntialias);
+      fontCode.setStyleStrategy(QFont::PreferAntialias);
     }
-    */
+    else
+    {
+      fontBig.setStyleStrategy(QFont::NoAntialias);
+      fontSmall.setStyleStrategy(QFont::NoAntialias);
+      fontConsole.setStyleStrategy(QFont::NoAntialias);
+      fontCode.setStyleStrategy(QFont::NoAntialias);
+    }
+
+    dataCustomize.setValue(DataCustomize::Key::FONT_BIG, fontBig);
+    dataCustomize.setValue(DataCustomize::Key::FONT_SMALL, fontSmall);
+    dataCustomize.setValue(DataCustomize::Key::FONT_CONSOLE, fontConsole);
+    dataCustomize.setValue(DataCustomize::Key::FONT_CODE, fontCode);
   }
 
   void Customize::writeConfigFile()

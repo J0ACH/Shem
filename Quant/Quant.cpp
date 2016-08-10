@@ -48,6 +48,7 @@ namespace QuantIDE
 
     connect(customize, SIGNAL(actDataChanged(DataCustomize)), customizePanel, SLOT(onCustomize(DataCustomize)));
     connect(customizePanel, SIGNAL(actChangeConfirmed(DataCustomize)), customize, SLOT(onModify(DataCustomize)));
+    connect(customizePanel, SIGNAL(actUserNameChanged(DataCustomize)), core, SLOT(onChangeUserName(DataCustomize)));
     connect(customizePanel, SIGNAL(actSaveConfirmed(DataCustomize)), customize, SLOT(onSave(DataCustomize)));
 
     customize->refresh();
