@@ -343,13 +343,12 @@ namespace QuantIDE
     data.setSender(userName);
     //data.setTime(proxy time); // pridat cas odeslani
 
-    /*
-    if (Data::getType(data.wrap()) != Data::DataType::USER)
-    {
-    this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
-    }
-    */
 
+    if (data.getType() != Data::DataType::USER)
+    {
+      this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
+      qDebug() << data.print("QuantCore::onObjectDataChanged");
+    }
 
     emit actObjectDataSend(data.wrap());
   }
@@ -364,11 +363,14 @@ namespace QuantIDE
       QString targetMethod = Data::getMethod(msg);
       std::string targetMethod_str = targetMethod.toLatin1().constData();
 
-      // qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
-      //  qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+      
 
-      //if (Data::getType(msg) != Data::DataType::USER)
-      //  this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
+      if (Data::getType(msg) != Data::DataType::USER)
+      {
+        qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+        qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+       // this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
+      }
 
       switch (Data::getType(msg))
       {
@@ -390,8 +392,7 @@ namespace QuantIDE
         QMetaObject::invokeMethod(lib_proxy->getProxy(), targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
         break;
       case Data::DataType::NODE:
-        qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
-        qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+        qDebug() << "QuantCore::onNetworkDataRecived DATA NODE targetObject: " << targetObject << "targetMethod : " << targetMethod;
         QMetaObject::invokeMethod(lib_nodes->getNode(targetObject), targetMethod_str.c_str(), Q_ARG(DataNode, DataNode(msg)));
         break;
       default:

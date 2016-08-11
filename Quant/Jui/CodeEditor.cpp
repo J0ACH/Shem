@@ -115,6 +115,22 @@ namespace Jui
     this->setStyleSheet("QTextEdit { background-color: rgba(0,0,0,0); }");
   }
 
+  void CodeEditor::onChangeExtraCursor(QString name, int position)
+  {
+    qDebug() << "CodeEditor::onChangeExtraCursor name:" << name << "position:" << position;
+
+    if (!extraCursors.contains(name))
+    {
+      QTextCursor *oneCursor = new QTextCursor(this->document());
+      //oneCursor = QRect(0, 0, 10, 10);
+
+      extraCursors.insert(name, oneCursor);
+    }
+
+    extraCursors.value(name)->setPosition(position);
+    this->update();
+  }
+
   bool CodeEditor::eventFilter(QObject* target, QEvent* event)
   {
     //qDebug() << "EventType " << event->type();
@@ -124,8 +140,6 @@ namespace Jui
       {
         QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
         quint32 modifers = eventKey->nativeModifiers();
-
-
 
         switch (eventKey->key())
         {
@@ -197,12 +211,17 @@ namespace Jui
 
     // second cursor test
     painter.setPen(QPen(QColor(90, 40, 40), 3));
-    painter.drawLine(
-      testSecondCursorRect.topLeft().x(),
-      testSecondCursorRect.topLeft().y(),
-      testSecondCursorRect.bottomLeft().x(),
-      testSecondCursorRect.bottomLeft().y()
-      );
+    foreach(QTextCursor *oneExtraCursor, extraCursors)
+    {
+      QRect cursorRect = this->cursorRect(*oneExtraCursor);
+      painter.drawLine(
+        cursorRect.topLeft().x(),
+        cursorRect.topLeft().y(),
+        cursorRect.bottomLeft().x(),
+        cursorRect.bottomLeft().y()
+        );
+    }
+    
 
     QTextEdit::paintEvent(event);
   }

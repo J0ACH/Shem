@@ -26,6 +26,7 @@ namespace Jui
     public slots:
 
     //void setCode(QString text);
+    void onChangeExtraCursor(QString name, int position);
 
     void fitTextFormat();
     void alphaUpdate();
@@ -59,6 +60,8 @@ namespace Jui
 
     QList<QList<QVariant>*> regexpText(HighLights type);
     void highlightText(int, int, QTextCharFormat);
+
+    QMap<QString, QTextCursor*> extraCursors;
   };
 
 }

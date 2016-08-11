@@ -297,7 +297,8 @@ namespace QuantIDE
     nodeData.setTargetObject("testNode");
     nodeData.setTargetMethod(target);
 
-    // emit actPrint("QuantProxy::sendData to target: " + target, MessageType::WARNING);
+    emit actPrint("QuantNode::sendData to: testNode, target: " + target, MessageType::WARNING);
+    qDebug() << nodeData.print("QuantNode::sendData");
     emit actDataChanged(nodeData);
   }
 
@@ -316,6 +317,11 @@ namespace QuantIDE
     //emit actPrint("Copying node from \"" + data.getSender() + "\"", MessageType::STATUS);
     //emit actPrint(data.print("QuantNode::onNet_NodeSet"), MessageType::NORMAL);
     this->setSource(data.getValue_string(DataNode::Key::SOURCE));
+
+    nodeData.setValue(DataNode::Key::SOURCE_CURSOR, data.getValue_int(DataNode::Key::SOURCE_CURSOR));
+
+    codeSource->onChangeExtraCursor(data.getSender(), data.getValue_int(DataNode::Key::SOURCE_CURSOR));
+    this->update();
   }
 
   void QuantNode::onNet_NodeEvaluate(DataNode data)
@@ -335,6 +341,8 @@ namespace QuantIDE
 
     qDebug() << "QuantNode::onNet_NodeDisplay SOURCE_CURSOR:" << data.getValue_int(DataNode::Key::SOURCE_CURSOR);
     //codeSource->setTe
+
+    this->update();
   }
 
   void QuantNode::onSourceChanged(QString sourceTxt)
@@ -354,7 +362,7 @@ namespace QuantIDE
     nodeData.setValue(DataNode::SOURCE_CURSOR, position);
     this->sendData(QuantNode::TargetMethod::NodeDisplay);
   }
- 
+
   void QuantNode::resizeEvent(QResizeEvent *event)
   {
     QuantObject::resizeEvent(event);
