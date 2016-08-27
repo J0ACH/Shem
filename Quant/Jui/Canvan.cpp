@@ -7,6 +7,10 @@ namespace Jui
   {
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setWindowTitle("CanvanNEW");
+    this->setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+    this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
     headerSize = 50;
     tailSize = 30;

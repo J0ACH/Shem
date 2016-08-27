@@ -46,7 +46,8 @@ namespace QuantIDE
     mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
 
     nodePanel = new QuantPanel(mCanvan);
-    mCanvan->addPanel(nodePanel, "NodePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+    mCanvan->addPanel(nodePanel, "NodePanel", Qt::DockWidgetArea::TopDockWidgetArea);
+    nodePanel->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
 
     lib_users = new Library(networkPanel, this);
     lib_proxy = new Library(timePanel, this);

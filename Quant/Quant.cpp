@@ -91,7 +91,7 @@ namespace QuantIDE
     customizePanel = new CustomizePanel();
     customizePanel->setVisible(false);
 
-    controlsBar = new CanvanNEW_ToolBar();
+        controlsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(controlsBar, "Bridge", Qt::ToolBarArea::BottomToolBarArea);
     controlsBar->addButton("Network", QImage(":/network_16px.png"), core, SLOT(onNetChangeState()));
     controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), core, SLOT(onInterpretChangeState()));
