@@ -77,6 +77,9 @@ namespace QuantIDE
     void onEvaluate(QString code, bool print = false);
     void onPrint(QString, MessageType msg = MessageType::NORMAL);
 
+    // NODES /////////////////////////////////////////
+
+    void onAddNode();
 
   signals:
     void actCoreInitPrepared();

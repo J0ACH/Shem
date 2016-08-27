@@ -35,11 +35,14 @@ namespace QuantIDE
       }
       break;
     case QuantObject::ObjectType::NODE:
-      if (!this->containObject("testNode"))
-      {
-        //     qDebug() << "Library::addObject JSEM OBJECT PROXY";
-        lib.insert("testNode", obj);
-      }
+      //name = static_cast<QuantNode*>(obj)->getName();
+      name = this->getUniqueName(static_cast<QuantNode*>(obj)->getName());
+      static_cast<QuantNode*>(obj)->setName(name);
+      //if (!this->containObject(name))
+      //{
+      qDebug() << "Library::addObject JSEM OBJECT NODE" << name;
+      lib.insert(name, obj);
+      //}
       break;
     }
 
@@ -47,12 +50,13 @@ namespace QuantIDE
   }
   void Library::addObject(QByteArray msg)
   {
+    DataUser userData;
+    DataNode nodeData;
 
     switch (Data::getType(msg))
     {
     case Data::DataType::USER:
-      //DataUser
-      DataUser userData(msg);
+      userData = DataUser(msg);
       if (!this->containObject(userData))
       {
         QString name(userData.getValue_string(DataUser::Key::NAME));
@@ -64,6 +68,21 @@ namespace QuantIDE
         lib.insert(name, newUser);
       }
       break;
+    case Data::DataType::NODE:
+      nodeData = DataNode(msg);
+      if (!this->containObject(nodeData))
+      {
+        QString name(nodeData.getValue_string(DataNode::Key::NAME));
+        // qDebug() << "Library::addObject JSEM OBJECT USER from DATA :" << name;
+
+        QuantNode *newNode = new QuantNode(this, mCore);
+        //newNode->setName(name);
+        newNode->setGeometry(10, 30, 30, 100);
+        newNode->show();
+        lib.insert(name, newNode);
+      }
+      break;
+
     }
     this->updateObjectPosition();
   }
@@ -136,7 +155,6 @@ namespace QuantIDE
 
     foreach(QuantObject *obj, lib)
     {
-
       obj->setGeometry(
         10,
         lastObjOriginY,
@@ -146,6 +164,22 @@ namespace QuantIDE
       lastObjOriginY += obj->height() + gapSize;
     }
     this->setFixedHeight(lastObjOriginY);
+  }
+
+  QString Library::getUniqueName(QString originalName)
+  {
+    int cntOfNames = 0;
+    foreach(QString oneKey, lib.keys())
+    {
+      if (oneKey.startsWith(originalName))
+      {
+        QString num = oneKey.remove(tr("%1").arg(originalName));
+        if (num.toInt() > cntOfNames) { cntOfNames = num.toInt() + 1; }
+        else { cntOfNames++; }
+      }
+    };
+    if (cntOfNames == 0) { return originalName; }
+    else { return tr("%1%2").arg(originalName, QString::number(cntOfNames)); };
   }
 
   void Library::resizeEvent(QResizeEvent *event)

@@ -52,6 +52,7 @@ namespace QuantIDE
     bool containObject(QString name);
     bool containObject(Data data);
 
+    QString getUniqueName(QString);
 
     QColor colorBackground;
   };

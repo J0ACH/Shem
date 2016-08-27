@@ -142,17 +142,20 @@ namespace QuantIDE
       Q_ENUMS(TargetMethod)
   public:
 
-    enum TargetMethod { NodeExist, NodeSet, NodeEvaluate, NodeDisplay };
+    enum TargetMethod { NodeCreated, NodeSet, NodeEvaluate, NodeDisplay };
 
     QuantNode(QWidget *parent, QObject *core);
     ~QuantNode();
+
+    void setName(QString);
+    QString getName();
 
     void setSource(QString);
     
     void sendData(TargetMethod targetMethod);
 
     public slots:
-    void onNet_NodeExist(DataNode);
+    void onNet_NodeCreated(DataNode);
     void onNet_NodeSet(DataNode);
     void onNet_NodeEvaluate(DataNode);
     void onNet_NodeDisplay(DataNode);
@@ -162,6 +165,9 @@ namespace QuantIDE
 
   private:
     DataNode nodeData;
+
+    Text *textName;
+
     CodeEditor *codeSource;
 
     private slots:

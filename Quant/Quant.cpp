@@ -42,7 +42,7 @@ namespace QuantIDE
     canvanNEW->addPanel(customizePanel, "Customize");
 
     connect(core, SIGNAL(actPrint(QString, QColor, bool)), console, SLOT(addText(QString, QColor, bool)));
-    
+
     connect(customize, SIGNAL(actDataChanged(DataCustomize)), this, SLOT(onCustomize(DataCustomize)));
     connect(customize, SIGNAL(actDataChanged(DataCustomize)), core, SLOT(onCustomize(DataCustomize)));
 
@@ -91,7 +91,7 @@ namespace QuantIDE
     customizePanel = new CustomizePanel();
     customizePanel->setVisible(false);
 
-        controlsBar = new CanvanNEW_ToolBar();
+    controlsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(controlsBar, "Bridge", Qt::ToolBarArea::BottomToolBarArea);
     controlsBar->addButton("Network", QImage(":/network_16px.png"), core, SLOT(onNetChangeState()));
     controlsBar->addButton("Interpretr", QImage(":/lang_16px.png"), core, SLOT(onInterpretChangeState()));

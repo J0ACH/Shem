@@ -45,7 +45,8 @@ namespace QuantIDE
     timePanel->setVisible(false);
     mCanvan->addPanel(timePanel, "TimePanel", Qt::DockWidgetArea::LeftDockWidgetArea);
 
-    nodePanel = new QuantPanel(mCanvan);
+    //nodePanel = new QuantPanel(mCanvan);
+    nodePanel = new NodePanelNEW(mCanvan);
     mCanvan->addPanel(nodePanel, "NodePanel", Qt::DockWidgetArea::TopDockWidgetArea);
     nodePanel->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
 
@@ -283,9 +284,13 @@ namespace QuantIDE
     lib_proxy->addObject(proxy);
     lib_proxy->getProxy()->sendData(QuantProxy::TargetMethod::ProxyExist);
 
+    connect(nodePanel, SIGNAL(actAddNode()), this, SLOT(onAddNode()));
+
+    /*
     QuantNode *testNode = new QuantNode(0, this);
     testNode->setGeometry(10, 30, 30, 100);
     lib_nodes->addObject(testNode);
+    */
 
     this->onPrint("Server init done...\n", MessageType::STATUS);
   }
@@ -295,6 +300,8 @@ namespace QuantIDE
     this->onPrint("Server kill...", MessageType::STATUS);
 
     lib_proxy->removeObject("proxy");
+
+    disconnect(nodePanel, SIGNAL(actAddNode()), this, SLOT(onAddNode()));
 
     //proxy->deleteLater();
     //proxy = NULL;
@@ -364,13 +371,11 @@ namespace QuantIDE
       QString targetMethod = Data::getMethod(msg);
       std::string targetMethod_str = targetMethod.toLatin1().constData();
 
-      
-
       if (Data::getType(msg) != Data::DataType::USER)
       {
         qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
         qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
-       // this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
+        // this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
       }
 
       switch (Data::getType(msg))
@@ -393,6 +398,10 @@ namespace QuantIDE
         QMetaObject::invokeMethod(lib_proxy->getProxy(), targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
         break;
       case Data::DataType::NODE:
+        if (targetMethod == "onNet_NodeCreated")
+        {
+          lib_nodes->addObject(msg);
+        }
         qDebug() << "QuantCore::onNetworkDataRecived DATA NODE targetObject: " << targetObject << "targetMethod : " << targetMethod;
         QMetaObject::invokeMethod(lib_nodes->getNode(targetObject), targetMethod_str.c_str(), Q_ARG(DataNode, DataNode(msg)));
         break;
@@ -433,6 +442,15 @@ namespace QuantIDE
       break;
     }
 
+  }
+
+  // NODES /////////////////////////////////////////
+
+  void QuantCore::onAddNode()
+  {
+    QuantNode *newNode = new QuantNode(0, this);
+    newNode->setGeometry(10, 30, 30, 100);
+    lib_nodes->addObject(newNode);
   }
 
   QuantCore::~QuantCore()

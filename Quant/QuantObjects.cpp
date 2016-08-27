@@ -274,17 +274,28 @@ namespace QuantIDE
 
     codeSource = new CodeEditor(this);
     codeSource->setGeometry(5, 50, 90, 20);
-    //sourceBox->setLabel("name");
-    // nameBox->setValue(this->getMap_string("name"));
+
+    textName = new Text(this);
+
+    nodeData.setValue(DataNode::Key::NAME, "node");
 
     connect(codeSource, SIGNAL(actValueChanged(QString)), this, SLOT(onSourceChanged(QString)));
     connect(codeSource, SIGNAL(actValueEvaluate(QString)), this, SLOT(onSourceEvaluate(QString)));
     connect(codeSource, SIGNAL(actCursorMoved(int)), this, SLOT(onSourceCursorMoved(int)));
   }
 
+  void QuantNode::setName(QString name)
+  {
+    nodeData.setValue(DataNode::Key::NAME, name);
+    textName->setText(name);
+
+    this->sendData(QuantNode::TargetMethod::NodeCreated);
+  }
+  QString QuantNode::getName()  { return nodeData.getValue_string(DataNode::Key::NAME); }
+
   void QuantNode::setSource(QString code)
   {
-    qDebug() << "QuantNode::setSource" << code;
+    //  qDebug() << "QuantNode::setSource" << code;
     codeSource->setText(code);
     codeSource->update();
 
@@ -294,7 +305,7 @@ namespace QuantIDE
   void QuantNode::sendData(TargetMethod targetMethod)
   {
     QString target = tr("onNet_%1").arg(metaEnum_targetMethods.valueToKey(targetMethod));
-    nodeData.setTargetObject("testNode");
+    nodeData.setTargetObject(this->getName());
     nodeData.setTargetMethod(target);
 
     emit actPrint("QuantNode::sendData to: testNode, target: " + target, MessageType::WARNING);
@@ -302,12 +313,14 @@ namespace QuantIDE
     emit actDataChanged(nodeData);
   }
 
-  void QuantNode::onNet_NodeExist(DataNode data)
+  void QuantNode::onNet_NodeCreated(DataNode data)
   {
     qDebug("QuantNode::onNet_NodeExist");
-    //  emit actPrint("User \"" + data.getSender() + "\" task for existing node", MessageType::STATUS);
-    // emit actPrint(data.print("QuantNode::onNet_NodeExist"), MessageType::NORMAL);
-    this->sendData(QuantNode::TargetMethod::NodeSet);
+    
+    nodeData = data;
+    textName->setText(this->getName());
+    this->update();
+   
   }
 
   void QuantNode::onNet_NodeSet(DataNode data)
@@ -322,6 +335,8 @@ namespace QuantIDE
 
     codeSource->onChangeExtraCursor(data.getSender(), data.getValue_int(DataNode::Key::SOURCE_CURSOR));
     this->update();
+
+    
   }
 
   void QuantNode::onNet_NodeEvaluate(DataNode data)
@@ -366,7 +381,8 @@ namespace QuantIDE
   void QuantNode::resizeEvent(QResizeEvent *event)
   {
     QuantObject::resizeEvent(event);
-    codeSource->setGeometry(5, 5, this->width() - 10, 90);
+    textName->setGeometry(5, 5, 200, 20);;
+    codeSource->setGeometry(5, 35, this->width() - 10, 60);
   }
 
   QuantNode::~QuantNode() { }

@@ -3,6 +3,7 @@
 
 #include "Panel.h"
 #include "Text.h"
+#include "QuantObjects.h"
 
 #include <QWidget>
 #include <QPainter>
@@ -24,11 +25,35 @@ namespace QuantIDE
     void setScrollWidget(QWidget*);
     QWidget* getScrollWidget();
 
+    void setScrollOffset(int);
+
   protected:
     void resizeEvent(QResizeEvent *event);
 
   private:
     QScrollArea *scrollArea;
+    int scrollOffset;
+  };
+
+  class NodePanelNEW : public QuantPanel
+  {
+    Q_OBJECT
+
+  public:
+    NodePanelNEW(QWidget *parent);
+    ~NodePanelNEW();
+
+    public slots:
+    void onAddNodePressed();
+
+  signals:
+    void actAddNode();
+
+  protected:
+    void resizeEvent(QResizeEvent *event);
+
+  private:
+    Button *buttonAddNode;
   };
 }
 

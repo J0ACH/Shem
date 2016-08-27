@@ -2,6 +2,9 @@
 
 namespace QuantIDE
 {
+  
+
+
   NodePanel::NodePanel(QWidget *parent, ScBridge *bridge, Customize *customize) :
     Panel(parent),
     mBridge(bridge),
