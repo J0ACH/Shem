@@ -21,7 +21,7 @@ namespace QuantIDE
     ~Library();
 
     void addObject(QuantObject* obj);
-        void addObject(QByteArray msg);
+    void addObject(QByteArray msg);
 
     void removeObject(QString name);
     void removeObject(Data data);
@@ -32,16 +32,16 @@ namespace QuantIDE
     QuantUser* getUser(DataUser data);
 
     QuantProxy* getProxy();
-        
+
     QuantNode* getNode(QString name);
     QuantNode* getNode(DataUser data);
-    
+
     void updateObjectPosition();
 
     void setColorBackground(QColor color);
     QColor getColorBackground();
 
-    protected:
+  protected:
     void resizeEvent(QResizeEvent *event);
     void paintEvent(QPaintEvent *event);
 

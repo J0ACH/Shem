@@ -361,7 +361,7 @@ namespace SupercolliderBridge
 
     this->setType(Data::DataType::NODE);
   }
-
+ 
   void DataNode::setValue(Key key, QVariant value)  { Data::setValue(metaEnum.valueToKey(key), value); }
   QString DataNode::getValue_string(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toString(); }
   bool DataNode::getValue_bool(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toBool(); }

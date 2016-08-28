@@ -286,12 +286,6 @@ namespace QuantIDE
 
     connect(nodePanel, SIGNAL(actAddNode()), this, SLOT(onAddNode()));
 
-    /*
-    QuantNode *testNode = new QuantNode(0, this);
-    testNode->setGeometry(10, 30, 30, 100);
-    lib_nodes->addObject(testNode);
-    */
-
     this->onPrint("Server init done...\n", MessageType::STATUS);
   }
   void QuantCore::onServerKill()
@@ -398,12 +392,22 @@ namespace QuantIDE
         QMetaObject::invokeMethod(lib_proxy->getProxy(), targetMethod_str.c_str(), Q_ARG(DataProxy, DataProxy(msg)));
         break;
       case Data::DataType::NODE:
+
         if (targetMethod == "onNet_NodeCreated")
         {
-          lib_nodes->addObject(msg);
+          QuantNode *newNode = new QuantNode(0, this);
+          newNode->setGeometry(10, 30, 30, 100);
+          lib_nodes->addObject(newNode);
+
+          connect(newNode, SIGNAL(actKilled(QString)), this, SLOT(onKillNode(QString)));
         }
+
         qDebug() << "QuantCore::onNetworkDataRecived DATA NODE targetObject: " << targetObject << "targetMethod : " << targetMethod;
         QMetaObject::invokeMethod(lib_nodes->getNode(targetObject), targetMethod_str.c_str(), Q_ARG(DataNode, DataNode(msg)));
+        if (targetMethod == "onNet_NodeKilled")
+        {
+          lib_nodes->removeObject(targetObject);
+        }
         break;
       default:
         break;
@@ -451,6 +455,17 @@ namespace QuantIDE
     QuantNode *newNode = new QuantNode(0, this);
     newNode->setGeometry(10, 30, 30, 100);
     lib_nodes->addObject(newNode);
+
+    connect(newNode, SIGNAL(actKilled(QString)), this, SLOT(onKillNode(QString)));
+
+    newNode->sendData(QuantNode::TargetMethod::NodeCreated);
+  }
+
+  void QuantCore::onKillNode(QString name)
+  {
+    qDebug() << "QuantCore::onKillNode()" << name;
+    lib_nodes->removeObject(name);
+    lib_nodes->update();
   }
 
   QuantCore::~QuantCore()

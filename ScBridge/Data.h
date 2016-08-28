@@ -146,7 +146,7 @@ namespace SupercolliderBridge
 
     DataNode();
     DataNode(QByteArray);
-
+  
     void setValue(Key, QVariant);
     QString getValue_string(Key);
     bool getValue_bool(Key);

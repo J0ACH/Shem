@@ -35,14 +35,10 @@ namespace QuantIDE
       }
       break;
     case QuantObject::ObjectType::NODE:
-      //name = static_cast<QuantNode*>(obj)->getName();
       name = this->getUniqueName(static_cast<QuantNode*>(obj)->getName());
       static_cast<QuantNode*>(obj)->setName(name);
-      //if (!this->containObject(name))
-      //{
-      qDebug() << "Library::addObject JSEM OBJECT NODE" << name;
+      //qDebug() << "Library::addObject JSEM OBJECT NODE" << name;
       lib.insert(name, obj);
-      //}
       break;
     }
 
@@ -68,21 +64,6 @@ namespace QuantIDE
         lib.insert(name, newUser);
       }
       break;
-    case Data::DataType::NODE:
-      nodeData = DataNode(msg);
-      if (!this->containObject(nodeData))
-      {
-        QString name(nodeData.getValue_string(DataNode::Key::NAME));
-        // qDebug() << "Library::addObject JSEM OBJECT USER from DATA :" << name;
-
-        QuantNode *newNode = new QuantNode(this, mCore);
-        //newNode->setName(name);
-        newNode->setGeometry(10, 30, 30, 100);
-        newNode->show();
-        lib.insert(name, newNode);
-      }
-      break;
-
     }
     this->updateObjectPosition();
   }
@@ -137,11 +118,11 @@ namespace QuantIDE
   bool Library::containObject(QString name)  { return lib.contains(name); }
   bool Library::containObject(Data data)
   {
+    QString name;
     switch (data.getType())
     {
     case Data::DataType::USER:
-      //DataUser userData(data);
-      QString name = DataUser(data).getValue_string(DataUser::Key::NAME);
+      name = DataUser(data).getValue_string(DataUser::Key::NAME);
       return lib.contains(name);
       break;
     }

@@ -272,6 +272,15 @@ namespace QuantIDE
 
     qDebug("QuantNode init...");
 
+    closeButton = new Button(this);
+    closeButton->setIcon(QImage(":/smallClose16.png"), 0);
+    closeButton->setText("X");
+
+    playButton = new Button(this);
+    playButton->setText("play");
+    playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
+    playButton->setGeometry(210, 10, 40, 20);
+
     codeSource = new CodeEditor(this);
     codeSource->setGeometry(5, 50, 90, 20);
 
@@ -279,17 +288,17 @@ namespace QuantIDE
 
     nodeData.setValue(DataNode::Key::NAME, "node");
 
+    connect(closeButton, SIGNAL(actPressed()), this, SLOT(onClose()));
     connect(codeSource, SIGNAL(actValueChanged(QString)), this, SLOT(onSourceChanged(QString)));
     connect(codeSource, SIGNAL(actValueEvaluate(QString)), this, SLOT(onSourceEvaluate(QString)));
     connect(codeSource, SIGNAL(actCursorMoved(int)), this, SLOT(onSourceCursorMoved(int)));
+
   }
 
   void QuantNode::setName(QString name)
   {
     nodeData.setValue(DataNode::Key::NAME, name);
     textName->setText(name);
-
-    this->sendData(QuantNode::TargetMethod::NodeCreated);
   }
   QString QuantNode::getName()  { return nodeData.getValue_string(DataNode::Key::NAME); }
 
@@ -315,12 +324,15 @@ namespace QuantIDE
 
   void QuantNode::onNet_NodeCreated(DataNode data)
   {
-    qDebug("QuantNode::onNet_NodeExist");
-    
+    qDebug("QuantNode::onNet_NodeCreated");
+
     nodeData = data;
     textName->setText(this->getName());
-    this->update();
-   
+  }
+  void QuantNode::onNet_NodeKilled(DataNode data)
+  {
+    qDebug("QuantNode::onNet_NodeKilled");
+    // emit actKilled(this->getName());
   }
 
   void QuantNode::onNet_NodeSet(DataNode data)
@@ -336,7 +348,7 @@ namespace QuantIDE
     codeSource->onChangeExtraCursor(data.getSender(), data.getValue_int(DataNode::Key::SOURCE_CURSOR));
     this->update();
 
-    
+
   }
 
   void QuantNode::onNet_NodeEvaluate(DataNode data)
@@ -360,6 +372,11 @@ namespace QuantIDE
     this->update();
   }
 
+  void QuantNode::onClose()
+  {
+    this->sendData(QuantNode::TargetMethod::NodeKilled);
+    emit actKilled(this->getName());
+  }
   void QuantNode::onSourceChanged(QString sourceTxt)
   {
     nodeData.setValue(DataNode::SOURCE, sourceTxt);
@@ -381,6 +398,7 @@ namespace QuantIDE
   void QuantNode::resizeEvent(QResizeEvent *event)
   {
     QuantObject::resizeEvent(event);
+    closeButton->setGeometry(this->width() - 30, 10, 16, 16);
     textName->setGeometry(5, 5, 200, 20);;
     codeSource->setGeometry(5, 35, this->width() - 10, 60);
   }

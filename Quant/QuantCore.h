@@ -80,6 +80,7 @@ namespace QuantIDE
     // NODES /////////////////////////////////////////
 
     void onAddNode();
+    void onKillNode(QString);
 
   signals:
     void actCoreInitPrepared();
