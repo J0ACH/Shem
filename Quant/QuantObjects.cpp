@@ -292,7 +292,6 @@ namespace QuantIDE
     connect(codeSource, SIGNAL(actValueChanged(QString)), this, SLOT(onSourceChanged(QString)));
     connect(codeSource, SIGNAL(actValueEvaluate(QString)), this, SLOT(onSourceEvaluate(QString)));
     connect(codeSource, SIGNAL(actCursorMoved(int)), this, SLOT(onSourceCursorMoved(int)));
-
   }
 
   void QuantNode::setName(QString name)
@@ -324,15 +323,15 @@ namespace QuantIDE
 
   void QuantNode::onNet_NodeCreated(DataNode data)
   {
-    qDebug("QuantNode::onNet_NodeCreated");
+    //qDebug("QuantNode::onNet_NodeCreated");
 
     nodeData = data;
     textName->setText(this->getName());
   }
   void QuantNode::onNet_NodeKilled(DataNode data)
   {
-    qDebug("QuantNode::onNet_NodeKilled");
-    // emit actKilled(this->getName());
+
+    //  qDebug("QuantNode::onNet_NodeKilled");
   }
 
   void QuantNode::onNet_NodeSet(DataNode data)
@@ -347,8 +346,6 @@ namespace QuantIDE
 
     codeSource->onChangeExtraCursor(data.getSender(), data.getValue_int(DataNode::Key::SOURCE_CURSOR));
     this->update();
-
-
   }
 
   void QuantNode::onNet_NodeEvaluate(DataNode data)
@@ -367,16 +364,12 @@ namespace QuantIDE
     nodeData.setValue(DataNode::Key::SOURCE_CURSOR, data.getValue_int(DataNode::Key::SOURCE_CURSOR));
 
     qDebug() << "QuantNode::onNet_NodeDisplay SOURCE_CURSOR:" << data.getValue_int(DataNode::Key::SOURCE_CURSOR);
-    //codeSource->setTe
 
     this->update();
   }
 
-  void QuantNode::onClose()
-  {
-    this->sendData(QuantNode::TargetMethod::NodeKilled);
-    emit actKilled(this->getName());
-  }
+  void QuantNode::onClose()  { emit actKilled(this->getName(), true); }
+
   void QuantNode::onSourceChanged(QString sourceTxt)
   {
     nodeData.setValue(DataNode::SOURCE, sourceTxt);

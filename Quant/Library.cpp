@@ -30,13 +30,12 @@ namespace QuantIDE
     case QuantObject::ObjectType::PROXY:
       if (!this->containObject("proxy"))
       {
-        //     qDebug() << "Library::addObject JSEM OBJECT PROXY";
+        //qDebug() << "Library::addObject JSEM OBJECT PROXY";
         lib.insert("proxy", obj);
       }
       break;
     case QuantObject::ObjectType::NODE:
-      name = this->getUniqueName(static_cast<QuantNode*>(obj)->getName());
-      static_cast<QuantNode*>(obj)->setName(name);
+      name = static_cast<QuantNode*>(obj)->getName();
       //qDebug() << "Library::addObject JSEM OBJECT NODE" << name;
       lib.insert(name, obj);
       break;
@@ -47,7 +46,6 @@ namespace QuantIDE
   void Library::addObject(QByteArray msg)
   {
     DataUser userData;
-    DataNode nodeData;
 
     switch (Data::getType(msg))
     {

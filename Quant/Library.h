@@ -37,6 +37,7 @@ namespace QuantIDE
     QuantNode* getNode(DataUser data);
 
     void updateObjectPosition();
+    QString getUniqueName(QString);
 
     void setColorBackground(QColor color);
     QColor getColorBackground();
@@ -52,7 +53,6 @@ namespace QuantIDE
     bool containObject(QString name);
     bool containObject(Data data);
 
-    QString getUniqueName(QString);
 
     QColor colorBackground;
   };

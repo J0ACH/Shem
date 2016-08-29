@@ -47,7 +47,7 @@ namespace QuantIDE
     void onAddNodePressed();
 
   signals:
-    void actAddNode();
+    void actAddNode(QString, bool);
 
   protected:
     void resizeEvent(QResizeEvent *event);

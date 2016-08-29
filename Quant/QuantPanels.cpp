@@ -43,7 +43,7 @@ namespace QuantIDE
   void NodePanelNEW::onAddNodePressed()
   {
     // qDebug("NodePanelNEW::onButtonAddNodePressed() -> node added");
-    emit actAddNode();
+    emit actAddNode("node", true);
   }
 
   void NodePanelNEW::resizeEvent(QResizeEvent *event)

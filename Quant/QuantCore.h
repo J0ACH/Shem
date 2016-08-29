@@ -72,16 +72,16 @@ namespace QuantIDE
     void onObjectDataChanged(Data);
     void onNetDataRecived(QByteArray);
 
+    // NODES /////////////////////////////////////////
+
+    void onAddNode(QString, bool);
+    void onKillNode(QString, bool);
+    
     // OTHERS /////////////////////////////////////////
 
     void onEvaluate(QString code, bool print = false);
     void onPrint(QString, MessageType msg = MessageType::NORMAL);
-
-    // NODES /////////////////////////////////////////
-
-    void onAddNode();
-    void onKillNode(QString);
-
+    
   signals:
     void actCoreInitPrepared();
     //void actCoreKillPrepared();

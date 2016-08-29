@@ -155,7 +155,7 @@ namespace QuantIDE
     void sendData(TargetMethod targetMethod);
 
   signals:
-    void actKilled(QString);
+    void actKilled(QString, bool);
 
     public slots:
     void onNet_NodeCreated(DataNode);
