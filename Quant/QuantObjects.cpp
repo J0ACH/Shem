@@ -272,6 +272,21 @@ namespace QuantIDE
 
     qDebug("QuantNode init...");
 
+    isPlaying = false;
+
+    nodeData.setValue(DataNode::Key::NAME, "node");
+
+    this->initControl();
+
+    connect(closeButton, SIGNAL(actPressed()), this, SLOT(onClose()));
+    connect(playButton, SIGNAL(actPressed()), this, SLOT(onPlayingChanged()));
+    connect(codeSource, SIGNAL(actValueChanged(QString)), this, SLOT(onSourceChanged(QString)));
+    connect(codeSource, SIGNAL(actValueEvaluate(QString)), this, SLOT(onSourceEvaluate(QString)));
+    connect(codeSource, SIGNAL(actCursorMoved(int)), this, SLOT(onSourceCursorMoved(int)));
+  }
+
+  void QuantNode::initControl()
+  {
     closeButton = new Button(this);
     closeButton->setIcon(QImage(":/smallClose16.png"), 0);
     closeButton->setText("X");
@@ -285,13 +300,6 @@ namespace QuantIDE
     codeSource->setGeometry(5, 50, 90, 20);
 
     textName = new Text(this);
-
-    nodeData.setValue(DataNode::Key::NAME, "node");
-
-    connect(closeButton, SIGNAL(actPressed()), this, SLOT(onClose()));
-    connect(codeSource, SIGNAL(actValueChanged(QString)), this, SLOT(onSourceChanged(QString)));
-    connect(codeSource, SIGNAL(actValueEvaluate(QString)), this, SLOT(onSourceEvaluate(QString)));
-    connect(codeSource, SIGNAL(actCursorMoved(int)), this, SLOT(onSourceCursorMoved(int)));
   }
 
   void QuantNode::setName(QString name)
@@ -324,14 +332,43 @@ namespace QuantIDE
   void QuantNode::onNet_NodeCreated(DataNode data)
   {
     //qDebug("QuantNode::onNet_NodeCreated");
-
+    emit actPrint("Node \"" + this->getName() + "\" created by user " + data.getSender() + " ...", MessageType::STATUS);
     nodeData = data;
     textName->setText(this->getName());
   }
   void QuantNode::onNet_NodeKilled(DataNode data)
   {
+    //qDebug("QuantNode::onNet_NodeKilled");
+    emit actEvaluate(tr("~%1.free").arg(this->getName()), true);
+    emit actPrint("Node \"" + this->getName() + "\" deleted by user " + data.getSender() + " ...", MessageType::STATUS);
+  }
+  void QuantNode::onNet_NodePlayingChanged(DataNode data)
+  {
+    QString nodeName = this->getName();
+    double volume = 0.5;
+    double fTime = 0;
 
-    //  qDebug("QuantNode::onNet_NodeKilled");
+    if (!isPlaying)
+    {
+      isPlaying = true;
+      emit actEvaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(
+        nodeName,
+        QString::number(volume),
+        QString::number(fTime)
+        ), true);
+      this->playButton->setState(Button::ON);
+      emit actPrint("Node \"" + this->getName() + "\" cmd PLAY by user " + data.getSender() + " ...", MessageType::STATUS);
+    }
+    else
+    {
+      isPlaying = false;
+      emit actEvaluate(tr("~%1.stop(%2)").arg(
+        nodeName,
+        QString::number(fTime)
+        ), true);
+      this->playButton->setState(Button::OFF);
+      emit actPrint("Node \"" + this->getName() + "\" cmd STOP by user " + data.getSender() + " ...", MessageType::STATUS);
+    }
   }
 
   void QuantNode::onNet_NodeSet(DataNode data)
@@ -356,7 +393,7 @@ namespace QuantIDE
     //emit actPrint(data.print("QuantNode::onNet_NodeEvaluate"), MessageType::NORMAL);
     this->setSource(data.getValue_string(DataNode::Key::SOURCE));
 
-    emit actEvaluate(data.getValue_string(DataNode::Key::SOURCE), true);
+    emit actEvaluate(tr("(~%1[0] = { %2 })").arg(this->getName(), data.getValue_string(DataNode::Key::SOURCE)), true);
   }
 
   void QuantNode::onNet_NodeDisplay(DataNode data)
@@ -368,7 +405,38 @@ namespace QuantIDE
     this->update();
   }
 
-  void QuantNode::onClose()  { emit actKilled(this->getName(), true); }
+  void QuantNode::onClose()
+  {
+    emit actEvaluate(tr("~%1.free").arg(this->getName()), true);
+    emit actKilled(this->getName(), true);
+  }
+  void QuantNode::onPlayingChanged()
+  {
+    QString nodeName = this->getName();
+    double volume = 0.5;
+    double fTime = 0;
+
+    if (!isPlaying)
+    {
+      isPlaying = true;
+      this->sendData(QuantNode::TargetMethod::NodePlayingChanged);
+
+      emit actEvaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(
+        nodeName,
+        QString::number(volume),
+        QString::number(fTime)
+        ), true);
+    }
+    else
+    {
+      isPlaying = false;
+      this->sendData(QuantNode::TargetMethod::NodePlayingChanged);
+      emit actEvaluate(tr("~%1.stop(%2)").arg(
+        nodeName,
+        QString::number(fTime)
+        ), true);
+    }
+  }
 
   void QuantNode::onSourceChanged(QString sourceTxt)
   {
@@ -378,7 +446,7 @@ namespace QuantIDE
   void QuantNode::onSourceEvaluate(QString sourceTxt)
   {
     nodeData.setValue(DataNode::SOURCE, sourceTxt);
-    emit actEvaluate(sourceTxt);
+    emit actEvaluate(tr("(~%1[0] = { %2 })").arg(this->getName(), sourceTxt));
     this->sendData(QuantNode::TargetMethod::NodeEvaluate);
   }
   void QuantNode::onSourceCursorMoved(int position)

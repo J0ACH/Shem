@@ -396,7 +396,7 @@ namespace QuantIDE
       case Data::DataType::NODE:
         if (targetMethod == "onNet_NodeCreated") { this->onAddNode(targetObject, false); }
 
-        qDebug() << "QuantCore::onNetworkDataRecived DATA NODE targetObject: " << targetObject << "targetMethod : " << targetMethod;
+        //qDebug() << "QuantCore::onNetworkDataRecived DATA NODE targetObject: " << targetObject << "targetMethod : " << targetMethod;
         QMetaObject::invokeMethod(lib_nodes->getNode(targetObject), targetMethod_str.c_str(), Q_ARG(DataNode, DataNode(msg)));
 
         if (targetMethod == "onNet_NodeKilled") { this->onKillNode(targetObject, false); }
@@ -429,7 +429,6 @@ namespace QuantIDE
 
     lib_nodes->removeObject(name);
     lib_nodes->update();
-
   }
 
   // OTHER /////////////////////////////////////////
