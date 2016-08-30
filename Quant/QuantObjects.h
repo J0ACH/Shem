@@ -156,6 +156,7 @@ namespace QuantIDE
 
   signals:
     void actKilled(QString, bool);
+    void actSizeChanged();
 
     public slots:
     void onNet_NodeCreated(DataNode);
@@ -174,15 +175,22 @@ namespace QuantIDE
     Button *closeButton, *playButton;
     Text *textName;
 
-    CodeEditor *codeSource;
+    QList<CodeEditor*> codeEditors;
+    QList<Text*> codeIndexs;
+    QList<Button*> insertCodeButtons, removeCodeButtons;
+    //CodeEditor *codeSource;
 
     bool isPlaying;
 
     void initControl();
 
+    void fitEditorsPosition();
+
     private slots:
     void onClose();
     void onPlayingChanged();
+    void onAddCodeEditor(QString insertButtonName);
+    void onRemoveCodeEditor(QString insertButtonName);
     void onSourceChanged(QString);
     void onSourceEvaluate(QString);
     void onSourceCursorMoved(int);

@@ -21,9 +21,9 @@ namespace QuantIDE
     ~Library();
 
     void addObject(QuantObject* obj);
-        void removeObject(QString name);
+    void removeObject(QString name);
     bool containObject(QString name);
-    
+
     QList<QString> keys();
 
     QuantUser* getUser(QString name);
@@ -34,12 +34,13 @@ namespace QuantIDE
     QuantNode* getNode(QString name);
     QuantNode* getNode(DataUser data);
 
-    void updateObjectPosition();
     QString getUniqueName(QString);
 
     void setColorBackground(QColor color);
     QColor getColorBackground();
 
+  public slots:
+    void onUpdateObjectPosition();
 
   protected:
     void resizeEvent(QResizeEvent *event);
@@ -48,7 +49,7 @@ namespace QuantIDE
   private:
     QObject *mCore;
     QMap<QString, QuantObject*> lib;
-    
+
     QColor colorBackground;
   };
 }

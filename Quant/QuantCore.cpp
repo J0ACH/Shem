@@ -433,6 +433,8 @@ namespace QuantIDE
     lib_nodes->addObject(newNode);
 
     connect(newNode, SIGNAL(actKilled(QString, bool)), this, SLOT(onKillNode(QString, bool)));
+    connect(newNode, SIGNAL(actSizeChanged()), lib_nodes, SLOT(onUpdateObjectPosition()));
+    
 
     if (sendData) { newNode->sendData(QuantNode::TargetMethod::NodeCreated); }
   }

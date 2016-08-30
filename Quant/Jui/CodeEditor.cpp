@@ -131,6 +131,14 @@ namespace Jui
     this->update();
   }
 
+  void CodeEditor::onEvaluate(QColor color)
+  {
+    backgroundAlpha = 255;
+    timer->stop();
+    timer->setInterval(fadeTimeOut / fps);
+    timer->start();
+  }
+
   bool CodeEditor::eventFilter(QObject* target, QEvent* event)
   {
     //qDebug() << "EventType " << event->type();
@@ -150,12 +158,15 @@ namespace Jui
           switch (eventKey->modifiers())
           {
           case Qt::KeyboardModifier::ControlModifier:
+            /*
             backgroundAlpha = 255;
             timer->stop();
             timer->setInterval(fadeTimeOut / fps);
             timer->start();
+            */
+            this->onEvaluate(activeColor);
 
-            emit evaluateAct();
+            //emit evaluateAct();
             emit sendText(this->toPlainText());
 
             emit actValueEvaluate(this->toPlainText());

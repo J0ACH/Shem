@@ -19,14 +19,13 @@ namespace Jui
     CodeEditor(QWidget *parent);
     ~CodeEditor();
 
-
     void setBackground(const QColor &);
     void setFontCode(QFont);
 
     public slots:
-
     //void setCode(QString text);
     void onChangeExtraCursor(QString name, int position);
+    void onEvaluate(QColor);
 
     void fitTextFormat();
     void alphaUpdate();

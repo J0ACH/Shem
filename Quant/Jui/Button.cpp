@@ -188,6 +188,7 @@ namespace Jui
 
       emit pressAct(); // bude odsraneno
       emit actPressed();
+      emit actPressed(this->objectName());
 
       mouseEvent->accept();
     }

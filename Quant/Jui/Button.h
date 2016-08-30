@@ -56,6 +56,7 @@ namespace Jui
   signals:
     void pressAct(); // bude odstraneno
     void actPressed();
+    void actPressed(QString objectName);
     //void enterAct(QString name);
     //void leaveAct(QString name);
 

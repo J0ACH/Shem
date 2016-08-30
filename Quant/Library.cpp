@@ -44,7 +44,7 @@ namespace QuantIDE
       break;
     }
 
-    this->updateObjectPosition();
+    this->onUpdateObjectPosition();
   }
 
   bool Library::containObject(QString name)  { return lib.contains(name); } 
@@ -55,7 +55,7 @@ namespace QuantIDE
     lib.value(name)->deleteLater();
     lib.remove(name);
 
-    this->updateObjectPosition();
+    this->onUpdateObjectPosition();
   }
   
   QuantUser* Library::getUser(QString name)
@@ -80,7 +80,7 @@ namespace QuantIDE
     return static_cast<QuantNode*>(lib.value(name, NULL));
   }
 
-    void Library::updateObjectPosition()
+  void Library::onUpdateObjectPosition()
   {
     int gapSize = 10;
     int lastObjOriginY = gapSize;
