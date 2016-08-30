@@ -153,15 +153,7 @@ namespace QuantIDE
   void QuantCore::onNetInitDone()
   {
     qDebug("QuantCore::onNetworkBootDone");
-
-    QuantUser *me = new QuantUser(0, this);
-    me->setName(userName);
-    me->setServerMeter(textServerMeter->getText());
-    me->setServerSynth(textServerSynths->getText());
-    me->setServerGroup(textServerGroups->getText());
-    lib_users->addObject(me);
-
-    me->sendData(QuantUser::TargetMethod::UserJoin);
+    this->onAddUser(userName, true, false);
 
     if (mBridge->isServerRunning())
     {
@@ -185,10 +177,7 @@ namespace QuantIDE
 
     mCanvan->getButtonBar("Bridge")->getButton("Network")->setState(Button::State::OFF);
 
-    foreach(QString oneName, lib_users->keys())
-    {
-      lib_users->removeObject(oneName);
-    }
+    this->onKillUser(userName, true);
   }
 
   // INTERPRET /////////////////////////////////////////
@@ -345,48 +334,47 @@ namespace QuantIDE
     data.setSender(userName);
     //data.setTime(proxy time); // pridat cas odeslani
 
+    // QString sender = data.getSender();
+    QString targetObject = data.getTarget();
+    QString targetMethod = data.getMethod();
 
-    if (data.getType() != Data::DataType::USER)
+    if (targetMethod != "onNet_UserServerStatus")
     {
-      this->onPrint("QuantCore::onObjectDataChanged print" + data.print(), MessageType::STATUS);
-      qDebug() << data.print("QuantCore::onObjectDataChanged");
+      // qDebug() << "QuantCore::onObjectDataChanged sender: " << sender;
+      qDebug() << "QuantCore::onObjectDataChanged targetObject: " << targetObject;
+      qDebug() << "QuantCore::onObjectDataChanged targetMethod: " << targetMethod;
+
+      // this->onPrint("Core [" + userName + "] send targetObject: " + targetObject + " targetMethod: " + targetMethod, MessageType::BUNDLE);
     }
 
     emit actObjectDataSend(data.wrap());
   }
   void QuantCore::onNetDataRecived(QByteArray msg)
   {
-    // QString sender = Data::(msg);
-    //  qDebug() << "QuantCore::onNetworkDataRecived msgOwner: " << ;
 
     if (Data::isFromOtherOwener(msg, userName))
     {
+      QString sender = Data::getSender(msg);
       QString targetObject = Data::getTarget(msg);
       QString targetMethod = Data::getMethod(msg);
       std::string targetMethod_str = targetMethod.toLatin1().constData();
 
-      if (Data::getType(msg) != Data::DataType::USER)
+      if (targetMethod != "onNet_UserServerStatus")
       {
+        qDebug() << "QuantCore::onNetworkDataRecived sender: " << sender;
         qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
         qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
-        // this->onPrint("QuantCore::onNetDataRecived", MessageType::STATUS);
+
+        //  this->onPrint("Core [" + sender + "->" + userName + "] recived targetObject: " + targetObject + " targetMethod: " + targetMethod, MessageType::WARNING);
       }
 
       switch (Data::getType(msg))
       {
       case Data::DataType::USER:
-        if (targetMethod == "onNet_UserJoin")
-        {
-          lib_users->addObject(msg);
-          lib_users->getUser(userName)->sendData(QuantUser::TargetMethod::UserExist);
-        }
-        if (targetMethod == "onNet_UserExist")
-        {
-          lib_users->addObject(msg);
-          lib_users->getUser(DataUser(msg));
-        }
+        if (targetMethod == "onNet_UserJoin") { this->onAddUser(sender, false, true); }
+        if (targetMethod == "onNet_UserExist") { this->onAddUser(sender, false, false); }
         QMetaObject::invokeMethod(lib_users->getUser(targetObject), targetMethod_str.c_str(), Q_ARG(DataUser, DataUser(msg)));
-        if (targetMethod == "onNet_UserLeave") { lib_users->removeObject(DataUser(msg)); }
+        if (targetMethod == "onNet_UserLeave") { this->onKillUser(sender, false); }
         break;
 
       case Data::DataType::PROXY:
@@ -395,15 +383,41 @@ namespace QuantIDE
 
       case Data::DataType::NODE:
         if (targetMethod == "onNet_NodeCreated") { this->onAddNode(targetObject, false); }
-
-        //qDebug() << "QuantCore::onNetworkDataRecived DATA NODE targetObject: " << targetObject << "targetMethod : " << targetMethod;
         QMetaObject::invokeMethod(lib_nodes->getNode(targetObject), targetMethod_str.c_str(), Q_ARG(DataNode, DataNode(msg)));
-
         if (targetMethod == "onNet_NodeKilled") { this->onKillNode(targetObject, false); }
         break;
       default:
         break;
       }
+    }
+  }
+
+  // USERS /////////////////////////////////////////
+
+  void QuantCore::onAddUser(QString name, bool sendMsgJoin, bool sendMsgExist)
+  {
+    if (!lib_users->containObject(name))
+    {
+      QuantUser *newUser = new QuantUser(0, this);
+      newUser->setName(name);
+      newUser->setFixedHeight(40);
+      lib_users->addObject(newUser);
+
+      if (sendMsgJoin) { newUser->sendData(QuantUser::TargetMethod::UserJoin); }
+      if (sendMsgExist) { newUser->sendData(QuantUser::TargetMethod::UserExist); }
+    }
+  }
+  void QuantCore::onKillUser(QString name, bool sendData)
+  {
+    if (lib_users->containObject(name))
+    {
+      if (sendData)
+      {
+        lib_users->getUser(name)->sendData(QuantUser::TargetMethod::UserLeave);
+        foreach(QString oneName, lib_users->keys()) { lib_users->removeObject(oneName); }
+      }
+      else { lib_users->removeObject(name); }
+      lib_users->update();
     }
   }
 
@@ -415,19 +429,19 @@ namespace QuantIDE
 
     QuantNode *newNode = new QuantNode(0, this);
     newNode->setName(newNodeName);
-    newNode->setGeometry(10, 30, 30, 100);
+    newNode->setFixedHeight(120);
     lib_nodes->addObject(newNode);
 
     connect(newNode, SIGNAL(actKilled(QString, bool)), this, SLOT(onKillNode(QString, bool)));
 
     if (sendData) { newNode->sendData(QuantNode::TargetMethod::NodeCreated); }
   }
-  void QuantCore::onKillNode(QString name, bool sendData)
+  void QuantCore::onKillNode(QString nodeName, bool sendData)
   {
-    qDebug() << "QuantCore::onKillNode()" << name;
-    if (sendData) { lib_nodes->getNode(name)->sendData(QuantNode::TargetMethod::NodeKilled); }
+    // qDebug() << "QuantCore::onKillNode()" << nodeName;
+    if (sendData) { lib_nodes->getNode(nodeName)->sendData(QuantNode::TargetMethod::NodeKilled); }
 
-    lib_nodes->removeObject(name);
+    lib_nodes->removeObject(nodeName);
     lib_nodes->update();
   }
 

@@ -39,6 +39,7 @@ namespace SupercolliderBridge
 
     static bool isFromOtherOwener(QByteArray, QString);
     static int getType(QByteArray);
+    static const QString getSender(QByteArray);
     static const QString getTarget(QByteArray);
     static const QString getMethod(QByteArray);
 

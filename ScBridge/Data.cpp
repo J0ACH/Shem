@@ -127,6 +127,22 @@ namespace SupercolliderBridge
     return metaEnum_type.keyToValue(header->value("TYPE").toStdString().c_str());
   }
 
+  const QString Data::getSender(QByteArray wrapedData)
+  {
+    QString dataMsg = QString::fromUtf8(wrapedData);
+    QStringList dataList = dataMsg.split("||");
+
+    foreach(QString oneLine, dataList)
+    {
+      if (oneLine.startsWith("HEADER_OWENER"))
+      {
+        QStringList args = oneLine.split("|");
+        //qDebug() << "Data::getTarget: " << args[1];
+        return args[1];
+      }
+    }
+    return "";
+  }
   const QString Data::getTarget(QByteArray wrapedData)
   {
     QString dataMsg = QString::fromUtf8(wrapedData);

@@ -72,10 +72,15 @@ namespace QuantIDE
     void onObjectDataChanged(Data);
     void onNetDataRecived(QByteArray);
 
+    // USERS /////////////////////////////////////////
+
+    void onAddUser(QString userName, bool sendMsgJoin, bool sendMsgExist);
+    void onKillUser(QString name, bool send);
+
     // NODES /////////////////////////////////////////
 
-    void onAddNode(QString, bool);
-    void onKillNode(QString, bool);
+    void onAddNode(QString name, bool send);
+    void onKillNode(QString name, bool send);
     
     // OTHERS /////////////////////////////////////////
 

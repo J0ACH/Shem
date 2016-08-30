@@ -24,8 +24,11 @@ namespace QuantIDE
     {
     case QuantObject::ObjectType::USER:
       name = static_cast<QuantUser*>(obj)->getName();
-      // qDebug() << "Library::addObject JSEM OBJECT USER :" << name;
-      lib.insert(name, obj);
+      qDebug() << "Library::addObject JSEM OBJECT USER :" << name;
+      if (!this->containObject(name))
+      {
+        lib.insert(name, obj);
+      }
       break;
     case QuantObject::ObjectType::PROXY:
       if (!this->containObject("proxy"))
@@ -43,28 +46,8 @@ namespace QuantIDE
 
     this->updateObjectPosition();
   }
-  void Library::addObject(QByteArray msg)
-  {
-    DataUser userData;
 
-    switch (Data::getType(msg))
-    {
-    case Data::DataType::USER:
-      userData = DataUser(msg);
-      if (!this->containObject(userData))
-      {
-        QString name(userData.getValue_string(DataUser::Key::NAME));
-        // qDebug() << "Library::addObject JSEM OBJECT USER from DATA :" << name;
-
-        QuantUser *newUser = new QuantUser(this, mCore);
-        newUser->setName(name);
-        newUser->show();
-        lib.insert(name, newUser);
-      }
-      break;
-    }
-    this->updateObjectPosition();
-  }
+  bool Library::containObject(QString name)  { return lib.contains(name); } 
 
   void Library::removeObject(QString name)
   {
@@ -74,23 +57,7 @@ namespace QuantIDE
 
     this->updateObjectPosition();
   }
-  void Library::removeObject(Data data)
-  {
-    switch (data.getType())
-    {
-    case Data::DataType::USER:
-      if (this->containObject(data))
-      {
-        DataUser userData(data);
-        QString name(userData.getValue_string(DataUser::Key::NAME));
-        lib.value(name)->close();
-        lib.value(name)->deleteLater();
-        lib.remove(name);
-      }
-    }
-    this->updateObjectPosition();
-  }
-
+  
   QuantUser* Library::getUser(QString name)
   {
     return static_cast<QuantUser*>(lib.value(name, NULL));
@@ -113,21 +80,7 @@ namespace QuantIDE
     return static_cast<QuantNode*>(lib.value(name, NULL));
   }
 
-  bool Library::containObject(QString name)  { return lib.contains(name); }
-  bool Library::containObject(Data data)
-  {
-    QString name;
-    switch (data.getType())
-    {
-    case Data::DataType::USER:
-      name = DataUser(data).getValue_string(DataUser::Key::NAME);
-      return lib.contains(name);
-      break;
-    }
-    return false;
-  }
-
-  void Library::updateObjectPosition()
+    void Library::updateObjectPosition()
   {
     int gapSize = 10;
     int lastObjOriginY = gapSize;
