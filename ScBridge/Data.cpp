@@ -377,9 +377,21 @@ namespace SupercolliderBridge
 
     this->setType(Data::DataType::NODE);
   }
- 
+
   void DataNode::setValue(Key key, QVariant value)  { Data::setValue(metaEnum.valueToKey(key), value); }
+  void DataNode::setValue(Key key, int index, QString value)
+  {
+    QStringList list = Data::getValue(metaEnum.valueToKey(key)).toStringList();
+    list.insert(index, value);
+
+    Data::setValue(metaEnum.valueToKey(key), list);
+  }
   QString DataNode::getValue_string(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toString(); }
+  QString DataNode::getValue_string(Key key, int index)
+  {
+    QStringList list = Data::getValue(metaEnum.valueToKey(key)).toStringList();
+    return list[index-1];
+  }
   bool DataNode::getValue_bool(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toBool(); }
   int DataNode::getValue_int(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toInt(); }
   float DataNode::getValue_double(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toDouble(); }

@@ -170,6 +170,7 @@ namespace Jui
             emit sendText(this->toPlainText());
 
             emit actValueEvaluate(this->toPlainText());
+            emit actValueEvaluate(this->objectName(), this->toPlainText());
 
 
             qDebug() << "KeyEvent: Ctrl+ENTER PRESSED (modifer" << eventKey->modifiers() << ")";
@@ -194,6 +195,8 @@ namespace Jui
 
         emit actCursorMoved(cursorPosition);
         emit actValueChanged(this->toPlainText());
+        emit actValueChanged(this->objectName(), this->toPlainText());
+
         qDebug() << "KeyEvent: cursor pos:" << cursorPosition;
         qDebug() << "KeyEvent: cursor RECT:" << this->cursorRect();
 

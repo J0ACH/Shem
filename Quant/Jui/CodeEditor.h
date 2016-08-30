@@ -33,6 +33,8 @@ namespace Jui
   signals:
     void actValueChanged(QString);
     void actValueEvaluate(QString);
+    void actValueChanged(QString objectName, QString code);
+    void actValueEvaluate(QString objectName, QString code);
     void actCursorMoved(int);
 
     // bude odstraneno

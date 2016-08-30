@@ -142,7 +142,7 @@ namespace QuantIDE
       Q_ENUMS(TargetMethod)
   public:
 
-    enum TargetMethod { NodeCreated, NodeKilled, NodePlayingChanged, NodeSet, NodeEvaluate, NodeDisplay };
+    enum TargetMethod { NodeCreated, NodeKilled, NodePlayingChanged, NodeCodes, NodeEvaluate, NodeDisplay };
 
     QuantNode(QWidget *parent, QObject *core);
     ~QuantNode();
@@ -150,8 +150,8 @@ namespace QuantIDE
     void setName(QString);
     QString getName();
 
-    void setSource(QString);
-
+   // void setSource(QString);
+   // void setCode(int index, QString code);
     void sendData(TargetMethod targetMethod);
 
   signals:
@@ -162,7 +162,7 @@ namespace QuantIDE
     void onNet_NodeCreated(DataNode);
     void onNet_NodeKilled(DataNode);
     void onNet_NodePlayingChanged(DataNode);
-    void onNet_NodeSet(DataNode);
+    void onNet_NodeCodes(DataNode);
     void onNet_NodeEvaluate(DataNode);
     void onNet_NodeDisplay(DataNode);
 
@@ -178,8 +178,7 @@ namespace QuantIDE
     QList<CodeEditor*> codeEditors;
     QList<Text*> codeIndexs;
     QList<Button*> insertCodeButtons, removeCodeButtons;
-    //CodeEditor *codeSource;
-
+    
     bool isPlaying;
 
     void initControl();
@@ -191,7 +190,8 @@ namespace QuantIDE
     void onPlayingChanged();
     void onAddCodeEditor(QString insertButtonName);
     void onRemoveCodeEditor(QString insertButtonName);
-    void onSourceChanged(QString);
+    void onCodeChanged(QString indexCodeName, QString code);
+    //void onSourceChanged(QString);
     void onSourceEvaluate(QString);
     void onSourceCursorMoved(int);
   };

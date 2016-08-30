@@ -143,13 +143,15 @@ namespace SupercolliderBridge
       Q_ENUMS(Key)
 
   public:
-    enum Key { NAME, SOURCE, SOURCE_CURSOR };
+    enum Key { NAME, INDEX_SIZE, CODES,  SOURCE_CURSOR };
 
     DataNode();
     DataNode(QByteArray);
   
     void setValue(Key, QVariant);
+    void setValue(Key, int, QString);
     QString getValue_string(Key);
+    QString getValue_string(Key, int);
     bool getValue_bool(Key);
     int getValue_int(Key);
     float getValue_double(Key);
