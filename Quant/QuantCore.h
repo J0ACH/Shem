@@ -6,7 +6,6 @@
 #include <QMetaObject>
 #include <QMetaMethod>
 
-
 #include "Customize.h"
 #include "ScBridge.h"
 #include "UDPServer.h"
@@ -22,7 +21,6 @@ using namespace Jui;
 
 namespace QuantIDE
 {
-
   class QuantCore : public QObject
   {
     Q_OBJECT
@@ -37,7 +35,6 @@ namespace QuantIDE
     public slots :
     void onCustomize(DataCustomize);
     void onChangeUserName(DataCustomize);
-
 
     // CORE /////////////////////////////////////////
 

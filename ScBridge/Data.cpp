@@ -316,20 +316,7 @@ namespace SupercolliderBridge
 
     this->setType(Data::DataType::USER);
   }
-  DataUser::DataUser(Data data)
-  {
-    const QMetaObject &mo = DataUser::staticMetaObject;
-    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
-
-    if (data.getType() == Data::DataType::USER)
-    {
-      this->setType(Data::DataType::USER);
-      this->setSender(data.getSender());
-      this->setTargetObject(data.getTarget());
-      this->setTargetMethod(data.getMethod());
-    }
-  }
-
+ 
   void DataUser::setValue(Key key, QVariant value)  { Data::setValue(metaEnum.valueToKey(key), value); }
   QString DataUser::getValue_string(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toString(); }
   bool DataUser::getValue_bool(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toBool(); }

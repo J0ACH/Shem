@@ -99,8 +99,7 @@ namespace SupercolliderBridge
 
     DataUser();
     DataUser(QByteArray);
-    DataUser(Data);
-
+    
     void setValue(Key, QVariant);
     QString getValue_string(Key);
     bool getValue_bool(Key);

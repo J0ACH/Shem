@@ -1,5 +1,7 @@
 #include "CustomizePanel.h"
 
+// bude presunut do QuantPanels
+
 namespace QuantIDE
 {
   CustomizePanel::CustomizePanel(QWidget *parent) : PanelNEW(parent)
