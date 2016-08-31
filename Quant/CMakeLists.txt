@@ -50,7 +50,6 @@ SET(Quant_hdr
   QuantCore.h
   QuantObjects.h
   QuantPanels.h
-  NodePanel.h
   Node.h
   ControlEnvelope.h
   CustomizePanel.h
@@ -62,7 +61,6 @@ SET(Quant_src
   QuantCore.cpp
   QuantObjects.cpp
   QuantPanels.cpp
-  NodePanel.cpp
   Node.cpp
   ControlEnvelope.cpp
   CustomizePanel.cpp

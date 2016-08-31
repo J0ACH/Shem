@@ -49,6 +49,7 @@ namespace QuantIDE
     nodePanel = new NodePanelNEW(mCanvan);
     mCanvan->addPanel(nodePanel, "NodePanel", Qt::DockWidgetArea::TopDockWidgetArea);
     nodePanel->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+    nodePanel->setMinimumHeight(300);
 
     lib_users = new Library(networkPanel, this);
     lib_proxy = new Library(timePanel, this);
@@ -434,7 +435,7 @@ namespace QuantIDE
 
     connect(newNode, SIGNAL(actKilled(QString, bool)), this, SLOT(onKillNode(QString, bool)));
     connect(newNode, SIGNAL(actSizeChanged()), lib_nodes, SLOT(onUpdateObjectPosition()));
-    
+
 
     if (sendData) { newNode->sendData(QuantNode::TargetMethod::NodeCreated); }
   }

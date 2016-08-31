@@ -113,7 +113,7 @@ namespace QuantIDE
     //QuantObject *proxyTest1, *proxyTest2;
 
     Canvan *canvan;
-    NodePanel *nodePanel;
+//    NodePanel *nodePanel;
     Panel *customizePanel, *networkPanel;
 
     QString userName;

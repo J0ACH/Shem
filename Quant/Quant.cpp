@@ -308,8 +308,8 @@ namespace QuantIDE
 
   void Quant::initControl()
   {
-    nodePanel = new NodePanel(canvan->screen, bridge, customize);
-    nodePanel->setTitle("NodePanel");
+//    nodePanel = new NodePanel(canvan->screen, bridge, customize);
+  //  nodePanel->setTitle("NodePanel");
 
     buttLang = new Button(canvan->tail);
     buttLang->setText("Lang");
@@ -351,7 +351,7 @@ namespace QuantIDE
     buttCustomize->setButtonGroup(panelButtons);
     buttNetwork->setButtonGroup(panelButtons);
 
-    globalCode = new CodeEditor(nodePanel);
+//    globalCode = new CodeEditor(nodePanel);
     globalCode->setText("s.plotTree");
 
     labelServerMeter = new QLabel(canvan->tail);
@@ -370,7 +370,7 @@ namespace QuantIDE
   void Quant::fitGeometry()
   {
     QRect screenRect = canvan->screen->rect();
-    nodePanel->setGeometry(1, 1, screenRect.width(), screenRect.height() - 1);
+  //  nodePanel->setGeometry(1, 1, screenRect.width(), screenRect.height() - 1);
 
     buttLang->setGeometry(5, 5, 24, 24);
     buttServer->setGeometry(35, 5, 24, 24);
@@ -378,7 +378,7 @@ namespace QuantIDE
     buttCustomize->setGeometry(125, 5, 24, 24);
     buttNetwork->setGeometry(155, 5, 24, 24);
 
-    globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
+  //  globalCode->setGeometry(10, nodePanel->height() - 40, 350, 30);
 
     labelServerMeter->setGeometry(canvan->tail->width() - 270, 5, 40, 25);
     labelServerSynths->setGeometry(canvan->tail->width() - 220, 5, 15, 25);
