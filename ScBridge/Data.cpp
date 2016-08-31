@@ -182,6 +182,11 @@ namespace SupercolliderBridge
   QString Data::getMethod()  { return header->value("METHOD", "NaN"); }
 
   void Data::setValue(QString key, QVariant value)  { library->insert(key, value); }
+  void Data::setValue(QString key1, QString key2, QVariant value)
+  {
+    this->setValue(QString("%1/%2").arg(key1, key2), value);
+  }
+
   QVariant Data::getValue(QString key)
   {
     switch (library->value(key).type())
@@ -189,6 +194,10 @@ namespace SupercolliderBridge
     case QVariant::Invalid: return "null"; break;
     default: return library->value(key); break;
     }
+  }
+  QVariant Data::getValue(QString key1, QString key2)
+  {
+    return this->getValue(QString("%1/%2").arg(key1, key2));
   }
 
   QString Data::print(QString comment)
@@ -316,7 +325,7 @@ namespace SupercolliderBridge
 
     this->setType(Data::DataType::USER);
   }
- 
+
   void DataUser::setValue(Key key, QVariant value)  { Data::setValue(metaEnum.valueToKey(key), value); }
   QString DataUser::getValue_string(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toString(); }
   bool DataUser::getValue_bool(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toBool(); }
@@ -366,18 +375,16 @@ namespace SupercolliderBridge
   }
 
   void DataNode::setValue(Key key, QVariant value)  { Data::setValue(metaEnum.valueToKey(key), value); }
-  void DataNode::setValue(Key key, int index, QString value)
+  void DataNode::setValue(Key key, int index, QVariant value)
   {
-    QStringList list = Data::getValue(metaEnum.valueToKey(key)).toStringList();
-    list.insert(index, value);
-
-    Data::setValue(metaEnum.valueToKey(key), list);
+    QString strIndex = QString("index_%1").arg(QString::number(index));
+    Data::setValue(metaEnum.valueToKey(key), strIndex, value);
   }
   QString DataNode::getValue_string(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toString(); }
   QString DataNode::getValue_string(Key key, int index)
   {
-    QStringList list = Data::getValue(metaEnum.valueToKey(key)).toStringList();
-    return list[index-1];
+    QString strIndex = QString("index_%1").arg(QString::number(index));
+    return Data::getValue(metaEnum.valueToKey(key), strIndex).toString();
   }
   bool DataNode::getValue_bool(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toBool(); }
   int DataNode::getValue_int(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toInt(); }

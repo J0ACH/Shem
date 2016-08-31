@@ -150,8 +150,7 @@ namespace QuantIDE
     void setName(QString);
     QString getName();
 
-   // void setSource(QString);
-   // void setCode(int index, QString code);
+    // void setCode(int index, QString code);
     void sendData(TargetMethod targetMethod);
 
   signals:
@@ -178,7 +177,7 @@ namespace QuantIDE
     QList<CodeEditor*> codeEditors;
     QList<Text*> codeIndexs;
     QList<Button*> insertCodeButtons, removeCodeButtons;
-    
+
     bool isPlaying;
 
     void initControl();
@@ -191,7 +190,6 @@ namespace QuantIDE
     void onAddCodeEditor(QString insertButtonName);
     void onRemoveCodeEditor(QString insertButtonName);
     void onCodeChanged(QString indexCodeName, QString code);
-    //void onSourceChanged(QString);
     void onSourceEvaluate(QString);
     void onSourceCursorMoved(int);
   };

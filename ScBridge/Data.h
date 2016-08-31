@@ -46,7 +46,9 @@ namespace SupercolliderBridge
   protected:
     void setType(DataType);
     void setValue(QString, QVariant);
+    void setValue(QString, QString, QVariant);
     QVariant getValue(QString);
+    QVariant getValue(QString, QString);
 
   private:
     QMetaEnum metaEnum_type;
@@ -148,7 +150,7 @@ namespace SupercolliderBridge
     DataNode(QByteArray);
   
     void setValue(Key, QVariant);
-    void setValue(Key, int, QString);
+    void setValue(Key, int, QVariant);
     QString getValue_string(Key);
     QString getValue_string(Key, int);
     bool getValue_bool(Key);
