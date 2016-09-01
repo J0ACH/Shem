@@ -145,7 +145,7 @@ namespace QuantIDE
     enum TargetMethod {
       NodeCreated, NodeKilled, NodePlayingChanged,
       AddCodeEditor, RemoveCodeEditor,
-      CodesChanged, NodeEvaluate, NodeDisplay
+      CodeChanged, CodeEvaluate, NodeDisplay
     };
 
     QuantNode(QWidget *parent, QObject *core);
@@ -169,8 +169,8 @@ namespace QuantIDE
     void onNet_AddCodeEditor(DataNode);
     void onNet_RemoveCodeEditor(DataNode);
 
-    void onNet_CodesChanged(DataNode);
-    void onNet_NodeEvaluate(DataNode);
+    void onNet_CodeChanged(DataNode);
+    void onNet_CodeEvaluate(DataNode);
     void onNet_NodeDisplay(DataNode);
 
   protected: // protected je viditelna jen detmi, ne z venku
@@ -200,7 +200,7 @@ namespace QuantIDE
     void onAddCodeEditor(QString insertButtonName);
     void onRemoveCodeEditor(QString insertButtonName);
     void onCodeChanged(QString indexCodeName, QString code);
-    void onSourceEvaluate(QString);
+    void onCodeEvaluate(QString indexCodeName, QString code);
     void onSourceCursorMoved(int);
   };
 

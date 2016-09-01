@@ -337,7 +337,7 @@ namespace QuantIDE
     for (int i = 0; i < codeEditors.size(); i++)
     {
       tempList.append(nodeData.getValue_string(DataNode::Key::CODES, i));
-   //   qDebug() << "QuantNode::addCodeEditor TEMPLIST A:" << i << " -> " << tempList[i];
+      //   qDebug() << "QuantNode::addCodeEditor TEMPLIST A:" << i << " -> " << tempList[i];
     }
 
     CodeEditor *newCodeEditor = new CodeEditor(this);
@@ -359,9 +359,9 @@ namespace QuantIDE
     removeButton->setIcon(QImage(":/smallClose16.png"), 0);
     removeButton->show();
     removeCodeButtons.append(removeButton);
-    
+
     connect(newCodeEditor, SIGNAL(actValueChanged(QString, QString)), this, SLOT(onCodeChanged(QString, QString)));
-    connect(newCodeEditor, SIGNAL(actValueEvaluate(QString)), this, SLOT(onSourceEvaluate(QString)));
+    connect(newCodeEditor, SIGNAL(actValueEvaluate(QString, QString)), this, SLOT(onCodeEvaluate(QString, QString)));
     connect(newCodeEditor, SIGNAL(actCursorMoved(int)), this, SLOT(onSourceCursorMoved(int)));
     connect(insertButton, SIGNAL(actPressed(QString)), this, SLOT(onAddCodeEditor(QString)));
     connect(removeButton, SIGNAL(actPressed(QString)), this, SLOT(onRemoveCodeEditor(QString)));
@@ -373,7 +373,7 @@ namespace QuantIDE
     for (int i = 0; i < tempList.size(); i++)
     {
       nodeData.setValue(DataNode::Key::CODES, i, tempList[i]);
-    //  qDebug() << "QuantNode::addCodeEditor TEMPLIST B:" << i << " -> " << tempList[i];
+      //  qDebug() << "QuantNode::addCodeEditor TEMPLIST B:" << i << " -> " << tempList[i];
     }
     nodeData.setValue(DataNode::Key::INDEX_SIZE, codeEditors.size());
   }
@@ -384,8 +384,8 @@ namespace QuantIDE
     //qDebug() << "QuantNode::onRemoveCodeEditor button name:" << removeingIndex;
 
     this->removeCodeEditor(removeingIndex);
-    
-    nodeData.setValue(DataNode::Key::INDEX_CHANGE, removeingIndex);    
+
+    nodeData.setValue(DataNode::Key::INDEX_CHANGE, removeingIndex);
     this->sendData(QuantNode::TargetMethod::RemoveCodeEditor);
   }
   void QuantNode::onNet_RemoveCodeEditor(DataNode data)
@@ -402,7 +402,7 @@ namespace QuantIDE
     for (int i = 0; i < codeEditors.size(); i++)
     {
       tempList.append(nodeData.getValue_string(DataNode::Key::CODES, i));
-     // qDebug() << "QuantNode::removeCodeEditor TEMPLIST A:" << i << " -> " << tempList[i];
+      // qDebug() << "QuantNode::removeCodeEditor TEMPLIST A:" << i << " -> " << tempList[i];
     }
 
     CodeEditor *codeEditor = codeEditors.takeAt(index);
@@ -424,7 +424,7 @@ namespace QuantIDE
     for (int i = 0; i < tempList.size(); i++)
     {
       nodeData.setValue(DataNode::Key::CODES, i, tempList[i]);
-     // qDebug() << "QuantNode::removeCodeEditor TEMPLIST B:" << i << " -> " << tempList[i];
+      // qDebug() << "QuantNode::removeCodeEditor TEMPLIST B:" << i << " -> " << tempList[i];
     }
 
     nodeData.deleteValue(DataNode::Key::CODES, codeEditors.size());
@@ -482,9 +482,9 @@ namespace QuantIDE
     nodeData.setValue(DataNode::Key::INDEX_CHANGE, codeIndex);
     nodeData.setValue(DataNode::Key::CODES, codeIndex, code);
     // emit actPrint(nodeData.print("QuantNode::onCodeChanged"), MessageType::EVAULATE);
-    this->sendData(QuantNode::TargetMethod::CodesChanged);
+    this->sendData(QuantNode::TargetMethod::CodeChanged);
   }
-  void QuantNode::onNet_CodesChanged(DataNode data)
+  void QuantNode::onNet_CodeChanged(DataNode data)
   {
     //qDebug() << "QuantNode::onNet_CodesChanged";
     int dataIndexCnt = data.getValue_int(DataNode::Key::INDEX_SIZE);
@@ -498,32 +498,34 @@ namespace QuantIDE
 
     emit actPrint(nodeData.print("QuantNode::onNet_CodesChanged"), MessageType::EVAULATE);
 
-
-    /*
-    for (int i = 0; i < dataIndexCnt; i++)
-    {
-    QString oneCode = data.getValue_string(DataNode::Key::CODES, i);
-    nodeData.setValue(DataNode::Key::CODES, i, oneCode);
-    codeEditors[i]->setText(oneCode);
-    qDebug() << "QuantNode::onNet_NodeCodes [name:" << i << "|| code:" << oneCode << "]";
-    }
-    */
-
-    // if (dataIndexCnt < codeEditors.size()) { this->onRemoveCodeEditor("test"); }
-
     // nodeData.setValue(DataNode::Key::SOURCE_CURSOR, data.getValue_int(DataNode::Key::SOURCE_CURSOR));
     // codeSource->onChangeExtraCursor(data.getSender(), data.getValue_int(DataNode::Key::SOURCE_CURSOR));
     this->update();
   }
 
-  void QuantNode::onNet_NodeEvaluate(DataNode data)
+  void QuantNode::onCodeEvaluate(QString indexCodeName, QString code)
   {
-    //qDebug() << "QuantNode::onNet_NodeSet key SOURCE:" << data.getValue_string(DataNode::Key::SOURCE);
-    //qDebug() << data.print("QuantNode::onNet_NodeEvaluate");
+    int codeIndex = indexCodeName.toInt();
+    qDebug() << "QuantNode::onCodeEvaluate [name:" << codeIndex << "|| code:" << code << "]";
 
-    // this->setSource(data.getValue_string(DataNode::Key::SOURCE));
+    nodeData.setValue(DataNode::Key::INDEX_CHANGE, codeIndex);
+    this->sendData(QuantNode::TargetMethod::CodeEvaluate);
 
-    //    emit actEvaluate(tr("(~%1[0] = { %2 })").arg(this->getName(), data.getValue_string(DataNode::Key::SOURCE)), true);
+    emit actEvaluate(tr("(~%1[%2] = { %3 })").arg(this->getName(), QString::number(codeIndex), code));
+  }
+  void QuantNode::onNet_CodeEvaluate(DataNode data)
+  {
+    int dataIndexEvaluated = data.getValue_int(DataNode::Key::INDEX_CHANGE);
+    qDebug() << "QuantNode::onNet_CodeEvaluate indexChanged:" << dataIndexEvaluated;
+    
+    QString code = data.getValue_string(DataNode::Key::CODES, dataIndexEvaluated);
+    nodeData.setValue(DataNode::Key::CODES, dataIndexEvaluated, code);
+    codeEditors[dataIndexEvaluated]->setText(code);
+    codeEditors[dataIndexEvaluated]->onEvaluate(QColor(120, 30, 30));
+
+    emit actEvaluate(tr("(~%1[%2] = { %3 })").arg(this->getName(), QString::number(dataIndexEvaluated), code));
+
+    this->update();
   }
 
   void QuantNode::onNet_NodeDisplay(DataNode data)
@@ -569,12 +571,6 @@ namespace QuantIDE
   }
 
 
-  void QuantNode::onSourceEvaluate(QString sourceTxt)
-  {
-    //nodeData.setValue(DataNode::SOURCE, sourceTxt);
-    emit actEvaluate(tr("(~%1[0] = { %2 })").arg(this->getName(), sourceTxt));
-    this->sendData(QuantNode::TargetMethod::NodeEvaluate);
-  }
   void QuantNode::onSourceCursorMoved(int position)
   {
     //qDebug("QuantNode::onSourceCursorMoved");
