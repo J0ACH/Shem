@@ -200,6 +200,12 @@ namespace SupercolliderBridge
     return this->getValue(QString("%1/%2").arg(key1, key2));
   }
 
+  void Data::deleteValue(QString key) { library->remove(key); }
+  void Data::deleteValue(QString key1, QString key2)
+  {
+    this->deleteValue(QString("%1/%2").arg(key1, key2));
+  }
+
   QString Data::print(QString comment)
   {
     QString txt;
@@ -390,4 +396,9 @@ namespace SupercolliderBridge
   int DataNode::getValue_int(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toInt(); }
   float DataNode::getValue_double(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toDouble(); }
 
+  void DataNode::deleteValue(Key key, int index)
+  {
+    QString strIndex = QString("index_%1").arg(QString::number(index));
+    Data::deleteValue(metaEnum.valueToKey(key), strIndex);
+  }
 }

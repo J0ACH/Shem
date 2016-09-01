@@ -345,7 +345,8 @@ namespace QuantIDE
       qDebug() << "QuantCore::onObjectDataChanged targetObject: " << targetObject;
       qDebug() << "QuantCore::onObjectDataChanged targetMethod: " << targetMethod;
 
-      // this->onPrint("Core [" + userName + "] send targetObject: " + targetObject + " targetMethod: " + targetMethod, MessageType::BUNDLE);
+      //this->onPrint("Core [" + userName + "] send targetObject: " + targetObject + " targetMethod: " + targetMethod, MessageType::NORMAL);
+      this->onPrint(data.print("Core data send"), MessageType::NORMAL);
     }
 
     emit actObjectDataSend(data.wrap());

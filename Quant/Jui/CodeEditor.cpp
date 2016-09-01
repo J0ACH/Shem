@@ -236,6 +236,7 @@ namespace Jui
         );
     }
     
+    painter.drawText(100, 20, this->objectName());
 
     QTextEdit::paintEvent(event);
   }

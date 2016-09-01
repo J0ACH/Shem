@@ -142,7 +142,11 @@ namespace QuantIDE
       Q_ENUMS(TargetMethod)
   public:
 
-    enum TargetMethod { NodeCreated, NodeKilled, NodePlayingChanged, NodeCodes, NodeEvaluate, NodeDisplay };
+    enum TargetMethod {
+      NodeCreated, NodeKilled, NodePlayingChanged,
+      AddCodeEditor, RemoveCodeEditor,
+      CodesChanged, NodeEvaluate, NodeDisplay
+    };
 
     QuantNode(QWidget *parent, QObject *core);
     ~QuantNode();
@@ -161,7 +165,11 @@ namespace QuantIDE
     void onNet_NodeCreated(DataNode);
     void onNet_NodeKilled(DataNode);
     void onNet_NodePlayingChanged(DataNode);
-    void onNet_NodeCodes(DataNode);
+
+    void onNet_AddCodeEditor(DataNode);
+    void onNet_RemoveCodeEditor(DataNode);
+
+    void onNet_CodesChanged(DataNode);
     void onNet_NodeEvaluate(DataNode);
     void onNet_NodeDisplay(DataNode);
 
@@ -181,6 +189,8 @@ namespace QuantIDE
     bool isPlaying;
 
     void initControl();
+    void addCodeEditor(int index);
+    void removeCodeEditor(int index);
 
     void fitEditorsPosition();
 

@@ -50,6 +50,9 @@ namespace SupercolliderBridge
     QVariant getValue(QString);
     QVariant getValue(QString, QString);
 
+    void deleteValue(QString);
+    void deleteValue(QString, QString);
+
   private:
     QMetaEnum metaEnum_type;
     QMap <QString, QString> *header;
@@ -144,7 +147,7 @@ namespace SupercolliderBridge
       Q_ENUMS(Key)
 
   public:
-    enum Key { NAME, INDEX_SIZE, CODES,  SOURCE_CURSOR };
+    enum Key { NAME, INDEX_SIZE, INDEX_CHANGE, CODES, SOURCE_CURSOR };
 
     DataNode();
     DataNode(QByteArray);
@@ -156,6 +159,8 @@ namespace SupercolliderBridge
     bool getValue_bool(Key);
     int getValue_int(Key);
     float getValue_double(Key);
+
+    void deleteValue(Key, int);
     
   private:
     QMetaEnum metaEnum;
