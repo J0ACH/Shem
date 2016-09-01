@@ -385,8 +385,11 @@ namespace QuantIDE
 
     this->removeCodeEditor(removeingIndex);
 
+
     nodeData.setValue(DataNode::Key::INDEX_CHANGE, removeingIndex);
     this->sendData(QuantNode::TargetMethod::RemoveCodeEditor);
+
+    emit actEvaluate(tr("~%1[%2] = nil").arg(this->getName(), QString::number(removeingIndex)));
   }
   void QuantNode::onNet_RemoveCodeEditor(DataNode data)
   {
@@ -395,6 +398,8 @@ namespace QuantIDE
     //qDebug() << "QuantNode::onNet_RemoveCodeEditor button name:" << removeingIndex;
 
     this->removeCodeEditor(removeingIndex);
+
+    emit actEvaluate(tr("~%1[%2] = nil").arg(this->getName(), QString::number(removeingIndex)));
   }
   void QuantNode::removeCodeEditor(int index)
   {
@@ -511,19 +516,21 @@ namespace QuantIDE
     nodeData.setValue(DataNode::Key::INDEX_CHANGE, codeIndex);
     this->sendData(QuantNode::TargetMethod::CodeEvaluate);
 
-    emit actEvaluate(tr("(~%1[%2] = { %3 })").arg(this->getName(), QString::number(codeIndex), code));
+    if (codeIndex == 0) { emit actEvaluate(tr("(~%1[%2] = { %3 })").arg(this->getName(), QString::number(codeIndex), code)); }
+    else { emit actEvaluate(tr("(~%1[%2] = %3)").arg(this->getName(), QString::number(codeIndex), code)); }
   }
   void QuantNode::onNet_CodeEvaluate(DataNode data)
   {
     int dataIndexEvaluated = data.getValue_int(DataNode::Key::INDEX_CHANGE);
     qDebug() << "QuantNode::onNet_CodeEvaluate indexChanged:" << dataIndexEvaluated;
-    
+
     QString code = data.getValue_string(DataNode::Key::CODES, dataIndexEvaluated);
     nodeData.setValue(DataNode::Key::CODES, dataIndexEvaluated, code);
     codeEditors[dataIndexEvaluated]->setText(code);
     codeEditors[dataIndexEvaluated]->onEvaluate(QColor(120, 30, 30));
 
-    emit actEvaluate(tr("(~%1[%2] = { %3 })").arg(this->getName(), QString::number(dataIndexEvaluated), code));
+    if (dataIndexEvaluated == 0) { emit actEvaluate(tr("(~%1[%2] = { %3 })").arg(this->getName(), QString::number(dataIndexEvaluated), code)); }
+    else { emit actEvaluate(tr("(~%1[%2] =  %3 )").arg(this->getName(), QString::number(dataIndexEvaluated), code)); }
 
     this->update();
   }
