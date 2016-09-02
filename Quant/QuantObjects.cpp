@@ -275,12 +275,11 @@ namespace QuantIDE
     isPlaying = false;
 
     nodeData.setValue(DataNode::Key::NAME, "node");
+    nodeData.setValue(DataNode::Key::VOLUME, "0.5");
+    nodeData.setValue(DataNode::Key::FTIME, "0");
 
     this->initControl();
-
-    connect(closeButton, SIGNAL(actPressed()), this, SLOT(onClose()));
-    connect(playButton, SIGNAL(actPressed()), this, SLOT(onPlayingChanged()));
-  }
+      }
 
   void QuantNode::initControl()
   {
@@ -291,10 +290,24 @@ namespace QuantIDE
     playButton = new Button(this);
     playButton->setText("play");
     playButton->setStateKeeping(Jui::Button::StateKeeping::HOLD);
-    playButton->setGeometry(210, 10, 40, 20);
+
+    volumeBox = new ControlBox(this);
+    volumeBox->setLabel("vol");
+    volumeBox->setLabelSize(15);
+    volumeBox->setValue(nodeData.getValue_string(DataNode::Key::VOLUME));
+    
+    fadeTimeBox = new ControlBox(this);
+    fadeTimeBox->setLabel("fTime");
+    fadeTimeBox->setLabelSize(30);
+    fadeTimeBox->setValue(nodeData.getValue_string(DataNode::Key::FTIME));    
 
     this->addCodeEditor(0); // sourceCode
     textName = new Text(this);
+
+    connect(closeButton, SIGNAL(actPressed()), this, SLOT(onClose()));
+    connect(playButton, SIGNAL(actPressed()), this, SLOT(onPlayingChanged()));
+    connect(volumeBox, SIGNAL(actValueEvaluate(QString)), this, SLOT(onVolumeChanged(QString)));
+    connect(fadeTimeBox, SIGNAL(actValueEvaluate(QString)), this, SLOT(onFadeTimeChanged(QString)));
   }
 
   void QuantNode::setName(QString name)
@@ -311,6 +324,89 @@ namespace QuantIDE
     nodeData.setTargetMethod(target);
 
     emit actDataChanged(nodeData);
+  }
+
+  void QuantNode::onNet_NodeCreated(DataNode data)
+  {
+    //qDebug("QuantNode::onNet_NodeCreated");
+    emit actPrint("Node \"" + this->getName() + "\" created by user " + data.getSender() + " ...", MessageType::STATUS);
+    nodeData = data;
+    textName->setText(this->getName());
+  }
+  void QuantNode::onNet_NodeKilled(DataNode data)
+  {
+    //qDebug("QuantNode::onNet_NodeKilled");    
+    emit actEvaluate(tr("~%1.free").arg(this->getName()), true);
+    emit actPrint("Node \"" + this->getName() + "\" deleted by user " + data.getSender() + " ...", MessageType::STATUS);
+  }
+  void QuantNode::onNet_NodePlayingChanged(DataNode data)
+  {
+    QString nodeName = this->getName();
+    QString volume = volumeBox->getValue_string();
+    QString fTime = fadeTimeBox->getValue_string();
+
+    if (!isPlaying)
+    {
+      isPlaying = true;
+      this->playButton->setState(Button::ON);
+      emit actPrint("Node \"" + this->getName() + "\" cmd PLAY by user " + data.getSender() + " ...", MessageType::STATUS);
+      emit actEvaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(
+        nodeName,
+        volume,
+        fTime
+        ), true);
+    }
+    else
+    {
+      isPlaying = false;
+      this->playButton->setState(Button::OFF);
+      emit actPrint("Node \"" + this->getName() + "\" cmd STOP by user " + data.getSender() + " ...", MessageType::STATUS);
+      emit actEvaluate(tr("~%1.stop(%2)").arg(
+        nodeName,
+        fTime
+        ), true);
+    }
+  }
+
+  void QuantNode::onVolumeChanged(QString txtValue)
+  {
+    // qDebug() << "QuantNode::onVolumeChanged value:" << txtValue;
+    nodeData.setValue(DataNode::Key::VOLUME, txtValue);
+    this->sendData(QuantNode::TargetMethod::VolumeChanged);
+
+    if (isPlaying)
+    {
+      emit actEvaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(this->getName(), volumeBox->getValue_string(), fadeTimeBox->getValue_string()));
+    }
+  }
+  void QuantNode::onNet_VolumeChanged(DataNode data)
+  {
+    // qDebug() << "QuantNode::onNet_VolumeChanged";
+    QString volume = data.getValue_string(DataNode::Key::VOLUME);
+    nodeData.setValue(DataNode::Key::VOLUME, volume);
+    volumeBox->setValue(volume);
+    if (isPlaying)
+    {
+      emit actPrint("Node \"" + this->getName() + "\" cmd VOLUME: " + volume + " set by user " + data.getSender() + " ...", MessageType::STATUS);
+      emit actEvaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(this->getName(), volumeBox->getValue_string(), fadeTimeBox->getValue_string()));
+    }
+  }
+
+  void QuantNode::onFadeTimeChanged(QString txtValue)
+  {
+    // qDebug() << "QuantNode::onFadeTimeChanged value:" << txtValue;
+    nodeData.setValue(DataNode::Key::FTIME, txtValue);
+    this->sendData(QuantNode::TargetMethod::FadeTimeChanged);
+    emit actEvaluate(tr("~%1.fadeTime_(%2);").arg(this->getName(), fadeTimeBox->getValue_string()));
+  }
+  void QuantNode::onNet_FadeTimeChanged(DataNode data)
+  {
+    // qDebug() << "QuantNode::onNet_FadeTimeChanged";
+    QString ftime = data.getValue_string(DataNode::Key::FTIME);
+    nodeData.setValue(DataNode::Key::FTIME, ftime);
+    fadeTimeBox->setValue(ftime);
+    emit actPrint("Node \"" + this->getName() + "\" cmd FadeTIME: " + ftime + " set by user " + data.getSender() + " ...", MessageType::STATUS);
+    emit actEvaluate(tr("~%1.fadeTime_(%2);").arg(this->getName(), fadeTimeBox->getValue_string()));
   }
 
   void QuantNode::onAddCodeEditor(QString insertButtonName)
@@ -437,48 +533,6 @@ namespace QuantIDE
     this->fitEditorsPosition();
   }
 
-  void QuantNode::onNet_NodeCreated(DataNode data)
-  {
-    //qDebug("QuantNode::onNet_NodeCreated");
-    emit actPrint("Node \"" + this->getName() + "\" created by user " + data.getSender() + " ...", MessageType::STATUS);
-    nodeData = data;
-    textName->setText(this->getName());
-  }
-  void QuantNode::onNet_NodeKilled(DataNode data)
-  {
-    //qDebug("QuantNode::onNet_NodeKilled");    
-    emit actEvaluate(tr("~%1.free").arg(this->getName()), true);
-    emit actPrint("Node \"" + this->getName() + "\" deleted by user " + data.getSender() + " ...", MessageType::STATUS);
-  }
-  void QuantNode::onNet_NodePlayingChanged(DataNode data)
-  {
-    QString nodeName = this->getName();
-    double volume = 0.5;
-    double fTime = 0;
-
-    if (!isPlaying)
-    {
-      isPlaying = true;
-      this->playButton->setState(Button::ON);
-      emit actPrint("Node \"" + this->getName() + "\" cmd PLAY by user " + data.getSender() + " ...", MessageType::STATUS);
-      emit actEvaluate(tr("~%1.play(vol: %2, fadeTime: %3)").arg(
-        nodeName,
-        QString::number(volume),
-        QString::number(fTime)
-        ), true);
-    }
-    else
-    {
-      isPlaying = false;
-      this->playButton->setState(Button::OFF);
-      emit actPrint("Node \"" + this->getName() + "\" cmd STOP by user " + data.getSender() + " ...", MessageType::STATUS);
-      emit actEvaluate(tr("~%1.stop(%2)").arg(
-        nodeName,
-        QString::number(fTime)
-        ), true);
-    }
-  }
-
   void QuantNode::onCodeChanged(QString indexCodeName, QString code)
   {
     int codeIndex = indexCodeName.toInt();
@@ -577,7 +631,6 @@ namespace QuantIDE
     }
   }
 
-
   void QuantNode::onSourceCursorMoved(int position)
   {
     //qDebug("QuantNode::onSourceCursorMoved");
@@ -589,13 +642,13 @@ namespace QuantIDE
   {
     QuantObject::resizeEvent(event);
     closeButton->setGeometry(this->width() - 30, 10, 16, 16);
-    textName->setGeometry(5, 5, 200, 20);
+    textName->setGeometry(5, 5, 70, 20);
+    playButton->setGeometry(80, 5, 40, 20);
+    volumeBox->setGeometry(130, 5, 50, 20);
+    fadeTimeBox->setGeometry(190, 5, 50, 20);
 
     this->fitEditorsPosition();
   }
-
-
-
 
   void QuantNode::fitEditorsPosition()
   {

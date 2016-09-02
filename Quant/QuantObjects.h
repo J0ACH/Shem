@@ -143,7 +143,8 @@ namespace QuantIDE
   public:
 
     enum TargetMethod {
-      NodeCreated, NodeKilled, NodePlayingChanged,
+      NodeCreated, NodeKilled,
+      NodePlayingChanged, VolumeChanged, FadeTimeChanged,
       AddCodeEditor, RemoveCodeEditor,
       CodeChanged, CodeEvaluate, NodeDisplay
     };
@@ -166,9 +167,12 @@ namespace QuantIDE
     void onNet_NodeKilled(DataNode);
     void onNet_NodePlayingChanged(DataNode);
 
+    void onNet_VolumeChanged(DataNode);
+    void onNet_FadeTimeChanged(DataNode);
+    
     void onNet_AddCodeEditor(DataNode);
     void onNet_RemoveCodeEditor(DataNode);
-
+    
     void onNet_CodeChanged(DataNode);
     void onNet_CodeEvaluate(DataNode);
     void onNet_NodeDisplay(DataNode);
@@ -181,6 +185,7 @@ namespace QuantIDE
 
     Button *closeButton, *playButton;
     Text *textName;
+    ControlBox *volumeBox, *fadeTimeBox;
 
     QList<CodeEditor*> codeEditors;
     QList<Text*> codeIndexs;
@@ -197,6 +202,8 @@ namespace QuantIDE
     private slots:
     void onClose();
     void onPlayingChanged();
+    void onVolumeChanged(QString);
+    void onFadeTimeChanged(QString);
     void onAddCodeEditor(QString insertButtonName);
     void onRemoveCodeEditor(QString insertButtonName);
     void onCodeChanged(QString indexCodeName, QString code);
