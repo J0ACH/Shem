@@ -125,13 +125,11 @@ namespace QuantIDE
     void resizeEvent(QResizeEvent *event);
 
   private:
-    Button *testButton;
     ControlBox *tempoBox;
     DataProxy proxyData;
 
     private slots:
     void onTempoChanged(QString);
-    void onBeep();
   };
 
   // QUANT NODEPROXY ////////////////////////////////////////////////////////////////
@@ -169,10 +167,10 @@ namespace QuantIDE
 
     void onNet_VolumeChanged(DataNode);
     void onNet_FadeTimeChanged(DataNode);
-    
+
     void onNet_AddCodeEditor(DataNode);
     void onNet_RemoveCodeEditor(DataNode);
-    
+
     void onNet_CodeChanged(DataNode);
     void onNet_CodeEvaluate(DataNode);
     void onNet_NodeDisplay(DataNode);
@@ -196,9 +194,8 @@ namespace QuantIDE
     void initControl();
     void addCodeEditor(int index);
     void removeCodeEditor(int index);
-
     void fitEditorsPosition();
-
+    
     private slots:
     void onClose();
     void onPlayingChanged();
@@ -209,6 +206,7 @@ namespace QuantIDE
     void onCodeChanged(QString indexCodeName, QString code);
     void onCodeEvaluate(QString indexCodeName, QString code);
     void onSourceCursorMoved(int);
+    void onCodeEditorHeightChanged();
   };
 
   // QUANT CONTROLS ////////////////////////////////////////////////////////////////

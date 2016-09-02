@@ -28,8 +28,10 @@ namespace SupercolliderBridge
     QString dataMsg = QString::fromUtf8(wrapedData);
     QStringList dataList = dataMsg.split("||");
 
-    //qDebug() << "Data(QByteArray)";
-    //qDebug() << "Data(QByteArray) dataMsg:\n" << dataMsg;
+    /*
+    qDebug() << "Data(QByteArray)";
+    if (this->getType() != DataType::USER) { qDebug() << "Data(QByteArray) dataMsg:\n" << dataMsg; }
+    */
 
     foreach(QString oneLine, dataList)
     {
@@ -181,7 +183,17 @@ namespace SupercolliderBridge
   }
   QString Data::getMethod()  { return header->value("METHOD", "NaN"); }
 
-  void Data::setValue(QString key, QVariant value)  { library->insert(key, value); }
+  void Data::setValue(QString key, QVariant value)
+  {
+    switch (library->value(key).type())
+    {
+    case QVariant::String:
+      if (value.toString().isEmpty()) { library->insert(key, "NaN"); }
+      else { library->insert(key, value); }
+      break;
+    default:  library->insert(key, value); break;
+    }
+  }
   void Data::setValue(QString key1, QString key2, QVariant value)
   {
     this->setValue(QString("%1/%2").arg(key1, key2), value);
@@ -192,6 +204,10 @@ namespace SupercolliderBridge
     switch (library->value(key).type())
     {
     case QVariant::Invalid: return "null"; break;
+    case QVariant::String:
+      if (library->value(key).toString() == "NaN") { return ""; }
+      else { return library->value(key); }
+      break;
     default: return library->value(key); break;
     }
   }

@@ -11,6 +11,9 @@ namespace Jui
     setFocusPolicy(Qt::StrongFocus);
     setFrameStyle(QFrame::NoFrame);
 
+    QFontMetrics fm(this->font());
+    linePixelHeight = fm.height();
+
     normalColor = QColor(120, 120, 120);
     overColor = QColor(230, 230, 230);
     activeColor = QColor(50, 65, 95);
@@ -22,21 +25,32 @@ namespace Jui
     fps = 25;
     timer = new QTimer(this);
 
-    testSecondCursor = new QTextCursor(this->document());
-    testSecondCursorRect = QRect(0, 0, 10, 10);
-
     connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
+    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
     connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
   }
 
-  void CodeEditor::setFontCode(QFont font) { this->setFont(font); update(); }
+  void CodeEditor::setFontCode(QFont font)
+  {
+    this->setFont(font);
+
+    QFontMetrics fm(this->font());
+    linePixelHeight = fm.height();
+
+    update();
+  }
+
+  int CodeEditor::getLinePixelHeight()  { return linePixelHeight; }
 
   void CodeEditor::fitTextFormat()
   {
     QTextCharFormat formatCommonText;
     formatCommonText.setForeground(QBrush(QColor(120, 120, 120)));
-    this->highlightText(0, this->toPlainText().size(), formatCommonText);
-
+    if (this->toPlainText().size() > 0)
+    {
+      this->highlightText(0, this->toPlainText().size(), formatCommonText);
+    }
     QList<QList<QVariant>*> classes = regexpText(HighLights::CLASS);
     QList<QList<QVariant>*> digits = regexpText(HighLights::DIGIT);
     QList<QList<QVariant>*> controls = regexpText(HighLights::CONTROL);
@@ -76,6 +90,7 @@ namespace Jui
     QRegExp rule(regexpRule);
     int count = 0;
     int position = 0;
+
     while ((position = rule.indexIn(text, position)) != -1)
     {
       QStringRef subString(&text, position, rule.matchedLength());
@@ -90,6 +105,7 @@ namespace Jui
       ++count;
       position += rule.matchedLength();
     }
+
 
     return answ;
   }
@@ -115,20 +131,40 @@ namespace Jui
     this->setStyleSheet("QTextEdit { background-color: rgba(0,0,0,0); }");
   }
 
+  void CodeEditor::onTextChanged()
+  {
+    // cursorPosition = this->textCursor().position();
+    // qDebug() << "CodeEditor::onTextChanged";
+    this->resizeByLines();
+
+    // emit actValueChanged(this->toPlainText());
+    // emit actValueChanged(this->objectName(), this->toPlainText());
+  }
+
+  void CodeEditor::onCursorPositionChanged()
+  {
+    cursorPosition = this->textCursor().position();
+    // qDebug() << "CodeEditor::onCursorPositionChanged" << cursorPosition;
+
+    emit actCursorMoved(cursorPosition);
+  }
+
   void CodeEditor::onChangeExtraCursor(QString name, int position)
   {
+    /*
     qDebug() << "CodeEditor::onChangeExtraCursor name:" << name << "position:" << position;
 
     if (!extraCursors.contains(name))
     {
-      QTextCursor *oneCursor = new QTextCursor(this->document());
-      //oneCursor = QRect(0, 0, 10, 10);
+    QTextCursor *oneCursor = new QTextCursor(this->document());
+    //oneCursor = QRect(0, 0, 10, 10);
 
-      extraCursors.insert(name, oneCursor);
+    extraCursors.insert(name, oneCursor);
     }
 
     extraCursors.value(name)->setPosition(position);
     this->update();
+    */
   }
 
   void CodeEditor::onEvaluate(QColor color)
@@ -158,20 +194,11 @@ namespace Jui
           switch (eventKey->modifiers())
           {
           case Qt::KeyboardModifier::ControlModifier:
-            /*
-            backgroundAlpha = 255;
-            timer->stop();
-            timer->setInterval(fadeTimeOut / fps);
-            timer->start();
-            */
-            this->onEvaluate(activeColor);
 
-            //emit evaluateAct();
-            emit sendText(this->toPlainText());
+            this->onEvaluate(activeColor);
 
             emit actValueEvaluate(this->toPlainText());
             emit actValueEvaluate(this->objectName(), this->toPlainText());
-
 
             qDebug() << "KeyEvent: Ctrl+ENTER PRESSED (modifer" << eventKey->modifiers() << ")";
             event->accept();
@@ -188,25 +215,56 @@ namespace Jui
       }
       if (event->type() == QEvent::KeyRelease)
       {
-        cursorPosition = this->textCursor().position();
-        testSecondCursor->setPosition(cursorPosition - 5);
-        testSecondCursorRect = this->cursorRect(*testSecondCursor);
-        this->update();
+        QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
 
-        emit actCursorMoved(cursorPosition);
+        cursorPosition = this->textCursor().position();
+        // testSecondCursor->setPosition(cursorPosition - 5);
+        // testSecondCursorRect = this->cursorRect(*testSecondCursor);
+        // this->update();
+
         emit actValueChanged(this->toPlainText());
         emit actValueChanged(this->objectName(), this->toPlainText());
 
+        qDebug();
+        qDebug() << "KeyEvent: cursor pos:" << cursorPosition;
+        qDebug() << "KeyEvent: size of change:" << eventKey->count();
+        qDebug() << "KeyEvent: insert text:" << eventKey->text();
+        qDebug() << "KeyEvent: insert key:" << eventKey->key();
+
+        /*
         qDebug() << "KeyEvent: cursor pos:" << cursorPosition;
         qDebug() << "KeyEvent: cursor RECT:" << this->cursorRect();
 
         qDebug() << "KeyEvent: cursor 2ND pos:" << testSecondCursor->position();
         qDebug() << "KeyEvent: cursor 2NP RECT:" << this->cursorRect(*testSecondCursor);
+        */
+
       }
     };
 
     event->ignore();
     return QObject::eventFilter(target, event);
+  }
+
+  void CodeEditor::resizeByLines()
+  {
+    QString text = this->toPlainText();
+    QRegExp rule("\n");
+    int count = 1;
+    int position = 0;
+
+    while ((position = rule.indexIn(text, position)) != -1)
+    {
+      QStringRef subString(&text, position, rule.matchedLength());
+      ++count;
+      position += rule.matchedLength();
+    }
+
+    this->setFixedHeight(count * linePixelHeight + 10);
+
+    //qDebug() << "CodeEditor::resizeByLines count of lines" << count;
+    emit actHeightChanged();
+
   }
 
   void CodeEditor::paintEvent(QPaintEvent *event)
@@ -224,19 +282,21 @@ namespace Jui
     painter.drawLine(0, height() - 1, width(), height() - 1);
 
     // second cursor test
+    /*
     painter.setPen(QPen(QColor(90, 40, 40), 3));
     foreach(QTextCursor *oneExtraCursor, extraCursors)
     {
-      QRect cursorRect = this->cursorRect(*oneExtraCursor);
-      painter.drawLine(
-        cursorRect.topLeft().x(),
-        cursorRect.topLeft().y(),
-        cursorRect.bottomLeft().x(),
-        cursorRect.bottomLeft().y()
-        );
+    QRect cursorRect = this->cursorRect(*oneExtraCursor);
+    painter.drawLine(
+    cursorRect.topLeft().x(),
+    cursorRect.topLeft().y(),
+    cursorRect.bottomLeft().x(),
+    cursorRect.bottomLeft().y()
+    );
     }
-    
-    painter.drawText(100, 20, this->objectName());
+    */
+
+    // painter.drawText(100, 20, this->objectName());
 
     QTextEdit::paintEvent(event);
   }

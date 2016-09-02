@@ -22,8 +22,11 @@ namespace Jui
     void setBackground(const QColor &);
     void setFontCode(QFont);
 
+    int getLinePixelHeight();
+
     public slots:
-    //void setCode(QString text);
+    void onTextChanged();
+    void onCursorPositionChanged();
     void onChangeExtraCursor(QString name, int position);
     void onEvaluate(QColor);
 
@@ -31,15 +34,17 @@ namespace Jui
     void alphaUpdate();
 
   signals:
+    void actValueInsert(int, int, QString);
     void actValueChanged(QString);
     void actValueEvaluate(QString);
     void actValueChanged(QString objectName, QString code);
     void actValueEvaluate(QString objectName, QString code);
     void actCursorMoved(int);
+    void actHeightChanged();
 
     // bude odstraneno
-    void evaluateAct();
-    void sendText(QString);
+    // void evaluateAct();
+    // void sendText(QString);
 
   protected:
     virtual bool eventFilter(QObject * watched, QEvent * event);
@@ -48,9 +53,11 @@ namespace Jui
   private:
     enum HighLights { CLASS, CONTROL, NODE, DIGIT };
 
+    int linePixelHeight;
+
     int cursorPosition;
-    QTextCursor *testSecondCursor;
-    QRect testSecondCursorRect;
+    // QTextCursor *testSecondCursor;
+    // QRect testSecondCursorRect;
 
     int fadeTimeOut;
     int fps;
@@ -62,7 +69,9 @@ namespace Jui
     QList<QList<QVariant>*> regexpText(HighLights type);
     void highlightText(int, int, QTextCharFormat);
 
-    QMap<QString, QTextCursor*> extraCursors;
+    void resizeByLines();
+
+    // QMap<QString, QTextCursor*> extraCursors;
   };
 
 }

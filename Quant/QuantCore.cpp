@@ -342,11 +342,10 @@ namespace QuantIDE
     if (targetMethod != "onNet_UserServerStatus")
     {
       // qDebug() << "QuantCore::onObjectDataChanged sender: " << sender;
-      qDebug() << "QuantCore::onObjectDataChanged targetObject: " << targetObject;
-      qDebug() << "QuantCore::onObjectDataChanged targetMethod: " << targetMethod;
+      // qDebug() << "QuantCore::onObjectDataChanged targetObject: " << targetObject;
+      // qDebug() << "QuantCore::onObjectDataChanged targetMethod: " << targetMethod;
 
-      //this->onPrint("Core [" + userName + "] send targetObject: " + targetObject + " targetMethod: " + targetMethod, MessageType::NORMAL);
-      this->onPrint(data.print("Core data send"), MessageType::NORMAL);
+      // this->onPrint(data.print("Core data send"), MessageType::NORMAL);
     }
 
     emit actObjectDataSend(data.wrap());
@@ -363,9 +362,9 @@ namespace QuantIDE
 
       if (targetMethod != "onNet_UserServerStatus")
       {
-        qDebug() << "QuantCore::onNetworkDataRecived sender: " << sender;
-        qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
-        qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
+        // qDebug() << "QuantCore::onNetworkDataRecived sender: " << sender;
+        // qDebug() << "QuantCore::onNetworkDataRecived targetObject: " << targetObject;
+        // qDebug() << "QuantCore::onNetworkDataRecived targetMethod: " << targetMethod;
 
         //  this->onPrint("Core [" + sender + "->" + userName + "] recived targetObject: " + targetObject + " targetMethod: " + targetMethod, MessageType::WARNING);
       }
