@@ -289,8 +289,6 @@ namespace SupercolliderBridge
     const QMetaObject &mo = DataCustomize::staticMetaObject;
     metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
 
-    Data::Data(wrapedData);
-
     this->setType(Data::DataType::CUSTOMIZE);
   }
 

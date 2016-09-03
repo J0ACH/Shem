@@ -8,8 +8,9 @@ namespace Jui
     setObjectName("CodeEditor");
 
     this->installEventFilter(this);
-    setFocusPolicy(Qt::StrongFocus);
-    setFrameStyle(QFrame::NoFrame);
+    this->setFocusPolicy(Qt::StrongFocus);
+    this->setFrameStyle(QFrame::NoFrame);
+    this->setTabStopWidth(30);
 
     QFontMetrics fm(this->font());
     linePixelHeight = fm.height();
