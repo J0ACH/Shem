@@ -652,9 +652,9 @@ namespace QuantIDE
       codeEditors[i]->setObjectName(QString::number(i));
 
       insertCodeButtons[i]->setGeometry(
-        30,
+        width() - 120,
         lastObjOriginY + codeEditors[i]->height() + gapSize / 2,
-        width() - 60,
+        90,
         20
         );
       insertCodeButtons[i]->setObjectName(QString::number(i));

@@ -23,6 +23,7 @@ namespace Jui
     void setFontCode(QFont);
 
     int getLinePixelHeight();
+    void codeSnippet();
 
     public slots:
     void onTextChanged();
@@ -30,7 +31,6 @@ namespace Jui
     void onChangeExtraCursor(QString name, int position);
     void onEvaluate(QColor);
 
-    void fitTextFormat();
     void alphaUpdate();
 
   signals:
@@ -41,10 +41,6 @@ namespace Jui
     void actValueEvaluate(QString objectName, QString code);
     void actCursorMoved(int);
     void actHeightChanged();
-
-    // bude odstraneno
-    // void evaluateAct();
-    // void sendText(QString);
 
   protected:
     virtual bool eventFilter(QObject * watched, QEvent * event);

@@ -26,7 +26,7 @@ namespace Jui
     fps = 25;
     timer = new QTimer(this);
 
-    connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
+    //connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
     connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
     connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
@@ -44,8 +44,18 @@ namespace Jui
 
   int CodeEditor::getLinePixelHeight()  { return linePixelHeight; }
 
-  void CodeEditor::fitTextFormat()
+
+  void CodeEditor::setBackground(const QColor & color)
   {
+    this->setStyleSheet("QTextEdit { background-color: rgba(0,0,0,0); }");
+  }
+
+  void CodeEditor::onTextChanged()
+  {
+    // cursorPosition = this->textCursor().position();
+    // qDebug() << "CodeEditor::onTextChanged";
+    this->codeSnippet();
+
     QTextCharFormat formatCommonText;
     formatCommonText.setForeground(QBrush(QColor(120, 120, 120)));
     if (this->toPlainText().size() > 0)
@@ -55,7 +65,39 @@ namespace Jui
     QList<QList<QVariant>*> classes = regexpText(HighLights::CLASS);
     QList<QList<QVariant>*> digits = regexpText(HighLights::DIGIT);
     QList<QList<QVariant>*> controls = regexpText(HighLights::CONTROL);
-    //QList<QList<QVariant>*> nodes = regexpText(HighLights::NODE);
+
+    this->resizeByLines();
+
+    // emit actValueChanged(this->toPlainText());
+    // emit actValueChanged(this->objectName(), this->toPlainText());
+  }
+
+  void CodeEditor::codeSnippet()
+  {
+    disconnect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+
+
+    QString text = this->toPlainText();
+
+    QString snipped = "ahoj";
+    QString code = "pozdrav bude nekdy priste";
+
+    if (text.contains(snipped))
+    {
+      QTextCursor cursor = this->textCursor();
+      int cursorPositionBackup = cursor.position();
+
+      QString foundText = text.replace(snipped, code, Qt::CaseSensitivity::CaseInsensitive);
+      qDebug() << "CodeEditor::codeSnippet FOUND:" << foundText;
+      this->setPlainText(foundText);
+      //this->insertPlainText(code);
+
+      //cursor.setPosition(cursorPositionBackup + code.size(), QTextCursor::MoveMode::MoveAnchor);
+      cursor.setPosition(5, QTextCursor::MoveMode::MoveAnchor);
+      this->update();
+    }
+
+    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
   }
 
   QList<QList<QVariant>*> CodeEditor::regexpText(HighLights typeHighLight)
@@ -67,7 +109,7 @@ namespace Jui
     case HighLights::CLASS:
       regexpRule = "\\b[A-Z]\\w*";
       format.setFontWeight(QFont::Normal);
-      format.setForeground(QBrush(QColor(180, 180, 180)));
+      format.setForeground(QBrush(QColor(220, 220, 220)));
       break;
     case HighLights::CONTROL:
       regexpRule = "\\\\\\w*";
@@ -113,7 +155,7 @@ namespace Jui
 
   void CodeEditor::highlightText(int position, int lenght, QTextCharFormat format)
   {
-    disconnect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
+    disconnect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
 
     QTextCursor cursor = this->textCursor();
     int cursorPositionBackup = cursor.position();
@@ -124,22 +166,7 @@ namespace Jui
 
     cursor.setPosition(cursorPositionBackup, QTextCursor::MoveMode::MoveAnchor);
 
-    connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
-  }
-
-  void CodeEditor::setBackground(const QColor & color)
-  {
-    this->setStyleSheet("QTextEdit { background-color: rgba(0,0,0,0); }");
-  }
-
-  void CodeEditor::onTextChanged()
-  {
-    // cursorPosition = this->textCursor().position();
-    // qDebug() << "CodeEditor::onTextChanged";
-    this->resizeByLines();
-
-    // emit actValueChanged(this->toPlainText());
-    // emit actValueChanged(this->objectName(), this->toPlainText());
+    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
   }
 
   void CodeEditor::onCursorPositionChanged()
