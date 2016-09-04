@@ -74,13 +74,10 @@ namespace Jui
 
   void CodeEditor::codeSnippet()
   {
-    disconnect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
-
-
     QString text = this->toPlainText();
 
     QString snipped = "ahoj";
-    QString code = "pozdrav bude nekdy priste";
+    QString code = "test insert snipped";
 
     if (text.contains(snipped))
     {
@@ -89,15 +86,14 @@ namespace Jui
 
       QString foundText = text.replace(snipped, code, Qt::CaseSensitivity::CaseInsensitive);
       qDebug() << "CodeEditor::codeSnippet FOUND:" << foundText;
+      qDebug() << "CodeEditor::codeSnippet position:" << cursorPositionBackup << "codeSize:" << code.size();
       this->setPlainText(foundText);
-      //this->insertPlainText(code);
 
-      //cursor.setPosition(cursorPositionBackup + code.size(), QTextCursor::MoveMode::MoveAnchor);
-      cursor.setPosition(5, QTextCursor::MoveMode::MoveAnchor);
+      cursor.setPosition(code.size() - cursorPositionBackup, QTextCursor::MoveMode::MoveAnchor);
+      //cursor.movePosition(QTextCursor::MoveOperation::Left, QTextCursor::MoveMode::MoveAnchor, 5);
+      this->setTextCursor(cursor);
       this->update();
     }
-
-    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
   }
 
   QList<QList<QVariant>*> CodeEditor::regexpText(HighLights typeHighLight)
