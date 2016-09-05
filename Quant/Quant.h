@@ -14,6 +14,7 @@
 #include "Edges.h"
 #include "CodeEditor.h"
 #include "CustomizePanel.h"
+#include "ListWidget.h"
 
 #include "Node.h"
 
@@ -41,6 +42,7 @@ namespace QuantIDE
     CanvanNEW *canvanNEW;
     Console *console;
     CustomizePanel *customizePanel;
+    Panel *snippedPanel;
 
     QuantCore *core;
 

@@ -11,7 +11,7 @@ int main(int argc, char** argv){
 #else
   QuantIDE::Quant *win = new QuantIDE::Quant(0);
 #endif
- 
+
   return app.exec();
 }
 
@@ -86,6 +86,30 @@ namespace QuantIDE
     customizePanel = new CustomizePanel();
     customizePanel->setVisible(false);
 
+    snippedPanel = new Panel(canvanNEW);
+    snippedPanel->setMinimumHeight(150);
+    ListWidget *test = new ListWidget(snippedPanel);
+    test->setFixedHeight(200);
+
+    QWidget *item = new QWidget();
+    ControlBox *snippetBox = new ControlBox(item);
+    snippetBox->setLabel("snippet");
+    snippetBox->setLabelSize(50);
+    ControlBox *codeBox = new ControlBox(item);
+    codeBox->setLabel("code");
+    codeBox->setLabelSize(50);
+    item->setFixedHeight(75);
+    snippetBox->setGeometry(5, 5, 200, 20);
+    codeBox->setGeometry(5, 30, 200, 40);
+
+    test->setGeometry(10, 30, 150, 150);
+    test->onAppendWidget();
+    test->onAppendWidget(item);
+    test->onAppendWidget();
+    test->show();
+
+    canvanNEW->addPanel(snippedPanel, "SnippedPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+
     controlsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(controlsBar, "Bridge", Qt::ToolBarArea::BottomToolBarArea);
     controlsBar->addButton("Network", QImage(":/network_16px.png"), core, SLOT(onNetChangeState()));
@@ -114,11 +138,11 @@ namespace QuantIDE
     panelsBar->addButton("NodePanel", QImage(":/network_16px.png"), canvanNEW->getPanel("NodePanel"), SLOT(onSwitchVisible()));
     panelsBar->getButton("NodePanel")->setState(Button::State::ON);
     connect(canvanNEW->getPanel("NodePanel"), SIGNAL(actClosed()), panelsBar->getButton("NodePanel"), SLOT(onSwitch()));
-    
+
     panelsBar->addButton("SnippedPanel", QImage(":/network_16px.png"), canvanNEW->getPanel("SnippedPanel"), SLOT(onSwitchVisible()));
     panelsBar->getButton("SnippedPanel")->setState(Button::State::ON);
     connect(canvanNEW->getPanel("SnippedPanel"), SIGNAL(actClosed()), panelsBar->getButton("SnippedPanel"), SLOT(onSwitch()));
-    
+
   }
 
   void Quant::onCustomize(DataCustomize data)

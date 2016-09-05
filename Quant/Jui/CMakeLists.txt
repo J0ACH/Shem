@@ -27,6 +27,7 @@ SET(Jui_hdr
 	Graph.h
 	ControlBox.h
 	Text.h
+	ListWidget.h
 )
 
 SET(Jui_src
@@ -40,6 +41,7 @@ SET(Jui_src
 	Graph.cpp
 	ControlBox.cpp
 	Text.cpp
+	ListWidget.cpp
 )
 
 QT5_WRAP_CPP( Jui_moc ${Jui_hdr} )

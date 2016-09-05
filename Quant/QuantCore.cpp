@@ -49,11 +49,7 @@ namespace QuantIDE
     mCanvan->addPanel(nodePanel, "NodePanel", Qt::DockWidgetArea::TopDockWidgetArea);
     nodePanel->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
     nodePanel->setMinimumHeight(300);
-
-    snippedPanel = new Panel(mCanvan);
-    snippedPanel->setMinimumHeight(150);
-    mCanvan->addPanel(snippedPanel, "SnippedPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
-
+  
     lib_users = new Library(networkPanel, this);
     lib_proxy = new Library(timePanel, this);
     lib_nodes = new Library(nodePanel, this);
