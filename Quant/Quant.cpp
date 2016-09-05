@@ -114,6 +114,11 @@ namespace QuantIDE
     panelsBar->addButton("NodePanel", QImage(":/network_16px.png"), canvanNEW->getPanel("NodePanel"), SLOT(onSwitchVisible()));
     panelsBar->getButton("NodePanel")->setState(Button::State::ON);
     connect(canvanNEW->getPanel("NodePanel"), SIGNAL(actClosed()), panelsBar->getButton("NodePanel"), SLOT(onSwitch()));
+    
+    panelsBar->addButton("SnippedPanel", QImage(":/network_16px.png"), canvanNEW->getPanel("SnippedPanel"), SLOT(onSwitchVisible()));
+    panelsBar->getButton("SnippedPanel")->setState(Button::State::ON);
+    connect(canvanNEW->getPanel("SnippedPanel"), SIGNAL(actClosed()), panelsBar->getButton("SnippedPanel"), SLOT(onSwitch()));
+    
   }
 
   void Quant::onCustomize(DataCustomize data)
@@ -129,9 +134,9 @@ namespace QuantIDE
       "Jui--CanvanNEW_StatusBar {qproperty-colorBackground: %5;}"
       "Jui--CanvanNEW_ToolBar {qproperty-colorBackground: %7;}"
 
-      "Jui--PanelNEW {qproperty-colorHeader: %7;}"
-      "Jui--PanelNEW {qproperty-colorBackground: %8;}"
-      "Jui--PanelNEW {qproperty-colorTitle: %4;}"
+      "Jui--Panel {qproperty-colorHeader: %7;}"
+      "Jui--Panel {qproperty-colorBackground: %8;}"
+      "Jui--Panel {qproperty-colorTitle: %4;}"
 
       "Jui--Text {qproperty-colorText: %4;}"
 

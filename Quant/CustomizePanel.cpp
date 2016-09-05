@@ -4,7 +4,7 @@
 
 namespace QuantIDE
 {
-  CustomizePanel::CustomizePanel(QWidget *parent) : PanelNEW(parent)
+  CustomizePanel::CustomizePanel(QWidget *parent) : Panel(parent)
   {
     this->setMinimumWidth(400);
     this->setMinimumHeight(150);
@@ -258,7 +258,7 @@ namespace QuantIDE
 
     scrollWidget->setFixedHeight(750); // end of scroll
 
-    PanelNEW::resizeEvent(event);
+    Panel::resizeEvent(event);
   }
 
   QString CustomizePanel::color2String(QColor color)

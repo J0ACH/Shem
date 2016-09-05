@@ -4,7 +4,7 @@ namespace QuantIDE
 {
   // QuantPanel /////////////////////////////////////////////////////////////////////////////////
 
-  QuantPanel::QuantPanel(QWidget *parent) : PanelNEW(parent)
+  QuantPanel::QuantPanel(QWidget *parent) : Panel(parent)
   {
     this->setMinimumWidth(400);
     this->setMinimumHeight(150);
@@ -23,7 +23,7 @@ namespace QuantIDE
     scrollArea->setGeometry(10, scrollOffset, width() - 20, height() - scrollOffset - 20);
     scrollArea->widget()->setFixedWidth(scrollArea->width() - 10);
 
-    PanelNEW::resizeEvent(event);
+    Panel::resizeEvent(event);
   }
 
   QuantPanel::~QuantPanel() { }

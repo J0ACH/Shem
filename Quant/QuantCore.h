@@ -107,6 +107,7 @@ namespace QuantIDE
     QuantPanel *networkPanel;
     QuantPanel *timePanel;
     QuantPanel *nodePanel;
+    Panel *snippedPanel;
 
     Library *lib_users;  // knihovna prihlasenych hracu pro komunikujici pres sit 
     Library *lib_proxy;

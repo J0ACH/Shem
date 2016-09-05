@@ -3,7 +3,7 @@
 namespace Jui
 {
 
-  Console::Console(QWidget *parent) : PanelNEW(parent)
+  Console::Console(QWidget *parent) : Panel(parent)
   {
     //setEdgeControler(EdgeControler::Direction::LEFT, true);
     this->setTitle("Console");
@@ -35,7 +35,7 @@ namespace Jui
 
   void Console::setColorBackground(QColor color)
   {
-    PanelNEW::setColorBackground(color);
+    Panel::setColorBackground(color);
     QWidget *viewport = text->viewport();
     QPalette palete = viewport->palette();
     palete.setColor(viewport->backgroundRole(), color);
@@ -63,7 +63,7 @@ namespace Jui
 
   void Console::resizeEvent(QResizeEvent *event)
   {
-    PanelNEW::resizeEvent(event); // send event to superclass
+    Panel::resizeEvent(event); // send event to superclass
     text->setGeometry(10, 35, this->width() - 20, this->height() - 45);
   }
 

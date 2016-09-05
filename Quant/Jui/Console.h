@@ -9,7 +9,7 @@
 namespace Jui
 {
 
-    class Console : public PanelNEW
+    class Console : public Panel
   {
     Q_OBJECT
       Q_PROPERTY(QFont fontConsole READ getFontConsole WRITE setFontConsole)

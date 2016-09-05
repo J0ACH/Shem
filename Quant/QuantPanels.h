@@ -14,7 +14,7 @@ using namespace Jui;
 
 namespace QuantIDE
 {
-  class QuantPanel : public PanelNEW
+  class QuantPanel : public Panel
   {
     Q_OBJECT
 

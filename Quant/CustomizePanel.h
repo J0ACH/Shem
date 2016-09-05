@@ -19,7 +19,7 @@ using namespace SupercolliderBridge;
 namespace QuantIDE
 {
 
-  class CustomizePanel : public PanelNEW
+  class CustomizePanel : public Panel
   {
     Q_OBJECT
 

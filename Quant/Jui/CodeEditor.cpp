@@ -26,7 +26,6 @@ namespace Jui
     fps = 25;
     timer = new QTimer(this);
 
-    //connect(this, SIGNAL(textChanged()), this, SLOT(fitTextFormat()));
     connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
     connect(timer, SIGNAL(timeout()), this, SLOT(alphaUpdate()));
@@ -43,7 +42,6 @@ namespace Jui
   }
 
   int CodeEditor::getLinePixelHeight()  { return linePixelHeight; }
-
 
   void CodeEditor::setBackground(const QColor & color)
   {
@@ -67,33 +65,48 @@ namespace Jui
     QList<QList<QVariant>*> controls = regexpText(HighLights::CONTROL);
 
     this->resizeByLines();
-
-    // emit actValueChanged(this->toPlainText());
-    // emit actValueChanged(this->objectName(), this->toPlainText());
   }
 
   void CodeEditor::codeSnippet()
   {
     QString text = this->toPlainText();
 
-    QString snipped = "ahoj";
-    QString code = "test insert snipped";
+    QMap<QString, QString> snippedLib;
+    snippedLib.insert("sin", "SinOsc.ar(\\freq.kr(90)!2)");
+    snippedLib.insert("setfreq", "\\xset -> Pbind(\n\t\\freq, Pseq([90,98,98,105], inf),\n\t\\dur, 0.5\n)");
 
-    if (text.contains(snipped))
+    foreach(QString oneSnipped, snippedLib.keys())
     {
-      QTextCursor cursor = this->textCursor();
-      int cursorPositionBackup = cursor.position();
+      if (text.contains(oneSnipped))
+      {
+        QTextCursor cursor = this->textCursor();
+        int cursorPositionBackup = cursor.position();
 
-      QString foundText = text.replace(snipped, code, Qt::CaseSensitivity::CaseInsensitive);
-      // qDebug() << "CodeEditor::codeSnippet FOUND:" << foundText;
-      // qDebug() << "CodeEditor::codeSnippet position:" << cursorPositionBackup << "codeSize:" << code.size();
-      this->setPlainText(foundText);
+        QString code = snippedLib.value(oneSnipped);
 
-      cursor.setPosition(cursorPositionBackup - snipped.size() + code.size(), QTextCursor::MoveMode::MoveAnchor);
-      //cursor.movePosition(QTextCursor::MoveOperation::Left, QTextCursor::MoveMode::MoveAnchor, 5);
-      this->setTextCursor(cursor);
-      this->update();
+        QString foundText = text.replace(oneSnipped, code, Qt::CaseSensitivity::CaseSensitive);
+        this->setPlainText(foundText);
+
+        cursor.setPosition(cursorPositionBackup - oneSnipped.size() + code.size(), QTextCursor::MoveMode::MoveAnchor);
+        this->setTextCursor(cursor);
+      }
     }
+  }
+
+  void CodeEditor::highlightText(int position, int lenght, QTextCharFormat format)
+  {
+    disconnect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+
+    QTextCursor cursor = this->textCursor();
+    int cursorPositionBackup = cursor.position();
+
+    cursor.setPosition(position, QTextCursor::MoveMode::MoveAnchor);
+    cursor.setPosition(position + lenght, QTextCursor::MoveMode::KeepAnchor);
+    cursor.setCharFormat(format);
+
+    cursor.setPosition(cursorPositionBackup, QTextCursor::MoveMode::MoveAnchor);
+
+    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
   }
 
   QList<QList<QVariant>*> CodeEditor::regexpText(HighLights typeHighLight)
@@ -149,32 +162,19 @@ namespace Jui
     return answ;
   }
 
-  void CodeEditor::highlightText(int position, int lenght, QTextCharFormat format)
-  {
-    disconnect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
-
-    QTextCursor cursor = this->textCursor();
-    int cursorPositionBackup = cursor.position();
-
-    cursor.setPosition(position, QTextCursor::MoveMode::MoveAnchor);
-    cursor.setPosition(position + lenght, QTextCursor::MoveMode::KeepAnchor);
-    cursor.setCharFormat(format);
-
-    cursor.setPosition(cursorPositionBackup, QTextCursor::MoveMode::MoveAnchor);
-
-    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
-  }
-
   void CodeEditor::onCursorPositionChanged()
   {
     cursorPosition = this->textCursor().position();
-    // qDebug() << "CodeEditor::onCursorPositionChanged" << cursorPosition;
+    qDebug() << "CodeEditor::onCursorPositionChanged" << cursorPosition;
 
     emit actCursorMoved(cursorPosition);
   }
 
   void CodeEditor::onChangeExtraCursor(QString name, int position)
   {
+
+    //cursor.movePosition(QTextCursor::MoveOperation::Left, QTextCursor::MoveMode::MoveAnchor, 5);
+
     /*
     qDebug() << "CodeEditor::onChangeExtraCursor name:" << name << "position:" << position;
 
@@ -213,7 +213,7 @@ namespace Jui
         {
         case Qt::Key::Key_Return:
 
-          qDebug() << "event: ENTER PRESSED";
+          //qDebug() << "event: ENTER PRESSED";
 
           switch (eventKey->modifiers())
           {
@@ -256,6 +256,7 @@ namespace Jui
         qDebug() << "KeyEvent: insert text:" << eventKey->text();
         qDebug() << "KeyEvent: insert key:" << eventKey->key();
         */
+
 
         /*
         qDebug() << "KeyEvent: cursor pos:" << cursorPosition;
