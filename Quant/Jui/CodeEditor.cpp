@@ -85,11 +85,11 @@ namespace Jui
       int cursorPositionBackup = cursor.position();
 
       QString foundText = text.replace(snipped, code, Qt::CaseSensitivity::CaseInsensitive);
-      qDebug() << "CodeEditor::codeSnippet FOUND:" << foundText;
-      qDebug() << "CodeEditor::codeSnippet position:" << cursorPositionBackup << "codeSize:" << code.size();
+      // qDebug() << "CodeEditor::codeSnippet FOUND:" << foundText;
+      // qDebug() << "CodeEditor::codeSnippet position:" << cursorPositionBackup << "codeSize:" << code.size();
       this->setPlainText(foundText);
 
-      cursor.setPosition(code.size() - cursorPositionBackup, QTextCursor::MoveMode::MoveAnchor);
+      cursor.setPosition(cursorPositionBackup - snipped.size() + code.size(), QTextCursor::MoveMode::MoveAnchor);
       //cursor.movePosition(QTextCursor::MoveOperation::Left, QTextCursor::MoveMode::MoveAnchor, 5);
       this->setTextCursor(cursor);
       this->update();
@@ -249,11 +249,13 @@ namespace Jui
         emit actValueChanged(this->toPlainText());
         emit actValueChanged(this->objectName(), this->toPlainText());
 
+        /*
         qDebug();
         qDebug() << "KeyEvent: cursor pos:" << cursorPosition;
         qDebug() << "KeyEvent: size of change:" << eventKey->count();
         qDebug() << "KeyEvent: insert text:" << eventKey->text();
         qDebug() << "KeyEvent: insert key:" << eventKey->key();
+        */
 
         /*
         qDebug() << "KeyEvent: cursor pos:" << cursorPosition;
