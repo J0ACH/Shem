@@ -60,14 +60,14 @@ namespace Jui
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
     virtual bool eventFilter(QObject * watched, QEvent * event);
-
+    void focusInEvent(QFocusEvent * event);
+    
   private:
     Text *label;
     QLineEdit *value;
     QString oldValue;
 
-    bool isFocused;
-    int labelSizeX;
+        int labelSizeX;
     QColor colorNormal, colorOver, colorActive, colorText;
     QFont font;
 

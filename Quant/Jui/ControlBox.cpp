@@ -3,18 +3,17 @@
 namespace Jui
 {
 
-  ControlBox::ControlBox(QWidget *parent) :
-    QWidget(parent)
+  ControlBox::ControlBox(QWidget *parent) : QWidget(parent)
   {
     label = new Text(this);
     label->setText("label");
 
     value = new QLineEdit(this);
     value->setText("NaN");
+    oldValue = "NaN";
 
     labelSizeX = 30;
-    isFocused = false;
-    //text->setTabStopWidth(30);
+    //isFocused = false;
 
     backgroundAlpha = 0;
     fadeTimeOut = 800;
@@ -42,8 +41,8 @@ namespace Jui
     oldValue = val;
   }
 
-  QString ControlBox::getValue_string()  { return value->displayText(); }
-  int ControlBox::getValue_int()  { return value->displayText().toInt(); }
+  QString ControlBox::getValue_string() { return value->displayText(); }
+  int ControlBox::getValue_int() { return value->displayText().toInt(); }
   double ControlBox::getValue_double()  { return value->displayText().toDouble(); }
   bool ControlBox::getValue_bool()
   {
@@ -67,13 +66,7 @@ namespace Jui
   QColor ControlBox::getColorText()  { return colorActive; }
   QFont ControlBox::getFont()  { return font; }
 
-  void ControlBox::setLabelSize(int size)
-  {
-    labelSizeX = size;
-    //  QWidget::resizeEvent;
-    // label->setGeometry(0, 0, labelSizeX, this->height());
-    //  value->setGeometry(labelSizeX, 1, this->width() - labelSizeX - 6, this->height() - 2);    
-  }
+  void ControlBox::setLabelSize(int size)  { labelSizeX = size; }
 
   bool ControlBox::eventFilter(QObject* target, QEvent* event)
   {
@@ -98,25 +91,39 @@ namespace Jui
         oldValue = value->displayText();
         emit actValueEvaluate(value->displayText());
         value->setFocus();
-        //qDebug() << "OldValue" << oldValue;
-        isFocused = true;
         this->update();
         return true;
       case Qt::Key::Key_Escape:
-        //qDebug() << "ControlBox Esc";
-        //qDebug() << "OldValue" << oldValue;
-        value->setText(oldValue);
-        emit actValueChanged(value->displayText());
-        value->clearFocus();
-        isFocused = false;
-        this->update();
+        qDebug() << "ControlBox Esc";
+        this->parentWidget()->setFocus();
+        //        this->update();
         return true;
+        break;
+      case Qt::Key::Key_Up:
+        qDebug() << "ControlBox::eventFilter UP on " << target->objectName();
+        qDebug() << "ControlBox::eventFilter children " << target->children();
+        //QWidget parentWidget = static_cast<QWidget> (target);
+        //this->previousInFocusChain()->setFocus();
         /*
-      default:
-
-      break;
-      */
+        if (!library.at(0)->hasFocus()) { this->focusPreviousChild(); }
+        else { library.at(library.size() - 1)->setFocus(); }
+        */
+        break;
+      case Qt::Key::Key_Down:
+        qDebug() << "ControlBox::eventFilter DOWN on " << target->objectName();
+        qDebug() << "ControlBox::eventFilter children " << target->children();
+        //this->nextInFocusChain()->setFocus();
+        /*
+        if (watched->children().size() > 0)
+        {
+          firstChildren = static_cast<QWidget*>(watched->children().at(0));
+          firstChildren->setFocus();
+          //          firstChildren->update();
+        }
+        */
+        break;
       }
+
     };
     if (event->type() == QEvent::KeyRelease)
     {
@@ -126,17 +133,24 @@ namespace Jui
     if (event->type() == QEvent::MouseButtonRelease)
     {
       // qDebug("ControlBox Pressed");
-      isFocused = true;
       value->setFocus();
       this->update();
     }
     if (event->type() == QEvent::FocusOut)
     {
-      // qDebug("ControlBox FocusOut");
-      isFocused = false;
+      //qDebug("ControlBox FocusOut");
+      value->setText(oldValue);
+      emit actValueChanged(value->displayText());
       this->update();
     }
     return QWidget::eventFilter(target, event);
+  }
+
+  void ControlBox::focusInEvent(QFocusEvent * event)
+  {
+    //qDebug("ControlBox focusInEvent");
+    value->setFocus();
+    value->update();
   }
 
   void ControlBox::paintEvent(QPaintEvent *event)
@@ -147,8 +161,13 @@ namespace Jui
     painter.fillRect(this->bounds(), fillColor);
 
     painter.setPen(colorText);
+    /*
     if (isFocused) { painter.setPen(colorOver); }
     else { painter.setPen(colorNormal); }
+    */
+
+    if (value->hasFocus()) { painter.setPen(QPen(QColor(220, 30, 30), 3)); }
+    else { painter.setPen(QPen(QColor(120, 30, 30), 1)); }
 
     painter.drawLine(QLine(0, 0, labelSizeX - 1, 0));
     painter.drawLine(QLine(0, this->height() - 1, labelSizeX - 1, this->height() - 1));

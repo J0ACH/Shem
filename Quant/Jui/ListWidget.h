@@ -5,12 +5,8 @@
 #include <QWidget>
 #include <QPainter>
 #include <QEvent>
-#include <QScrollArea>
-
 #include <QKeyEvent> 
-
-
-
+#include <QScrollArea>
 
 namespace Jui
 {
@@ -39,8 +35,11 @@ namespace Jui
     QList<QWidget*> library;
     QScrollArea *scrollArea;
     QWidget *scrollWidget;
+
     int borderOffset;
     int positionY(int index);
+
+    void sortLibrary();
   };
 }
 #endif // LISTWIDGET_H

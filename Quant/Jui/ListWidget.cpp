@@ -7,7 +7,7 @@ namespace Jui
 
   ListWidget::ListWidget(QWidget *parent) : QWidget(parent)
   {
-    parent->installEventFilter(this);
+    //parent->installEventFilter(this);
 
     this->setObjectName("ListWidget");
 
@@ -27,28 +27,11 @@ namespace Jui
     item->setParent(scrollWidget);
     item->setFocusPolicy(Qt::StrongFocus);
     item->setGeometry(borderOffset, this->positionY(library.size()), 30, item->height());
-    item->setObjectName(QString("item_%1").arg(QString::number(index)));
     item->show();
+    item->installEventFilter(this);
     library.insert(index, item);
 
-    if (library.size() > 1)
-    {
-      item->setTabOrder(library.at(index - 1), item);
-      item->setTabOrder(item, library.at(index));
-
-      if (index < library.size())
-      {
-        //item->setTabOrder(item, library.at(index + 1));
-      }
-      else
-      {
-        item->setTabOrder(item, library.at(0));
-      }
-      //library.at(library.size()-1)->setTabOrder((library.at(index - 1), library.at(index));
-    }
-
-    item->installEventFilter(this);
-
+    this->sortLibrary();
   }
 
   QWidget* ListWidget::onAppendWidget()
@@ -62,10 +45,23 @@ namespace Jui
 
   QWidget* ListWidget::getWidget(int index)  { return library.at(index); }
 
+  void ListWidget::sortLibrary()
+  {
+    for (int i = 0; i < library.size(); i++)
+    {
+      library[i]->setObjectName(QString("item_%1").arg(QString::number(i)));
 
+      if (i < library.size() - 1)
+      {
+        library[i]->setTabOrder(library.at(i), library.at(i + 1));
+      }
+    }
+  }
 
   bool ListWidget::eventFilter(QObject *watched, QEvent *event)
   {
+    QWidget *firstChildren;
+
     switch (event->type())
     {
     case QEvent::Resize:
@@ -86,18 +82,28 @@ namespace Jui
       switch (eventKey->key())
       {
       case Qt::Key::Key_Down:
-        this->focusNextChild();
-        
+        if (!library.at(library.size() - 1)->hasFocus()) { this->focusNextChild(); }
+        else { library.at(0)->setFocus(); }
         break;
       case Qt::Key::Key_Up:
-        this->focusPreviousChild();
-        
+        if (!library.at(0)->hasFocus()) { this->focusPreviousChild(); }
+        else { library.at(library.size() - 1)->setFocus(); }
+        break;
+      case Qt::Key::Key_Return:
+        qDebug() << "ListWidget::eventFilter ENTER on " << watched->objectName();
+        qDebug() << "ListWidget::eventFilter children " << watched->children();
+        if (watched->children().size() > 0)
+        {
+          firstChildren = static_cast<QWidget*>(watched->children().at(0));
+          firstChildren->setFocus();
+          //          firstChildren->update();
+        }
+        break;
+      case Qt::Key::Key_Escape:
+        qDebug() << "ListWidget::eventFilter ESCon " << watched->objectName();
         break;
       }
-
       this->update();
-
-      break;
     }
 
     return QWidget::eventFilter(watched, event);
@@ -130,13 +136,14 @@ namespace Jui
     {
       if (oneW->hasFocus()) { painter.setPen(QPen(QColor(220, 30, 30), 3)); }
       else { painter.setPen(QPen(QColor(120, 30, 30), 1)); }
+      
       painter.drawRect(
-        oneW->geometry().left(),
-        oneW->geometry().top() + scrollWidget->y(),
+        oneW->geometry().left() + borderOffset,
+        oneW->geometry().top() + scrollWidget->y() + borderOffset, 
         oneW->width(),
         oneW->height()
         );
-
+      
       painter.setPen(QColor(120, 30, 30));
 
       painter.drawText(

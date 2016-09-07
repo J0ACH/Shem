@@ -86,10 +86,13 @@ namespace QuantIDE
     customizePanel = new CustomizePanel();
     customizePanel->setVisible(false);
 
+    snippedPanelNEW = new SnippetPanel();
+    snippedPanelNEW->setMinimumHeight(300);
+    /*
     snippedPanel = new Panel(canvanNEW);
     snippedPanel->setMinimumHeight(350);
     ListWidget *test = new ListWidget(snippedPanel);
-    test->setFixedHeight(200);
+    test->setFixedHeight(300);
     QWidget *item = test->onAppendWidget();
     CodeEditor *testEditor = new CodeEditor(item);
     testEditor->setGeometry(5, 5, 200, 20);
@@ -102,6 +105,8 @@ namespace QuantIDE
     ControlBox *codeBox = new ControlBox(item2);
     codeBox->setLabel("code");
     codeBox->setLabelSize(50);
+    codeBox->setTabOrder(snippetBox, codeBox);
+
     item2->setFixedHeight(85);
     snippetBox->setGeometry(5, 5, 200, 20);
     codeBox->setGeometry(5, 30, 200, 40);
@@ -111,8 +116,9 @@ namespace QuantIDE
     test->onAppendWidget(item2);
     test->onAppendWidget();
     test->show();
+    */
 
-    canvanNEW->addPanel(snippedPanel, "SnippedPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
+    canvanNEW->addPanel(snippedPanelNEW, "SnippedPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
 
     controlsBar = new CanvanNEW_ToolBar();
     canvanNEW->addButtonBar(controlsBar, "Bridge", Qt::ToolBarArea::BottomToolBarArea);

@@ -42,6 +42,7 @@ namespace QuantIDE
     CanvanNEW *canvanNEW;
     Console *console;
     CustomizePanel *customizePanel;
+    SnippetPanel *snippedPanelNEW;
     Panel *snippedPanel;
 
     QuantCore *core;

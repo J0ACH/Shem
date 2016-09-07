@@ -3,6 +3,7 @@
 
 #include "Panel.h"
 #include "Text.h"
+#include "ListWidget.h"
 #include "QuantObjects.h"
 
 #include <QWidget>
@@ -19,7 +20,7 @@ namespace QuantIDE
     Q_OBJECT
 
   public:
-    QuantPanel(QWidget *parent);
+    QuantPanel(QWidget *parent = 0);
     ~QuantPanel();
 
     void setScrollWidget(QWidget*);
@@ -35,12 +36,14 @@ namespace QuantIDE
     int scrollOffset;
   };
 
+  // NodePanel //////////////////////////////////////////////////////
+
   class NodePanelNEW : public QuantPanel
   {
     Q_OBJECT
 
   public:
-    NodePanelNEW(QWidget *parent);
+    NodePanelNEW(QWidget *parent = 0);
     ~NodePanelNEW();
 
     public slots:
@@ -54,6 +57,36 @@ namespace QuantIDE
 
   private:
     Button *buttonAddNode;
+  };
+
+  // SnippedPanel //////////////////////////////////////////////////////
+
+  class SnippedPanel_Item : public QWidget
+  {
+    Q_OBJECT
+
+  public:
+    SnippedPanel_Item(QWidget *parent = 0);
+    ~SnippedPanel_Item();
+
+  protected:
+    void paintEvent(QPaintEvent *event);
+  };
+
+  class SnippetPanel : public Panel
+  {
+    Q_OBJECT
+
+  public:
+    SnippetPanel(QWidget *parent = 0);
+    ~SnippetPanel();
+
+  protected:
+    void resizeEvent(QResizeEvent *event);
+
+  private:
+    ListWidget *listWidget;
+    Button *buttonSave;
   };
 }
 
