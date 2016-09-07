@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QEvent>
+#include <QScrollArea>
 
 namespace Jui
 {
@@ -16,12 +17,16 @@ namespace Jui
     ListWidget(QWidget *parent = 0);
     ~ListWidget();
 
-    void getWidget(int i);
+    void insertWidget(QWidget *item, int index);
+
+    QWidget *getWidget(int i);
+
+
 
     public slots:
-    void onAppendWidget();
+    QWidget *onAppendWidget();
     void onAppendWidget(QWidget *item);
-
+    
   protected:
     void resizeEvent(QResizeEvent *event);
     void paintEvent(QPaintEvent *event);
@@ -29,7 +34,8 @@ namespace Jui
 
   private:
     QList<QWidget*> library;
-
+    QScrollArea *scrollArea;
+    QWidget *scrollWidget;
     int borderOffset;
     int positionY(int index);
   };

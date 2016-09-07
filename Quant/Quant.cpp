@@ -87,24 +87,28 @@ namespace QuantIDE
     customizePanel->setVisible(false);
 
     snippedPanel = new Panel(canvanNEW);
-    snippedPanel->setMinimumHeight(150);
+    snippedPanel->setMinimumHeight(350);
     ListWidget *test = new ListWidget(snippedPanel);
     test->setFixedHeight(200);
-
-    QWidget *item = new QWidget();
-    ControlBox *snippetBox = new ControlBox(item);
+    QWidget *item = test->onAppendWidget();
+    CodeEditor *testEditor = new CodeEditor(item);
+    testEditor->setGeometry(5, 5, 200, 20);
+    
+    QWidget *item2 = new QWidget();
+    ControlBox *snippetBox = new ControlBox(item2);
     snippetBox->setLabel("snippet");
     snippetBox->setLabelSize(50);
-    ControlBox *codeBox = new ControlBox(item);
+
+    ControlBox *codeBox = new ControlBox(item2);
     codeBox->setLabel("code");
     codeBox->setLabelSize(50);
-    item->setFixedHeight(75);
+    item2->setFixedHeight(85);
     snippetBox->setGeometry(5, 5, 200, 20);
     codeBox->setGeometry(5, 30, 200, 40);
 
     test->setGeometry(10, 30, 150, 150);
     test->onAppendWidget();
-    test->onAppendWidget(item);
+    test->onAppendWidget(item2);
     test->onAppendWidget();
     test->show();
 
