@@ -7,6 +7,11 @@
 #include <QEvent>
 #include <QScrollArea>
 
+#include <QKeyEvent> 
+
+
+
+
 namespace Jui
 {
   class ListWidget : public QWidget
@@ -20,8 +25,6 @@ namespace Jui
     void insertWidget(QWidget *item, int index);
 
     QWidget *getWidget(int i);
-
-
 
     public slots:
     QWidget *onAppendWidget();

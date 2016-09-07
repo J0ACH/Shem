@@ -199,12 +199,12 @@ namespace Jui
     timer->start();
   }
 
-  bool CodeEditor::eventFilter(QObject* target, QEvent* event)
+  bool CodeEditor::eventFilter(QObject *target, QEvent *event)
   {
     //qDebug() << "EventType " << event->type();
     if (hasFocus())
     {
-            if (event->type() == QEvent::KeyPress)
+      if (event->type() == QEvent::KeyPress)
       {
         QKeyEvent* eventKey = static_cast<QKeyEvent*>(event);
         quint32 modifers = eventKey->nativeModifiers();
