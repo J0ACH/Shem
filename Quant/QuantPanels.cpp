@@ -91,22 +91,115 @@ namespace QuantIDE
 
   SnippedPanel_Item::SnippedPanel_Item(QWidget *parent) : QWidget(parent)
   {
-    ControlBox *snippetBox = new ControlBox(this);
+    snippetBox = new ControlBox(this);
+    snippetBox->setObjectName("snippedBox");
     snippetBox->setLabel("snippet");
     snippetBox->setLabelSize(50);
     snippetBox->setGeometry(5, 5, 200, 20);
 
-    ControlBox *codeBox = new ControlBox(this);
+    /*
+    codeBox = new ControlBox(this);
+    codeBox->setObjectName("codeBox");
     codeBox->setLabel("code");
     codeBox->setLabelSize(50);
     codeBox->setGeometry(5, 35, 200, 20);
 
-    codeBox->setTabOrder(snippetBox, codeBox); 
-    /*
-    CodeEditor *testEditor = new CodeEditor(this);
-    testEditor->setGeometry(5, 5, 200, 20);
+    codeBox->setTabOrder(snippetBox, codeBox);
     */
 
+    snippetBox->installEventFilter(this);
+    //codeBox->installEventFilter(this);
+    
+    codeEditor = new CodeEditor(this);
+    codeEditor->setGeometry(5, 35, 200, 20);
+    
+
+  }
+
+  bool SnippedPanel_Item::eventFilter(QObject *watched, QEvent *event)
+  {
+    QWidget *firstChildren;
+
+    switch (event->type())
+    {
+    case QEvent::KeyPress:
+
+      QKeyEvent *eventKey = static_cast<QKeyEvent*>(event);  // static_cast<QKeyEvent>(event);
+      quint32 modifers = eventKey->nativeModifiers();
+
+      switch (eventKey->key())
+      {
+
+      case Qt::Key::Key_Up:
+        //this->findChild<ControlBox*>("snippedBox")->hasFocus();
+        //if (this->findChild<ControlBox*>("snippedBox")->hasFocus())
+        if (snippetBox->hasFocus())
+        {
+          /*
+          ControlBox *target  = this->findChild<ControlBox*>("codeBox");
+          target->setFocus();
+          target->update();
+          */
+         // codeBox->setFocus(Qt::FocusReason::MouseFocusReason);
+          qDebug() << "SnippedBox ma focus" << this->findChild<ControlBox*>("codeBox")->hasFocus();
+        }
+        /*
+        if (static_cast<ControlBox*>(this->children().at(0))->hasFocus())
+        {
+        static_cast<ControlBox*>(this->children().at(this->children().size()-1))->setFocus();
+        qDebug() << "Key_Up SnippedPanel_Item::eventFilter focus set to childAt" << codeBox->origin();
+
+        }
+        if (static_cast<ControlBox*>(this->children().at(0))->hasFocus())
+        {
+        this->childAt(codeBox->origin())->setFocus();
+        qDebug() << "Key_Up SnippedPanel_Item::eventFilter focus set to childAt" << codeBox->origin();
+        }
+        else {
+        this->childAt(snippetBox->origin())->setFocus();
+        qDebug() << "Key_Up SnippedPanel_Item::eventFilter focus set to childAt" << snippetBox->origin();
+        }
+        */
+
+
+        break;
+
+      case Qt::Key::Key_Down:
+
+        if (codeEditor->hasFocus())
+        {
+          snippetBox->setFocus(Qt::FocusReason::MouseFocusReason);
+          qDebug() << "SnippedBox ma focus" << this->findChild<ControlBox*>("codeBox")->hasFocus();
+        }
+
+        /*
+
+        if (static_cast<ControlBox*>(this->children().at(this->children().size() - 1))->hasFocus())
+        {
+          this->childAt(snippetBox->origin())->setFocus();
+          qDebug() << "Key_Down SnippedPanel_Item::eventFilter focus set to childAt" << codeBox->origin();
+        }
+        */
+        break;
+        /*
+        if (static_cast<ControlBox*>(this->children().at(0))->hasFocus())
+        {
+        this->childAt(codeBox->origin())->setFocus();
+        qDebug() << "Key_Down SnippedPanel_Item::eventFilter focus set to childAt" << codeBox->origin();
+        }
+        else {
+        this->childAt(snippetBox->origin())->setFocus();
+        qDebug() << "Key_Down SnippedPanel_Item::eventFilter focus set to childAt" << snippetBox->origin();
+        }
+        break;
+        */
+      }
+
+      qDebug() << "SnippedPanel_Item::eventFilter UPDATE";
+      this->update();
+    }
+
+    return QWidget::eventFilter(watched, event);
   }
 
   void SnippedPanel_Item::paintEvent(QPaintEvent *event)

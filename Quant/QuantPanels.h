@@ -70,8 +70,14 @@ namespace QuantIDE
     ~SnippedPanel_Item();
 
   protected:
+    bool eventFilter(QObject *watched, QEvent * event);
     void paintEvent(QPaintEvent *event);
+
+  private:
+    ControlBox *snippetBox, *codeBox;
+    CodeEditor *codeEditor;
   };
+
 
   class SnippetPanel : public Panel
   {
@@ -83,7 +89,7 @@ namespace QuantIDE
 
   protected:
     void resizeEvent(QResizeEvent *event);
-
+    
   private:
     ListWidget *listWidget;
     Button *buttonSave;

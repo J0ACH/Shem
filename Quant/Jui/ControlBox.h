@@ -27,7 +27,7 @@ namespace Jui
     ~ControlBox();
 
     QRect bounds();
-
+    QPoint origin();
     void setLabel(QString);
 
     QString getValue_string();
@@ -48,6 +48,8 @@ namespace Jui
     QFont getFont();
 
     void setLabelSize(int);
+
+    bool hasFocus();
 
     public slots:
     void setValue(QString text);  

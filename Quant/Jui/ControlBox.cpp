@@ -33,6 +33,15 @@ namespace Jui
   }
 
   QRect ControlBox::bounds() { return QRect(0, 0, width() - 1, height() - 1); }
+  QPoint ControlBox::origin() {
+    //qDebug() << "ControlBox::origin()" << this->geometry().topLeft();
+    return this->geometry().topLeft();
+  }
+
+  bool ControlBox::hasFocus() {
+    //qDebug() << "ControlBox::hasFocus()" << value->hasFocus();
+    return value->hasFocus();
+  }
 
   void ControlBox::setLabel(QString txt) { label->setText(txt); }
   void ControlBox::setValue(QString val)
@@ -100,8 +109,8 @@ namespace Jui
         return true;
         break;
       case Qt::Key::Key_Up:
-        qDebug() << "ControlBox::eventFilter UP on " << target->objectName();
-        qDebug() << "ControlBox::eventFilter children " << target->children();
+        //  qDebug() << "ControlBox::eventFilter UP on " << target->objectName();
+        //  qDebug() << "ControlBox::eventFilter children " << target->children();
         //QWidget parentWidget = static_cast<QWidget> (target);
         //this->previousInFocusChain()->setFocus();
         /*
@@ -110,15 +119,15 @@ namespace Jui
         */
         break;
       case Qt::Key::Key_Down:
-        qDebug() << "ControlBox::eventFilter DOWN on " << target->objectName();
-        qDebug() << "ControlBox::eventFilter children " << target->children();
+        //   qDebug() << "ControlBox::eventFilter DOWN on " << target->objectName();
+        //   qDebug() << "ControlBox::eventFilter children " << target->children();
         //this->nextInFocusChain()->setFocus();
         /*
         if (watched->children().size() > 0)
         {
-          firstChildren = static_cast<QWidget*>(watched->children().at(0));
-          firstChildren->setFocus();
-          //          firstChildren->update();
+        firstChildren = static_cast<QWidget*>(watched->children().at(0));
+        firstChildren->setFocus();
+        //          firstChildren->update();
         }
         */
         break;
