@@ -131,6 +131,18 @@ namespace QuantIDE
 
   SnippetPanel::SnippetPanel(QWidget *parent) : Panel(parent)
   {
+    snippetFile = new File();
+    snippetFile->setFileName("pokus1.txt");
+    snippetFile->setFileText("ahoj1 ahoj2");
+    snippetFile->onWrite();
+    snippetFile->setFileName("pokus2.scd");
+    snippetFile->setFileText("ahoj3 ahoj4 FIN");
+    snippetFile->onWrite();
+    snippetFile->setFileName("pokus1.txt");
+    snippetFile->onRead();
+    snippetFile->setFileName("pokus2.txt");
+    snippetFile->onRead();
+
     listWidget = new ListWidget(this);
 
     buttonSave = new Button(this);

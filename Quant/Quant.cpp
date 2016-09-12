@@ -88,6 +88,7 @@ namespace QuantIDE
 
     customizePanelNEW = new CustomizePanelNEW();
     customizePanelNEW->setMinimumHeight(200);
+    customizePanelNEW->setVisible(false);
     canvanNEW->addPanel(customizePanelNEW, "CustomizePanelNEW", Qt::DockWidgetArea::RightDockWidgetArea);
 
     snippedPanelNEW = new SnippetPanel();

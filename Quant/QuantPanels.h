@@ -5,13 +5,16 @@
 #include "Text.h"
 #include "ListWidget.h"
 #include "QuantObjects.h"
+#include "File.h"
 
 #include <QWidget>
 #include <QPainter>
 #include <QDebug>
 #include <QScrollArea>
 
+using namespace SupercolliderBridge;
 using namespace Jui;
+
 
 namespace QuantIDE
 {
@@ -76,7 +79,7 @@ namespace QuantIDE
     void resizeEvent(QResizeEvent *event);
 
   private:
-    ControlBox *valueBox;
+        ControlBox *valueBox;
   };
 
   class CustomizePanelNEW : public Panel
@@ -117,7 +120,7 @@ namespace QuantIDE
     void resizeEvent(QResizeEvent *event);
 
   private:
-    ControlBox *snippetBox;
+       ControlBox *snippetBox;
     CodeEditor *codeEditor;
 
     private slots:
@@ -140,6 +143,7 @@ namespace QuantIDE
     void resizeEvent(QResizeEvent *event);
 
   private:
+    File *snippetFile;
     ListWidget *listWidget;
     Button *buttonSave;
   };
