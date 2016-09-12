@@ -74,6 +74,8 @@ namespace QuantIDE
     listWidget->onAppendWidget(item2);
 
     listWidget->onAppendWidget();
+    listWidget->onAppendWidget();
+    listWidget->onAppendWidget();
   }
 
   void SnippetPanel::resizeEvent(QResizeEvent *event)

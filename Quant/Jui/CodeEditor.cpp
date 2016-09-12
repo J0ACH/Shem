@@ -260,7 +260,7 @@ namespace Jui
         if (target->objectName() == "code")
         {
           // qDebug() << "ControlBox::eventFilter UP on CODE" << target->objectName();
-          return true;
+          return false;
         }
         else
         {
@@ -274,7 +274,7 @@ namespace Jui
         if (target->objectName() == "code")
         {
           //  qDebug() << "ControlBox::eventFilter DOWN on CODE" << target->objectName();
-          return true;
+          return false;
         }
         else
         {
