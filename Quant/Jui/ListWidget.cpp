@@ -50,7 +50,7 @@ namespace Jui
     for (int i = 0; i < library.size(); i++)
     {
       library[i]->setObjectName(QString("item_%1").arg(QString::number(i)));
-
+      library[i]->setGeometry(library[i]->geometry().left(), this->positionY(i), library[i]->width(), library[i]->height());
       if (i < library.size() - 1)
       {
         library[i]->setTabOrder(library.at(i), library.at(i + 1));
@@ -71,12 +71,12 @@ namespace Jui
       {
         oneW->resize(QSize(this->width() - 2 * borderOffset, oneW->height()));
       }
-
+      this->sortLibrary();
       break;
 
     case QEvent::KeyPress:
 
-      QKeyEvent *eventKey = static_cast<QKeyEvent*>(event);  // static_cast<QKeyEvent>(event);
+      QKeyEvent *eventKey = static_cast<QKeyEvent*>(event);
       quint32 modifers = eventKey->nativeModifiers();
 
       switch (eventKey->key())
@@ -96,7 +96,6 @@ namespace Jui
         {
           firstChildren = static_cast<QWidget*>(watched->children().at(0));
           firstChildren->setFocus();
-          //          firstChildren->update();
         }
         break;
       case Qt::Key::Key_Escape:
@@ -136,14 +135,14 @@ namespace Jui
     {
       if (oneW->hasFocus()) { painter.setPen(QPen(QColor(220, 30, 30), 3)); }
       else { painter.setPen(QPen(QColor(120, 30, 30), 1)); }
-      
+
       painter.drawRect(
         oneW->geometry().left() + borderOffset,
-        oneW->geometry().top() + scrollWidget->y() + borderOffset, 
+        oneW->geometry().top() + scrollWidget->y() + borderOffset,
         oneW->width(),
         oneW->height()
         );
-      
+
       painter.setPen(QColor(120, 30, 30));
 
       painter.drawText(

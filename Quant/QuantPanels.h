@@ -69,13 +69,21 @@ namespace QuantIDE
     SnippedPanel_Item(QWidget *parent = 0);
     ~SnippedPanel_Item();
 
+
   protected:
     bool eventFilter(QObject *watched, QEvent * event);
     void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
   private:
     ControlBox *snippetBox, *codeBox;
     CodeEditor *codeEditor;
+
+    private slots:
+    void onPreviousFocused(QWidget*);
+    void onNextFocused(QWidget*);
+    void onParentFocused(QWidget*);
+    void onCodeHeightChanged();
   };
 
 

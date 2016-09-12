@@ -30,10 +30,13 @@ namespace Jui
     QPoint origin();
     void setLabel(QString);
 
+    void enterFocus();
+    void exitFocus();
+
     QString getValue_string();
     int getValue_int();
     double getValue_double();
-    bool getValue_bool(); 
+    bool getValue_bool();
 
     void setColorNormal(QColor);
     void setColorOver(QColor);
@@ -49,27 +52,28 @@ namespace Jui
 
     void setLabelSize(int);
 
-    bool hasFocus();
-
     public slots:
-    void setValue(QString text);  
+    void setValue(QString text);
 
   signals:
     void actValueChanged(QString);
     void actValueEvaluate(QString);
+    void actPreviousFocused(QWidget*);
+    void actNextFocused(QWidget*);
+    void actParentFocused(QWidget*);
 
   protected:
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
     virtual bool eventFilter(QObject * watched, QEvent * event);
     void focusInEvent(QFocusEvent * event);
-    
+
   private:
     Text *label;
     QLineEdit *value;
     QString oldValue;
 
-        int labelSizeX;
+    int labelSizeX;
     QColor colorNormal, colorOver, colorActive, colorText;
     QFont font;
 

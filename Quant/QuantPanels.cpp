@@ -74,9 +74,6 @@ namespace QuantIDE
     listWidget->onAppendWidget(item2);
 
     listWidget->onAppendWidget();
-    //listWidget->onAppendWidget();
-    //listWidget->onAppendWidget();
-    //listWidget->onAppendWidget();
   }
 
   void SnippetPanel::resizeEvent(QResizeEvent *event)
@@ -94,32 +91,41 @@ namespace QuantIDE
     snippetBox = new ControlBox(this);
     snippetBox->setObjectName("snippedBox");
     snippetBox->setLabel("snippet");
-    snippetBox->setLabelSize(50);
-    snippetBox->setGeometry(5, 5, 200, 20);
+    snippetBox->setLabelSize(50);    
 
-    /*
-    codeBox = new ControlBox(this);
-    codeBox->setObjectName("codeBox");
-    codeBox->setLabel("code");
-    codeBox->setLabelSize(50);
-    codeBox->setGeometry(5, 35, 200, 20);
+    connect(snippetBox, SIGNAL(actPreviousFocused(QWidget*)), this, SLOT(onPreviousFocused(QWidget*)));
+    connect(snippetBox, SIGNAL(actNextFocused(QWidget*)), this, SLOT(onNextFocused(QWidget*)));
+    connect(snippetBox, SIGNAL(actParentFocused(QWidget*)), this, SLOT(onParentFocused(QWidget*)));
 
-    codeBox->setTabOrder(snippetBox, codeBox);
-    */
+    codeEditor = new CodeEditor(this); 
 
-    snippetBox->installEventFilter(this);
-    //codeBox->installEventFilter(this);
-    
-    codeEditor = new CodeEditor(this);
-    codeEditor->setGeometry(5, 35, 200, 20);
-    
+    connect(codeEditor, SIGNAL(actPreviousFocused(QWidget*)), this, SLOT(onPreviousFocused(QWidget*)));
+    connect(codeEditor, SIGNAL(actNextFocused(QWidget*)), this, SLOT(onNextFocused(QWidget*)));
+    connect(codeEditor, SIGNAL(actParentFocused(QWidget*)), this, SLOT(onParentFocused(QWidget*)));
+    connect(codeEditor, SIGNAL(actHeightChanged()), this, SLOT(onCodeHeightChanged()));
+  }
 
+  void SnippedPanel_Item::onPreviousFocused(QWidget *target)
+  {
+    //qDebug() << "SnippedPanel_Item::onPreviousFocused target" << target->objectName();
+    if (target->objectName() == "snippedBox") { codeEditor->setFocus(); }
+    else { snippetBox->setFocus(); }
+  }
+  void SnippedPanel_Item::onNextFocused(QWidget *target)
+  {
+    //qDebug() << "SnippedPanel_Item::onNextFocused target" << target->objectName();
+    if (target->objectName() == "snippedBox") { codeEditor->setFocus(); }
+    else { snippetBox->setFocus(); }
+  }
+  void SnippedPanel_Item::onParentFocused(QWidget *target)  { this->setFocus(); }
+
+  void SnippedPanel_Item::onCodeHeightChanged()
+  {
+    this->setFixedHeight(snippetBox->height() + codeEditor->height() + 15);
   }
 
   bool SnippedPanel_Item::eventFilter(QObject *watched, QEvent *event)
   {
-    QWidget *firstChildren;
-
     switch (event->type())
     {
     case QEvent::KeyPress:
@@ -131,75 +137,61 @@ namespace QuantIDE
       {
 
       case Qt::Key::Key_Up:
+        qDebug() << "SnippedPanel_Item::eventFilter Key_Up";
         //this->findChild<ControlBox*>("snippedBox")->hasFocus();
         //if (this->findChild<ControlBox*>("snippedBox")->hasFocus())
+
         if (snippetBox->hasFocus())
         {
-          /*
-          ControlBox *target  = this->findChild<ControlBox*>("codeBox");
-          target->setFocus();
-          target->update();
-          */
-         // codeBox->setFocus(Qt::FocusReason::MouseFocusReason);
-          qDebug() << "SnippedBox ma focus" << this->findChild<ControlBox*>("codeBox")->hasFocus();
+          codeEditor->setFocus();
         }
-        /*
-        if (static_cast<ControlBox*>(this->children().at(0))->hasFocus())
+        else
         {
-        static_cast<ControlBox*>(this->children().at(this->children().size()-1))->setFocus();
-        qDebug() << "Key_Up SnippedPanel_Item::eventFilter focus set to childAt" << codeBox->origin();
-
+          snippetBox->setFocus();
         }
-        if (static_cast<ControlBox*>(this->children().at(0))->hasFocus())
-        {
-        this->childAt(codeBox->origin())->setFocus();
-        qDebug() << "Key_Up SnippedPanel_Item::eventFilter focus set to childAt" << codeBox->origin();
-        }
-        else {
-        this->childAt(snippetBox->origin())->setFocus();
-        qDebug() << "Key_Up SnippedPanel_Item::eventFilter focus set to childAt" << snippetBox->origin();
-        }
-        */
-
-
         break;
 
       case Qt::Key::Key_Down:
+        qDebug() << "SnippedPanel_Item::eventFilter Key_Down";
 
         if (codeEditor->hasFocus())
         {
-          snippetBox->setFocus(Qt::FocusReason::MouseFocusReason);
-          qDebug() << "SnippedBox ma focus" << this->findChild<ControlBox*>("codeBox")->hasFocus();
+          snippetBox->setFocus();
+          // qDebug() << "SnippedBox ma focus" << this->findChild<ControlBox*>("codeBox")->hasFocus();
         }
-
-        /*
-
-        if (static_cast<ControlBox*>(this->children().at(this->children().size() - 1))->hasFocus())
+        else
         {
-          this->childAt(snippetBox->origin())->setFocus();
-          qDebug() << "Key_Down SnippedPanel_Item::eventFilter focus set to childAt" << codeBox->origin();
-        }
-        */
-        break;
-        /*
-        if (static_cast<ControlBox*>(this->children().at(0))->hasFocus())
-        {
-        this->childAt(codeBox->origin())->setFocus();
-        qDebug() << "Key_Down SnippedPanel_Item::eventFilter focus set to childAt" << codeBox->origin();
-        }
-        else {
-        this->childAt(snippetBox->origin())->setFocus();
-        qDebug() << "Key_Down SnippedPanel_Item::eventFilter focus set to childAt" << snippetBox->origin();
+          codeEditor->setFocus();
+          //  codeEditor->update();
         }
         break;
-        */
+
+      case Qt::Key::Key_Return:
+        qDebug() << "SnippedPanel_Item::eventFilter Key_ENTER";
+        snippetBox->enterFocus();
+        snippetBox->update();
+        return true;
+
+      case Qt::Key::Key_Escape:
+        qDebug() << "SnippedPanel_Item::eventFilter Key_Escape";
+        this->setFocus();
+        //        this->update();
+        return true;
+        break;
       }
 
-      qDebug() << "SnippedPanel_Item::eventFilter UPDATE";
+      //qDebug() << "SnippedPanel_Item::eventFilter UPDATE";
       this->update();
     }
 
     return QWidget::eventFilter(watched, event);
+  }
+
+  void SnippedPanel_Item::resizeEvent(QResizeEvent *event)
+  {
+    snippetBox->setGeometry(5, 5, this->width() - 10, 20);
+    codeEditor->setGeometry(5, 30, this->width() - 10, 20);
+    this->onCodeHeightChanged();
   }
 
   void SnippedPanel_Item::paintEvent(QPaintEvent *event)

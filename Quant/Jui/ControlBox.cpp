@@ -5,14 +5,18 @@ namespace Jui
 
   ControlBox::ControlBox(QWidget *parent) : QWidget(parent)
   {
+    this->setObjectName("ControlBox");
+
     label = new Text(this);
     label->setText("label");
 
     value = new QLineEdit(this);
+    value->setObjectName("value");
     value->setText("NaN");
     oldValue = "NaN";
 
     labelSizeX = 30;
+    //this->setFocusPolicy(Qt::StrongFocus);
     //isFocused = false;
 
     backgroundAlpha = 0;
@@ -20,6 +24,7 @@ namespace Jui
     fps = 25;
     timer = new QTimer(this);
 
+    this->installEventFilter(this);
     label->installEventFilter(this);
     value->installEventFilter(this);
 
@@ -37,12 +42,7 @@ namespace Jui
     //qDebug() << "ControlBox::origin()" << this->geometry().topLeft();
     return this->geometry().topLeft();
   }
-
-  bool ControlBox::hasFocus() {
-    //qDebug() << "ControlBox::hasFocus()" << value->hasFocus();
-    return value->hasFocus();
-  }
-
+  
   void ControlBox::setLabel(QString txt) { label->setText(txt); }
   void ControlBox::setValue(QString val)
   {
@@ -91,45 +91,60 @@ namespace Jui
       {
       case Qt::Key::Key_Enter:
       case Qt::Key::Key_Return:
-        //qDebug() << "ControlBox ENTER";
-        backgroundAlpha = 255;
-        timer->stop();
-        timer->setInterval(fadeTimeOut / fps);
-        timer->start();
+        qDebug() << "ControlBox ENTER";
+        if (target->objectName() == "value")
+        {
+          backgroundAlpha = 255;
+          timer->stop();
+          timer->setInterval(fadeTimeOut / fps);
+          timer->start();
 
-        oldValue = value->displayText();
-        emit actValueEvaluate(value->displayText());
+          oldValue = value->displayText();
+          emit actValueEvaluate(value->displayText());
+        }
         value->setFocus();
+        value->update();
         this->update();
         return true;
       case Qt::Key::Key_Escape:
         qDebug() << "ControlBox Esc";
-        this->parentWidget()->setFocus();
-        //        this->update();
+        if (target->objectName() == "value")
+        {
+          this->exitFocus();
+        }
+        else
+        {
+          emit actParentFocused(this);
+        }
         return true;
         break;
       case Qt::Key::Key_Up:
-        //  qDebug() << "ControlBox::eventFilter UP on " << target->objectName();
-        //  qDebug() << "ControlBox::eventFilter children " << target->children();
-        //QWidget parentWidget = static_cast<QWidget> (target);
-        //this->previousInFocusChain()->setFocus();
-        /*
-        if (!library.at(0)->hasFocus()) { this->focusPreviousChild(); }
-        else { library.at(library.size() - 1)->setFocus(); }
-        */
+        qDebug() << "ControlBox::eventFilter pressed Key_UP";
+        if (target->objectName() == "value")
+        {
+          qDebug() << "ControlBox::eventFilter UP on VALUE" << target->objectName();
+          return true;
+        }
+        else
+        {
+          // qDebug() << "ControlBox::eventFilter emit actPreviousFocused(" << this->objectName() << ")";
+          emit actPreviousFocused(this);
+          return true;
+        }
         break;
       case Qt::Key::Key_Down:
-        //   qDebug() << "ControlBox::eventFilter DOWN on " << target->objectName();
-        //   qDebug() << "ControlBox::eventFilter children " << target->children();
-        //this->nextInFocusChain()->setFocus();
-        /*
-        if (watched->children().size() > 0)
+        qDebug() << "ControlBox::eventFilter pressed Key_Down";
+        if (target->objectName() == "value")
         {
-        firstChildren = static_cast<QWidget*>(watched->children().at(0));
-        firstChildren->setFocus();
-        //          firstChildren->update();
+          qDebug() << "ControlBox::eventFilter DOWN on VALUE" << target->objectName();
+          return true;
         }
-        */
+        else
+        {
+          // qDebug() << "ControlBox::eventFilter emit actNextFocused(" << this->objectName() << ")";
+          emit actNextFocused(this);
+          return true;
+        }
         break;
       }
 
@@ -147,7 +162,7 @@ namespace Jui
     }
     if (event->type() == QEvent::FocusOut)
     {
-      //qDebug("ControlBox FocusOut");
+      qDebug("ControlBox FocusOut");
       value->setText(oldValue);
       emit actValueChanged(value->displayText());
       this->update();
@@ -157,9 +172,25 @@ namespace Jui
 
   void ControlBox::focusInEvent(QFocusEvent * event)
   {
-    //qDebug("ControlBox focusInEvent");
+    qDebug("ControlBox focusInEvent");
+    //value->setFocus();
+    //value->update();
+    //  this->setFocus();
+    //this->update();
+  }
+
+  void ControlBox::enterFocus()
+  {
+    qDebug("ControlBox enterFocus");
     value->setFocus();
     value->update();
+    this->update();
+  }
+  void ControlBox::exitFocus()
+  {
+    qDebug("ControlBox exitFocus");
+    this->setFocus();
+    this->update();
   }
 
   void ControlBox::paintEvent(QPaintEvent *event)
@@ -175,8 +206,13 @@ namespace Jui
     else { painter.setPen(colorNormal); }
     */
 
+
+    if (this->hasFocus()) { painter.setPen(QPen(QColor(220, 30, 30), 3)); }
+    else { painter.setPen(QPen(QColor(120, 30, 30), 1)); }
+    /*
     if (value->hasFocus()) { painter.setPen(QPen(QColor(220, 30, 30), 3)); }
     else { painter.setPen(QPen(QColor(120, 30, 30), 1)); }
+    */
 
     painter.drawLine(QLine(0, 0, labelSizeX - 1, 0));
     painter.drawLine(QLine(0, this->height() - 1, labelSizeX - 1, this->height() - 1));

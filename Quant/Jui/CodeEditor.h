@@ -11,7 +11,7 @@
 namespace Jui
 {
 
-  class CodeEditor : public QTextEdit
+  class CodeEditor : public QWidget
   {
     Q_OBJECT
 
@@ -24,6 +24,8 @@ namespace Jui
 
     int getLinePixelHeight();
     void codeSnippet();
+
+    void setText(QString);
 
     public slots:
     void onTextChanged();
@@ -41,12 +43,17 @@ namespace Jui
     void actValueEvaluate(QString objectName, QString code);
     void actCursorMoved(int);
     void actHeightChanged();
+    void actPreviousFocused(QWidget*);
+    void actNextFocused(QWidget*);
+    void actParentFocused(QWidget*);
 
   protected:
     virtual bool eventFilter(QObject * watched, QEvent * event);
     void paintEvent(QPaintEvent *paintEvent);
-
+    void resizeEvent(QResizeEvent *resizeEvent);
+    
   private:
+    QTextEdit *code;
     enum HighLights { CLASS, CONTROL, NODE, DIGIT };
 
     int linePixelHeight;
