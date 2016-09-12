@@ -86,38 +86,12 @@ namespace QuantIDE
     customizePanel = new CustomizePanel();
     customizePanel->setVisible(false);
 
+    customizePanelNEW = new CustomizePanelNEW();
+    customizePanelNEW->setMinimumHeight(200);
+    canvanNEW->addPanel(customizePanelNEW, "CustomizePanelNEW", Qt::DockWidgetArea::RightDockWidgetArea);
+
     snippedPanelNEW = new SnippetPanel();
-    snippedPanelNEW->setMinimumHeight(300);
-    /*
-    snippedPanel = new Panel(canvanNEW);
-    snippedPanel->setMinimumHeight(350);
-    ListWidget *test = new ListWidget(snippedPanel);
-    test->setFixedHeight(300);
-    QWidget *item = test->onAppendWidget();
-    CodeEditor *testEditor = new CodeEditor(item);
-    testEditor->setGeometry(5, 5, 200, 20);
-    
-    QWidget *item2 = new QWidget();
-    ControlBox *snippetBox = new ControlBox(item2);
-    snippetBox->setLabel("snippet");
-    snippetBox->setLabelSize(50);
-
-    ControlBox *codeBox = new ControlBox(item2);
-    codeBox->setLabel("code");
-    codeBox->setLabelSize(50);
-    codeBox->setTabOrder(snippetBox, codeBox);
-
-    item2->setFixedHeight(85);
-    snippetBox->setGeometry(5, 5, 200, 20);
-    codeBox->setGeometry(5, 30, 200, 40);
-
-    test->setGeometry(10, 30, 150, 150);
-    test->onAppendWidget();
-    test->onAppendWidget(item2);
-    test->onAppendWidget();
-    test->show();
-    */
-
+    snippedPanelNEW->setMinimumHeight(300);   
     canvanNEW->addPanel(snippedPanelNEW, "SnippedPanel", Qt::DockWidgetArea::LeftDockWidgetArea);
 
     controlsBar = new CanvanNEW_ToolBar();
@@ -136,6 +110,9 @@ namespace QuantIDE
 
     panelsBar->addButton("Customize", QImage(":/customize_16px.png"), customizePanel, SLOT(onSwitchVisible()));
     connect(customizePanel, SIGNAL(actClosed()), panelsBar->getButton("Customize"), SLOT(onSwitch()));
+
+    panelsBar->addButton("CustomizeNEW", QImage(":/customize_16px.png"), customizePanelNEW, SLOT(onSwitchVisible()));
+    connect(customizePanelNEW, SIGNAL(actClosed()), panelsBar->getButton("CustomizeNEW"), SLOT(onSwitch()));
 
     panelsBar->addButton("NetworkPanel", QImage(":/network_16px.png"), canvanNEW->getPanel("NetworkPanel"), SLOT(onSwitchVisible()));
     panelsBar->getButton("NetworkPanel")->setState(Button::State::ON);

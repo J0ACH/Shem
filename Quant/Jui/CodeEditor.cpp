@@ -3,7 +3,7 @@
 namespace Jui
 {
 
-    CodeEditor::CodeEditor(QWidget *parent) : QWidget(parent)
+  CodeEditor::CodeEditor(QWidget *parent) : QWidget(parent)
   {
     code = new QTextEdit(this);
     code->setObjectName("code");
@@ -339,13 +339,11 @@ namespace Jui
 
     //qDebug() << "CodeEditor::resizeByLines count of lines" << count;
     emit actHeightChanged();
-
   }
 
   void CodeEditor::paintEvent(QPaintEvent *event)
   {
     QPainter painter(this);
-    //QPainter painter(viewport());
     QRect bounds = QRect(0, 0, this->width() - 1, this->height() - 1);
     QColor fillColor = activeColor;
     fillColor.setAlpha(backgroundAlpha);
@@ -378,13 +376,12 @@ namespace Jui
 
     // painter.drawText(100, 20, this->objectName());
 
-    //QTextEdit::paintEvent(event);
     QWidget::paintEvent(event);
   }
 
   void CodeEditor::resizeEvent(QResizeEvent *resizeEvent)
   {
-    code->setGeometry(0, 0, this->width(), this->height());
+    code->setGeometry(1, 1, this->width() - 2, this->height() - 2);
   }
 
   void CodeEditor::alphaUpdate()

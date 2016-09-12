@@ -55,6 +55,78 @@ namespace QuantIDE
 
   NodePanelNEW::~NodePanelNEW() { }
 
+  // CustomizePanel ///////////////////////////////////////////////////////////////////////////////
+
+  CustomizePanelNEW::CustomizePanelNEW(QWidget *parent) : Panel(parent)
+  {
+    listWidget = new ListWidget(this);
+
+    buttonSave = new Button(this);
+    buttonSave->setText("Save");
+    //connect(buttonSave, SIGNAL(pressAct()), this, SLOT(onSavePressed()));
+
+    CustomizePanelNEW_ItemString *itemString1 = new CustomizePanelNEW_ItemString();
+    itemString1->setLabel("userName");
+    itemString1->setText("unkwown");
+    listWidget->onAppendWidget(itemString1);
+
+    listWidget->onAppendWidget();
+    listWidget->onAppendWidget();
+    listWidget->onAppendWidget();
+  }
+
+  void CustomizePanelNEW::resizeEvent(QResizeEvent *event)
+  {
+    listWidget->setGeometry(10, 30, this->width() - 20, this->height() - 70);
+    buttonSave->setGeometry(this->width() - 90, this->height() - 30, 80, 20);
+
+    Panel::resizeEvent(event);
+  }
+
+  void CustomizePanelNEW::onPreviousFocused(QWidget *target)
+  {
+    qDebug() << "SnippedPanel_Item::onPreviousFocused target" << target->objectName();
+    /*
+    if (target->objectName() == "snippedBox") { codeEditor->setFocus(); }
+    else { snippetBox->setFocus(); }
+    */
+  }
+  void CustomizePanelNEW::onNextFocused(QWidget *target)
+  {
+    qDebug() << "SnippedPanel_Item::onNextFocused target" << target->objectName();
+    /*
+    if (target->objectName() == "snippedBox") { codeEditor->setFocus(); }
+    else { snippetBox->setFocus(); }
+    */
+  }
+  void CustomizePanelNEW::onParentFocused(QWidget *target)  { this->setFocus(); }
+
+  CustomizePanelNEW::~CustomizePanelNEW() {}
+
+  CustomizePanelNEW_ItemString::CustomizePanelNEW_ItemString(QWidget *parent) : QWidget(parent)
+  {
+    this->setFixedHeight(30);
+
+    valueBox = new ControlBox(this);
+    valueBox->setLabel("ahoj");
+    valueBox->setValue("Nannnn");
+    valueBox->setLabelSize(50);
+
+    connect(valueBox, SIGNAL(actPreviousFocused(QWidget*)), this, SLOT(onPreviousFocused(QWidget*)));
+    connect(valueBox, SIGNAL(actNextFocused(QWidget*)), this, SLOT(onNextFocused(QWidget*)));
+    connect(valueBox, SIGNAL(actParentFocused(QWidget*)), this, SLOT(onParentFocused(QWidget*)));
+  }
+
+  void CustomizePanelNEW_ItemString::setLabel(QString txt) { valueBox->setLabel(txt); }
+  void CustomizePanelNEW_ItemString::setText(QString txt)  { valueBox->setValue(txt); }
+
+  void CustomizePanelNEW_ItemString::resizeEvent(QResizeEvent *event)
+  {
+    valueBox->setGeometry(5, 5, this->width() - 10, 20);
+  }
+
+  CustomizePanelNEW_ItemString::~CustomizePanelNEW_ItemString() {}
+
   // SnippetPanel /////////////////////////////////////////////////////////////////////////////////
 
   SnippetPanel::SnippetPanel(QWidget *parent) : Panel(parent)
@@ -93,13 +165,13 @@ namespace QuantIDE
     snippetBox = new ControlBox(this);
     snippetBox->setObjectName("snippedBox");
     snippetBox->setLabel("snippet");
-    snippetBox->setLabelSize(50);    
+    snippetBox->setLabelSize(50);
 
     connect(snippetBox, SIGNAL(actPreviousFocused(QWidget*)), this, SLOT(onPreviousFocused(QWidget*)));
     connect(snippetBox, SIGNAL(actNextFocused(QWidget*)), this, SLOT(onNextFocused(QWidget*)));
     connect(snippetBox, SIGNAL(actParentFocused(QWidget*)), this, SLOT(onParentFocused(QWidget*)));
 
-    codeEditor = new CodeEditor(this); 
+    codeEditor = new CodeEditor(this);
 
     connect(codeEditor, SIGNAL(actPreviousFocused(QWidget*)), this, SLOT(onPreviousFocused(QWidget*)));
     connect(codeEditor, SIGNAL(actNextFocused(QWidget*)), this, SLOT(onNextFocused(QWidget*)));
@@ -205,7 +277,7 @@ namespace QuantIDE
     //else { painter.setPen(QPen(QColor(30, 120, 30), 1)); }
 
     //painter.drawRect(rect);
-    painter.fillRect(rect, QColor(20, 130, 20, 70));
+    // painter.fillRect(rect, QColor(20, 130, 20, 70));
 
     QWidget::paintEvent(event);
   }

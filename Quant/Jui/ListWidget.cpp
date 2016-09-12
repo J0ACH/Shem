@@ -7,7 +7,7 @@ namespace Jui
 
   ListWidget::ListWidget(QWidget *parent) : QWidget(parent)
   {
-    //parent->installEventFilter(this);
+   // parent->installEventFilter(this);
 
     this->setObjectName("ListWidget");
 
@@ -65,8 +65,8 @@ namespace Jui
     switch (event->type())
     {
     case QEvent::Resize:
-      qDebug() << "ListWidget::eventFilter parent resized";
-      this->setFixedWidth(this->parentWidget()->width() - 20);
+      //qDebug() << "ListWidget::eventFilter parent resized";
+      //this->setFixedWidth(this->parentWidget()->width() - 20);
       foreach(QWidget *oneW, library)
       {
         oneW->resize(QSize(this->width() - 2 * borderOffset, oneW->height()));
