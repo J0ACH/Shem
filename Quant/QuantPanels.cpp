@@ -140,8 +140,8 @@ namespace QuantIDE
     snippetFile->onWrite();
     snippetFile->setFileName("pokus1.txt");
     snippetFile->onRead();
-    snippetFile->setFileName("pokus2.txt");
-    snippetFile->onRead();
+    snippetFile->setFileName("pokus2.scd");
+    qDebug() << "onRead TEST:" << snippetFile->onRead();
 
     listWidget = new ListWidget(this);
 

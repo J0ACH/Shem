@@ -40,29 +40,51 @@ namespace SupercolliderBridge
 
   void File::onWrite()
   {
-    file->open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(file);
+    QTimer time;
+    time.setSingleShot(true);
+    time.start(500);
 
-    out << fileText;
+    {
+      QEventLoop loop;
+      loop.connect(&time, SIGNAL(timeout()), SLOT(quit()));
+      loop.connect(this, SIGNAL(actAnswered()), SLOT(quit()));
 
-    file->close();
+      file->open(QIODevice::WriteOnly | QIODevice::Text);
+      QTextStream out(file);
+
+      out << fileText;
+
+      file->close();
+
+      loop.exec();
+    }
   }
 
-  void File::onRead()
+  QString File::onRead()
   {
-    file->open(QIODevice::ReadOnly | QIODevice::Text);
-    QTextStream in(file);
-    fileText = "";
-    while (!in.atEnd())
-    {
-      QString line = in.readLine();
-      fileText += line;
-    }
+    QTimer time;
+    time.setSingleShot(true);
+    time.start(500);
 
-    //if (!txt.isEmpty()) { dataCustomize = DataCustomize(txt.toUtf8()); }
-    qDebug() << "File::onRead() -- " << fileName << " -- " << fileText;
-    file->close();
-    emit actFileRead(fileText);
+    {
+      QEventLoop loop;
+      loop.connect(&time, SIGNAL(timeout()), SLOT(quit()));
+      //loop.connect(this, SIGNAL(actAnswered()), SLOT(quit()));
+
+      file->open(QIODevice::ReadOnly | QIODevice::Text);
+      QTextStream in(file);
+      fileText = "";
+      while (!in.atEnd())
+      {
+        QString line = in.readLine();
+        fileText += line;
+      }
+      //qDebug() << "File::onRead() -- " << fileName << " -- " << fileText;
+      file->close();
+      
+      loop.exec();
+    }
+    return fileText;
   }
 
   File::~File() { }

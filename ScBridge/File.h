@@ -8,6 +8,8 @@
 #include <QFile>
 #include <QDebug>
 #include <QStandardPaths> 
+#include <QTimer>
+#include <QEventLoop>
 
 namespace SupercolliderBridge
 {
@@ -22,15 +24,16 @@ namespace SupercolliderBridge
     void setFileName(QString);
     void setDirectory(QString);
     void setFileText(QString);
-
-    public slots:
+    
     void onWrite();
-    void onRead();
+    QString onRead();
+
+    //public slots:
     //void onModify(DataCustomize);
     //void onSave(DataCustomize);
 
   signals:
-    void actFileRead(QString);
+    //void actFileRead(QString);
 
   private:
     QString fileName, dirName;
@@ -38,7 +41,6 @@ namespace SupercolliderBridge
     QDir directory;
 
     QString fileText;
-
   };
 }
 
