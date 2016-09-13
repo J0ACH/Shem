@@ -24,9 +24,10 @@ namespace SupercolliderBridge
     void setFileName(QString);
     void setDirectory(QString);
     void setFileText(QString);
-    
+    void setFileText(QByteArray);
+
     void onWrite();
-    QString onRead();
+    QByteArray onRead();
 
     //public slots:
     //void onModify(DataCustomize);

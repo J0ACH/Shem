@@ -16,9 +16,9 @@ namespace SupercolliderBridge
   {
     Q_GADGET
       Q_ENUMS(DataType)
-      
+
   public:
-    enum DataType { CUSTOMIZE, USER, PROXY, NODE };
+    enum DataType { CUSTOMIZE, SNIPPET, USER, PROXY, NODE };
 
     Data();
     Data(QByteArray);
@@ -87,7 +87,30 @@ namespace SupercolliderBridge
     QColor getValue_color(Key);
 
     QString toStyleSheet(Key);
-    
+
+  private:
+    QMetaEnum metaEnum;
+  };
+
+  //////////////////////////////////////////////////////////////////////////////////
+
+  class DataSnippet : public Data
+  {
+    Q_GADGET
+      Q_ENUMS(Key)
+
+  public:
+    enum Key{ KEY, CODE, SIZE };
+
+    DataSnippet();
+    DataSnippet(QByteArray);
+
+    void setValue(Key, QVariant);
+    void setValue(Key, int, QVariant);
+    QString getValue_string(Key, int);
+    int getValue_int(Key);
+    void deleteValue(Key, int);
+
   private:
     QMetaEnum metaEnum;
   };
@@ -104,7 +127,7 @@ namespace SupercolliderBridge
 
     DataUser();
     DataUser(QByteArray);
-    
+
     void setValue(Key, QVariant);
     QString getValue_string(Key);
     bool getValue_bool(Key);
@@ -136,10 +159,12 @@ namespace SupercolliderBridge
     bool getValue_bool(Key);
     int getValue_int(Key);
     float getValue_double(Key);
-    
+
   private:
     QMetaEnum metaEnum;
   };
+
+  //////////////////////////////////////////////////////////////////////////////////
 
   class DataNode : public Data
   {
@@ -151,7 +176,7 @@ namespace SupercolliderBridge
 
     DataNode();
     DataNode(QByteArray);
-  
+
     void setValue(Key, QVariant);
     void setValue(Key, int, QVariant);
     QString getValue_string(Key);
@@ -161,7 +186,7 @@ namespace SupercolliderBridge
     float getValue_double(Key);
 
     void deleteValue(Key, int);
-    
+
   private:
     QMetaEnum metaEnum;
   };

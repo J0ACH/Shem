@@ -37,6 +37,10 @@ namespace SupercolliderBridge
   {
     fileText = text;
   }
+  void File::setFileText(QByteArray data)
+  {
+    fileText = QString(data);
+  }
 
   void File::onWrite()
   {
@@ -47,7 +51,7 @@ namespace SupercolliderBridge
     {
       QEventLoop loop;
       loop.connect(&time, SIGNAL(timeout()), SLOT(quit()));
-      loop.connect(this, SIGNAL(actAnswered()), SLOT(quit()));
+     // loop.connect(this, SIGNAL(actAnswered()), SLOT(quit()));
 
       file->open(QIODevice::WriteOnly | QIODevice::Text);
       QTextStream out(file);
@@ -60,7 +64,8 @@ namespace SupercolliderBridge
     }
   }
 
-  QString File::onRead()
+  //QString File::onRead()
+  QByteArray File::onRead()
   {
     QTimer time;
     time.setSingleShot(true);
@@ -84,7 +89,8 @@ namespace SupercolliderBridge
       
       loop.exec();
     }
-    return fileText;
+    //return fileText;
+    return fileText.toUtf8();
   }
 
   File::~File() { }

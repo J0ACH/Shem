@@ -79,7 +79,7 @@ namespace QuantIDE
     void resizeEvent(QResizeEvent *event);
 
   private:
-        ControlBox *valueBox;
+    ControlBox *valueBox;
   };
 
   class CustomizePanelNEW : public Panel
@@ -114,13 +114,19 @@ namespace QuantIDE
     SnippedPanel_Item(QWidget *parent = 0);
     ~SnippedPanel_Item();
 
+    void setSnippet(QString);
+    QString getSnippet();
+
+    void setCode(QString);
+    QString getCode();
+
   protected:
     bool eventFilter(QObject *watched, QEvent * event);
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
 
   private:
-       ControlBox *snippetBox;
+    ControlBox *snippetBox;
     CodeEditor *codeEditor;
 
     private slots:
@@ -146,6 +152,14 @@ namespace QuantIDE
     File *snippetFile;
     ListWidget *listWidget;
     Button *buttonSave;
+
+    DataSnippet data;
+    void loadSnippetFile();
+    void saveSnippetFile();
+
+    private slots:
+    void onSavePressed();
+
   };
 }
 

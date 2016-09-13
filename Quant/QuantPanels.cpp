@@ -131,24 +131,18 @@ namespace QuantIDE
 
   SnippetPanel::SnippetPanel(QWidget *parent) : Panel(parent)
   {
-    snippetFile = new File();
-    snippetFile->setFileName("pokus1.txt");
-    snippetFile->setFileText("ahoj1 ahoj2");
-    snippetFile->onWrite();
-    snippetFile->setFileName("pokus2.scd");
-    snippetFile->setFileText("ahoj3 ahoj4 FIN");
-    snippetFile->onWrite();
-    snippetFile->setFileName("pokus1.txt");
-    snippetFile->onRead();
-    snippetFile->setFileName("pokus2.scd");
-    qDebug() << "onRead TEST:" << snippetFile->onRead();
-
     listWidget = new ListWidget(this);
+    
+    snippetFile = new File();
+    snippetFile->setFileName("ShemSnippet.scd");
+    
+    this->loadSnippetFile();
 
     buttonSave = new Button(this);
     buttonSave->setText("Save");
-    //connect(buttonSave, SIGNAL(pressAct()), this, SLOT(onSavePressed()));
+    connect(buttonSave, SIGNAL(pressAct()), this, SLOT(onSavePressed()));
 
+    /*
     SnippedPanel_Item *item1 = new SnippedPanel_Item();
     item1->setFixedHeight(70);
     listWidget->onAppendWidget(item1);
@@ -156,10 +150,49 @@ namespace QuantIDE
     SnippedPanel_Item *item2 = new SnippedPanel_Item();
     item2->setFixedHeight(70);
     listWidget->onAppendWidget(item2);
+    */
 
-    listWidget->onAppendWidget();
-    listWidget->onAppendWidget();
-    listWidget->onAppendWidget();
+    //listWidget->onAppendWidget();
+    //listWidget->onAppendWidget();
+    //listWidget->onAppendWidget();
+  }
+
+  void SnippetPanel::loadSnippetFile()
+  {
+    qDebug() << data.print("SnippetPanel::loadSnippetFile");
+    data = DataSnippet(snippetFile->onRead());
+    int size = data.getValue_int(DataSnippet::Key::SIZE);
+    qDebug() << "SnippetPanel::loadSnippetFile size:" << size;
+    for (int i = 0; i < size; i++)
+    {
+      SnippedPanel_Item *item = new SnippedPanel_Item();
+      item->setFixedHeight(70);
+      item->setSnippet(data.getValue_string(DataSnippet::Key::KEY, i));
+      item->setCode(data.getValue_string(DataSnippet::Key::CODE, i));
+      listWidget->onAppendWidget(item);
+    }
+  }
+
+  void SnippetPanel::saveSnippetFile()
+  {
+    data = DataSnippet();
+
+    for (int i = 0; i < listWidget->size(); i++)
+    {
+      SnippedPanel_Item *item = static_cast<SnippedPanel_Item*>(listWidget->getWidget(i));
+      data.setValue(DataSnippet::Key::KEY, i, item->getSnippet());
+      data.setValue(DataSnippet::Key::CODE, i, item->getCode());
+      data.setValue(DataSnippet::Key::SIZE, i + 1);
+    }
+
+    snippetFile->setFileText(data.wrap());
+    snippetFile->onWrite();
+  }
+
+  void SnippetPanel::onSavePressed()
+  {
+    this->saveSnippetFile();
+    qDebug() << "SnippetPanel::onSavePressed()";
   }
 
   void SnippetPanel::resizeEvent(QResizeEvent *event)
@@ -190,6 +223,12 @@ namespace QuantIDE
     connect(codeEditor, SIGNAL(actParentFocused(QWidget*)), this, SLOT(onParentFocused(QWidget*)));
     connect(codeEditor, SIGNAL(actHeightChanged()), this, SLOT(onCodeHeightChanged()));
   }
+
+  void SnippedPanel_Item::setSnippet(QString snippet) { snippetBox->setValue(snippet); }
+  QString SnippedPanel_Item::getSnippet() { return snippetBox->getValue_string(); }
+
+  void SnippedPanel_Item::setCode(QString code) { codeEditor->setText(code); }
+  QString SnippedPanel_Item::getCode() { return codeEditor->getText(); }
 
   void SnippedPanel_Item::onPreviousFocused(QWidget *target)
   {

@@ -26,6 +26,7 @@ namespace Jui
     void codeSnippet();
 
     void setText(QString);
+    QString getText();
 
     public slots:
     void onTextChanged();

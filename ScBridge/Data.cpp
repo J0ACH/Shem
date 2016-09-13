@@ -331,6 +331,45 @@ namespace SupercolliderBridge
 
   //////////////////////////////////////////////////////////////////////////////////
 
+  DataSnippet::DataSnippet() : Data()
+  {
+    const QMetaObject &mo = DataNode::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    this->setType(Data::DataType::SNIPPET);
+  }
+    DataSnippet::DataSnippet(QByteArray wrapedData) : Data(wrapedData)
+  {
+    const QMetaObject &mo = DataNode::staticMetaObject;
+    metaEnum = mo.enumerator(mo.indexOfEnumerator("Key"));
+
+    this->setType(Data::DataType::SNIPPET);
+
+    qDebug() << "DataSnippet NEW from QByteArray:" << this->print();
+  }
+
+  void DataSnippet::setValue(Key key, QVariant value)  { Data::setValue(metaEnum.valueToKey(key), value); }
+  void DataSnippet::setValue(Key key, int index, QVariant value)
+  {
+    QString strIndex = QString("index_%1").arg(QString::number(index));
+    Data::setValue(metaEnum.valueToKey(key), strIndex, value);
+  }
+
+  QString DataSnippet::getValue_string(Key key, int index)
+  {
+    QString strIndex = QString("index_%1").arg(QString::number(index));
+    return Data::getValue(metaEnum.valueToKey(key), strIndex).toString();
+  }
+
+  int DataSnippet::getValue_int(Key key) { return Data::getValue(metaEnum.valueToKey(key)).toInt(); }
+  void DataSnippet::deleteValue(Key key, int index)
+  {
+    QString strIndex = QString("index_%1").arg(QString::number(index));
+    Data::deleteValue(metaEnum.valueToKey(key), strIndex);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////
+
   DataUser::DataUser() : Data()
   {
     const QMetaObject &mo = DataUser::staticMetaObject;

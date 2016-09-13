@@ -51,6 +51,7 @@ namespace Jui
   }
 
   void CodeEditor::setText(QString txt)  { code->setText(txt); }
+  QString CodeEditor::getText() { return code->toPlainText(); }
 
   void CodeEditor::onTextChanged()
   {

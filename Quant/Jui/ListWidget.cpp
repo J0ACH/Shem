@@ -43,6 +43,7 @@ namespace Jui
   }
   void ListWidget::onAppendWidget(QWidget *item)  { this->insertWidget(item, library.size()); }
 
+  int ListWidget::size() { return library.size(); }
   QWidget* ListWidget::getWidget(int index)  { return library.at(index); }
 
   void ListWidget::sortLibrary()

@@ -20,6 +20,7 @@ namespace Jui
 
     void insertWidget(QWidget *item, int index);
 
+    int size();
     QWidget *getWidget(int i);
 
     public slots:
