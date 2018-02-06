@@ -271,8 +271,8 @@ namespace Jui
     float tolerance = 10;
     QPointF testPt = this->getPixel();
 
-    bool overX = abs(testPt.x() - mouse.x()) < tolerance;
-    bool overY = abs(testPt.y() - mouse.y()) < tolerance;
+    bool overX = std::abs(testPt.x() - mouse.x()) < tolerance;
+    bool overY = std::abs(testPt.y() - mouse.y()) < tolerance;
 
     if (overX && overY) { return true; }
     else { return false; }
@@ -1110,7 +1110,7 @@ namespace Jui
       {
         for (int i = 0; i < controlVertexs.size(); i++)
         {
-          if (abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
+          if (std::abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
           {
             // qDebug() << "Graph::add VERTEX ID" << i;
             // otazka jestli nenapsat lip, problem s vkladacim casem
@@ -1122,7 +1122,7 @@ namespace Jui
       {
         for (int i = 0; i < controlVertexs.size(); i++)
         {
-          if (abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
+          if (std::abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
           {
             //  qDebug() << "Graph::remove VERTEX ID" << i;
             this->onVertexDeleted(i);
@@ -1136,7 +1136,7 @@ namespace Jui
       if (i < controlVertexs.size())
       {
         //  qDebug() << "Graph::abs(controlVertexs[i]->valueY - levels[i]) > 0.01 -> " << abs(controlVertexs[i]->valueY - levels[i]);
-        if (abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
+        if (std::abs(controlVertexs[i]->valueY - levels[i]) > 0.01)
         {
           //  qDebug() << "Graph::onEnvChanged -> set level for ID " << i;
           controlVertexs[i]->setValueY(levels[i]);
@@ -1157,7 +1157,7 @@ namespace Jui
       if (i < controlVertexs.size() - 1)
       {
         //qDebug() << "Graph::abs(controlVertexs[i]->valueX - times[i]) > 0.01 -> " << abs(controlVertexs[i]->valueX - positionX[i - 1]);
-        if (abs(controlVertexs[i]->valueX - timePosition[i - 1]) > 0.01)
+        if (std::abs(controlVertexs[i]->valueX - timePosition[i - 1]) > 0.01)
         {
           // qDebug() << "Graph::onEnvChanged -> set time for ID " << i << "from:" << controlVertexs[i]->valueX << "to:" << timePosition[i - 1];
           controlVertexs[i]->setValueX(timePosition[i - 1]);
